@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appcompat="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/abr_search"
+        android:orderInCategory="300"
+        android:title="Search"
+        appcompat:actionViewClass="android.support.v7.widget.SearchView"
+        appcompat:showAsAction="always"></item>
+
+    <item
+        android:id="@+id/action_add_bill"
+        android:icon="@drawable/edittext_round_background"
+        android:orderInCategory="300"
+        android:title="use"
+        appcompat:showAsAction="always"></item>
+    <item
+        android:id="@+id/areaSpinner"
+        appcompat:actionViewClass="android.support.v7.widget.AppCompatSpinner"
+        android:orderInCategory="1"
+        appcompat:showAsAction="always"
+        android:title="areas">
+        </item>
+    <!--<item-->
+    <!--android:title="Hadaspar, Pune"-->
+    <!--android:id="@+id/areas"-->
+    <!--android:shape="rectangle"-->
+    <!--android:gravity="center"-->
+    <!--android:orderInCategory="200"-->
+    <!--appcompat:showAsAction="always"-->
+    <!-->-->
+    <!--<menu>-->
+    <!--<item-->
+    <!--android:id="@+id/item0"-->
+    <!--android:title="All Areas" />-->
+    <!--<item-->
+    <!--android:id="@+id/item1"-->
+    <!--android:title="Hadaspar,Pune" />-->
+    <!--<item-->
+    <!--android:id="@+id/item2"-->
+    <!--android:title="Worli,Mumbai" />-->
+    <!--<item-->
+    <!--android:id="@+id/item3"-->
+    <!--android:title="Baner,Pune" />-->
+    <!--<item-->
+    <!--android:id="@+id/item4"-->
+    <!--android:title="Phase5,Mohali" />-->
+    <!--<item-->
+    <!--android:id="@+id/item5"-->
+    <!--android:title="Sector 71,Mohali" />-->
+
+    <!--</menu>-->
+    <!--</item>-->
+</menu>
+

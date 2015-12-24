@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/coordinatorLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1">
+
+            <ScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:background="@color/white"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:orientation="vertical"
+                    android:paddingTop="5dp">
+
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="@color/gray"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_user" />
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="0dp">
+
+                            <EditText
+                                android:text="17 Nov 2015 "
+                                android:id="@+id/start_date"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Start Date"
+                                android:inputType="textNoSuggestions" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:id="@+id/balanceLayout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="@color/gray"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_user" />
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="0dp">
+
+                            <EditText
+                                android:text="30 Nov 2015 "
+                                android:id="@+id/end_date"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="End Date" />
+                        </android.support.design.widget.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="@color/gray"
+                            android:padding="5dp"
+                            android:src="@drawable/icon_filter" />
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="0dp">
+
+                            <EditText
+                                android:text="2 L"
+                                android:id="@+id/milk_quantity"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Milk Quantity" />
+                        </android.support.design.widget.TextInputLayout>
+                    </LinearLayout>
+
+                    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/card_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:padding="2dp"
+                        card_view:cardCornerRadius="4dp">
+
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/gray">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:background="@color/gray"
+                                    android:padding="5dp"
+                                    android:src="@drawable/ic_balance" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:padding="10dp"
+                                    android:text="Bill"
+                                    android:textColor="@color/white"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+
+                            <android.support.design.widget.TextInputLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="0dp">
+
+                                <EditText
+                                    android:id="@+id/rate"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Rate"
+                                    android:text="100 Rs"/>
+                            </android.support.design.widget.TextInputLayout>
+
+
+                            <android.support.design.widget.TextInputLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="0dp">
+
+                                <EditText
+                                    android:text="50 Rs"
+                                    android:id="@+id/balance_amount"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Balance Amount" />
+                            </android.support.design.widget.TextInputLayout>
+
+
+                            <android.support.design.widget.TextInputLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="0dp">
+
+                                <EditText
+                                    android:id="@+id/tax"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Tax"
+                                    android:text="20 %" />
+                            </android.support.design.widget.TextInputLayout>
+
+
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+
+
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/gray">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="Total"
+                            android:textColor="@color/white"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="Bill"
+                            android:textColor="@color/white"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </ScrollView>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/editFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="@dimen/fab_margin"
+                android:src="@drawable/edit_white"
+                android:visibility="visible"
+                app:backgroundTint="@color/colorPrimary"
+                app:borderWidth="0dp" />
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <LinearLayout
+            android:id="@+id/bottomLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/save"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/transparent_button_click"
+                android:text="Save"
+                android:textColor="@color/black"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/transparent_button_click"
+                android:text="Cancel"
+                android:textColor="@color/black"
+                android:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
+

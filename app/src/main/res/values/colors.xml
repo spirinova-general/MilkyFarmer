@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="white">#ffffff</color>
+    <color name="gray">#C7C7C7</color>
+    <color name="textColorPrimary">@color/white</color>
+    <color name="black">#000000</color>
+    <color name="gray_lighter">#FFD6D4D4</color>
+    <color name="darken_gray">#9c9b9b</color>
+    <!--<color name="colorPrimary">#FA0</color>-->
+
+  <!--  <color name="colorPrimary">#FFC107</color>
+    <color name="colorPrimaryDark">#FFA000</color>
+    <color name="colorPrimaryLight">#FFECB3</color>
+    <color name="colorAccent">#FFC107</color>-->
+   <!-- <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#212121</color>
+    <color name="divider">#B6B6B6</color>-->
+
+    <!--Purple-->
+    <!--<color name="colorPrimary">#673AB7</color>
+    <color name="colorPrimaryDark">#512DA8</color>
+    <color name="colorPrimaryLight">#D1C4E9</color>
+    <color name="colorAccent">#E040FB</color>
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#727272</color>-->
+
+    <!--Grey-->
+   <!-- <color name="colorPrimary">#9E9E9E</color>
+    <color name="colorPrimaryDark">#616161</color>
+    <color name="colorPrimaryLight">#F5F5F5</color>
+    <color name="colorAccent">#607D8B</color>-->
+    <!--Blue Grey-->
+  <!--  <color name="colorPrimary">#607D8B</color>
+    <color name="colorPrimaryDark">#455A64</color>
+    <color name="colorPrimaryLight">#CFD8DC</color>
+    <color name="colorAccent">#607D8B</color>
+-->
+
+    <!--Indego-->
+   <!-- <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryLight">#C5CAE9</color>
+    <color name="colorAccent">#607D8B</color>
+-->
+   <!--Green-->
+    <!--<color name="colorPrimary">#70d944</color>-->
+    <!--<color name="colorPrimaryDark">#3fcc04</color>-->
+    <!--<color name="colorAccent">#008329</color>-->
+    <!--<color name="colorPrimaryLight">#68ff29</color>-->
+<!--Blue-->
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorPrimaryLight">#BBDEFB</color>
+    <color name="colorAccent">#03A9F4</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#B6B6B6</color>
+
+
+</resources>

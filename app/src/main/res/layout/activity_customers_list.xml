@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="milky.com.milky.com.milky.ui.customers.CustomersList">
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/total_pending_bills"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="5 Pending Bills"
+            android:visibility="gone" />
+
+        <ListView
+            android:id="@+id/customersList"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_margin="10dp"
+        ></ListView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_Layout"
+        android:layout_alignBottom="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Save"
+            android:onClick="onClick"
+            android:textColor="@color/white"
+            android:background="@drawable/transparent_button_click" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            android:text="Cancel"
+            android:textColor="@color/white"
+            android:background="@drawable/transparent_button_click" />
+
+    </LinearLayout>`
+</LinearLayout>

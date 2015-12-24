@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Milky</string>
+    <string name="action_settings">Settings</string>
+    <string name="about">About</string>
+    <string name="drawer_open">Open Navigation Drawer</string>
+    <string name="drawer_close">Close Navigation Drawer</string>
+    <string name="title_activity_customers_list">CustomersList</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="search_hint">Search</string>
+    <string name="title_activity_customers_setting">CustomersSetting</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="setting">Setting</string>
+    <string name="sync">Sync</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="title_activity_sign_up">SignUp</string>
+    <string name="err_tel">err_tel</string>
+    <string name="global_setting">Settings</string>
+    <string name="field_cant_empty">This field cannot be empty</string>
+    <string name="invalid_phone_no">Invalid phone number</string>
+    <string name="fill_require_fields">Please fill the required fields</string>
+    <string name="data_saved_successfully">Data saved successfully !</string>
+    <string name="select_area">Select Area</string>
+    <string name="select_city">Select City</string>
+    <string name="set_global_rate">Please setup settings first</string>
+    <string name="all">All</string>
+    <string name="title_activity_farmer_signup">FarmerSignup</string>
+</resources>
+

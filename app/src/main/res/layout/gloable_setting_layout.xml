@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_weight="1">
+
+
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+
+            <LinearLayout
+                android:padding="3dp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="@color/white"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:orientation="vertical"
+                android:paddingTop="5dp">
+
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                 >
+
+                  <!--  <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@color/gray"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_user" />-->
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/custCode_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+
+                        android:padding="0dp">
+
+                        <EditText
+                            android:textColor="@color/textfield_enable"                            android:enabled="false"
+                            android:id="@+id/custCode"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Code"
+                            android:singleLine="true" />
+                    </android.support.design.widget.TextInputLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/balanceLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                   <!-- <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@color/gray"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_balance" />-->
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/rate_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="0dp">
+
+                        <EditText
+                            android:id="@+id/rate"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Rate(Rs)"
+                            android:inputType="numberDecimal"
+                            android:singleLine="true" />
+                    </android.support.design.widget.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                   <!-- <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@color/gray"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_balance" />-->
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/tax_percent_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="0dp">
+
+                        <EditText
+                            android:id="@+id/tax"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Service Tax(%)"
+                            android:inputType="numberDecimal"
+                            android:singleLine="true" />
+                    </android.support.design.widget.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/autocomplete_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/autocomplete_city_area"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:completionThreshold="1"
+                            android:hint="Seach area and city"
+                            android:inputType="textAutoComplete"
+                            android:imeOptions="actionNext"
+                            android:singleLine="true" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/add_button"
+                        android:text="Add" />
+                </LinearLayout>
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp">
+                <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:id="@+id/linearview"
+    android:weightSum="1">
+</LinearLayout>
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+      <!--  <android.support.design.widget.FloatingActionButton
+            android:id="@+id/editFab"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="onClick"
+            android:src="@drawable/edit_white"
+            android:visibility="visible"
+            app:backgroundTint="@color/colorPrimary"
+            app:borderWidth="0dp" />-->
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/save"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/transparent_button_click"
+            android:onClick="onClick"
+            android:text="Save"
+            android:textColor="@color/white"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/transparent_button_click"
+            android:onClick="onClick"
+            android:text="Cancel"
+            android:textColor="@color/white"
+            android:visibility="visible" />
+    </LinearLayout>
+</LinearLayout>

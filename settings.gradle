@@ -1,0 +1,3 @@
+include ':app',':extcal'
+project(':extcal').projectDir = new File('./3rdpartylib/extcal')
+include ':extcal'
