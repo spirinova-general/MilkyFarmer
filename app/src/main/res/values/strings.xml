@@ -9,7 +9,7 @@
     <string name="search_hint">Search</string>
     <string name="title_activity_customers_setting">CustomersSetting</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="setting">Setting</string>
+    <string name="setting">Settings</string>
     <string name="sync">Sync</string>
     <string name="sign_out">Sign Out</string>
     <string name="title_activity_sign_up">SignUp</string>

@@ -6,22 +6,28 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.ui.customers.CustomersList;
 import com.milky.utils.AppUtil;
+import com.milky.utils.Constants;
+import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
  * Created by Neha on 11/18/2015.
  */
 public class CustomersFragmentListAdapter extends RecyclerView.Adapter<CustomersFragmentListAdapter.CustomersViewHolder> {
-    private List<VCustomersList> mCustomersList;
+    private List<VCustomersList> mCustomersList, tempList,suggestions;
     private CustomersFragmentListAdapter mListAdapter;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
@@ -37,7 +43,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
     public CustomersViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.
                 from(parent.getContext()).
-                inflate(R.layout.customers_fragment_items, parent, false);
+                inflate(R.layout.global_customers_list_item, parent, false);
 
 
         return new CustomersViewHolder(itemView);
@@ -48,10 +54,15 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         VCustomersList customer = mCustomersList.get(position);
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
-        holder.userFlatNo.setText("#" + customer.getAddress1() + ", ");
+        holder.userFlatNo.setText(customer.getAddress1() + ", ");
         holder.userAreaName.setText(AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
         holder.userStreet.setText(customer.getAddress2() + ", ");
         holder.userCity.setText(AreaCityTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), customer.getCityId()));
+        String a = Character.toString(customer.getFirstName().charAt(0));
+        String b = Character.toString(customer.getLastName().charAt(0));
+
+        //get first name and last name letters
+        holder._nameView.setText(a + b);
 
     }
 
@@ -66,6 +77,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         protected TextView userAreaName;
         protected TextView userStreet;
         protected TextView userCity;
+        protected TextView _nameView;
 
         public CustomersViewHolder(View itemView) {
             super(itemView);
@@ -76,6 +88,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
             userAreaName = (TextView) itemView.findViewById(R.id.area_name);
             userStreet = (TextView) itemView.findViewById(R.id.street);
             userCity = (TextView) itemView.findViewById(R.id.city);
+            _nameView = (TextView) itemView.findViewById(R.id.nameView);
         }
 
         @Override
@@ -99,5 +112,14 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
 
         }
     }
+
+    public void flushFilter(){
+        tempList=new ArrayList<>();
+        tempList.addAll(mCustomersList);
+        notifyDataSetChanged();
+    }
+
+
+
 }
 

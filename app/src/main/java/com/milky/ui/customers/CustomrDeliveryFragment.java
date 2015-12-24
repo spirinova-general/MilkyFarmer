@@ -46,17 +46,16 @@ public class CustomrDeliveryFragment extends Fragment {
     }
 
     private void initResources() {
-        _mCalenderView.setQuantity("2L");
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
-                Constants.SELECTED_DAY = day;
-                Constants.QUANTITY_UPDATED_DAY = String.valueOf(day.getDay());
-                Constants.QUANTITY_UPDATED_MONTH = String.valueOf(day.getMonth());
-                Constants.QUANTITY_UPDATED_YEAR = String.valueOf(day.getYear());
-                Constants.DELIVERY_DATE = String.valueOf(day.getDay()) + "-" + String.valueOf(day.getMonth()) + "-" + String.valueOf(day.getYear());
-                String balance = CustomersTableMagagement.getBalanceForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-                onCreateDialog(balance);
+//                Constants.SELECTED_DAY = day;
+//                Constants.QUANTITY_UPDATED_DAY = String.valueOf(day.getDay());
+//                Constants.QUANTITY_UPDATED_MONTH = String.valueOf(day.getMonth());
+//                Constants.QUANTITY_UPDATED_YEAR = String.valueOf(day.getYear());
+//                Constants.DELIVERY_DATE = String.valueOf(day.getDay()) + "-" + String.valueOf(day.getMonth()) + "-" + String.valueOf(day.getYear());
+//                String balance = CustomersTableMagagement.getBalanceForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
+//                onCreateDialog(balance);
 //                String month = new DateFormatSymbols().getMonths()[day.getMonth()];
 //                Intent intent = new Intent(getActivity(), CustomersList.class).putExtra("day", day.getDay()).putExtra("month", month);
 //                startActivity(intent);

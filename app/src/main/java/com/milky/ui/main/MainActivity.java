@@ -34,6 +34,8 @@ import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
+import com.milky.ui.adapters.CustomersFragmentListAdapter;
+import com.milky.ui.customers.CustomerSettingFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
@@ -169,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                         if (getFragmentRefreshListener() != null) {
                             getFragmentRefreshListener().onRefresh();
                         }
+
                     } else {
                         if (getFragmentRefreshListener() != null) {
                             getFragmentRefreshListener().onRefresh();
@@ -182,7 +185,20 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                     return false;
                 }
             });
-            //Set up your OnQueryTextListener here);
+            mSpinnerItem2.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    // Do whatever you need
+                    return true; // KEEP IT TO TRUE OR IT DOESN'T OPEN !!
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    // Do whatever you need
+                    return true; // OR FALSE IF YOU DIDN'T WANT IT TO CLOSE!
+                }
+            });
 
         }
         return true;
@@ -213,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             areacity.setAreaId(_areaList.get(i).getAreaId());
             areacity.setCityId(_areaList.get(i).getCityId());
             areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
-            areacity.setCityArea(areacity.getArea() + areacity.getCity());
+            areacity.setCityArea(areacity.getArea()+", "+ areacity.getCity());
             _areacityList.add(areacity);
 
 
@@ -240,20 +256,19 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             case 0:
                 menu.findItem(R.id.action_search).setVisible(false);
                 menu.findItem(R.id.areaSpinner).setVisible(false);
-                menu.findItem(R.id.action_add_bill).setVisible(false);
+                menu.findItem(R.id.save).setVisible(false);
 
 
                 break;
             case 1:
                 menu.findItem(R.id.action_search).setVisible(true);
                 menu.findItem(R.id.areaSpinner).setVisible(true);
-                menu.findItem(R.id.action_add_bill).setVisible(false);
-
+                menu.findItem(R.id.save).setVisible(false);
                 break;
             case 2:
                 menu.findItem(R.id.action_search).setVisible(false);
                 menu.findItem(R.id.areaSpinner).setVisible(false);
-                menu.findItem(R.id.action_add_bill).setVisible(false);
+                menu.findItem(R.id.save).setVisible(false);
                 break;
         }
         return true;

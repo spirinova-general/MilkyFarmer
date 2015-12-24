@@ -30,7 +30,6 @@
             android:textSize="10sp" />
 
     </LinearLayout>
-
     <ImageView
         android:padding="5dp"
         android:id="@+id/deleteCustomer"
@@ -39,4 +38,28 @@
         android:layout_alignParentRight="true"
         android:src="@drawable/ic_action_discard"
         android:visibility="gone" />
+<LinearLayout
+    android:id="@+id/saveManu"
+    android:layout_alignParentRight="true"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    android:layout_marginRight="5dp">
+    <ImageView
+        android:padding="5dp"
+        android:id="@+id/saveBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_save"
+        android:visibility="visible" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_gravity="center"
+        android:textColor="@color/white"/>
+
+</LinearLayout>
+
 </RelativeLayout>

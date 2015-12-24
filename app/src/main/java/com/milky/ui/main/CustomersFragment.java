@@ -38,11 +38,11 @@ import java.util.List;
 public class CustomersFragment extends Fragment {
 
     private List<VCustomersList> _mCustomersList;
-    private CustomersFragmentListAdapter _mAdapter;
+    public static CustomersFragmentListAdapter _mAdapter;
     private FloatingActionButton mFab;
     private TextView mTotalCustomers;
     private DatabaseHelper _dbHelper;
-    private RecyclerView recList;
+    public static RecyclerView recList;
 
 
     @Override

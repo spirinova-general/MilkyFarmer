@@ -120,8 +120,79 @@ public class CustomerAddActivity extends AppCompatActivity {
         View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
         TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
+        subTitle.setVisibility(View.GONE);
         title.setText("Add Customer");
-        subTitle.setText(formattedDate);
+        LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
+
+        saveManu.setVisibility(View.VISIBLE);
+        saveManu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if (_firstName.getText().toString().equals(""))
+                        name_layout.setError("Enter name!");
+                    else if (_lastName.getText().toString().equals(""))
+                        last_name_layout.setError("Enter name!");
+                    else if (_rate.getText().toString().equals(""))
+                        rate_layout.setError("Enter amount!");
+                    else if (_mBalance.getText().toString().equals(""))
+                        balance_layout.setError("Enter balance amount");
+                    else if (_mAddress1.getText().toString().equals(""))
+                        flat_number_layout.setError("Enter flat number!");
+                    else if (_address2.getText().toString().equals(""))
+                        street_layout.setError("Enter street !");
+
+                    else if (selectedCityId.equals("") && selectedAreaId.equals(""))
+                        autocomplete_layout.setError("Select valid area");
+                    else if (_mPhone.getText().toString().equals(""))
+                        _phone_textinput_layout.setError("Enter mobile number!");
+                    else if (_mQuantuty.getText().toString().equals(""))
+                        milk_quantity_layout.setError("Enter milk quantity!");
+                    else if ((!_firstName.getText().toString().equals("")
+                            && !_lastName.getText().toString().equals("") &&
+                            !_mBalance.getText().toString().equals("") &&
+                            !_mAddress1.getText().toString().equals("")
+                            && !_address2.getText().toString().equals("")
+                            && !selectedCityId.equals("") && !selectedAreaId.equals("")
+                            && !_mPhone.getText().toString().equals("") &&
+                            !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
+                    )) {
+                        VCustomersList holder = new VCustomersList();
+                        holder.setFirstName(_firstName.getText().toString());
+                        holder.setLastName(_lastName.getText().toString());
+                        holder.setBalance_amount(_mBalance.getText().toString());
+                        holder.setAddress1(_mAddress1.getText().toString());
+                        holder.setAddress2(_address2.getText().toString());
+                        holder.setCityId(selectedCityId);
+                        autocomplete_layout.setError(null);
+                        holder.setAreaId(selectedAreaId);
+                        holder.setMobile(_mPhone.getText().toString());
+                        holder.setQuantity(_mQuantuty.getText().toString());
+                        holder.setAccountId(Constants.ACCOUNT_ID);
+                        holder.setRate(_rate.getText().toString());
+                        c = Calendar.getInstance();
+                        SimpleDateFormat df = Constants.format;
+                        formattedDate = df.format(c.getTime());
+                        holder.setDateAdded(formattedDate);
+                        holder.setStart_date(formattedDate);
+                        holder.setDeliverydate(_pickdate.getText().toString().trim());
+                        holder.setCustomerId(Constants.ACCOUNT_ID + String.valueOf(System.currentTimeMillis()));
+                        CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
+                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
+
+                        holder.setTax(GlobalSettingTableManagement.getDefaultTax(_dbHelper.getReadableDatabase()));
+                        holder.setAdjustment("");
+                        holder.setPaymentMade("0");
+                        holder.setIsCleared("0");
+                        holder.setDateModified(holder.getStart_date());
+                        BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
+                        CustomerAddActivity.this.finish();
+                    }
+                } catch (NullPointerException npe) {
+                }
+            }
+        });
+
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -241,7 +312,7 @@ public class CustomerAddActivity extends AppCompatActivity {
         _mCancel = (Button) findViewById(R.id.cancel);
         _mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         _mBottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
-        _mBottomLayout.setVisibility(View.VISIBLE);
+        _mBottomLayout.setVisibility(View.GONE);
         _rate = (EditText) findViewById(R.id.rate);
         _mCancel.setVisibility(View.GONE);
         _pickdate = (TextView) findViewById(R.id.pick_date);
@@ -326,74 +397,6 @@ public class CustomerAddActivity extends AppCompatActivity {
 
                     }
                 });
-        _mSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    if (_firstName.getText().toString().equals(""))
-                        name_layout.setError("Enter name!");
-                    else if (_lastName.getText().toString().equals(""))
-                        last_name_layout.setError("Enter name!");
-                    else if (_rate.getText().toString().equals(""))
-                        rate_layout.setError("Enter amount!");
-                    else if (_mBalance.getText().toString().equals(""))
-                        balance_layout.setError("Enter balance amount");
-                    else if (_mAddress1.getText().toString().equals(""))
-                        flat_number_layout.setError("Enter flat number!");
-                    else if (_address2.getText().toString().equals(""))
-                        street_layout.setError("Enter street !");
-
-                    else if (selectedCityId.equals("") && selectedAreaId.equals(""))
-                        autocomplete_layout.setError("Select valid area");
-                    else if (_mPhone.getText().toString().equals(""))
-                        _phone_textinput_layout.setError("Enter mobile number!");
-                    else if (_mQuantuty.getText().toString().equals(""))
-                        milk_quantity_layout.setError("Enter milk quantity!");
-                    else if ((!_firstName.getText().toString().equals("")
-                            && !_lastName.getText().toString().equals("") &&
-                            !_mBalance.getText().toString().equals("") &&
-                            !_mAddress1.getText().toString().equals("")
-                            && !_address2.getText().toString().equals("")
-                            && !selectedCityId.equals("") && !selectedAreaId.equals("")
-                            && !_mPhone.getText().toString().equals("") &&
-                            !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
-                    )) {
-                        VCustomersList holder = new VCustomersList();
-                        holder.setFirstName(_firstName.getText().toString());
-                        holder.setLastName(_lastName.getText().toString());
-                        holder.setBalance_amount(_mBalance.getText().toString());
-                        holder.setAddress1(_mAddress1.getText().toString());
-                        holder.setAddress2(_address2.getText().toString());
-                        holder.setCityId(selectedCityId);
-                        autocomplete_layout.setError(null);
-                        holder.setAreaId(selectedAreaId);
-                        holder.setMobile(_mPhone.getText().toString());
-                        holder.setQuantity(_mQuantuty.getText().toString());
-                        holder.setAccountId(Constants.ACCOUNT_ID);
-                        holder.setRate(_rate.getText().toString());
-                        c = Calendar.getInstance();
-                        SimpleDateFormat df = Constants.format;
-                        formattedDate = df.format(c.getTime());
-                        holder.setDateAdded(formattedDate);
-                        holder.setStart_date(formattedDate);
-                        holder.setDeliverydate(_pickdate.getText().toString().trim());
-                        holder.setCustomerId(Constants.ACCOUNT_ID + String.valueOf(System.currentTimeMillis()));
-                        CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
-                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
-
-                        holder.setTax(GlobalSettingTableManagement.getDefaultTax(_dbHelper.getReadableDatabase()));
-                        holder.setAdjustment("");
-                        holder.setPaymentMade("0");
-                        holder.setIsCleared("0");
-                        holder.setDateModified(holder.getStart_date());
-                        BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
-                        CustomerAddActivity.this.finish();
-                    }
-                } catch (NullPointerException npe) {
-                    snackbar.show();
-                }
-            }
-        });
 
     }
 

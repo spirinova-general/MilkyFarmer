@@ -2,11 +2,8 @@ package com.milky.ui.customers;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +25,7 @@ import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.GlobalSettingTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
+import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.EnableEditableFields;
@@ -136,9 +133,9 @@ public class CustomerSettingFragment extends Fragment {
         _mQuantuty = (EditText) view.findViewById(R.id.milk_quantity);
         _mAddress2 = (EditText) view.findViewById(R.id.street);
         _mBalance = (EditText) view.findViewById(R.id.balance);
-        _autocomplete_city_area = (AutoCompleteTextView) view.findViewById(R.id.autocomplete_city_area);
-        _autocomplete_city_area.setFocusable(false);
-        _autocomplete_city_area.setFocusableInTouchMode(false);
+       _autocomplete_city_area = (AutoCompleteTextView) view.findViewById(R.id.autocomplete_city_area);
+//        _autocomplete_city_area.setFocusable(false);
+//        _autocomplete_city_area.setFocusableInTouchMode(false);
         _mSave = (Button) view.findViewById(R.id.save);
         _mCancel = (Button) view.findViewById(R.id.cancel);
 //        _mEdit = (FloatingActionButton) view.findViewById(R.id.editFab);
@@ -154,6 +151,7 @@ public class CustomerSettingFragment extends Fragment {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         pick_date = (TextView) view.findViewById(R.id.pick_date);
         pick_date.setText(getActivity().getIntent().getStringExtra("delivery_date"));
+        pick_date.setBackgroundColor(getResources().getColor(R.color.gray_lighter));
         pick_date.setEnabled(false);
 
         /*Set defaul rate
@@ -326,7 +324,7 @@ public class CustomerSettingFragment extends Fragment {
         /*
         * Save button onclick Event
         * */
-        _mSave.setOnClickListener(new View.OnClickListener() {
+        CustomersActivity.saveManu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (_mFirstName.getText().toString().equals(""))

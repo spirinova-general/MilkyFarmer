@@ -4,7 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
 
     tools:context=".MainActivity">
-
+    <item
+        android:orderInCategory="300"
+        android:id="@+id/areaSpinner"
+        appcompat:actionViewClass="android.support.v7.widget.AppCompatSpinner"
+        appcompat:showAsAction="always"
+        android:title="Filter areas">
+    </item>
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/abr_search"
@@ -13,19 +19,19 @@
         appcompat:actionViewClass="android.support.v7.widget.SearchView"
         appcompat:showAsAction="always"></item>
 
-    <item
+   <!-- <item
         android:id="@+id/action_add_bill"
         android:icon="@drawable/edittext_round_background"
         android:orderInCategory="300"
         android:title="use"
-        appcompat:showAsAction="always"></item>
+        appcompat:showAsAction="always"></item>-->
     <item
-        android:id="@+id/areaSpinner"
-        appcompat:actionViewClass="android.support.v7.widget.AppCompatSpinner"
-        android:orderInCategory="1"
-        appcompat:showAsAction="always"
-        android:title="areas">
-        </item>
+        android:id="@+id/save"
+        android:icon="@drawable/ic_save"
+        android:title="Save"
+        android:orderInCategory="300"
+        appcompat:showAsAction="always"/>
+
     <!--<item-->
     <!--android:title="Hadaspar, Pune"-->
     <!--android:id="@+id/areas"-->

@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.milky.R;
+import com.milky.ui.main.CustomersActivity;
+import com.milky.ui.main.MainActivity;
 
 /**
  * Created by Neha on 11/19/2015.
@@ -41,7 +43,13 @@ public class CustomerTabFragment extends Fragment {
          *Set an Apater for the View Pager
          */
         viewPager.setAdapter(new MyAdapter(getChildFragmentManager()));
-
+        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                CustomersActivity.POSITION = viewPager.getCurrentItem();
+                getActivity().supportInvalidateOptionsMenu();
+            }
+        });
         /**
          * Now , this is a workaround ,
          * The setupWithViewPager dose't works without the runnable .

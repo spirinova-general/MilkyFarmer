@@ -30,11 +30,11 @@ public class TextValidationMessage implements TextWatcher {
         if (s.length() > 0 ) {
             if (_isPhone && !isValidMobile(s.toString())) {
 //                _textInputLayout.setErrorEnabled(true);
-                phoneText.setError(_context.getResources().getString(R.string.invalid_phone_no));
+                _textInputLayout.setError(_context.getResources().getString(R.string.invalid_phone_no));
                 isValid = false;
             } else {
 //                _textInputLayout.setErrorEnabled(false);
-                phoneText.setError(null);
+                _textInputLayout.setError(null);
                 isValid = true;
 
             }

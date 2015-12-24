@@ -698,7 +698,7 @@ public class CalendarAdapter extends BaseAdapter {
                     // Date matches
                     if (d.getDay() == cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
                             .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)) {
-                        quantity = Integer.parseInt(customerMillkQuantity.get(i).getQuantity());
+                        quantity = Float.parseFloat(customerMillkQuantity.get(i).getQuantity());
                         bigDecimal = round(quantity, 1);
 
                     } else {

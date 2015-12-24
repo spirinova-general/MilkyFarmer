@@ -130,7 +130,7 @@ public class CustomersTableMagagement {
     }
 
     public static ArrayList<VCustomersList> getAllCustomers(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DIRTY + " ='" + "0'";
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DIRTY + " ='" + "0'" +" AND "+ TableColumns.ISDELETED+" ='0'";
         ArrayList<VCustomersList> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
@@ -175,7 +175,7 @@ public class CustomersTableMagagement {
                 list.add(holder);
             }
             while (cursor.moveToNext());
-                    }
+        }
         cursor.close();
         if (db.isOpen())
             db.close();
@@ -236,10 +236,15 @@ public class CustomersTableMagagement {
         return list;
     }
 
-    public static ArrayList<VCustomersList> getAllCustomersBySelectedDate(SQLiteDatabase db) {
-        Calendar c = Calendar.getInstance();
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELIVERY_DATE
-                + " <='"+  Constants.DELIVERY_DATE +  "'";
+
+    public static ArrayList<VCustomersList> getAllCustomersBySelectedDate(SQLiteDatabase db, String areaid) {
+        String selectquery = "";
+        if (areaid.equals(""))
+            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELIVERY_DATE
+                    + " <='" + Constants.DELIVERY_DATE + "'";
+        else
+            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELIVERY_DATE
+                    + " <='" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'";
 
 
         ArrayList<VCustomersList> list = new ArrayList<>();

@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.milky.R;
@@ -22,13 +24,17 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VCustomersList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Neha on 11/17/2015.
  */
-public class GlobalDeliveryAdapter extends BaseAdapter {
+public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
     private Context mContext;
     private String date;
-
+    private List<VCustomersList> filteredList;
+    private VCustomersList filetrHolder;
     public GlobalDeliveryAdapter(final Context con, final String quantityEditDate) {
         this.mContext = con;
         this.date = quantityEditDate;
@@ -61,7 +67,6 @@ public class GlobalDeliveryAdapter extends BaseAdapter {
             holder._firstName = (TextView) convertView.findViewById(R.id.first_name);
             holder._quantity = (EditText) convertView.findViewById(R.id.milk_quantity);
             holder._latsName = (TextView) convertView.findViewById(R.id.last_name);
-            holder._quantity.setInputType(InputType.TYPE_CLASS_NUMBER);
             holder._quantity_input_layout = (TextInputLayout) convertView.findViewById(R.id.quantity_layout);
 
             convertView.setTag(holder);
@@ -90,7 +95,7 @@ public class GlobalDeliveryAdapter extends BaseAdapter {
 /*
         * Set text field listeners*/
         holder._firstName.setText(CustomersList._mCustomersList.get(position).getFirstName());
-        holder._latsName.setText(CustomersList._mCustomersList.get(position).getLastName());
+        holder._latsName.setText(" "+CustomersList._mCustomersList.get(position).getLastName());
         final ViewHolder finalHolder = holder;
         holder._quantity.addTextChangedListener(new TextWatcher() {
             @Override
@@ -123,6 +128,15 @@ public class GlobalDeliveryAdapter extends BaseAdapter {
 
         return convertView;
     }
+    private CustomerFilter friendFilter;
+    @Override
+    public Filter getFilter() {
+        if (filteredList == null) {
+            friendFilter = new CustomerFilter();
+        }
+
+        return friendFilter;
+    }
 
     private class ViewHolder {
         private TextView _firstName, _latsName, _nameView;
@@ -130,6 +144,46 @@ public class GlobalDeliveryAdapter extends BaseAdapter {
         private TextInputLayout _quantity_input_layout;
     }
 
+    /**
+     * Custom filter for friend list
+     * Filter content in friend list according to the search text
+     */
+    private class CustomerFilter extends Filter {
 
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults filterResults = new FilterResults();
+            if (constraint!=null && constraint.length()>0) {
+                List<VCustomersList> tempList = new ArrayList<>();
+
+                // search content in friend list
+                for (VCustomersList user : CustomersList._mCustomersList) {
+                    if (user.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        tempList.add(user);
+                    }
+                }
+
+                filterResults.count = tempList.size();
+                filterResults.values = tempList;
+            } else {
+                filterResults.count = CustomersList._mCustomersList.size();
+                filterResults.values = CustomersList._mCustomersList;
+            }
+
+            return filterResults;
+        }
+
+        /**
+         * Notify about filtered list to ui
+         * @param constraint text
+         * @param results filtered result
+         */
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            filteredList = (List<VCustomersList>) results.values;
+            notifyDataSetChanged();
+        }
+    }
 }
 

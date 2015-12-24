@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,12 +72,6 @@ public class BillingEdit extends AppCompatActivity {
         getview();
 
 
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
     }
 
 
@@ -94,6 +90,17 @@ public class BillingEdit extends AppCompatActivity {
         TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
         subTitle.setVisibility(View.GONE);
         title.setText(intent.getStringExtra("titleString"));
+        LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
+
+        saveManu.setVisibility(View.VISIBLE);
+        saveManu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);

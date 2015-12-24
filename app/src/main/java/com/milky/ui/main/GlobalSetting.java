@@ -1,14 +1,17 @@
 package com.milky.ui.main;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,6 +29,8 @@ import android.widget.Toast;
 import com.milky.R;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
+import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.GlobalSettingTableManagement;
 import com.milky.service.databaseutils.TableNames;
@@ -190,12 +195,65 @@ public class GlobalSetting extends AppCompatActivity {
     }
 
     private void setActionBar() {
-        _mToolbar = (Toolbar) findViewById(R.id.toolbar); // Attaching the layout to the toolbar object
+        _mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(_mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
-        getSupportActionBar().setTitle(getResources().getString(R.string.global_setting));
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        /*
+        * Set Custome action bar
+        * */
+        LayoutInflater mInflater = LayoutInflater.from(this);
+        View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
+        TextView title = (TextView) mCustomView.findViewById(R.id.title);
+        TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
+        ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
+        deleteCustomer.setVisibility(View.GONE);
+
+        title.setText("Settings");
+        LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
+
+        saveManu.setVisibility(View.VISIBLE);
+        saveManu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+
+
+            {
+                if (rate.getText().toString().trim().equals("")) {
+                    rate_layout.setError(getResources().getString(R.string.field_cant_empty));
+                } else if (tax.getText().toString().trim().equals("")) {
+                    tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
+                } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
+                    autocomplete_layout.setError("Please select some area !");
+                } else {
+
+                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS)) {
+                        VGlobalSettings holder = new VGlobalSettings();
+                        holder.setTax(tax.getText().toString().trim());
+                        holder.setDefaultRate(rate.getText().toString().trim());
+                        holder.setDateModified(String.valueOf(System.currentTimeMillis()));
+                        GlobalSettingTableManagement.updateGlobalSettingData(_dbHelper.getWritableDatabase(), holder, Constants.ACCOUNT_ID);
+                    } else {
+                        VGlobalSettings holder = new VGlobalSettings();
+                        holder.setId(custCode.getText().toString());
+                        holder.setTax(tax.getText().toString().trim());
+                        holder.setAccountId(Constants.ACCOUNT_ID);
+                        holder.setDefaultRate(rate.getText().toString().trim());
+                        holder.setDateModified(String.valueOf(System.currentTimeMillis()));
+                        GlobalSettingTableManagement.insertGlobalSettingData(_dbHelper.getWritableDatabase(), holder);
+
+                    }
+                    Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
+
+                    GlobalSetting.this.finish();
+                }
+
+
+            }
+        });
+        getSupportActionBar().setCustomView(mCustomView);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override
@@ -229,36 +287,9 @@ public class GlobalSetting extends AppCompatActivity {
             case R.id.save:
 
 
-                if (rate.getText().toString().trim().equals("")) {
-                    rate_layout.setError(getResources().getString(R.string.field_cant_empty));
-                } else if (tax.getText().toString().trim().equals("")) {
-                    tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
-                } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
-                    autocomplete_layout.setError("Please select some area !");
-                } else {
-
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS)) {
-                        VGlobalSettings holder = new VGlobalSettings();
-                        holder.setTax(tax.getText().toString().trim());
-                        holder.setDefaultRate(rate.getText().toString().trim());
-                        holder.setDateModified(String.valueOf(System.currentTimeMillis()));
-                        GlobalSettingTableManagement.updateGlobalSettingData(_dbHelper.getWritableDatabase(), holder, Constants.ACCOUNT_ID);
-                    } else {
-                        VGlobalSettings holder = new VGlobalSettings();
-                        holder.setId(custCode.getText().toString());
-                        holder.setTax(tax.getText().toString().trim());
-                        holder.setAccountId(Constants.ACCOUNT_ID);
-                        holder.setDefaultRate(rate.getText().toString().trim());
-                        holder.setDateModified(String.valueOf(System.currentTimeMillis()));
-                        GlobalSettingTableManagement.insertGlobalSettingData(_dbHelper.getWritableDatabase(), holder);
-
-                    }
-                    Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
-
-                    GlobalSetting.this.finish();
 
 
-                }
+
                 break;
             case R.id.cancel:
 //                EnableEditableFields.setIsEnabled(false);

@@ -46,7 +46,7 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="fill_parent"
             android:id="@+id/quantity_layout"
-            android:hint="Milk Quantity (liters)"
+            android:hint="Milk Quantity (Litres)"
             android:inputType="numberDecimal"
             android:layout_height="wrap_content">
 
