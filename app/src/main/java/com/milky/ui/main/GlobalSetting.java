@@ -1,16 +1,11 @@
 package com.milky.ui.main;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -27,30 +22,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.utils.EnableEditableFields;
 import com.milky.utils.TextValidationMessage;
+import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VGlobalSettings;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Neha on 11/19/2015.
  */
 public class GlobalSetting extends AppCompatActivity {
     private Toolbar _mToolbar;
-    private TextInputLayout rate_layout, custCode_layout, tax_layouts, autocomplete_layout;
-    private EditText custCode, rate, tax;
+    private TextInputLayout rate_layout, custCode_layout, tax_layouts, autocomplete_layout, name_layout, lastname_layout, mobile_layout;
+    private EditText custCode, rate, tax, firstname, lastname, mobile;
     private InputMethodManager inputMethodManager;
     private LinearLayout _mBottomLayout;
     //    private FloatingActionButton _editFab;
@@ -99,11 +93,18 @@ public class GlobalSetting extends AppCompatActivity {
         custCode = (EditText) findViewById(R.id.custCode);
         rate = (EditText) findViewById(R.id.rate);
         tax = (EditText) findViewById(R.id.tax);
+        firstname = (EditText) findViewById(R.id.first_name);
+        lastname = (EditText) findViewById(R.id.last_name);
+        mobile = (EditText) findViewById(R.id.mobile);
+
         AreaAutocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete_city_area);
         _mBottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
 //        _editFab = (FloatingActionButton) findViewById(R.id.editFab);
         add = (Button) findViewById(R.id.add_button);
         autocomplete_layout = (TextInputLayout) findViewById(R.id.autocomplete_layout);
+        name_layout = (TextInputLayout) findViewById(R.id.name_layout);
+        lastname_layout = (TextInputLayout) findViewById(R.id.last_name_layout);
+        mobile_layout = (TextInputLayout) findViewById(R.id.mobile_layout);
         myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
         inputManager = (InputMethodManager)
                 getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -115,6 +116,10 @@ public class GlobalSetting extends AppCompatActivity {
 //        custCode.addTextChangedListener(new TextValidationMessage(custCode_layout, this, false));
         rate.addTextChangedListener(new TextValidationMessage(rate, rate_layout, this, false));
         tax.addTextChangedListener(new TextValidationMessage(rate, tax_layouts, this, false));
+        firstname.addTextChangedListener(new TextValidationMessage(firstname, name_layout, this, false));
+        lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this, false));
+        mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this, true));
+
 
          /* Let fields be enabled if edit button has been clicked only.
         * */
@@ -122,7 +127,16 @@ public class GlobalSetting extends AppCompatActivity {
 //        rate.setOnTouchListener(new EnableEditableFields(rate, this, inputMethodManager));
 //        tax.setOnTouchListener(new EnableEditableFields(tax, this, inputMethodManager));
         /*Set default cust code*/
-        custCode.setText("1Axc");
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+            VAccount holder = Account.getAccountDetails(_dbHelper.getReadableDatabase());
+            firstname.setText(holder.getFirstName());
+            lastname.setText(holder.getLastName());
+            rate.setText(holder.getRate());
+            tax.setText(holder.getTax());
+            mobile.setText(holder.getMobile());
+            custCode.setText(holder.getFarmerCode());
+
+        }
         /*Fill fields from db*/
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
             ArrayList<String> list = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
@@ -185,13 +199,7 @@ public class GlobalSetting extends AppCompatActivity {
             }
         });
 
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS)) {
-            VGlobalSettings holder = GlobalSettingTableManagement.getGlobalSettingDetail(_dbHelper.getReadableDatabase());
-            rate.setText(holder.getDefaultRate());
-            tax.setText(holder.getTax());
 
-
-        }
     }
 
     private void setActionBar() {
@@ -226,21 +234,21 @@ public class GlobalSetting extends AppCompatActivity {
                 } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
                     autocomplete_layout.setError("Please select some area !");
                 } else {
+                    Calendar cl = Calendar.getInstance();
+                    String date = String.valueOf(cl.get(Calendar.MONTH))
+                            + "-" + String.valueOf(cl.get(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(cl.get(Calendar.YEAR));
+                    VAccount holder = new VAccount();
+                    holder.setTax(tax.getText().toString().trim());
+                    holder.setRate(rate.getText().toString().trim());
+                    holder.setDateModified(date);
+                    holder.setMobile(mobile.getText().toString());
+                    holder.setFirstName(firstname.getText().toString());
+                    holder.setLastName(lastname.getText().toString());
+                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+                        Account.updateAccountDetails(_dbHelper.getWritableDatabase(), holder);
 
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS)) {
-                        VGlobalSettings holder = new VGlobalSettings();
-                        holder.setTax(tax.getText().toString().trim());
-                        holder.setDefaultRate(rate.getText().toString().trim());
-                        holder.setDateModified(String.valueOf(System.currentTimeMillis()));
-                        GlobalSettingTableManagement.updateGlobalSettingData(_dbHelper.getWritableDatabase(), holder, Constants.ACCOUNT_ID);
                     } else {
-                        VGlobalSettings holder = new VGlobalSettings();
-                        holder.setId(custCode.getText().toString());
-                        holder.setTax(tax.getText().toString().trim());
-                        holder.setAccountId(Constants.ACCOUNT_ID);
-                        holder.setDefaultRate(rate.getText().toString().trim());
-                        holder.setDateModified(String.valueOf(System.currentTimeMillis()));
-                        GlobalSettingTableManagement.insertGlobalSettingData(_dbHelper.getWritableDatabase(), holder);
+                        Account.insertAccountDetails(_dbHelper.getWritableDatabase(), holder);
 
                     }
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
@@ -285,9 +293,6 @@ public class GlobalSetting extends AppCompatActivity {
 //                EnableEditableFields.setIsEnabled(true);
 //                break;
             case R.id.save:
-
-
-
 
 
                 break;

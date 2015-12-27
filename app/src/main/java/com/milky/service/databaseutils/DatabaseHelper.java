@@ -37,7 +37,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(TableColumsDetail.CUSTOMER);
         db.execSQL(TableColumsDetail.CUSTOMER_SETTINGS);
         db.execSQL(TableColumsDetail.DELIVERY);
-        db.execSQL(TableColumsDetail.GLOBAL_SETTINGS);
         db.execSQL(TableColumsDetail.CUSTOMERS_BILL);
         db.execSQL(TableColumsDetail.AREA_ACCOUNT_MAPPING);
     }
@@ -47,7 +46,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] tables = {
                 TableNames.TABLE_ACCOUNT,
                 TableNames.TABLE_ACCOUNT_AREA_MAPPING,
-                TableNames.TABLE_GLOBAL_SETTINGS,
                 TableNames.TABLE_DELIVERY,
                 TableNames.TABLE_CUSTOMER_SETTINGS,
                 TableNames.TABLE_CUSTOMER,

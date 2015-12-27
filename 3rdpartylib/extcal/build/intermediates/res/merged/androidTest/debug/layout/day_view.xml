@@ -50,4 +50,4 @@
         android:layout_height="@dimen/text_height_width"
         android:layout_below="@+id/layout" android:gravity="center" android:text="10L"
         android:textColor="#008329" android:textSize="10sp" />
-</RelativeLayout><!-- From: file:/F:/SvnProjects/MobileAppDevelopment/DEVELOPMENT/CODEBASE/trunk/Milky/3rdpartylib/extcal/src/main/res/layout/day_view.xml --><!-- From: file:/F:/SvnProjects/MobileAppDevelopment/DEVELOPMENT/CODEBASE/trunk/Milky/3rdpartylib/extcal/build/intermediates/bundles/debug/res/layout/day_view.xml -->
+</RelativeLayout><!-- From: file:/G:/BB%20reop/3rdpartylib/extcal/src/main/res/layout/day_view.xml --><!-- From: file:/G:/BB%20reop/3rdpartylib/extcal/build/intermediates/bundles/debug/res/layout/day_view.xml -->

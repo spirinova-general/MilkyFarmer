@@ -43,15 +43,16 @@
 
     </LinearLayout>
     <LinearLayout
+        android:paddingLeft="10dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/fb_login"
-            android:layout_weight="1"
-            android:padding="3dp"
+        <com.facebook.login.widget.LoginButton
+            android:layout_weight="0.5"
+            android:id="@+id/login_button"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/fb_login"/>
+            android:layout_gravity="center"
+            />
         <ImageView
             android:layout_weight="1"
             android:layout_width="fill_parent"

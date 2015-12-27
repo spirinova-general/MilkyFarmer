@@ -9,17 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-
-import java.util.List;
 
 import com.milky.R;
-import com.milky.service.databaseutils.GlobalSettingTableManagement;
-import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Account;
 import com.milky.utils.AppUtil;
 
 /**
@@ -60,7 +55,7 @@ public class BillingEdit extends AppCompatActivity {
         total_amount.setText(intent.getStringExtra("total"));
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
-        tax.setText(GlobalSettingTableManagement.getDefaultTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase()));
+        tax.setText(Account.getDefautTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase()));
     }
 
     @Override

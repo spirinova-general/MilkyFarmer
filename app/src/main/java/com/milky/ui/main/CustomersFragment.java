@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -115,7 +116,7 @@ public class CustomersFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //check if global setting has been set
-                if (!AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS)) {
+                if ("0".equals(Account.getDefaultRate(_dbHelper.getReadableDatabase()))) {
                     MainActivity.mDrawerLayout.openDrawer(MainActivity.mNavigationView);
                     Toast.makeText(getActivity(), getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
                 } else {

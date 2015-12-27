@@ -6,4 +6,4 @@
     <item android:state_selected="true" android:drawable="@drawable/day_selected"/>
 	<item android:drawable="@drawable/normal_day"/>
 </selector>
-<!-- From: file:/F:/SvnProjects/MobileAppDevelopment/DEVELOPMENT/CODEBASE/trunk/Milky/3rdpartylib/extcal/src/main/res/drawable/date_number_background.xml -->
+<!-- From: file:/G:/BB%20reop/3rdpartylib/extcal/src/main/res/drawable/date_number_background.xml -->

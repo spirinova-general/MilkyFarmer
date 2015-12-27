@@ -7,8 +7,10 @@ public class TableColumsDetail {
 
     //ACCOUNT
     public static final String ACCOUNT = "CREATE TABLE " + TableNames.TABLE_ACCOUNT + "("
-            + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.FARMER_CODE + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME,"
-            + TableColumns.DATE_ADDED + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.FIRST_NAME + " TEXT," + TableColumns.LAST_NAME + " TEXT," + TableColumns.MOBILE + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
+            + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.FARMER_CODE + " TEXT,"
+            + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DEFAULT_RATE + " TEXT," + TableColumns.TAX + " TEXT,"
+            + TableColumns.DATE_ADDED + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.FIRST_NAME + " TEXT,"
+            + TableColumns.LAST_NAME + " TEXT," + TableColumns.MOBILE + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
             ")";
 
 
@@ -48,9 +50,11 @@ public class TableColumsDetail {
             + TableColumns.START_DATE + " DATETIME,"
             + TableColumns.DELIVERY_DATE + " DATETIME," +
             TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.ISDELETED + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
+/*
     //GLOBAL_SETTINGS
     public static final String GLOBAL_SETTINGS = "CREATE TABLE " + TableNames.TABLE_GLOBAL_SETTINGS + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DEFAULT_RATE + " TEXT,"
             + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.TAX + " TEXT," + TableColumns.ACCOUNT_ID + " TEXT," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
+*/
 
     //AREA_ACCOUNT_MAPPING
     public static final String AREA_ACCOUNT_MAPPING = "CREATE TABLE " + TableNames.TABLE_ACCOUNT_AREA_MAPPING + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.AREA_ID + " TEXT,"

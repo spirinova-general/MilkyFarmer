@@ -6,6 +6,5 @@ package com.milky.utils;
 public class UserPrefrences {
     public static String PREFRENCES = "com.milky_prefrences";
     public static final String NEW_USER = "new_user";
-    
-
+    public static final String VALID_USER = "valid_user";
 }

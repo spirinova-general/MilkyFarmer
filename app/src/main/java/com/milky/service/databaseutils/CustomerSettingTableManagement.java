@@ -29,11 +29,17 @@ public class CustomerSettingTableManagement {
         values.put(TableColumns.DIRTY, "0");
         values.put(TableColumns.SYNC_STATUS, "0");
         values.put(TableColumns.ISDELETED, "0");
-        values.put(TableColumns.ISDELETED, "0");
         long i = db.insert(TableNames.TABLE_CUSTOMER_SETTINGS, null, values);
 
     }
+    public static void updateSyncedData(SQLiteDatabase db) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.DIRTY, "1");
+        values.put(TableColumns.SYNC_STATUS, "1");
 
+        db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.SYNC_STATUS + " ='" + "0" + "'"
+                + " AND " + TableColumns.DIRTY + " ='" + "0" + "'", null);
+    }
     public static ArrayList<VCustomersList> getAllCustomersByCustomerId(SQLiteDatabase db, String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'";
@@ -83,10 +89,55 @@ public class CustomerSettingTableManagement {
     {
         ContentValues values = new ContentValues();
         values.put(TableColumns.ADJUSTMENTS, holder.getRate());
+        values.put(TableColumns.SYNC_STATUS, "0");
         db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
                 , null);
     }
+    public static ArrayList<VCustomersList> getAllCustomersByCustomerIdToSync(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.SYNC_STATUS + " ='"
+                +  "0'";
+        ArrayList<VCustomersList> list = new ArrayList<>();
 
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                VCustomersList holder = new VCustomersList();
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
+                    holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
+                    holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
+                    holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)) != null)
+                    holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
+                    holder.setStart_date(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)) != null)
+                    holder.setEnd_date(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DELIVERY_DATE)) != null)
+                    holder.setDeliverydate(cursor.getString(cursor.getColumnIndex(TableColumns.DELIVERY_DATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ISDELETED)) != null)
+                    holder.setIs_deleted(cursor.getString(cursor.getColumnIndex(TableColumns.ISDELETED)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)) != null)
+                    holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
+                    holder.setBalance_amount(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)) != null)
+                    holder.setAdjustment(cursor.getString(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)));
+                list.add(holder);
+
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return list;
+    }
     public static ArrayList<DateQuantityModel> getAllCustomers(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS;
         ArrayList<DateQuantityModel> list = new ArrayList<>();

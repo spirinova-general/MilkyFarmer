@@ -71,7 +71,62 @@
 
 
                 </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
 
+
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/name_layout"
+                        android:layout_weight="1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        >
+
+                        <EditText
+                            android:id="@+id/first_name"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="First Name"
+                            android:inputType="textCapSentences"
+                            android:nextFocusDown="@+id/last_name"
+                            android:singleLine="true" />
+                    </android.support.design.widget.TextInputLayout>
+
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/last_name_layout"
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/last_name"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Last Name"
+                            android:inputType="textCapSentences"
+                            android:singleLine="true" />
+                    </android.support.design.widget.TextInputLayout>
+
+
+                </LinearLayout>
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/mobile_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="0dp">
+
+                    <EditText
+                        android:id="@+id/mobile"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Mobile"
+                        android:inputType="number"
+                        android:singleLine="true" />
+                </android.support.design.widget.TextInputLayout>
                 <LinearLayout
                     android:id="@+id/balanceLayout"
                     android:layout_width="fill_parent"

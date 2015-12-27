@@ -126,6 +126,7 @@ public class CustomersList extends AppCompatActivity {
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
         TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
         subTitle.setVisibility(View.GONE);
+        title.setText(Constants.DELIVERY_DATE);
         ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
         deleteCustomer.setVisibility(View.GONE);
 

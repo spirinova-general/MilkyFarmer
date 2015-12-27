@@ -10,8 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.milky.R;
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingTableManagement;
 import com.milky.ui.main.BillingEdit;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
@@ -105,7 +105,7 @@ public class BillingAdapter extends BaseAdapter {
         String billAmount = "0";
         float previousBill = 0;
         SimpleDateFormat sdf = Constants.format;
-        Float tax = (Float.parseFloat(rate) * Float.parseFloat(GlobalSettingTableManagement.getDefaultTax(databaseHelper.getReadableDatabase()))) / 100;
+        Float tax = (Float.parseFloat(rate) * Float.parseFloat(Account.getDefautTax(databaseHelper.getReadableDatabase()))) / 100;
         try {
             todaydate = sdf.parse(currentDate);
             tempdate = sdf.parse(currentDate);

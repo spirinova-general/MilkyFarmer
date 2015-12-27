@@ -17,12 +17,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.main.CustomersActivity;
@@ -156,8 +156,8 @@ public class CustomerSettingFragment extends Fragment {
 
         /*Set defaul rate
         * */
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS))
-            _mRate.setText(GlobalSettingTableManagement.getDefaultRate(_dbHelper.getReadableDatabase()));
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
+            _mRate.setText(Account.getDefaultRate(_dbHelper.getReadableDatabase()));
 
         /*
         * If to edit customer details

@@ -1,9 +1,11 @@
 package com.milky.utils;
 
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.serverapi.SyncDataService;
 
 /**
  * Singleton class for access shared resource in application wide.
@@ -25,7 +27,7 @@ public class AppUtil extends Application {
         _instance = this;
         _dbHandler = new DatabaseHelper(getApplicationContext());
         _sharedPRefrences = getApplicationContext().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
-
+        startService(new Intent(getBaseContext(), SyncDataService.class));
     }
 
     public static synchronized AppUtil getInstance() {

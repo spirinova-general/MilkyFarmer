@@ -23,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.AreaMapTableManagement;
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     Spinner spinner;
     int selectedPosition = 0;
     public static String selectedAreaId = "";
-    public static String selectedArea="";
+    public static String selectedArea = "";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
                     selectedPosition = arg2;
                     selectedAreaId = _areacityList.get(arg2).getAreaId();
-                    selectedArea =_areacityList.get(arg2).getArea()+", "+_areacityList.get(arg2).getCity();
+                    selectedArea = _areacityList.get(arg2).getArea() + ", " + _areacityList.get(arg2).getCity();
                     if (getFragmentRefreshListener() != null) {
                         getFragmentRefreshListener().onRefresh();
                     }
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             });
 
         }
-        if (view1 instanceof SearchView) {
+        if (searchView instanceof SearchView) {
             SearchView actionSearchView = (SearchView) searchView;
             final EditText editSearch;
             actionSearchView.setIconifiedByDefault(false);
@@ -168,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     if (TextUtils.isEmpty(editSearch.getText().toString())) {
+
                         if (getFragmentRefreshListener() != null) {
                             getFragmentRefreshListener().onRefresh();
                         }
@@ -185,25 +187,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                     return false;
                 }
             });
-            mSpinnerItem2.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-
-                @Override
-                public boolean onMenuItemActionExpand(MenuItem item) {
-                    // Do whatever you need
-                    return true; // KEEP IT TO TRUE OR IT DOESN'T OPEN !!
-                }
-
-                @Override
-                public boolean onMenuItemActionCollapse(MenuItem item) {
-                    // Do whatever you need
-                    return true; // OR FALSE IF YOU DIDN'T WANT IT TO CLOSE!
-                }
-            });
 
         }
         return true;
     }
+
     ArrayList<String> areas;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -229,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             areacity.setAreaId(_areaList.get(i).getAreaId());
             areacity.setCityId(_areaList.get(i).getCityId());
             areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
-            areacity.setCityArea(areacity.getArea()+", "+ areacity.getCity());
+            areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
             _areacityList.add(areacity);
 
 
@@ -294,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
 
         //check if global setting has been set
-        if (!AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS)) {
+        if ("0".equals(Account.getDefaultRate(_dbHelper.getReadableDatabase()))) {
             mDrawerLayout.openDrawer(mNavigationView);
             Toast.makeText(MainActivity.this, getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
         }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/F:/SvnProjects/MobileAppDevelopment/DEVELOPMENT/CODEBASE/trunk/Milky/3rdpartylib/extcal/build/intermediates/bundles/debug/res/values/values.xml -->
+    <!-- From: file:/G:/BB%20reop/3rdpartylib/extcal/build/intermediates/bundles/debug/res/values/values.xml -->
     <eat-comment/>
     <dimen name="day_margin">24dp</dimen>
     <dimen name="first_day_margin">10dp</dimen>

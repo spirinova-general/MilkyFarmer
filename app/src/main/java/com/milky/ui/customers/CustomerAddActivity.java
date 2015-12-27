@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -24,16 +23,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AutocompleteAreaArrayAdapter;
@@ -176,11 +174,11 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setDateAdded(formattedDate);
                         holder.setStart_date(formattedDate);
                         holder.setDeliverydate(_pickdate.getText().toString().trim());
-                        holder.setCustomerId(Constants.ACCOUNT_ID + String.valueOf(System.currentTimeMillis()));
+                        holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
 
-                        holder.setTax(GlobalSettingTableManagement.getDefaultTax(_dbHelper.getReadableDatabase()));
+                        holder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
                         holder.setAdjustment("");
                         holder.setPaymentMade("0");
                         holder.setIsCleared("0");
@@ -322,8 +320,8 @@ public class CustomerAddActivity extends AppCompatActivity {
         _cityAreaAutocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete_city_area);
         /*Set defaul rate
         * */
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS))
-            _rate.setText(GlobalSettingTableManagement.getDefaultRate(_dbHelper.getReadableDatabase()));
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
+            _rate.setText(Account.getDefaultRate(_dbHelper.getReadableDatabase()));
 
         _phone_textinput_layout = (TextInputLayout) findViewById(R.id.phone_textinput_layout);
         rate_layout = (TextInputLayout) findViewById(R.id.rate_layout);

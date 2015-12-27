@@ -24,5 +24,7 @@
     <string name="set_global_rate">Please setup settings first</string>
     <string name="all">All</string>
     <string name="title_activity_farmer_signup">FarmerSignup</string>
+    <string name="facebook_app_id">1104501639590760</string>
+
 </resources>
 

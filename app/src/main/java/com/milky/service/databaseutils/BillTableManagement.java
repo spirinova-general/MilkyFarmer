@@ -112,6 +112,53 @@ public class BillTableManagement {
         return list;
     }
 
+    public static ArrayList<VCustomersList> getCustomersBillToSync(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.SYNC_STATUS + " ='" + "0'" + " AND " + TableColumns.DIRTY + " ='0'";
+        ArrayList<VCustomersList> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                VCustomersList holder = new VCustomersList();
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
+                    holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
+                    holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
+                    holder.setStart_date(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)) != null)
+                    holder.setEnd_date(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)) != null)
+                    holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
+                    holder.setBalance_amount(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)) != null)
+                    holder.setAdjustment(cursor.getString(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.TAX)) != null)
+                    holder.setTax(cursor.getString(cursor.getColumnIndex(TableColumns.TAX)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.IS_CLEARED)) != null)
+                    holder.setIsCleared("false");
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)) != null)
+                    holder.setPaymentMade(cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
+                    holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)) != null)
+                    holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+
+
+                list.add(holder);
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return list;
+    }
+
     public static void updateSyncedData(SQLiteDatabase db) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DIRTY, "1");

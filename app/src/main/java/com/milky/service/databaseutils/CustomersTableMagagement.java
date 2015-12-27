@@ -69,7 +69,7 @@ public class CustomersTableMagagement {
         values.put(TableColumns.DATE_QUANTITY_MODIFIED, holder.getDateAdded());
         values.put(TableColumns.ISDELETED, "0");
         values.put(TableColumns.DIRTY, "0");
-        values.put(TableColumns.SYNC_STATUS, "0");
+        values.put(TableColumns.SYNC_STATUS, "1");
         db.insert(TableNames.TABLE_CUSTOMER, null, values);
     }
 
@@ -315,6 +315,7 @@ public class CustomersTableMagagement {
         values.put(TableColumns.DATE_MODIFIED, holder.getDateAdded());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.ISDELETED, "0");
+        values.put(TableColumns.SYNC_STATUS, "0");
         db.update(TableNames.TABLE_CUSTOMER, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
     }
 
@@ -322,6 +323,7 @@ public class CustomersTableMagagement {
         ContentValues values = new ContentValues();
         values.put(TableColumns.ISDELETED, "1");
         values.put(TableColumns.ISDELETED, deletedDate);
+        values.put(TableColumns.SYNC_STATUS, "0");
         db.update(TableNames.TABLE_CUSTOMER, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
     }
 
@@ -336,7 +338,58 @@ public class CustomersTableMagagement {
 //    public static void deleteCustomer(SQLiteDatabase db, String custId) {
 //        db.delete(TableNames.TABLE_CUSTOMER, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
 //    }
+public static ArrayList<VCustomersList> getAllCustomersToSync(SQLiteDatabase db) {
+    String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.SYNC_STATUS + " ='" + "0'" ;
+    ArrayList<VCustomersList> list = new ArrayList<>();
 
+    Cursor cursor = db.rawQuery(selectquery, null);
+
+    if (cursor.moveToFirst()) {
+        do {
+            VCustomersList holder = new VCustomersList();
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
+                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
+                holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
+                holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
+                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
+                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
+                holder.setBalance_amount(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)) != null)
+                holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
+                holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)) != null)
+                holder.setCityId(cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
+                holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
+                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)) != null)
+                holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
+                holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)) != null)
+                holder.setQuantityModifiedDate(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.ISDELETED)) != null)
+                holder.setIs_deleted(cursor.getString(cursor.getColumnIndex(TableColumns.ISDELETED)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.DELIVERY_DATE)) != null)
+                holder.setDeliverydate(cursor.getString(cursor.getColumnIndex(TableColumns.DELIVERY_DATE)));
+            if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)) != null)
+                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+            list.add(holder);
+        }
+        while (cursor.moveToNext());
+    }
+    cursor.close();
+    if (db.isOpen())
+        db.close();
+    return list;
+}
     public static int getTotalMilkQuantytyByDay(SQLiteDatabase db, String date) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DATE_QUANTITY_MODIFIED + " ='" + date + "'";
         int quantityTotal = 0;
