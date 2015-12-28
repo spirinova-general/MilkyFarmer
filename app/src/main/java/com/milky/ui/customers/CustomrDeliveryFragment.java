@@ -16,7 +16,6 @@ import android.widget.EditText;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.utils.AppUtil;
-import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
@@ -36,7 +35,7 @@ public class CustomrDeliveryFragment extends Fragment {
         _mCalenderView = (ExtendedCalendarView) view.findViewById(R.id.calendar);
         _mCalenderView.setTotalQuantity(CustomersTableMagagement.getTotalMilkQuantytyForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
                 getActivity().getIntent().getStringExtra("cust_id")));
-        _mCalenderView.customersMilkQuantity(DeliveryTableManagement.gwtMilkQuantityofCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
+        _mCalenderView.customersMilkQuantity(DeliveryTableManagement.getMilkQuantityofCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
                 getActivity().getIntent().getStringExtra("cust_id")));
         _mCalenderView.setForCustomersDelivery(true);
 

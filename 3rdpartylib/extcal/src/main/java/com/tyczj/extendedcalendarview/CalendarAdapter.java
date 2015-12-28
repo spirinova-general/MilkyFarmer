@@ -124,7 +124,7 @@ public class CalendarAdapter extends BaseAdapter {
                     && d.getDay() < registrationDate) {
                 today.setVisibility(View.GONE);
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth()< cal.get(Calendar.MONTH)) {
+            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() < cal.get(Calendar.MONTH)) {
                 today.setVisibility(View.GONE);
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
             } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() < cal.get(Calendar.MONTH)) {
@@ -496,241 +496,263 @@ public class CalendarAdapter extends BaseAdapter {
 //    }
 
 
+    //    private BigDecimal getQuantity(final Day d) {
+//        float quantity = 0;
+//        BigDecimal bigDecimal = round(quantity, 1);
+//        arrayCustId = new ArrayList<>();
+//        dateList = new ArrayList<>();
+//        Calendar deletedCal = Calendar.getInstance();
+//
+////If setting table has data
+//        if (!isForCustomers) {
+//            if (totalData != null && totalData.size() > 0) {
+//                for (int i = 0; i < totalData.size(); ++i) {
+//                    //Check if deliverydate is same as of calander
+//
+//                    try {
+//                        date = sdf.parse(totalData.get(i).getDeliveryDate());
+//
+//                        cal.setTime(date);
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                    if (d.getDay() >= cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() >= cal
+//                            .get(Calendar.MONTH) && d.getYear() >= cal.get(Calendar.YEAR)
+//                            ) {
+//                        if (totalData.get(i).getIs_deleted().equals("0")) {
+//                            //If delivery table has data
+//                            if (quantityByDateList != null && quantityByDateList.size() > 0) {
+//                                for (int j = 0; j < quantityByDateList.size(); j++) {
+//                                    try {
+//                                        date = sdf.parse(quantityByDateList.get(j).getDeliveryDate());
+//
+//                                        cal.setTime(date);
+//                                    } catch (ParseException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                    if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+//                                            .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+//                                            && totalData.get(i).getCustomerId().equals(quantityByDateList.get(j).getCustomerId())) {
+//                                        quantity = Float.parseFloat(quantityByDateList.get(j).getQuantity());
+//                                        bigDecimal = round(quantity, 1);
+//                                        arrayCustId.add(totalData.get(i).getCustomerId());
+//                                    } else {
+//                                        //get data from customer setting table
+//                                        Calendar cal_start = Calendar.getInstance();
+//                                        Calendar cal_end = Calendar.getInstance();
+//                                        Calendar delivery_date = Calendar.getInstance();
+//                                        java.util.Date date_start = null, date_end = null, delivery_end = null;
+//
+//                                        try {
+//                                            date_start = sdf.parse(totalData.get(i).getStartDate());
+//
+//                                            delivery_end = sdf.parse(totalData.get(i).getDeliveryDate());
+//
+//                                            cal_start.setTime(date_start);
+//
+//                                            delivery_date.setTime(delivery_end);
+//
+//                                            if (!totalData.get(i).getEndDate().equals("0")) {
+//                                                date_end = sdf.parse(totalData.get(i).getEndDate());
+//                                                cal_end.setTime(date_end);
+//                                            }
+//                                        } catch (ParseException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                        //array has no customer info
+//                                        if (totalData.get(i).getEndDate().equals("0")) {
+//                                            if (!arrayCustId.contains(totalData.get(i).getCustomerId())) {
+//                                                if (d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
+//                                                        .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)) {
+//                                                    quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
+//                                                    bigDecimal = round(quantity, 1);
+//                                                    arrayCustId.add(totalData.get(i).getCustomerId());
+//                                                }
+//                                            }
+//                                        } else if ((d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
+//                                                .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)
+//                                                &&
+//                                                d.getDay() < cal_end.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_end
+//                                                .get(Calendar.MONTH) && d.getYear() == cal_end.get(Calendar.YEAR))) {
+//                                            quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
+//                                            arrayCustId.add(totalData.get(i).getCustomerId());
+//
+//                                        }
+//                                    }
+//
+//                                }
+//                            } else {
+//                                //get data from customer setting table
+//                                Calendar cal_start = Calendar.getInstance();
+//                                Calendar cal_end = Calendar.getInstance();
+//                                Calendar delivery_date = Calendar.getInstance();
+//                                java.util.Date date_start = null, date_end = null, delivery_end = null;
+//
+//                                try {
+//                                    date_start = sdf.parse(totalData.get(i).getStartDate());
+//
+//                                    delivery_end = sdf.parse(totalData.get(i).getDeliveryDate());
+//
+//                                    cal_start.setTime(date_start);
+//
+//                                    delivery_date.setTime(delivery_end);
+//
+//                                    if (!totalData.get(i).getEndDate().equals("0")) {
+//                                        date_end = sdf.parse(totalData.get(i).getEndDate());
+//                                        cal_end.setTime(date_end);
+//                                    }
+//                                } catch (ParseException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                //array has no customer info
+//                                if (totalData.get(i).getEndDate().equals("0")) {
+//                                    if (d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
+//                                            .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)) {
+//                                        quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
+//                                        bigDecimal = round(quantity, 1);
+//                                        arrayCustId.add(totalData.get(i).getCustomerId());
+//                                    }
+//                                } else if ((d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
+//                                        .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)
+//                                        &&
+//                                        d.getDay() < cal_end.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_end
+//                                        .get(Calendar.MONTH) && d.getYear() == cal_end.get(Calendar.YEAR))) {
+//                                    quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
+//                                    arrayCustId.add(totalData.get(i).getCustomerId());
+//
+//                                }
+//                            }
+//                        } else {/*Customer has been deletd
+//                */
+//                            try {
+//                                deletedDate = sdf.parse(totalData.get(i).getDateModified());
+//
+//                                deletedCal.setTime(deletedDate);
+//                            } catch (ParseException e) {
+//                                e.printStackTrace();
+//                            }
+//                            if (quantityByDateList != null && quantityByDateList.size() > 0) {
+//                                for (int j = 0; j < quantityByDateList.size(); j++) {
+//                                    try {
+//                                        date = sdf.parse(quantityByDateList.get(j).getDeliveryDate());
+//
+//                                        cal.setTime(date);
+//                                    } catch (ParseException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                    if (d.getDay() < deletedCal.get(Calendar.DAY_OF_MONTH) && d.getMonth() <= deletedCal.get(Calendar.MONTH)
+//                                            && d.getYear() <= deletedCal.get(Calendar.YEAR)) {
+//                                        if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+//                                                .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+//                                                && totalData.get(i).getCustomerId().equals(quantityByDateList.get(j).getCustomerId())) {
+//                                            quantity = Float.parseFloat(quantityByDateList.get(j).getQuantity());
+//                                            bigDecimal = round(quantity, 1);
+//                                        }
+//
+//
+//                                    }
+//
+//                                }
+//                            }
+//
+//
+//                        }
+//                    } else {
+//                        try {
+//                            date = sdf.parse(totalData.get(i).getDeliveryDate());
+//
+//                            cal.setTime(date);
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+//                        /*set previous dates 0*/
+//                        if ((d.getDay() == 1 || d.getDay() < cal.get(Calendar.DAY_OF_MONTH)) && d.getMonth() == cal.get(Calendar.MONTH)
+//                                && d.getYear() == cal.get(Calendar.YEAR)) {
+//                            bigDecimal = round(0, 1);
+//                        }
+//                    }
+//
+//
+//                }
+//            } else {
+//                //No data is in datanbase
+//            }
+//        } else {
+//            /*For customer's delivery*/
+//            if (customerMillkQuantity != null && customerMillkQuantity.size() > 0) {
+//
+//                for (int i = 0; i < customerMillkQuantity.size(); i++) {
+//                    Calendar cal_start = Calendar.getInstance();
+//                    java.util.Date deliveryDate = null;
+//
+//                    try {
+//                        deliveryDate = sdf.parse(customerMillkQuantity.get(i).getDate());
+//
+//
+//                        cal_start.setTime(deliveryDate);
+//
+//
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                    // Date matches
+//                    if (d.getDay() == cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
+//                            .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)) {
+//                        quantity = Float.parseFloat(customerMillkQuantity.get(i).getQuantity());
+//                        bigDecimal = round(quantity, 1);
+//
+//                    } else {
+//                        quantity = totalQuantity;
+//                        bigDecimal = round(quantity, 1);
+//                    }
+//                }
+//
+//            } else {
+//                quantity = totalQuantity;
+//                bigDecimal = round(quantity, 1);
+//            }
+//
+//        }
+//
+//
+//
+//
+///*//Check if deleted customer
+//        if(totaldata.getIsDeletedCustomer().equals("1"))
+//        {
+//
+//        }*/
+//
+//
+//        return bigDecimal;
+//    }
+    BigDecimal bigDecimal = null;
+
     private BigDecimal getQuantity(final Day d) {
-        float quantity = 0;
-        BigDecimal bigDecimal = round(quantity, 1);
-        arrayCustId = new ArrayList<>();
-        dateList = new ArrayList<>();
-        Calendar deletedCal = Calendar.getInstance();
+        for (int i = 0; i < totalData.size(); ++i) {
+            //Check if deliverydate is same as of calander
 
-//If setting table has data
-        if (!isForCustomers) {
-            if (totalData != null && totalData.size() > 0) {
-                for (int i = 0; i < totalData.size(); ++i) {
-                    //Check if deliverydate is same as of calander
+            try {
+                date = sdf.parse(totalData.get(i).getDeliveryDate());
 
-                    try {
-                        date = sdf.parse(totalData.get(i).getDeliveryDate());
-
-                        cal.setTime(date);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    if (d.getDay() >= cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() >= cal
-                            .get(Calendar.MONTH) && d.getYear() >= cal.get(Calendar.YEAR)
-                            ) {
-                        if (totalData.get(i).getIs_deleted().equals("0")) {
-                            //If delivery table has data
-                            if (quantityByDateList != null && quantityByDateList.size() > 0) {
-                                for (int j = 0; j < quantityByDateList.size(); j++) {
-                                    try {
-                                        date = sdf.parse(quantityByDateList.get(j).getDeliveryDate());
-
-                                        cal.setTime(date);
-                                    } catch (ParseException e) {
-                                        e.printStackTrace();
-                                    }
-                                    if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
-                                            .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
-                                            && totalData.get(i).getCustomerId().equals(quantityByDateList.get(j).getCustomerId())) {
-                                        quantity = Float.parseFloat(quantityByDateList.get(j).getQuantity());
-                                        bigDecimal = round(quantity, 1);
-                                        arrayCustId.add(totalData.get(i).getCustomerId());
-                                    } else {
-                                        //get data from customer setting table
-                                        Calendar cal_start = Calendar.getInstance();
-                                        Calendar cal_end = Calendar.getInstance();
-                                        Calendar delivery_date = Calendar.getInstance();
-                                        java.util.Date date_start = null, date_end = null, delivery_end = null;
-
-                                        try {
-                                            date_start = sdf.parse(totalData.get(i).getStartDate());
-
-                                            delivery_end = sdf.parse(totalData.get(i).getDeliveryDate());
-
-                                            cal_start.setTime(date_start);
-
-                                            delivery_date.setTime(delivery_end);
-
-                                            if (!totalData.get(i).getEndDate().equals("0")) {
-                                                date_end = sdf.parse(totalData.get(i).getEndDate());
-                                                cal_end.setTime(date_end);
-                                            }
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
-                                        }
-                                        //array has no customer info
-                                        if (totalData.get(i).getEndDate().equals("0")) {
-                                            if (!arrayCustId.contains(totalData.get(i).getCustomerId())) {
-                                                if (d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
-                                                        .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)) {
-                                                    quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
-                                                    bigDecimal = round(quantity, 1);
-                                                    arrayCustId.add(totalData.get(i).getCustomerId());
-                                                }
-                                            }
-                                        } else if ((d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
-                                                .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)
-                                                &&
-                                                d.getDay() < cal_end.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_end
-                                                .get(Calendar.MONTH) && d.getYear() == cal_end.get(Calendar.YEAR))) {
-                                            quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
-                                            arrayCustId.add(totalData.get(i).getCustomerId());
-
-                                        }
-                                    }
-
-                                }
-                            } else {
-                                //get data from customer setting table
-                                Calendar cal_start = Calendar.getInstance();
-                                Calendar cal_end = Calendar.getInstance();
-                                Calendar delivery_date = Calendar.getInstance();
-                                java.util.Date date_start = null, date_end = null, delivery_end = null;
-
-                                try {
-                                    date_start = sdf.parse(totalData.get(i).getStartDate());
-
-                                    delivery_end = sdf.parse(totalData.get(i).getDeliveryDate());
-
-                                    cal_start.setTime(date_start);
-
-                                    delivery_date.setTime(delivery_end);
-
-                                    if (!totalData.get(i).getEndDate().equals("0")) {
-                                        date_end = sdf.parse(totalData.get(i).getEndDate());
-                                        cal_end.setTime(date_end);
-                                    }
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                                //array has no customer info
-                                if (totalData.get(i).getEndDate().equals("0")) {
-                                    if (d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
-                                            .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)) {
-                                        quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
-                                        bigDecimal = round(quantity, 1);
-                                        arrayCustId.add(totalData.get(i).getCustomerId());
-                                    }
-                                } else if ((d.getDay() >= cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
-                                        .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)
-                                        &&
-                                        d.getDay() < cal_end.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_end
-                                        .get(Calendar.MONTH) && d.getYear() == cal_end.get(Calendar.YEAR))) {
-                                    quantity = Float.parseFloat(totalData.get(i).getQuantity()) + quantity;
-                                    arrayCustId.add(totalData.get(i).getCustomerId());
-
-                                }
-                            }
-                        } else {/*Customer has been deletd
-                */
-                            try {
-                                deletedDate = sdf.parse(totalData.get(i).getDateModified());
-
-                                deletedCal.setTime(deletedDate);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            if (quantityByDateList != null && quantityByDateList.size() > 0) {
-                                for (int j = 0; j < quantityByDateList.size(); j++) {
-                                    try {
-                                        date = sdf.parse(quantityByDateList.get(j).getDeliveryDate());
-
-                                        cal.setTime(date);
-                                    } catch (ParseException e) {
-                                        e.printStackTrace();
-                                    }
-                                    if (d.getDay() < deletedCal.get(Calendar.DAY_OF_MONTH) && d.getMonth() <= deletedCal.get(Calendar.MONTH)
-                                            && d.getYear() <= deletedCal.get(Calendar.YEAR)) {
-                                        if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
-                                                .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
-                                                && totalData.get(i).getCustomerId().equals(quantityByDateList.get(j).getCustomerId())) {
-                                            quantity = Float.parseFloat(quantityByDateList.get(j).getQuantity());
-                                            bigDecimal = round(quantity, 1);
-                                        }
-
-
-                                    }
-
-                                }
-                            }
-
-
-                        }
-                    } else {
-                        try {
-                            date = sdf.parse(totalData.get(i).getDeliveryDate());
-
-                            cal.setTime(date);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        /*set previous dates 0*/
-                        if ((d.getDay() == 1 || d.getDay() < cal.get(Calendar.DAY_OF_MONTH)) && d.getMonth() == cal.get(Calendar.MONTH)
-                                && d.getYear() == cal.get(Calendar.YEAR)) {
-                            bigDecimal = round(0, 1);
-                        }
-                    }
-
-
-                }
-            } else {
-                //No data is in datanbase
+                cal.setTime(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-        } else {
-            /*For customer's delivery*/
-            if (customerMillkQuantity != null && customerMillkQuantity.size() > 0) {
-
-                for (int i = 0; i < customerMillkQuantity.size(); i++) {
-                    Calendar cal_start = Calendar.getInstance();
-                    java.util.Date deliveryDate = null;
-
-                    try {
-                        deliveryDate = sdf.parse(customerMillkQuantity.get(i).getDate());
-
-
-                        cal_start.setTime(deliveryDate);
-
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    // Date matches
-                    if (d.getDay() == cal_start.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal_start
-                            .get(Calendar.MONTH) && d.getYear() == cal_start.get(Calendar.YEAR)) {
-                        quantity = Float.parseFloat(customerMillkQuantity.get(i).getQuantity());
-                        bigDecimal = round(quantity, 1);
-
-                    } else {
-                        quantity = totalQuantity;
-                        bigDecimal = round(quantity, 1);
-                    }
-                }
-
-            } else {
-                quantity = totalQuantity;
-                bigDecimal = round(quantity, 1);
+            if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+                    .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+                    ) {
+                bigDecimal = totalData.get(i).getCalculatedQuqantity();
+                return bigDecimal;
             }
+            else
+            {
 
+            }
         }
-
-
-
-
-/*//Check if deleted customer
-        if(totaldata.getIsDeletedCustomer().equals("1"))
-        {
-
-        }*/
-
 
         return bigDecimal;
     }
 
 
-    public static BigDecimal round(float d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Float.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd;
-    }
 }

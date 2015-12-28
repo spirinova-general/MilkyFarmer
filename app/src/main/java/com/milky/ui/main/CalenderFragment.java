@@ -51,12 +51,14 @@ public class CalenderFragment extends Fragment {
         super.onResume();
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
         _mCalenderView.setForCustomersDelivery(false);
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            _mCalenderView.customersList(CustomerSettingTableManagement.getAllCustomers(_dbHelper.getReadableDatabase()));
-            if (_dbHelper.isTableNotEmpty(TableNames.TABLE_DELIVERY))
-                _mCalenderView.quantityByDate(DeliveryTableManagement.getQuantityOfDay(_dbHelper.getReadableDatabase()));
-            _mCalenderView.refreshAdapter();
-        }
+//        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+//            _mCalenderView.customersList(CustomerSettingTableManagement.getAllCustomers(_dbHelper.getReadableDatabase()));
+//            if (_dbHelper.isTableNotEmpty(TableNames.TABLE_DELIVERY))
+//                _mCalenderView.quantityByDate(DeliveryTableManagement.getQuantityOfDay(_dbHelper.getReadableDatabase()));
+//            _mCalenderView.refreshAdapter();
+//        }
+        if(Constants.totalData.size()>0)
+            _mCalenderView.totalQuantityCalculated(Constants.totalData);
 
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override

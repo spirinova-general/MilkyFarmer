@@ -173,6 +173,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                         formattedDate = df.format(c.getTime());
                         holder.setDateAdded(formattedDate);
                         holder.setStart_date(formattedDate);
+                        holder.setEnd_date(String.valueOf(c.get(Calendar.MONTH)+1) + "-" +
+                                String.valueOf(Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(c.get(Calendar.YEAR)));
                         holder.setDeliverydate(_pickdate.getText().toString().trim());
                         holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);

@@ -378,7 +378,8 @@ public class CustomerSettingFragment extends Fragment {
                     String formattedDate = df.format(c.getTime());
                     holder.setDateModified(formattedDate);
                     holder.setStart_date(formattedDate);
-                    holder.setEnd_date("0");
+                    holder.setEnd_date(String.valueOf(c.get(Calendar.MONTH)+1) + "-" +
+                            String.valueOf(Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(c.get(Calendar.YEAR)));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
 
                     if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
@@ -386,7 +387,8 @@ public class CustomerSettingFragment extends Fragment {
                         CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
 
                     } else {
-                        CustomerSettingTableManagement.updateQuantity(_dbHelper.getWritableDatabase(), holder);
+                        String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
+                        CustomerSettingTableManagement.updateQuantity(_dbHelper.getWritableDatabase(), holder, enddate);
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
 
 

@@ -350,4 +350,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     public void customersMilkQuantity(ArrayList<DateQuantityModel> quantity) {
         CalendarAdapter.customersMilkQuantity(quantity);
     }
+    public void totalQuantityCalculated(final ArrayList<DateQuantityModel> totalList) {
+        CalendarAdapter.totalDataList(totalList);
+    }
 }

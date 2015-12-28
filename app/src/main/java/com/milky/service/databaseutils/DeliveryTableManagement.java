@@ -99,7 +99,27 @@ public class DeliveryTableManagement {
         return quantityList;
     }
 
-    public static ArrayList<DateQuantityModel> gwtMilkQuantityofCustomer(SQLiteDatabase db, final String custId) {
+    public static double getQuantityOfDayByDate(SQLiteDatabase db, String day) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.DELIVERY_DATE + " ='" + day + "'";
+        Cursor cursor = db.rawQuery(selectquery, null);
+        double quantity = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                Constants.custIds.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
+
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return quantity;
+    }
+
+    public static ArrayList<DateQuantityModel> getMilkQuantityofCustomer(SQLiteDatabase db, final String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
         ArrayList<DateQuantityModel> quantityList = new ArrayList<>();
 

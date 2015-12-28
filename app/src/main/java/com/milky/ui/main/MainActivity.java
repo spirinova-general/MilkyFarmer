@@ -226,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         }
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
+        Constants.getTotalQuantity();
     }
 
     private void supportActionBar() {

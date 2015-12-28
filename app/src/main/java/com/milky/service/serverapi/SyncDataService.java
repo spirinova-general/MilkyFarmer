@@ -47,7 +47,6 @@ public class SyncDataService extends Service implements OnTaskCompleteListner{
         handler = new Handler();
         runnable = new Runnable() {
             public void run() {
-                Toast.makeText(context, "Service is still running", Toast.LENGTH_LONG).show();
                 SyncNow();
                 handler.postDelayed(runnable,50000);
             }
@@ -59,8 +58,6 @@ public class SyncDataService extends Service implements OnTaskCompleteListner{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Let it continue running until it is stopped.
-        Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
-
 
         return START_STICKY;
     }

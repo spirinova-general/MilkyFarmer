@@ -1,5 +1,7 @@
 package com.tyczj.extendedcalendarview;
 
+import java.math.BigDecimal;
+
 /**
  * Created by Neha on 12/7/2015.
  */
@@ -16,6 +18,15 @@ public class DateQuantityModel {
     private String deliveryDate;
     private String is_deleted;
     private String dateModified;
+    private BigDecimal calculatedQuqantity=null;
+
+    public BigDecimal getCalculatedQuqantity() {
+        return calculatedQuqantity;
+    }
+
+    public void setCalculatedQuqantity(BigDecimal calculatedQuqantity) {
+        this.calculatedQuqantity = calculatedQuqantity;
+    }
 
     public String getDateModified() {
         return dateModified;
