@@ -26,10 +26,9 @@ public class BillTableManagement {
         values.put(TableColumns.TAX, holder.getTax());
         values.put(TableColumns.IS_CLEARED, holder.getIsCleared());
         values.put(TableColumns.PAYMENT_MADE, holder.getPaymentMade());
-        values.put(TableColumns.DATE_ADDED, holder.getDeliverydate());
         values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
-        values.put(TableColumns.SYNC_STATUS, "0");
-        values.put(TableColumns.DIRTY, "0");
+        values.put(TableColumns.SYNC_STATUS, "1");
+        values.put(TableColumns.DIRTY, "1");
 
         db.insert(TableNames.TABLE_CUSTOMER_BILL, null, values);
     }

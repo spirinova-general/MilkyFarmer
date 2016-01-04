@@ -44,6 +44,7 @@ import com.milky.viewmodel.VCustomersList;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class CustomerAddActivity extends AppCompatActivity {
     private Toolbar _mToolbar;
@@ -172,10 +173,9 @@ public class CustomerAddActivity extends AppCompatActivity {
                         SimpleDateFormat df = Constants.format;
                         formattedDate = df.format(c.getTime());
                         holder.setDateAdded(formattedDate);
-                        holder.setStart_date(formattedDate);
-                        holder.setEnd_date(String.valueOf(c.get(Calendar.MONTH)+1) + "-" +
-                                String.valueOf(Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(c.get(Calendar.YEAR)));
-                        holder.setDeliverydate(_pickdate.getText().toString().trim());
+                        holder.setStart_date(_pickdate.getText().toString().trim());
+                        holder.setEnd_date(String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+                                String.format("%02d",Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
                         holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
@@ -204,14 +204,16 @@ public class CustomerAddActivity extends AppCompatActivity {
 
 
         final Calendar c = Calendar.getInstance();
+
         myear = c.get(Calendar.YEAR);
         mmonth = c.get(Calendar.MONTH);
         mday = c.get(Calendar.DAY_OF_MONTH);
 
         // set current date into textview
+
         _pickdate.setText(new StringBuilder()
                 // Month is 0 based, just add 1
-                .append(mmonth + 1).append("-").append(mday).append("-")
+                .append( String.format("%02d",mmonth+1)).append("-").append( String.format("%02d",mday)).append("-")
                 .append(myear).append(" "));
 
     }
@@ -227,6 +229,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                 myear = c.get(Calendar.YEAR);
                 mmonth = c.get(Calendar.MONTH);
                 mday = c.get(Calendar.DAY_OF_MONTH);
+
                 showDialog(DATE_DIALOG_ID);
 
             }
@@ -272,8 +275,8 @@ public class CustomerAddActivity extends AppCompatActivity {
 
             // set selected date into textview
             _pickdate.setText(new StringBuilder()
-                    .append(mmonth + 1).append("-")
-                    .append(mday)
+                    .append( String.format("%02d",mmonth+1)).append("-")
+                    .append( String.format("%02d",mday))
                     .append("-")
                     .append(myear).append(" "));
 

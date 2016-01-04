@@ -35,12 +35,12 @@ public class TableColumsDetail {
             + TableColumns.LAST_NAME + " TEXT," + TableColumns.MOBILE + " TEXT," + TableColumns.ADDRESS_1 + " TEXT," + TableColumns.ADDRESS_2 + " TEXT," + TableColumns.BALANCE + " TEXT,"
             + TableColumns.DATE_ADDED + " DATETIME," + TableColumns.AREA_ID + " TEXT," + TableColumns.CITY_ID + " TEXT,"
             + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.ACCOUNT_ID + " TEXT," + TableColumns.QUANTITY + " TEXT," + TableColumns.DEFAULT_RATE + " TEXT,"
-            + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.DELIVERY_DATE + " DATETIME," + TableColumns.DATE_QUANTITY_MODIFIED + " DATETIME," + TableColumns.ISDELETED + " TEXT," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
+            + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.START_DATE + " DATETIME," + TableColumns.DATE_QUANTITY_MODIFIED + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
             ")";
 
     //DELIVERY
     public static final String DELIVERY = "CREATE TABLE " + TableNames.TABLE_DELIVERY + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.ACCOUNT_ID + " TEXT," + TableColumns.QUANTITY + " TEXT,"
-            + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.DELIVERY_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
+            + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.START_DATE + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
             ")";
 
     //CUSTOMER SETTINGS
@@ -49,8 +49,7 @@ public class TableColumsDetail {
             + TableColumns.DEFAULT_QUANTITY + " TEXT,"
             + TableColumns.BALANCE + " TEXT,"
             + TableColumns.START_DATE + " DATETIME,"
-            + TableColumns.DELIVERY_DATE + " DATETIME," +
-            TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.ISDELETED + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
+            + TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
 
 
     //AREA_ACCOUNT_MAPPING

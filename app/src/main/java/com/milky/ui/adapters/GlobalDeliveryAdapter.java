@@ -110,7 +110,7 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
                     VCustomersList holder = new VCustomersList();
                     holder.setQuantity(s.toString());
                     holder.setCustomerId(CustomersList._mCustomersList.get(position2).getCustomerId());
-                    holder.setDeliverydate(Constants.DELIVERY_DATE);
+                    holder.setStart_date(Constants.DELIVERY_DATE);
                     CustomersList._mDeliveryList.add(holder);
                     finalHolder._quantity_input_layout.setError(null);
                 } else {

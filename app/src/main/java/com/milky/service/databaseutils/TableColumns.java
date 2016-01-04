@@ -30,7 +30,6 @@ public class TableColumns {
     public static final String PAYMENT_MADE = "payment_made";
     public static final String ADDRESS_1 = "address_1";
     public static final String ADDRESS_2 = "address_2";
-    public static final String DELIVERY_DATE = "delivery_date";
     public static final String DEFAULT_QUANTITY = "default_quantity";
     public static final String RATE = "rate";
     public static final String DEFAULT_RATE = "default_rate";
@@ -41,9 +40,9 @@ public class TableColumns {
     public static final String MONTH = "month";
     public static final String YEAR = "year";
     public static final String IS_QUANTITY_UPDATED = "is_quantity_updated";
-    public static final String ISDELETED = "isdeleted";
+    public static final String DELETED_ON = "deleted_on";
     public static final String DIRTY = "dirty";
-    public static final String TOTAL_AMOUNT ="total_amount";
+    public static final String TOTAL_AMOUNT = "total_amount";
 
     public static String SYNC_STATUS = "sync_status";
 

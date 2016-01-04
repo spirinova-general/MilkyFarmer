@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.ui.customers.CustomerTabFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
@@ -113,7 +114,8 @@ public class CustomersActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         CustomersTableMagagement.updatedeletedCustomerDetail(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-                        CustomerSettingTableManagement.updateDeletetdCustomer(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"));
+                        CustomerSettingTableManagement.updateDeletetdCustomer(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
+                        DeliveryTableManagement.updateDeletedCustomer(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
                         finish();
                     }
                 });

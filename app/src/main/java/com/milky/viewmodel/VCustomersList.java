@@ -24,7 +24,7 @@ public class VCustomersList {
     private String rate;
     private String tax;
     private String quantityModifiedDate;
-    private String day, month, year, deliverydate;
+    private String day, month, year;
     private String adjustment;
     private String isCleared;
     private String paymentMade;
@@ -44,13 +44,6 @@ public class VCustomersList {
         return is_deleted;
     }
 
-    public String getDeliverydate() {
-        return deliverydate;
-    }
-
-    public void setDeliverydate(String deliverydate) {
-        this.deliverydate = deliverydate;
-    }
 
 
     public void setIs_deleted(String is_deleted) {

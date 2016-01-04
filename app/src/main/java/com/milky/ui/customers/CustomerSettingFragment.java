@@ -372,12 +372,11 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setAccountId(Constants.ACCOUNT_ID);
                     holder.setRate(_mRate.getText().toString());
                     holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
-                    holder.setDeliverydate(getActivity().getIntent().getStringExtra("delivery_date"));
+                    holder.setStart_date(getActivity().getIntent().getStringExtra("delivery_date"));
                     Calendar c = Calendar.getInstance();
                     SimpleDateFormat df = Constants.format;
-                    String formattedDate = df.format(c.getTime());
+                    String formattedDate = df.format(String.format("%02d", c.getTime()));
                     holder.setDateModified(formattedDate);
-                    holder.setStart_date(formattedDate);
                     holder.setEnd_date(String.valueOf(c.get(Calendar.MONTH)+1) + "-" +
                             String.valueOf(Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(c.get(Calendar.YEAR)));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));

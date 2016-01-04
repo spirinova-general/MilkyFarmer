@@ -107,7 +107,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
                     .putExtra("added_date", mCustomersList.get(getPosition()).getDateAdded())
                     .putExtra("balance", mCustomersList.get(getPosition()).getBalance_amount())
                     .putExtra("cust_id", mCustomersList.get(getPosition()).getCustomerId())
-                    .putExtra("delivery_date", mCustomersList.get(getPosition()).getDeliverydate());
+                    .putExtra("delivery_date", mCustomersList.get(getPosition()).getStart_date());
             mActivity.startActivity(intent);
 
         }

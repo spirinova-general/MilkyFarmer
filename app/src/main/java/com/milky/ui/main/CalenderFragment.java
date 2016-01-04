@@ -57,8 +57,8 @@ public class CalenderFragment extends Fragment {
 //                _mCalenderView.quantityByDate(DeliveryTableManagement.getQuantityOfDay(_dbHelper.getReadableDatabase()));
 //            _mCalenderView.refreshAdapter();
 //        }
-        if(Constants.totalData.size()>0)
-            _mCalenderView.totalQuantityCalculated(Constants.totalData);
+        if(AppUtil.totalData.size()>0)
+            _mCalenderView.totalQuantityCalculated(AppUtil.totalData);
 
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
@@ -67,7 +67,8 @@ public class CalenderFragment extends Fragment {
                 Constants.QUANTITY_UPDATED_DAY = String.valueOf(day.getDay());
                 Constants.QUANTITY_UPDATED_MONTH = String.valueOf(day.getMonth());
                 Constants.QUANTITY_UPDATED_YEAR = String.valueOf(day.getYear());
-                Constants.DELIVERY_DATE = String.valueOf(day.getMonth() + 1) + "-" + String.valueOf(day.getDay()) + "-" + String.valueOf(day.getYear());
+                Constants.DELIVERY_DATE = String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay())
+                        + "-" + String.format("%02d", day.getYear());
                 Intent intent = new Intent(getActivity(), CustomersList.class);
                 startActivity(intent);
             }

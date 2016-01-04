@@ -23,8 +23,8 @@ public class Account {
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.TAX, holder.getTax());
-        values.put(TableColumns.SYNC_STATUS, "0");
-        values.put(TableColumns.DIRTY, "0");
+        values.put(TableColumns.SYNC_STATUS, "1");
+        values.put(TableColumns.DIRTY, "1");
 
         db.insert(TableNames.TABLE_ACCOUNT, null, values);
     }

@@ -151,7 +151,7 @@ public class CustomersList extends AppCompatActivity {
                 for (int i = 0; i < _mDeliveryList.size(); i++) {
 
                     if (DeliveryTableManagement.isHasData(_dbHelper.getReadableDatabase(),
-                            _mDeliveryList.get(i).getCustomerId(), _mDeliveryList.get(i).getDeliverydate()))
+                            _mDeliveryList.get(i).getCustomerId(), _mDeliveryList.get(i).getStart_date()))
                         DeliveryTableManagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), _mDeliveryList.get(i));
                     else
                         DeliveryTableManagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), _mDeliveryList.get(i));

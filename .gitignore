@@ -8,3 +8,7 @@
 /captures
 app/proguard-rules.pro
 *.iml
+3rdpartylib/extcal/build/intermediates/bundles/debug/classes.jar
+*.class
+3rdpartylib/extcal/build/outputs/aar/extcal-debug.aar
+.idea/misc.xml

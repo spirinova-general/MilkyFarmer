@@ -35,8 +35,6 @@ import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
-import com.milky.ui.adapters.CustomersFragmentListAdapter;
-import com.milky.ui.customers.CustomerSettingFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
@@ -226,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         }
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
-        Constants.getTotalQuantity();
+        AppUtil.getTotalQuantity();
     }
 
     private void supportActionBar() {

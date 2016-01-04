@@ -70,16 +70,17 @@ public class BillingAdapter extends BaseAdapter {
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
 
-        holder.startDate.setText(mCustomersData.get(position).getDeliverydate());
+        holder.startDate.setText(mCustomersData.get(position).getStart_date());
         holder.endDate.setText(time);
-        holder.amount.setText(getBill(time, mCustomersData.get(position).getCustomerId(), mCustomersData.get(position).getDeliverydate(), mCustomersData.get(position).getEnd_date(), mCustomersData.get(position).getRate()
+        holder.amount.setText(getBill(time, mCustomersData.get(position).getCustomerId(),
+                mCustomersData.get(position).getStart_date(), mCustomersData.get(position).getEnd_date(), mCustomersData.get(position).getRate()
                 , mCustomersData.get(position).getQuantity(), mCustomersData.get(position).getBalance_amount(), mCustomersData.get(position).getAdjustment()));
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, BillingEdit.class);
-                intent.putExtra("start_date", mCustomersData.get(position).getDeliverydate())
+                intent.putExtra("start_date", mCustomersData.get(position).getStart_date())
                         .putExtra("end_date", time)
                         .putExtra("quantity", mCustomersData.get(position).getQuantity())
                         .putExtra("amount", mCustomersData.get(position).getRate())
