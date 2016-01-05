@@ -54,8 +54,7 @@ public class FarmerSignup extends AppCompatActivity {
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
         TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
         subTitle.setVisibility(View.GONE);
-        title.setText(
-                "Profile");
+        title.setText("Profile");
         LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 
         saveManu.setVisibility(View.VISIBLE);
@@ -91,6 +90,7 @@ public class FarmerSignup extends AppCompatActivity {
 
                         Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
                     startActivity(new Intent(FarmerSignup.this, MainActivity.class));
+                    finish();
                 }
 
             }

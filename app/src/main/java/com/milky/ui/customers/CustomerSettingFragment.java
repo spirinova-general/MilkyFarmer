@@ -45,7 +45,7 @@ public class CustomerSettingFragment extends Fragment {
     private EditText _mFirstName, _mLastName, _mAddress1, _mBalance, _mQuantuty, _mAddress2, _mMobile, _mRate;
     private InputMethodManager inputMethodManager;
     private Button _mSave, _mCancel;
-//    private FloatingActionButton _mEdit;
+    //    private FloatingActionButton _mEdit;
     private int dataCount = 0;
     private TextInputLayout _phone_textinput_layout;
     private AutoCompleteTextView _autocomplete_city_area;
@@ -80,15 +80,15 @@ public class CustomerSettingFragment extends Fragment {
 
        /*
         * Set text field listeners*/
-        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1,flat_number_layout, getActivity(), false));
-        _mFirstName.addTextChangedListener(new TextValidationMessage(_mAddress1,name_layout, getActivity(), false));
-        _mLastName.addTextChangedListener(new TextValidationMessage(_mAddress1,last_name_layout, getActivity(), false));
+        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, getActivity(), false));
+        _mFirstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, getActivity(), false));
+        _mLastName.addTextChangedListener(new TextValidationMessage(_mAddress1, last_name_layout, getActivity(), false));
 
-        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1,milk_quantity_layout, getActivity(), false));
-        _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1,balance_layout, getActivity(), false));
-        _mMobile.addTextChangedListener(new TextValidationMessage(_mMobile,_phone_textinput_layout, getActivity(), true));
-        _mAddress2.addTextChangedListener(new TextValidationMessage(_mMobile,street_layout, getActivity(), false));
-        _mRate.addTextChangedListener(new TextValidationMessage(_mMobile,rate_layout, getActivity(), false));
+        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, getActivity(), false));
+        _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, getActivity(), false));
+        _mMobile.addTextChangedListener(new TextValidationMessage(_mMobile, _phone_textinput_layout, getActivity(), true));
+        _mAddress2.addTextChangedListener(new TextValidationMessage(_mMobile, street_layout, getActivity(), false));
+        _mRate.addTextChangedListener(new TextValidationMessage(_mMobile, rate_layout, getActivity(), false));
 
         /* ---------------------------------------------------*/
 //
@@ -133,7 +133,7 @@ public class CustomerSettingFragment extends Fragment {
         _mQuantuty = (EditText) view.findViewById(R.id.milk_quantity);
         _mAddress2 = (EditText) view.findViewById(R.id.street);
         _mBalance = (EditText) view.findViewById(R.id.balance);
-       _autocomplete_city_area = (AutoCompleteTextView) view.findViewById(R.id.autocomplete_city_area);
+        _autocomplete_city_area = (AutoCompleteTextView) view.findViewById(R.id.autocomplete_city_area);
 //        _autocomplete_city_area.setFocusable(false);
 //        _autocomplete_city_area.setFocusableInTouchMode(false);
         _mSave = (Button) view.findViewById(R.id.save);
@@ -186,8 +186,7 @@ public class CustomerSettingFragment extends Fragment {
         _mQuantuty.setSelection(getActivity().getIntent().getStringExtra("quantity").length());
 
 
-
-            //        areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
+        //        areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
         ArrayList<String> areas = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
         for (int i = 0; i < areas.size(); ++i) {
             areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
@@ -375,10 +374,10 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setStart_date(getActivity().getIntent().getStringExtra("delivery_date"));
                     Calendar c = Calendar.getInstance();
                     SimpleDateFormat df = Constants.format;
-                    String formattedDate = df.format(String.format("%02d", c.getTime()));
+                    String formattedDate = df.format(c.getTime());
                     holder.setDateModified(formattedDate);
-                    holder.setEnd_date(String.valueOf(c.get(Calendar.MONTH)+1) + "-" +
-                            String.valueOf(Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(c.get(Calendar.YEAR)));
+                    holder.setEnd_date(String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
 
                     if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
@@ -387,10 +386,9 @@ public class CustomerSettingFragment extends Fragment {
 
                     } else {
                         String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
-                        CustomerSettingTableManagement.updateQuantity(_dbHelper.getWritableDatabase(), holder, enddate);
+                        CustomerSettingTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
+                        holder.setStart_date(formattedDate);
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
-
-
                     }
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
 //                    EnableEditableFields.setIsEnabled(false);

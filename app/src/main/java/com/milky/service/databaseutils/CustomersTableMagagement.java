@@ -304,6 +304,55 @@ public class CustomersTableMagagement {
         return list;
     }
 
+    public static String getFirstName(SQLiteDatabase db, final String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE "
+                + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        String name = "";
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
+                    name = cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME));
+
+
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return name;
+    }
+
+    public static String getLastName(SQLiteDatabase db, final String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE "
+                + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+
+        String name = "";
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
+                    name = cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME));
+
+
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return name;
+    }
+
     public static void updateCustomerDetail(SQLiteDatabase db, VCustomersList holder, String custId) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.FIRST_NAME, holder.getFirstName());

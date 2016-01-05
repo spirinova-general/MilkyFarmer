@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DeliveryTableManagement;
@@ -74,7 +75,7 @@ public class CustomersList extends AppCompatActivity {
         setActionBar();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            _mCustomersList = CustomersTableMagagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
+            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(),"");
             _mAdaapter = new GlobalDeliveryAdapter(this, String.valueOf(Constants.SELECTED_DAY));
             _mCustomers.setItemsCanFocus(true);
             _mCustomers.setAdapter(_mAdaapter);
@@ -204,12 +205,12 @@ public class CustomersList extends AppCompatActivity {
 
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
                         if (arg2 == 0) {
-                            _mCustomersList = CustomersTableMagagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
+                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
                             _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
                             _mCustomers.setItemsCanFocus(true);
                             _mCustomers.setAdapter(_mAdaapter);
                         } else {
-                            _mCustomersList = CustomersTableMagagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), selectedAreaId);
+                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), selectedAreaId);
                             _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
                             _mCustomers.setItemsCanFocus(true);
                             _mCustomers.setAdapter(_mAdaapter);

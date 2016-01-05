@@ -16,6 +16,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.milky.R;
+import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -87,15 +88,19 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
         }
         holder._quantity.setTag(position);
         holder._quantity.setId(position);
-        String a = Character.toString(CustomersList._mCustomersList.get(position).getFirstName().charAt(0));
-        String b = Character.toString(CustomersList._mCustomersList.get(position).getLastName().charAt(0));
+        String a = Character.toString(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
+                CustomersList._mCustomersList.get(position).getCustomerId()).charAt(0));
+        String b = Character.toString(CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
+                CustomersList._mCustomersList.get(position).getCustomerId()).charAt(0));
 
         //get first name and last name letters
         holder._nameView.setText(a + b);
 /*
         * Set text field listeners*/
-        holder._firstName.setText(CustomersList._mCustomersList.get(position).getFirstName());
-        holder._latsName.setText(" "+CustomersList._mCustomersList.get(position).getLastName());
+        holder._firstName.setText(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
+                CustomersList._mCustomersList.get(position).getCustomerId()));
+        holder._latsName.setText(" "+CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
+                CustomersList._mCustomersList.get(position).getCustomerId()));
         final ViewHolder finalHolder = holder;
         holder._quantity.addTextChangedListener(new TextWatcher() {
             @Override

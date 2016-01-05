@@ -57,6 +57,7 @@ public class CalenderFragment extends Fragment {
 //                _mCalenderView.quantityByDate(DeliveryTableManagement.getQuantityOfDay(_dbHelper.getReadableDatabase()));
 //            _mCalenderView.refreshAdapter();
 //        }
+        _mCalenderView.refreshCalendar();
         if(AppUtil.totalData.size()>0)
             _mCalenderView.totalQuantityCalculated(AppUtil.totalData);
 

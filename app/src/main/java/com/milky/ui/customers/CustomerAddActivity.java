@@ -175,7 +175,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setDateAdded(formattedDate);
                         holder.setStart_date(_pickdate.getText().toString().trim());
                         holder.setEnd_date(String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                                String.format("%02d",Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+                                String.format("%02d",Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)+1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
                         holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);

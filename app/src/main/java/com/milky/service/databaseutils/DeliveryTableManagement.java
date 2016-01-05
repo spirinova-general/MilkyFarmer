@@ -41,14 +41,14 @@ public class DeliveryTableManagement {
     }
 
     public static String getQuantityBySelectedDay(SQLiteDatabase db, String custId, String deliveryDate) {
-        String selectQuery = "",quantity="";
-        if (isDeletedCustomer(db))
+        String selectQuery = "", quantity = "";
+        if (isDeletedCustomer(db,deliveryDate))
             selectQuery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.START_DATE
-                    + " ='" + deliveryDate + "'" + " AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+                    + " ='" + deliveryDate + "'" + " AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.DELETED_ON + " ='1'";
         else
             selectQuery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.START_DATE
                     + " ='" + deliveryDate + "'" + " AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND "
-                    + TableColumns.DELETED_ON + " >='" + deliveryDate + "'";
+                    + TableColumns.DELETED_ON + " >'" + deliveryDate + "'";
 
 
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -114,11 +114,11 @@ public class DeliveryTableManagement {
 
     public static double getQuantityOfDayByDate(SQLiteDatabase db, String day) {
         String selectquery = "";
-        if (isDeletedCustomer(db))
+        if (isDeletedCustomer(db, day))
             selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.START_DATE + " ='" + day + "'";
         else
             selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
-                    + " AND " + TableColumns.DELETED_ON + " <='" + day + "'";
+                    + " AND " + TableColumns.DELETED_ON + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         double quantity = 0;
         if (cursor.moveToFirst()) {
@@ -161,9 +161,9 @@ public class DeliveryTableManagement {
         return quantityList;
     }
 
-    public static boolean isDeletedCustomer(SQLiteDatabase db) {
+    public static boolean isDeletedCustomer(SQLiteDatabase db, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ='"
-                + "1" + "'";
+                + "1" + "' AND " + TableColumns.START_DATE + " ='" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;

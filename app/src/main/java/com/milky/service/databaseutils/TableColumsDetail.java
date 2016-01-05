@@ -48,7 +48,7 @@ public class TableColumsDetail {
             + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.DEFAULT_RATE + " TEXT,"
             + TableColumns.DEFAULT_QUANTITY + " TEXT,"
             + TableColumns.BALANCE + " TEXT,"
-            + TableColumns.START_DATE + " DATETIME,"
+            + TableColumns.START_DATE + " DATETIME," + TableColumns.AREA_ID + " TEXT,"
             + TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
 
 
