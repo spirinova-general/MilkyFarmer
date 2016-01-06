@@ -78,7 +78,7 @@ public class CustomersActivity extends AppCompatActivity {
         * Set Custome action bar
         * */
         LayoutInflater mInflater = LayoutInflater.from(this);
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
+        View mCustomView = mInflater.inflate(R.layout.actionbar_withsubtitle_layout, null);
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
         TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
         ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
@@ -86,10 +86,10 @@ public class CustomersActivity extends AppCompatActivity {
 
         saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 
-
         title.setText(_mIntent.getStringExtra("fname") + " " + _mIntent.getStringExtra("lname"));
         titleString = _mIntent.getStringExtra("fname") + " " + _mIntent.getStringExtra("lname");
         subTitle.setText("Date Added- " + _mIntent.getStringExtra("added_date"));
+        subTitle.setVisibility(View.VISIBLE);
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);

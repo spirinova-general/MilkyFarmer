@@ -1,5 +1,7 @@
 package com.milky.viewmodel;
 
+import java.math.BigDecimal;
+
 /**
  * Created by Neha on 11/30/2015.
  */
@@ -17,6 +19,7 @@ public class VBill {
     private String paymentMode;
     private String dateAdded;
     private String dateModified;
+    private double totalPrice;
 
     public String getId() {
         return id;
@@ -120,5 +123,19 @@ public class VBill {
 
     public void setDateModified(String dateModified) {
         this.dateModified = dateModified;
+    }
+
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String getTotalPrice() {
+        return String.valueOf(round(totalPrice,2));
+    }
+    public static BigDecimal round(double d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Double.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd;
     }
 }

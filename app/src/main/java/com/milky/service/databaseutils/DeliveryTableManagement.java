@@ -171,6 +171,30 @@ public class DeliveryTableManagement {
         cursor.close();
         return result;
     }
+    public static double getQuantityOfDayByDateForCustomer(SQLiteDatabase db, String day,String CustId) {
+        String selectquery = "";
+        if (isDeletedCustomer(db, day))
+            selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
+                    +" AND "+TableColumns.CUSTOMER_ID+" ='"+CustId+"'";
+        else
+            selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
+                    + " AND " + TableColumns.DELETED_ON + " >'" + day + "'" +" AND "+TableColumns.CUSTOMER_ID+" ='"+CustId+"'";
+        Cursor cursor = db.rawQuery(selectquery, null);
+        double quantity = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                AppUtil.custIds.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
 
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return quantity;
+    }
 
 }

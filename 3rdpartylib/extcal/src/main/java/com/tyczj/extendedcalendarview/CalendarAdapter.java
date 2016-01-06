@@ -729,25 +729,46 @@ public class CalendarAdapter extends BaseAdapter {
     BigDecimal bigDecimal = null;
 
     private BigDecimal getQuantity(final Day d) {
-        for (int i = 0; i < totalData.size(); ++i) {
-            //Check if deliverydate is same as of calander
+        if (!isForCustomers) {
+            if(totalData!=null)
+            for (int i = 0; i < totalData.size(); ++i) {
+                //Check if deliverydate is same as of calander
 
-            try {
-                date = sdf.parse(totalData.get(i).getDeliveryDate());
+                try {
+                    date = sdf.parse(totalData.get(i).getDeliveryDate());
 
-                cal.setTime(date);
-            } catch (ParseException e) {
-                e.printStackTrace();
+                    cal.setTime(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+                        .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+                        ) {
+                    bigDecimal = totalData.get(i).getCalculatedQuqantity();
+                    return bigDecimal;
+                } else {
+
+                }
             }
-            if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
-                    .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
-                    ) {
-                bigDecimal = totalData.get(i).getCalculatedQuqantity();
-                return bigDecimal;
-            }
-            else
-            {
+        } else if(customerMillkQuantity!=null){
+            for (int i = 0; i < customerMillkQuantity.size(); ++i) {
+                //Check if deliverydate is same as of calander
 
+                try {
+                    date = sdf.parse(customerMillkQuantity.get(i).getDeliveryDate());
+
+                    cal.setTime(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+                        .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+                        ) {
+                    bigDecimal = customerMillkQuantity.get(i).getCalculatedQuqantity();
+                    return bigDecimal;
+                } else {
+
+                }
             }
         }
 

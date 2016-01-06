@@ -60,8 +60,8 @@ public class TableColumsDetail {
     public static final String CUSTOMERS_BILL = "CREATE TABLE " + TableNames.TABLE_CUSTOMER_BILL + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.ACCOUNT_ID + " TEXT,"
             + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.START_DATE + " DATETIME," + TableColumns.END_DATE + " DATETIME," + TableColumns.QUANTITY + " TEXT," + TableColumns.BALANCE + " TEXT,"
             + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.TAX + " TEXT," + TableColumns.IS_CLEARED + " TEXT,"
-            + TableColumns.PAYMENT_MADE + " TEXT,"
-            + TableColumns.DATE_ADDED + " DATETIME,"
+            + TableColumns.PAYMENT_MADE + " TEXT," + TableColumns.IS_OUTSTANDING + " TEXT,"
+            + TableColumns.DATE_ADDED + " DATETIME," + TableColumns.DEFAULT_RATE + " TEXT,"
             + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
 
 

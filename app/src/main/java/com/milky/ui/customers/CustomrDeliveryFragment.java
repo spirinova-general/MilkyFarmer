@@ -13,13 +13,20 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DeliveryTableManagement;
+import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
+import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import com.milky.R;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Neha on 11/19/2015.
@@ -28,6 +35,7 @@ public class CustomrDeliveryFragment extends Fragment {
     private ExtendedCalendarView _mCalenderView;
     private TextInputLayout bill_amount_layout;
     private int dataCount = 0;
+    private String custId = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,14 +45,21 @@ public class CustomrDeliveryFragment extends Fragment {
                 getActivity().getIntent().getStringExtra("cust_id")));
         _mCalenderView.customersMilkQuantity(DeliveryTableManagement.getMilkQuantityofCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
                 getActivity().getIntent().getStringExtra("cust_id")));
+        custId = getActivity().getIntent().getStringExtra("cust_id");
         _mCalenderView.setForCustomersDelivery(true);
 
         initResources();
+        if(totalData.size()>0)
+        {
+            _mCalenderView.setForCustomersDelivery(true);
+            _mCalenderView.customersMilkQuantity(totalData);
+        }
         return view;
 
     }
 
     private void initResources() {
+        getTotalQuantity();
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
@@ -118,5 +133,60 @@ public class CustomrDeliveryFragment extends Fragment {
         dialog.show();
 
 
+    }
+
+    public static ArrayList<DateQuantityModel> totalData = new ArrayList<>();
+    public static double quantity = 0;
+    static Calendar cal = Calendar.getInstance();
+    public static ArrayList<String> custIds = new ArrayList<>();
+
+
+    public ArrayList<DateQuantityModel> getTotalQuantity() {
+        totalData.clear();
+        for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
+            quantity = getDeliveryOfCustomer(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+            DateQuantityModel holder = new DateQuantityModel();
+            holder.setDeliveryDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+            holder.setCalculatedQuqantity(round(quantity, 1));
+            totalData.add(holder);
+        }
+
+
+        return totalData;
+    }
+
+    public static BigDecimal round(double d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Double.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd;
+    }
+    private String d = "";
+    public double getDeliveryOfCustomer(String day) {
+        double qty = 0;
+        double adjustedQty = 0;
+        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_DELIVERY)) {
+            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId) == 0) {
+                if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+
+                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+                            , custId);
+
+                }
+            }
+            else
+                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId);
+
+
+        }
+        else
+        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+
+            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+                    , custId);
+
+        }
+
+
+        return qty;
     }
 }

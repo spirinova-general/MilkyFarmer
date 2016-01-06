@@ -1,13 +1,9 @@
 package com.milky.ui.customers;
 
-import android.app.SearchManager;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,23 +22,18 @@ import com.milky.R;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.ui.adapters.GlobalDeliveryAdapter;
-import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
-import com.milky.viewmodel.VDelivery;
 
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class CustomersList extends AppCompatActivity {
@@ -52,7 +42,6 @@ public class CustomersList extends AppCompatActivity {
     private String _mMonth;
     private Toolbar _mToolbar;
     private GlobalDeliveryAdapter _mAdaapter;
-    private Button _save, _cancel;
     private DatabaseHelper _dbHelper;
     private LinearLayout _bottomLayout;
     public static List<VCustomersList> _mCustomersList, _mDeliveryList = new ArrayList<>();
@@ -66,8 +55,7 @@ public class CustomersList extends AppCompatActivity {
 
     private void initResources() {
         _mCustomers = (ListView) findViewById(R.id.customersList);
-        _save = (Button) findViewById(R.id.save);
-        _cancel = (Button) findViewById(R.id.cancel);
+
         _bottomLayout = (LinearLayout) findViewById(R.id.bottom_Layout);
         String month = new DateFormatSymbols().getMonths()[(Constants.SELECTED_DAY).getMonth()];
         _mDay = Constants.SELECTED_DAY.getDay();
@@ -123,10 +111,9 @@ public class CustomersList extends AppCompatActivity {
         * Set Custome action bar
         * */
         LayoutInflater mInflater = LayoutInflater.from(this);
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
+        View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
-        TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
-        subTitle.setVisibility(View.GONE);
+
         title.setText(Constants.DELIVERY_DATE);
         ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
         deleteCustomer.setVisibility(View.GONE);

@@ -1,6 +1,7 @@
 package com.milky.ui.main;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -34,6 +35,7 @@ import com.milky.service.databaseutils.TableNames;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
+import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
@@ -163,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             actionSearchView.setIconifiedByDefault(false);
             editSearch = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
             editSearch.setHintTextColor(getResources().getColor(R.color.white));
+
             actionSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -225,7 +228,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
         AppUtil.getTotalQuantity();
+
     }
+
+
 
     private void supportActionBar() {
         _mToolbar = (Toolbar) findViewById(R.id.toolbar);

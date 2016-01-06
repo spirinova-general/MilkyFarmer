@@ -41,7 +41,7 @@ public class BillingEdit extends AppCompatActivity {
 
         start_date.setText(intent.getStringExtra("start_date"));
         end_date.setText(intent.getStringExtra("end_date"));
-        rate.setText(intent.getStringExtra("amount"));
+        rate.setText(intent.getStringExtra("totalPrice"));
         start_date.setEnabled(false);
         end_date.setEnabled(false);
         milk_quantity.setText(intent.getStringExtra("quantity"));
@@ -79,15 +79,14 @@ public class BillingEdit extends AppCompatActivity {
         * Set Custome action bar
         * */
         LayoutInflater mInflater = LayoutInflater.from(this);
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
+        View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
 
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
-        TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
-        subTitle.setVisibility(View.GONE);
+
         title.setText(intent.getStringExtra("titleString"));
         LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 
-        saveManu.setVisibility(View.VISIBLE);
+        saveManu.setVisibility(View.GONE);
         saveManu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

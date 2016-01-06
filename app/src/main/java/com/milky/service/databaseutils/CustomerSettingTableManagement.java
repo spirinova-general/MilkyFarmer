@@ -238,7 +238,25 @@ public class CustomerSettingTableManagement {
             db.close();
         return list;
     }
+    public static ArrayList<String> getStartDeliveryDate(SQLiteDatabase db, String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        ArrayList<String> startDate = new ArrayList<>();
+        Cursor cursor = db.rawQuery(selectquery, null);
 
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
+                    startDate.add(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return startDate;
+
+    }
     public static double getAllCustomersByCustId(SQLiteDatabase db, String day, String id) {
         String selectquery = "";
         if (isDeletedCustomer(db, id,day)) {
@@ -364,6 +382,34 @@ public class CustomerSettingTableManagement {
 
     public static void updateData(SQLiteDatabase db, VCustomersList holder) {
         ContentValues values = new ContentValues();
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
+        values.put(TableColumns.END_DATE, holder.getEnd_date());
+        values.put(TableColumns.AREA_ID, holder.getAreaId());
+
+        db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
+                + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
+    }
+
+    public static void updateAllData(SQLiteDatabase db, VCustomersList holder) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.ACCOUNT_ID, holder.getAccountId());
+        values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
+        values.put(TableColumns.START_DATE, holder.getStart_date());
+        values.put(TableColumns.BALANCE, holder.getBalance_amount());
+        values.put(TableColumns.END_DATE, holder.getEnd_date());
+        values.put(TableColumns.ADJUSTMENTS, "0");
+        values.put(TableColumns.DIRTY, "1");
+        values.put(TableColumns.SYNC_STATUS, "0");
+        values.put(TableColumns.DELETED_ON, "1");
+        values.put(TableColumns.AREA_ID, holder.getAreaId());
+
+
+
+
+
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
         values.put(TableColumns.END_DATE, holder.getEnd_date());

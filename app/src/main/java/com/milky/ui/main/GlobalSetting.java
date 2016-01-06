@@ -33,7 +33,6 @@ import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VGlobalSettings;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -211,9 +210,9 @@ public class GlobalSetting extends AppCompatActivity {
         * Set Custome action bar
         * */
         LayoutInflater mInflater = LayoutInflater.from(this);
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
+        View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
-        TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
+
         ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
         deleteCustomer.setVisibility(View.GONE);
 
@@ -229,7 +228,11 @@ public class GlobalSetting extends AppCompatActivity {
             {
                 if (rate.getText().toString().trim().equals("")) {
                     rate_layout.setError(getResources().getString(R.string.field_cant_empty));
-                } else if (tax.getText().toString().trim().equals("")) {
+                }
+                else if(Float.parseFloat(rate.getText().toString().trim())<=0)
+                {
+                    rate_layout.setError(getResources().getString(R.string.fill_valid_amount));
+                }else if (tax.getText().toString().trim().equals("")) {
                     tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
                 } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
                     autocomplete_layout.setError("Please select some area !");

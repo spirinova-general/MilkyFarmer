@@ -22,15 +22,49 @@ public class BillTableManagement {
         values.put(TableColumns.END_DATE, holder.getEnd_date());
         values.put(TableColumns.QUANTITY, holder.getQuantity());
         values.put(TableColumns.BALANCE, holder.getBalance_amount());
-        values.put(TableColumns.ADJUSTMENTS,"0");
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.ADJUSTMENTS, "0");
         values.put(TableColumns.TAX, holder.getTax());
         values.put(TableColumns.IS_CLEARED, holder.getIsCleared());
         values.put(TableColumns.PAYMENT_MADE, holder.getPaymentMade());
         values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
         values.put(TableColumns.SYNC_STATUS, "1");
+        values.put(TableColumns.IS_OUTSTANDING, "1");
         values.put(TableColumns.DIRTY, "1");
 
         db.insert(TableNames.TABLE_CUSTOMER_BILL, null, values);
+    }
+
+    public static void updateBillData(SQLiteDatabase db, VCustomersList holder) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.QUANTITY, holder.getQuantity());
+        values.put(TableColumns.END_DATE, holder.getEnd_date());
+        values.put(TableColumns.AREA_ID, holder.getAreaId());
+
+        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
+                + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
+    }
+
+    public static void updateCurrentDateData(SQLiteDatabase db, VCustomersList holder) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
+        values.put(TableColumns.END_DATE, holder.getEnd_date());
+        values.put(TableColumns.AREA_ID, holder.getAreaId());
+
+        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
+                + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
+    }
+
+    public static void updateEndDate(SQLiteDatabase db, VCustomersList holder, String enddate, String updatedEndDate) {
+        ContentValues values = new ContentValues();
+//        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
+//        values.put(TableColumns.AREA_ID, holder.getAreaId());
+        values.put(TableColumns.END_DATE, updatedEndDate);
+
+        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
+                + " AND " + TableColumns.END_DATE + " ='" + enddate + "'", null);
     }
 
     public static boolean isHasAmount(SQLiteDatabase db, String custId) {
@@ -43,16 +77,41 @@ public class BillTableManagement {
         return result;
     }
 
-    public static float getPreviousBill(SQLiteDatabase db, final String custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+    public static float getPreviousBill(SQLiteDatabase db, final String custId, final String day, final double quantity) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
+                + custId + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+        Cursor cursor = db.rawQuery(selectquery, null);
+        float amount = 0;
+
+        if (cursor.moveToFirst()) {
+            do {
+                if(Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.TAX)))>0)
+                amount = ((Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE))) * Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.TAX))))
+                        / 100) * (float)quantity;
+                else
+                    amount= Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE))) * (float)quantity;
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return amount;
+    }
+    public static float getTotalRate(SQLiteDatabase db, final String custId, final String day) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
+                + custId + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         float amount = 0;
 
         if (cursor.moveToFirst()) {
             do {
 
-                amount = ((Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.RATE))) * Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.TAX))))
-                        / 100) * Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
+                    amount= Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
 
             }
             while (cursor.moveToNext());
@@ -160,10 +219,22 @@ public class BillTableManagement {
 
     public static void updateSyncedData(SQLiteDatabase db) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DIRTY, "1");
-        values.put(TableColumns.SYNC_STATUS, "1");
+        values.put(TableColumns.DIRTY, "0");
+        values.put(TableColumns.SYNC_STATUS, "0");
 
         db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.SYNC_STATUS + " ='" + "0" + "'"
-                + " AND " + TableColumns.DIRTY + " ='" + "0" + "'", null);
+                + " AND " + TableColumns.DIRTY + " ='" + "1" + "'", null);
+    }
+
+    public static void updateData(SQLiteDatabase db, VCustomersList holder) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+
+        values.put(TableColumns.QUANTITY, holder.getQuantity());
+        values.put(TableColumns.SYNC_STATUS, "0");
+        values.put(TableColumns.IS_OUTSTANDING, "1");
+        values.put(TableColumns.DIRTY, "0");
+
+        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'", null);
     }
 }

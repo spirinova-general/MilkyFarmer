@@ -15,37 +15,7 @@ import java.util.Calendar;
  * Created by Neha on 11/30/2015.
  */
 public class CustomersTableMagagement {
-    /*
-//    * Insert Customer's details into table*/
-//    public static void insertGlobaleDeliveryData(SQLiteDatabase db, JSONArray data) {
-//        String sql = String.format("INSERT OR REPLACE INTO %s VALUES (?,?,?,?,?,?,?,?,?);", TableNames.TABLE_CUSTOMER);
-//        SQLiteStatement statement = db.compileStatement(sql);
-//        db.beginTransaction();
-//        int count = data.length();
-//        try {
-//            for (int i = 0; i < count; ++i) {
-//                JSONObject record = data.getJSONObject(i);
-//                statement.clearBindings();
-//                statement.bindString(1, record.getString(""));
-//                statement.bindString(2, record.getString(""));
-//                statement.bindString(3, record.getString(""));
-//                statement.bindString(4, record.getString(""));
-//                statement.bindString(5, record.getString(""));
-//                statement.bindString(6, record.getString(""));
-//                statement.bindString(7, record.getString(""));
-//                statement.bindString(8, record.getString(""));
-//                statement.bindString(9, record.getString(""));
-//                statement.execute();
-//            }
-//        } catch (JSONException ignored) {
-//        }
-//        db.setTransactionSuccessful();
-//        db.endTransaction();
-//        if (db.isOpen())
-//            db.close();
-//
-//
-//    }
+
 
     public static void insertCustomerDetail(SQLiteDatabase db, VCustomersList holder) {
         ContentValues values = new ContentValues();
@@ -444,6 +414,8 @@ public class CustomersTableMagagement {
             db.close();
         return list;
     }
+
+
 
     public static int getTotalMilkQuantytyByDay(SQLiteDatabase db, String date) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DATE_QUANTITY_MODIFIED + " ='" + date + "'";

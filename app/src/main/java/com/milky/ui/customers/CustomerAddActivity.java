@@ -44,7 +44,6 @@ import com.milky.viewmodel.VCustomersList;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 public class CustomerAddActivity extends AppCompatActivity {
     private Toolbar _mToolbar;
@@ -116,11 +115,11 @@ public class CustomerAddActivity extends AppCompatActivity {
         * Set Custome action bar
         * */
         LayoutInflater mInflater = LayoutInflater.from(this);
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
+        View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
         TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
-        subTitle.setVisibility(View.GONE);
-        title.setText("Add Customer");
+//        subTitle.setVisibility(View.GONE);
+//        title.setText("Add Customer");
         LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 
         saveManu.setVisibility(View.VISIBLE);
@@ -134,6 +133,9 @@ public class CustomerAddActivity extends AppCompatActivity {
                         last_name_layout.setError("Enter name!");
                     else if (_rate.getText().toString().equals(""))
                         rate_layout.setError("Enter amount!");
+                    else if(Float.parseFloat(_rate.getText().toString().trim())<=0)
+                        rate_layout.setError("Enter valid amount!");
+
                     else if (_mBalance.getText().toString().equals(""))
                         balance_layout.setError("Enter balance amount");
                     else if (_mAddress1.getText().toString().equals(""))
@@ -147,6 +149,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                         _phone_textinput_layout.setError("Enter mobile number!");
                     else if (_mQuantuty.getText().toString().equals(""))
                         milk_quantity_layout.setError("Enter milk quantity!");
+                    else if(Float.parseFloat(_mQuantuty.getText().toString().trim())<=0)
+                        milk_quantity_layout.setError("Enter valid quantity!");
                     else if ((!_firstName.getText().toString().equals("")
                             && !_lastName.getText().toString().equals("") &&
                             !_mBalance.getText().toString().equals("") &&

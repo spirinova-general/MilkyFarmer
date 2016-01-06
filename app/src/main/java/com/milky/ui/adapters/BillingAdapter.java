@@ -16,6 +16,7 @@ import com.milky.ui.main.BillingEdit;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomersList;
 
 import java.math.BigDecimal;
@@ -31,6 +32,7 @@ import java.util.List;
 public class BillingAdapter extends BaseAdapter {
 
     private List<VCustomersList> mCustomersData;
+    private List<VBill> totalBill;
     private Context mContext;
     private boolean _mIsCustomer = false;
 
@@ -40,8 +42,16 @@ public class BillingAdapter extends BaseAdapter {
         this._mIsCustomer = isCustomer;
     }
 
+    public BillingAdapter(final List<VBill> dataList, final Context con) {
+        this.mContext = con;
+        this.totalBill = dataList;
+
+    }
+
     @Override
     public int getCount() {
+        if (mCustomersData == null)
+            return totalBill.size();
         return mCustomersData.size();
     }
 
@@ -70,23 +80,22 @@ public class BillingAdapter extends BaseAdapter {
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
 
-        holder.startDate.setText(mCustomersData.get(position).getStart_date());
-        holder.endDate.setText(time);
-        holder.amount.setText(getBill(time, mCustomersData.get(position).getCustomerId(),
-                mCustomersData.get(position).getStart_date(), mCustomersData.get(position).getEnd_date(), mCustomersData.get(position).getRate()
-                , mCustomersData.get(position).getQuantity(), mCustomersData.get(position).getBalance_amount(), mCustomersData.get(position).getAdjustment()));
 
+        holder.startDate.setText(totalBill.get(position).getStartDate());
+        holder.endDate.setText(totalBill.get(position).getEndDate());
+        holder.amount.setText(totalBill.get(position).getPaymentMode());
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, BillingEdit.class);
-                intent.putExtra("start_date", mCustomersData.get(position).getStart_date())
-                        .putExtra("end_date", time)
-                        .putExtra("quantity", mCustomersData.get(position).getQuantity())
-                        .putExtra("amount", mCustomersData.get(position).getRate())
-                        .putExtra("balance", mCustomersData.get(position).getBalance_amount())
+                intent.putExtra("start_date", totalBill.get(position).getStartDate())
+                        .putExtra("end_date", totalBill.get(position).getEndDate())
+                        .putExtra("quantity", totalBill.get(position).getQuantity())
+                        .putExtra("amount", "0")
+                        .putExtra("balance", totalBill.get(position).getBalance())
                         .putExtra("titleString", CustomersActivity.titleString)
-                        .putExtra("total", holder.amount.getText().toString());
+                        .putExtra("totalPrice", totalBill.get(position).getTotalPrice())
+                        .putExtra("total", totalBill.get(position).getPaymentMode());
                 mContext.startActivity(intent);
 
             }

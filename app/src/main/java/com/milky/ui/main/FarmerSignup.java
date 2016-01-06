@@ -3,7 +3,6 @@ package com.milky.ui.main;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -49,11 +48,10 @@ public class FarmerSignup extends AppCompatActivity {
         * Set Custome action bar
         * */
         LayoutInflater mInflater = LayoutInflater.from(this);
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar_layout, null);
+        View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
 
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
-        TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
-        subTitle.setVisibility(View.GONE);
+
         title.setText("Profile");
         LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 

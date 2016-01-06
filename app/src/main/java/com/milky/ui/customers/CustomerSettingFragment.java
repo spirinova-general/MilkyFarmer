@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +22,11 @@ import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.main.CustomersActivity;
@@ -32,7 +36,9 @@ import com.milky.utils.EnableEditableFields;
 import com.milky.utils.TextValidationMessage;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.DateQuantityModel;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,8 +67,9 @@ public class CustomerSettingFragment extends Fragment {
     private String formattedDate;
     private Calendar c;
     private TextView pick_date;
+    private String custId = "";
     //   private FormEditText et_phone;
-
+    private boolean updatedQtyRate = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -84,43 +91,87 @@ public class CustomerSettingFragment extends Fragment {
         _mFirstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, getActivity(), false));
         _mLastName.addTextChangedListener(new TextValidationMessage(_mAddress1, last_name_layout, getActivity(), false));
 
-        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, getActivity(), false));
+//        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, getActivity(), false));
         _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, getActivity(), false));
         _mMobile.addTextChangedListener(new TextValidationMessage(_mMobile, _phone_textinput_layout, getActivity(), true));
         _mAddress2.addTextChangedListener(new TextValidationMessage(_mMobile, street_layout, getActivity(), false));
-        _mRate.addTextChangedListener(new TextValidationMessage(_mMobile, rate_layout, getActivity(), false));
+//        _mRate.addTextChangedListener(new TextValidationMessage(_mMobile, rate_layout, getActivity(), false));
 
+        _mQuantuty.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+
+                    milk_quantity_layout.setError(null);
+                    updatedQtyRate = true;
+
+
+                } else {
+                    milk_quantity_layout.setError(getResources().getString(R.string.field_cant_empty));
+                    updatedQtyRate = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+
+                    milk_quantity_layout.setError(null);
+                    updatedQtyRate = true;
+
+
+                } else {
+                    milk_quantity_layout.setError(getResources().getString(R.string.field_cant_empty));
+                    updatedQtyRate = false;
+                }
+            }
+        });
+        _mRate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+
+                    rate_layout.setError(null);
+                    updatedQtyRate = true;
+
+
+                } else {
+                    rate_layout.setError(getResources().getString(R.string.field_cant_empty));
+                    updatedQtyRate = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+
+                    rate_layout.setError(null);
+                    updatedQtyRate = true;
+
+
+                } else {
+                    rate_layout.setError(getResources().getString(R.string.field_cant_empty));
+                    updatedQtyRate = false;
+                }
+            }
+        });
         /* ---------------------------------------------------*/
-//
-///* Let fields be enabled if edit button has been clicked only.
-//* */
-//        _mRate.setOnTouchListener(new EnableEditableFields(_mRate, getActivity(), inputMethodManager));
-//        _mBalance.setOnTouchListener(new EnableEditableFields(_mBalance, getActivity(), inputMethodManager));
-//        _mLastName.setOnTouchListener(new EnableEditableFields(_mLastName, getActivity(), inputMethodManager));
-//        _mFirstName.setOnTouchListener(new EnableEditableFields(_mFirstName, getActivity(), inputMethodManager));
-//        _mMobile.setOnTouchListener(new EnableEditableFields(_mMobile, getActivity(), inputMethodManager));
-//        _mAddress1.setOnTouchListener(new EnableEditableFields(_mAddress1, getActivity(), inputMethodManager));
-//        _mAddress2.setOnTouchListener(new EnableEditableFields(_mAddress2, getActivity(), inputMethodManager));
-//        _mQuantuty.setOnTouchListener(new EnableEditableFields(_mQuantuty, getActivity(), inputMethodManager));
 
 
         return view;
 
     }
 
-    /*    public void onClickNext(View v) {
-            FormEditText[] allFields = {_mPhone};
-            boolean allValid = true;
-            for (FormEditText field : allFields) {
-                allValid = field.testValidity() && allValid;
-            }
-
-            if (allValid) {
-                // YAY
-            } else {
-                // EditText are going to appear with an exclamation mark and an explicative message.
-            }
-        }*/
 
     private void initResources(View view) {
 
@@ -184,7 +235,7 @@ public class CustomerSettingFragment extends Fragment {
         _mAddress2.setSelection(getActivity().getIntent().getStringExtra("address2").length());
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
         _mQuantuty.setSelection(getActivity().getIntent().getStringExtra("quantity").length());
-
+        custId = getActivity().getIntent().getStringExtra("cust_id");
 
         //        areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
         ArrayList<String> areas = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
@@ -383,12 +434,20 @@ public class CustomerSettingFragment extends Fragment {
                     if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
                             getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
                         CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
+                        BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
 
                     } else {
-                        String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
-                        CustomerSettingTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
-                        holder.setStart_date(formattedDate);
-                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
+                        if (updatedQtyRate) {
+                            String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
+                            CustomerSettingTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
+                            BillTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
+                            holder.setStart_date(formattedDate);
+                            CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
+                            BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
+                        } else {
+                            CustomerSettingTableManagement.updateAllData(_dbHelper.getWritableDatabase(), holder);
+                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
+                        }
                     }
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
 //                    EnableEditableFields.setIsEnabled(false);
@@ -419,4 +478,6 @@ public class CustomerSettingFragment extends Fragment {
         new EnableEditableFields(_mAddress1, getActivity(), inputMethodManager).blockDefaultKeys();
         new EnableEditableFields(_mAddress2, getActivity(), inputMethodManager).blockDefaultKeys();
     }
+
+
 }

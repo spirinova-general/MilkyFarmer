@@ -1,7 +1,6 @@
 package com.milky.ui.main;
 
-import android.app.Activity;
-import android.content.Context;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,14 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
-import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.customers.CustomersList;
 import com.milky.utils.AppUtil;
@@ -51,23 +46,17 @@ public class CalenderFragment extends Fragment {
         super.onResume();
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
         _mCalenderView.setForCustomersDelivery(false);
-//        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-//            _mCalenderView.customersList(CustomerSettingTableManagement.getAllCustomers(_dbHelper.getReadableDatabase()));
-//            if (_dbHelper.isTableNotEmpty(TableNames.TABLE_DELIVERY))
-//                _mCalenderView.quantityByDate(DeliveryTableManagement.getQuantityOfDay(_dbHelper.getReadableDatabase()));
-//            _mCalenderView.refreshAdapter();
-//        }
+
         _mCalenderView.refreshCalendar();
         if(AppUtil.totalData.size()>0)
             _mCalenderView.totalQuantityCalculated(AppUtil.totalData);
+
 
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
                 Constants.SELECTED_DAY = day;
-                Constants.QUANTITY_UPDATED_DAY = String.valueOf(day.getDay());
-                Constants.QUANTITY_UPDATED_MONTH = String.valueOf(day.getMonth());
-                Constants.QUANTITY_UPDATED_YEAR = String.valueOf(day.getYear());
+
                 Constants.DELIVERY_DATE = String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay())
                         + "-" + String.format("%02d", day.getYear());
                 Intent intent = new Intent(getActivity(), CustomersList.class);
@@ -105,8 +94,6 @@ public class CalenderFragment extends Fragment {
         viewLayout = view;
 
         _prefrences = AppUtil.getInstance().getPrefrences();
-
-
         _editor = _prefrences.edit();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
 

@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.AreaCityTableManagement;
+import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.customers.CustomersList;
 import com.milky.utils.AppUtil;
@@ -26,8 +28,8 @@ import java.util.Locale;
 /**
  * Created by Neha on 11/18/2015.
  */
-public class CustomersFragmentListAdapter extends RecyclerView.Adapter<CustomersFragmentListAdapter.CustomersViewHolder> {
-    private List<VCustomersList> mCustomersList, tempList,suggestions;
+public class CustomersFragmentListAdapter extends RecyclerView.Adapter<CustomersFragmentListAdapter.CustomersViewHolder> implements Filterable{
+    private List<VCustomersList> mCustomersList, items,tempList,tempItems, suggestions;
     private CustomersFragmentListAdapter mListAdapter;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
@@ -36,6 +38,8 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         this.mCustomersList = listData;
         this.mActivity = act;
         _dbhelper = AppUtil.getInstance().getDatabaseHandler();
+        tempItems = new ArrayList<VCustomersList>(mCustomersList); // this makes the difference.
+        suggestions = new ArrayList<>();
     }
 
 
@@ -65,7 +69,54 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         holder._nameView.setText(a + b);
 
     }
+    @Override
+    public Filter getFilter() {
+        return nameFilter;
+    }
+    Filter nameFilter = new Filter() {
+        @Override
+        public CharSequence convertResultToString(Object resultValue) {
+            String str = ((VAreaMapper) resultValue).getCityArea();
 
+            return str;
+        }
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            if (constraint != null) {
+                suggestions.clear();
+                for (VCustomersList Area : tempItems) {
+                    if (Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        suggestions.add(Area);
+                    }
+                }
+                if(suggestions.size()>0)
+                    Constants.validArea = true;
+                else
+                    Constants.validArea=false;
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = suggestions;
+                filterResults.count = suggestions.size();
+                return filterResults;
+            } else {
+                suggestions.clear();
+                Constants.validArea=false;
+                return new FilterResults();
+            }
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            List<VCustomersList> filterList = (ArrayList<VCustomersList>) results.values;
+            if (results != null && results.count > 0) {
+                filterList.clear();
+                for (VCustomersList Area : filterList) {
+                    filterList.add(Area);
+                    notifyDataSetChanged();
+                }
+            }
+        }
+    };
     @Override
     public int getItemCount() {
         return mCustomersList.size();

@@ -3,6 +3,7 @@ package com.milky.utils;
 import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
@@ -55,6 +56,8 @@ public class AppUtil extends Application {
     public static double quantity = 0;
     static Calendar cal = Calendar.getInstance();
     public static ArrayList<String> custIds = new ArrayList<>();
+
+
     public static ArrayList<DateQuantityModel> getTotalQuantity() {
         totalData.clear();
         for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {

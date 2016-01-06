@@ -12,3 +12,6 @@ app/proguard-rules.pro
 *.class
 3rdpartylib/extcal/build/outputs/aar/extcal-debug.aar
 .idea/misc.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/classes.jar
+3rdpartylib/extcal/build/outputs/aar/extcal-release.aar
+app/src/main/res/layout/actionbar_withsubtitle_layout.xml

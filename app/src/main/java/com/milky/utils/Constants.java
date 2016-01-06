@@ -20,9 +20,7 @@ import java.util.Date;
 public class Constants {
     public static String ACCOUNT_ID = "12345";
     public static Day SELECTED_DAY;
-    public static String QUANTITY_UPDATED_DAY = "";
-    public static String QUANTITY_UPDATED_MONTH = "";
-    public static String QUANTITY_UPDATED_YEAR = "";
+
     public static String DELIVERY_DATE = "";
     public static boolean CUSTOMER_ADDED = false;
     public static SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
