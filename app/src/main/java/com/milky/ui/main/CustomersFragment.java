@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.milky.ui.adapters.CustomersFragmentListAdapter;
+import com.milky.ui.adapters.MainCustomersListAdapter;
 import com.milky.ui.customers.CustomerAddActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
@@ -39,11 +41,11 @@ import java.util.List;
 public class CustomersFragment extends Fragment {
 
     private List<VCustomersList> _mCustomersList;
-    public static CustomersFragmentListAdapter _mAdapter;
+    public static MainCustomersListAdapter _mAdapter;
     private FloatingActionButton mFab;
-    private TextView mTotalCustomers;
+    public static TextView mTotalCustomers;
     private DatabaseHelper _dbHelper;
-    public static RecyclerView recList;
+    public static ListView recList;
 
 
     @Override
@@ -62,7 +64,7 @@ public class CustomersFragment extends Fragment {
                             mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
                         else
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
-                        _mAdapter = new CustomersFragmentListAdapter(getActivity(), _mCustomersList);
+                        _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.te1, _mCustomersList);
                         recList.setAdapter(_mAdapter);
                     } else {
                         _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), MainActivity.selectedAreaId);
@@ -70,7 +72,7 @@ public class CustomersFragment extends Fragment {
                           mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in "+MainActivity.selectedArea);
                         else
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in "+MainActivity.selectedArea);
-                        _mAdapter = new CustomersFragmentListAdapter(getActivity(), _mCustomersList);
+                        _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.te1, _mCustomersList);
                         recList.setAdapter(_mAdapter);
                     }
 
@@ -82,13 +84,14 @@ public class CustomersFragment extends Fragment {
                 mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
             else
                 mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers ");
-                _mAdapter = new CustomersFragmentListAdapter(getActivity(), _mCustomersList);
+                _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.te1, _mCustomersList);
                 recList.setAdapter(_mAdapter);
 
 
 
         } else
             mTotalCustomers.setText(String.valueOf("No customer added yet !"));
+        _dbHelper.close();
 
 
     }
@@ -101,14 +104,10 @@ public class CustomersFragment extends Fragment {
     }
 
     private void initResources(View view) {
-        recList = (RecyclerView) view.findViewById(R.id.customersListView);
-        recList.setHasFixedSize(true);
+        recList = (ListView) view.findViewById(R.id.customersListView);
+
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         mTotalCustomers = (TextView) view.findViewById(R.id.totalCustomers);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        recList.setLayoutManager(llm);
-//        _mCustomersList = GetCustomersListFromAssets.GetCustomersList(getActivity());
 
 
         mFab = (FloatingActionButton) view.findViewById(R.id.fab);
@@ -123,6 +122,7 @@ public class CustomersFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), CustomerAddActivity.class).putExtra("istoAddCustomer", true);
                     startActivity(intent);
                 }
+                _dbHelper.close();
             }
         });
         mTotalCustomers.setOnClickListener(new View.OnClickListener() {

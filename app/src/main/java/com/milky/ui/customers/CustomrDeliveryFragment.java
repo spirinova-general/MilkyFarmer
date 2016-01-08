@@ -49,8 +49,7 @@ public class CustomrDeliveryFragment extends Fragment {
         _mCalenderView.setForCustomersDelivery(true);
 
         initResources();
-        if(totalData.size()>0)
-        {
+        if (totalData.size() > 0) {
             _mCalenderView.setForCustomersDelivery(true);
             _mCalenderView.customersMilkQuantity(totalData);
         }
@@ -60,6 +59,7 @@ public class CustomrDeliveryFragment extends Fragment {
 
     private void initResources() {
         getTotalQuantity();
+        AppUtil.getInstance().getDatabaseHandler().close();
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
@@ -160,7 +160,9 @@ public class CustomrDeliveryFragment extends Fragment {
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd;
     }
+
     private String d = "";
+
     public double getDeliveryOfCustomer(String day) {
         double qty = 0;
         double adjustedQty = 0;
@@ -172,14 +174,11 @@ public class CustomrDeliveryFragment extends Fragment {
                             , custId);
 
                 }
-            }
-            else
+            } else
                 qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId);
 
 
-        }
-        else
-        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+        } else if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
 
             qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
                     , custId);

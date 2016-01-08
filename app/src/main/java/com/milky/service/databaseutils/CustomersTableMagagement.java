@@ -144,6 +144,23 @@ public class CustomersTableMagagement {
             }
             while (cursor.moveToNext());
         }
+
+        return list;
+    }
+    public static ArrayList<String> getAllCustomersIds(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='1'";
+        ArrayList<String> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+
+                list.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+            }
+            while (cursor.moveToNext());
+        }
         cursor.close();
         if (db.isOpen())
             db.close();

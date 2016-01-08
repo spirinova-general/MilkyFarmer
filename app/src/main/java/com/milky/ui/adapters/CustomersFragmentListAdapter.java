@@ -68,6 +68,8 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         //get first name and last name letters
         holder._nameView.setText(a + b);
 
+        _dbhelper.close();
+
     }
     @Override
     public Filter getFilter() {

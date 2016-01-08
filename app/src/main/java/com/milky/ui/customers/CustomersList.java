@@ -144,6 +144,7 @@ public class CustomersList extends AppCompatActivity {
                     else
                         DeliveryTableManagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), _mDeliveryList.get(i));
                 }
+            _dbHelper.close();
             finish();
         }
 
@@ -203,6 +204,7 @@ public class CustomersList extends AppCompatActivity {
                             _mCustomers.setAdapter(_mAdaapter);
                         }
                     }
+                    _dbHelper.close();
 
                 }
                 @Override

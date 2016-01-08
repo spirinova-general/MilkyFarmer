@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.utils.Constants;
+import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomersList;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 
@@ -33,17 +34,87 @@ public class CustomerSettingTableManagement {
 
     }
 
+    public static boolean isHasDataForDay(SQLiteDatabase db, String custId, String day) {
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE + " ='" + day+"'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        db.close();
+        return result;
+    }
+
+    public static void insertNewCustomersSetting(SQLiteDatabase db, VBill holder) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.ACCOUNT_ID, holder.getAccountId());
+        values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
+        values.put(TableColumns.START_DATE, holder.getStartDate());
+        values.put(TableColumns.BALANCE, holder.getBalance());
+        values.put(TableColumns.END_DATE, holder.getEndDate());
+        values.put(TableColumns.ADJUSTMENTS, "0");
+        values.put(TableColumns.DIRTY, "1");
+        values.put(TableColumns.SYNC_STATUS, "1");
+        values.put(TableColumns.DELETED_ON, "1");
+        values.put(TableColumns.AREA_ID, getAreaId(db, holder.getCustomerId()));
+
+        long i = db.insert(TableNames.TABLE_CUSTOMER_SETTINGS, null, values);
+
+    }
+
+    public static String getAreaId(SQLiteDatabase db, String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        String areaId = "";
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
+                    areaId = cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID));
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return areaId;
+
+    }
+
+    public static String getPrice(SQLiteDatabase db, String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        String areaId = "";
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
+                    areaId = cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE));
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return areaId;
+
+    }
+
     public static ArrayList<VCustomersList> getAllCustomersBySelectedDate(SQLiteDatabase db, String areaid) {
         String selectquery = "";
         if (areaid.equals("")) {
-            if (isDeletedCustomer(db,Constants.DELIVERY_DATE)) {
+            if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
                 selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
                         + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'"
                         + " AND " + TableColumns.DELETED_ON + " ='1'";
             } else
                 selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
                         + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.DELETED_ON + " >'" + Constants.DELIVERY_DATE + "'";
-        } else if (isDeletedCustomer(db,Constants.DELIVERY_DATE)) {
+        } else if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
                     + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
                     + " AND " + TableColumns.DELETED_ON + " ='1'";
@@ -238,6 +309,7 @@ public class CustomerSettingTableManagement {
             db.close();
         return list;
     }
+
     public static ArrayList<String> getStartDeliveryDate(SQLiteDatabase db, String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
         ArrayList<String> startDate = new ArrayList<>();
@@ -257,9 +329,10 @@ public class CustomerSettingTableManagement {
         return startDate;
 
     }
+
     public static double getAllCustomersByCustId(SQLiteDatabase db, String day, String id) {
         String selectquery = "";
-        if (isDeletedCustomer(db, id,day)) {
+        if (isDeletedCustomer(db, id, day)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
                     + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'" + " AND "
                     + TableColumns.CUSTOMER_ID + " ='" + id + "'" + " AND " + TableColumns.DELETED_ON + " ='1'";
@@ -292,10 +365,10 @@ public class CustomerSettingTableManagement {
 
     public static double getAllCustomersByDay(SQLiteDatabase db, String day) {
         String selectquery = "";
-        if (isDeletedCustomer(db,day)) {
+        if (isDeletedCustomer(db, day)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
                     + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
-            + " AND " + TableColumns.DELETED_ON + " ='1'"
+                    + " AND " + TableColumns.DELETED_ON + " ='1'"
             ;
         } else
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
@@ -350,7 +423,7 @@ public class CustomerSettingTableManagement {
 
     public static boolean isDeletedCustomer(SQLiteDatabase db, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ="
-                + "'1'"+" AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + "'1'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -407,9 +480,6 @@ public class CustomerSettingTableManagement {
         values.put(TableColumns.AREA_ID, holder.getAreaId());
 
 
-
-
-
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
         values.put(TableColumns.END_DATE, holder.getEnd_date());
@@ -442,7 +512,7 @@ public class CustomerSettingTableManagement {
 
     public static boolean isDeletedCustomer(SQLiteDatabase db, String custId, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ='"
-                + "1" + "'" +" AND "+ TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + "1" + "'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;

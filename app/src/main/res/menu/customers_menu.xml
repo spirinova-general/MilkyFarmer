@@ -5,16 +5,14 @@
 
     tools:context=".MainActivity">
     <item
-        android:orderInCategory="300"
         android:id="@+id/areaSpinner"
         appcompat:actionViewClass="android.support.v7.widget.AppCompatSpinner"
-        appcompat:showAsAction="always"
+        appcompat:showAsAction="ifRoom"
         android:title="Filter areas">
     </item>
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/abr_search"
-        android:orderInCategory="300"
         android:title="Search"
         appcompat:actionViewClass="android.support.v7.widget.SearchView"
         appcompat:showAsAction="always"></item>
@@ -29,7 +27,6 @@
         android:id="@+id/save"
         android:icon="@drawable/ic_save"
         android:title="Save"
-        android:orderInCategory="300"
         appcompat:showAsAction="always"/>
 
     <!--<item-->

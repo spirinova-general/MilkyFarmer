@@ -6,15 +6,14 @@
     android:orientation="horizontal"
     >
 
-    <TextView
+    <TextView android:layout_width="wrap_content"
         android:id="@+id/nameView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
+        android:text="UT"
+        android:padding="12dp"
         android:layout_gravity="center"
-        android:background="@drawable/edittext_round_background"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="UT" />
+        android:textColor="@color/colorPrimaryDark"
+        android:background="@drawable/edittext_round_background"/>
 
     <LinearLayout
         android:layout_width="fill_parent"

@@ -56,6 +56,7 @@ public class BillingEdit extends AppCompatActivity {
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
         tax.setText(Account.getDefautTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase()));
+        AppUtil.getInstance().getDatabaseHandler().close();
     }
 
     @Override

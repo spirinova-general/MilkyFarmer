@@ -54,6 +54,7 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
             if (lblName != null)
                 lblName.setText(Area.getArea());
             lblName2.setText(AreaMapTableManagement.getCityNameById(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), Area.getCityId()));
+            AppUtil.getInstance().getDatabaseHandler().close();
         }
         return view;
     }

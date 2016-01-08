@@ -22,6 +22,7 @@ import com.milky.viewmodel.VCustomersList;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +36,7 @@ public class BillingAdapter extends BaseAdapter {
     private List<VBill> totalBill;
     private Context mContext;
     private boolean _mIsCustomer = false;
+    private ArrayList<String> names = new ArrayList<>();
 
     public BillingAdapter(final List<VCustomersList> dataList, final Context con, final boolean isCustomer) {
         this.mContext = con;
@@ -42,9 +44,10 @@ public class BillingAdapter extends BaseAdapter {
         this._mIsCustomer = isCustomer;
     }
 
-    public BillingAdapter(final List<VBill> dataList, final Context con) {
+    public BillingAdapter(final List<VBill> dataList, final Context con, ArrayList<String> name) {
         this.mContext = con;
         this.totalBill = dataList;
+        this.names = name;
 
     }
 
@@ -79,8 +82,9 @@ public class BillingAdapter extends BaseAdapter {
         holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
+        holder.name = (TextView) convertView.findViewById(R.id.name);
 
-
+        holder.name.setText(names.get(position));
         holder.startDate.setText(totalBill.get(position).getStartDate());
         holder.endDate.setText(totalBill.get(position).getEndDate());
         holder.amount.setText(totalBill.get(position).getPaymentMode());
@@ -94,7 +98,7 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("amount", "0")
                         .putExtra("balance", totalBill.get(position).getBalance())
                         .putExtra("titleString", CustomersActivity.titleString)
-                        .putExtra("totalPrice", totalBill.get(position).getTotalPrice())
+                        .putExtra("totalPrice", totalBill.get(position).getRate())
                         .putExtra("total", totalBill.get(position).getPaymentMode());
                 mContext.startActivity(intent);
 
@@ -105,7 +109,7 @@ public class BillingAdapter extends BaseAdapter {
     }
 
     class ViewHolder {
-        TextView startDate, endDate, amount;
+        TextView startDate, endDate, amount, name;
     }
 
     private DatabaseHelper databaseHelper = AppUtil.getInstance().getDatabaseHandler();

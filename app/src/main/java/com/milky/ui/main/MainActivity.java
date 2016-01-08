@@ -1,22 +1,28 @@
 package com.milky.ui.main;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -39,6 +45,7 @@ import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
 
@@ -91,6 +98,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                         startActivity(i);
 
                         break;
+                    case R.id.nav_sign_out:
+                        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+                        SharedPreferences.Editor edit = preferences.edit();
+                        edit.clear();
+                        edit.commit();
+                        finish();
+
+                        break;
                 }
                 mDrawerLayout.closeDrawers();
 
@@ -104,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
          */
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
                 R.string.app_name);
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -113,20 +128,26 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
     }
 
+    ActionBarDrawerToggle mDrawerToggle;
+
     ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
     View view1, searchView;
     Spinner spinner;
     int selectedPosition = 0;
     public static String selectedAreaId = "";
     public static String selectedArea = "";
+    Menu menu = null;
+    boolean expended = false;
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
 
         MenuInflater mi = getMenuInflater();
         mi.inflate(R.menu.customers_menu, menu);
-        MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
-        MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
+        this.menu = menu;
+        final MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
+        final MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
+
         view1 = mSpinnerItem1.getActionView();
         searchView = mSpinnerItem2.getActionView();
         if (view1 instanceof Spinner) {
@@ -159,13 +180,52 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             });
 
         }
+        MenuItemCompat.expandActionView(mSpinnerItem2);
+
+
         if (searchView instanceof SearchView) {
-            SearchView actionSearchView = (SearchView) searchView;
+            final SearchView actionSearchView = (SearchView) searchView;
             final EditText editSearch;
-            actionSearchView.setIconifiedByDefault(false);
             editSearch = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
             editSearch.setHintTextColor(getResources().getColor(R.color.white));
+            actionSearchView.setOnSearchClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    expended = true;
+                    mSpinnerItem1.setVisible(false);
+                }
+            });
 
+            actionSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    if (expended) {
+                        expended = false;
+                        mSpinnerItem1.setVisible(true);
+                        mSpinnerItem2.collapseActionView();
+                    }
+                    return true;
+                }
+            });
+
+            editSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if(CustomersFragment._mAdapter!=null)
+                    CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
             actionSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -176,9 +236,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                         }
 
                     } else {
-                        if (getFragmentRefreshListener() != null) {
-                            getFragmentRefreshListener().onRefresh();
-                        }
+                        if(CustomersFragment._mAdapter!=null)
+                        CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
+
                     }
                     return true;
                 }
@@ -207,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         for (int i = 0; i < areas.size(); ++i) {
             _areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
         }
+        _dbHelper.close();
         VAreaMapper areacity = new VAreaMapper();
         areacity.setArea("");
         areacity.setAreaId("");
@@ -225,12 +286,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
 
         }
+        _dbHelper.close();
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
         AppUtil.getTotalQuantity();
 
     }
-
 
 
     private void supportActionBar() {
@@ -241,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
     }
+
 
     public static int POSITION = 0;
 
@@ -292,6 +354,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         if ("0".equals(Account.getDefaultRate(_dbHelper.getReadableDatabase()))) {
             mDrawerLayout.openDrawer(mNavigationView);
             Toast.makeText(MainActivity.this, getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
+            _dbHelper.close();
         }
 
         String Area[] = new String[]{"Hadaspar", "Worli", "Baner", "Phase5", "Sector 71"};
@@ -299,7 +362,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         String City[] = new String[]{"Pune", "Mumbai", "Mohali"};
         int CityId[] = new int[]{1, 2, 3};
 
-        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
             for (int i = 0; i < 5; i++) {
                 VAreaMapper holder = new VAreaMapper();
@@ -319,6 +381,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 holder.setAccountId(Constants.ACCOUNT_ID);
                 AreaCityTableManagement.insertAreaDetail(_dbHelper.getWritableDatabase(), holder);
             }
+        _dbHelper.close();
         for (int i = 0; i < City.length; i++) {
             VAreaMapper holder = new VAreaMapper();
             holder.setCityId(String.valueOf(CityId[i]));
@@ -326,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             holder.setAccountId(Constants.ACCOUNT_ID);
             AreaCityTableManagement.insertCityDetail(_dbHelper.getWritableDatabase(), holder);
         }
+        _dbHelper.close();
 
 
     }
@@ -348,6 +412,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
 
         }
+        _dbHelper.close();
     }
 
     public FragmentRefreshListener getFragmentRefreshListener() {
@@ -413,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 }
             }
 
-
+            _dbHelper.close();
         }
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
             ArrayList<VCustomersList> billList = BillTableManagement.getCustomersBill(_dbHelper.getReadableDatabase());
@@ -456,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                     e.printStackTrace();
                 }
             }
-
+            _dbHelper.close();
 
         }
 
@@ -468,5 +533,24 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
         return nameValuePair;
     }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(expended)
+        if (getFragmentRefreshListener() != null) {
+            getFragmentRefreshListener().onRefresh();
+        }
+    }
 }

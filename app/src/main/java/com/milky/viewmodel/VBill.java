@@ -15,11 +15,20 @@ public class VBill {
     private String balance;
     private String adjustment;
     private String tax;
+    private String rate;
     private String isCleared;
     private String paymentMode;
     private String dateAdded;
     private String dateModified;
     private double totalPrice;
+
+    public String getRate() {
+        return rate;
+    }
+
+    public void setRate(String rate) {
+        this.rate = rate;
+    }
 
     public String getId() {
         return id;
@@ -126,13 +135,6 @@ public class VBill {
     }
 
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public String getTotalPrice() {
-        return String.valueOf(round(totalPrice,2));
-    }
     public static BigDecimal round(double d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Double.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);

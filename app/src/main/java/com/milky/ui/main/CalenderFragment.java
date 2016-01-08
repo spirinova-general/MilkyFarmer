@@ -85,6 +85,7 @@ public class CalenderFragment extends Fragment {
 
         } else
             _mCalenderView.setQuantity("0");
+        _dbHelper.close();
 
     }
 

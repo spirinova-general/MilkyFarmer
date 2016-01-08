@@ -129,6 +129,7 @@ public class CustomersActivity extends AppCompatActivity {
                 builder.show();
             }
         });
+        AppUtil.getInstance().getDatabaseHandler().close();
     }
 
     @Override

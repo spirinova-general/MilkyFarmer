@@ -434,21 +434,23 @@ public class CustomerSettingFragment extends Fragment {
                     if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
                             getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
                         CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
-                        BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
+
 
                     } else {
                         if (updatedQtyRate) {
                             String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
                             CustomerSettingTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
-                            BillTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
+//                            BillTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
                             holder.setStart_date(formattedDate);
                             CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
-                            BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
+//                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
                         } else {
                             CustomerSettingTableManagement.updateAllData(_dbHelper.getWritableDatabase(), holder);
-                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
+
                         }
+
                     }
+                    BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
 //                    EnableEditableFields.setIsEnabled(false);
                     getActivity().finish();
@@ -478,6 +480,30 @@ public class CustomerSettingFragment extends Fragment {
         new EnableEditableFields(_mAddress1, getActivity(), inputMethodManager).blockDefaultKeys();
         new EnableEditableFields(_mAddress2, getActivity(), inputMethodManager).blockDefaultKeys();
     }
+    public double getQtyOfCustomer(String day) {
+        double qty = 0;
+        double adjustedQty = 0;
+        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_DELIVERY)) {
+            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId) == 0) {
+                if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
 
+                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+                            , custId);
+
+                }
+            } else
+                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId);
+
+
+        } else if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+
+            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+                    , custId);
+
+        }
+
+
+        return qty;
+    }
 
 }

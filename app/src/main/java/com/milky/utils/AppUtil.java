@@ -1,20 +1,32 @@
 package com.milky.utils;
 
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
 
+import com.milky.R;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.serverapi.SyncDataService;
+import com.milky.ui.main.MainActivity;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Singleton class for access shared resource in application wide.
@@ -61,12 +73,13 @@ public class AppUtil extends Application {
     public static ArrayList<DateQuantityModel> getTotalQuantity() {
         totalData.clear();
         for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-            quantity = getDeliveryOfCustomer(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" +String.format("%02d", cal.get(Calendar.YEAR)));
+            quantity = getDeliveryOfCustomer(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
             DateQuantityModel holder = new DateQuantityModel();
-            holder.setDeliveryDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" +String.format("%02d",cal.get(Calendar.YEAR)));
+            holder.setDeliveryDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
             holder.setCalculatedQuqantity(round(quantity, 1));
             totalData.add(holder);
         }
+        AppUtil.getInstance().getDatabaseHandler().close();
 
 
         return totalData;
@@ -93,6 +106,39 @@ public class AppUtil extends Application {
             qty += CustomerSettingTableManagement.getAllCustomersByDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day) - adjustedQty;
         }
         return qty;
+    }
+
+    public static String generateOTP() {
+        List<Integer> numbers = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            numbers.add(i);
+        }
+
+        Collections.shuffle(numbers);
+
+        String result = "";
+        for (int i = 0; i < 4; i++) {
+            result += numbers.get(i).toString();
+        }
+        return result;
+    }
+    public static void showNotification(Context context, String title, String content, Intent intent) {
+        intent.setFlags(0);
+        int notificationId = (new Random()).nextInt();
+        PendingIntent contentIntent = PendingIntent.getBroadcast(context, notificationId, intent, 0);
+        Constants.OTP=generateOTP();
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle(title).setAutoCancel(true).setContentIntent(contentIntent)
+                        .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+                        .setContentText(content.replaceAll("<[^<>]+>", "")+Constants.OTP);
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification = mBuilder.build();
+//        if (sound != null && sound.trim().length() > 0) {
+//            notification.sound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + sound);
+//        }
+        manager.notify(notificationId, notification);
     }
 
 }

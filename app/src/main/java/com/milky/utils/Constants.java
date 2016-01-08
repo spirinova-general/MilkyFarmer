@@ -25,6 +25,7 @@ public class Constants {
     public static boolean CUSTOMER_ADDED = false;
     public static SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
     public static boolean validArea = false;
+    public static String OTP ="";
 
 
     static Calendar cal = Calendar.getInstance();

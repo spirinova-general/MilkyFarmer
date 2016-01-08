@@ -46,7 +46,6 @@ public class GlobalSetting extends AppCompatActivity {
     private EditText custCode, rate, tax, firstname, lastname, mobile;
     private InputMethodManager inputMethodManager;
     private LinearLayout _mBottomLayout;
-    //    private FloatingActionButton _editFab;
     private DatabaseHelper _dbHelper;
     private AutoCompleteTextView AreaAutocomplete;
     private ArrayList<VAreaMapper> _areaList, _areacityList = new ArrayList<>(), selectedareasList = new ArrayList<>(), selectedareacityList = new ArrayList<>();
@@ -160,8 +159,9 @@ public class GlobalSetting extends AppCompatActivity {
                 addLabel(selectedareacityList.get(x).getCityArea(), false);
             }
         }
-        _areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
 
+        _areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
+        _dbHelper.close();
         autoCompleteData = new String[_areaList.size()];
         for (int i = 0; i < _areaList.size(); i++) {
             VAreaMapper areacity = new VAreaMapper();
@@ -172,6 +172,7 @@ public class GlobalSetting extends AppCompatActivity {
             areacity.setCityArea(areacity.getArea() + areacity.getCity());
             _areacityList.add(areacity);
         }
+        _dbHelper.close();
 //        AreaAutocomplete.setFocusable(false);
 //        AreaAutocomplete.setFocusableInTouchMode(false);
         AreaAutocomplete.setThreshold(1);
@@ -254,6 +255,7 @@ public class GlobalSetting extends AppCompatActivity {
                         Account.insertAccountDetails(_dbHelper.getWritableDatabase(), holder);
 
                     }
+                    _dbHelper.close();
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
 
                     GlobalSetting.this.finish();
@@ -358,6 +360,7 @@ public class GlobalSetting extends AppCompatActivity {
                         ((ViewGroup) label.getParent()).removeView(label);
                         ((ViewGroup) remove.getParent()).removeView(remove);
                     }
+                    _dbHelper.close();
 
                 }
             });
@@ -377,6 +380,7 @@ public class GlobalSetting extends AppCompatActivity {
                     selectedAreaId = "";
                     selectedCityId = "";
                     AccountAreaMapping.insertmappedareas(_dbHelper.getWritableDatabase(), _areacityList.get(Position));
+                    _dbHelper.close();
                 } else {
                     autocomplete_layout.setError("This Area is already Selected");
                     myVib.vibrate(100);

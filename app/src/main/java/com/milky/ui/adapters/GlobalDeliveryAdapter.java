@@ -36,6 +36,7 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
     private String date;
     private List<VCustomersList> filteredList;
     private VCustomersList filetrHolder;
+
     public GlobalDeliveryAdapter(final Context con, final String quantityEditDate) {
         this.mContext = con;
         this.date = quantityEditDate;
@@ -99,7 +100,7 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
         * Set text field listeners*/
         holder._firstName.setText(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
                 CustomersList._mCustomersList.get(position).getCustomerId()));
-        holder._latsName.setText(" "+CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
+        holder._latsName.setText(" " + CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
                 CustomersList._mCustomersList.get(position).getCustomerId()));
         final ViewHolder finalHolder = holder;
         holder._quantity.addTextChangedListener(new TextWatcher() {
@@ -130,10 +131,12 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
             }
         });
 
-
+        db.close();
         return convertView;
     }
+
     private CustomerFilter friendFilter;
+
     @Override
     public Filter getFilter() {
         if (filteredList == null) {
@@ -158,7 +161,7 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
-            if (constraint!=null && constraint.length()>0) {
+            if (constraint != null && constraint.length() > 0) {
                 List<VCustomersList> tempList = new ArrayList<>();
 
                 // search content in friend list
@@ -180,8 +183,9 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
 
         /**
          * Notify about filtered list to ui
+         *
          * @param constraint text
-         * @param results filtered result
+         * @param results    filtered result
          */
         @SuppressWarnings("unchecked")
         @Override

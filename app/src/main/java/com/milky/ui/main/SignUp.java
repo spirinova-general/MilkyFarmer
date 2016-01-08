@@ -31,7 +31,7 @@ public class SignUp extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _dbHelper =AppUtil.getInstance().getDatabaseHandler();
+        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(getApplicationContext(), getResources().getString(R.string.facebook_app_id));
     }
@@ -50,16 +50,26 @@ public class SignUp extends AppCompatActivity {
 //                    startActivity(i);
 //                } else
 //                    Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
-                if(_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-                {
-                    Intent i = new Intent(SignUp.this, MainActivity.class);
-                    startActivity(i);
-                }
-                else
-                {
+                if (preferences.contains(UserPrefrences.PASSWORD)) {
+                    if (preferences.getString(UserPrefrences.PASSWORD, "").length() > 0) {
+                        Intent i = new Intent(SignUp.this, MainActivity.class);
+                        startActivity(i);
+                    }
+                } else {
                     Intent i = new Intent(SignUp.this, FarmerSignup.class);
                     startActivity(i);
                 }
+//                if(_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
+//                {
+//                    Intent i = new Intent(SignUp.this, MainActivity.class);
+//                    startActivity(i);
+//                }
+//                else
+//                {
+//                    Intent i = new Intent(SignUp.this, FarmerSignup.class);
+//                    startActivity(i);
+//                }
+//                _dbHelper.close();
 
             }
         });
@@ -71,17 +81,16 @@ public class SignUp extends AppCompatActivity {
 //                    startActivity(i);
 //                } else
 //                    Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
-                if(_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-                {
-                    Intent i = new Intent(SignUp.this, MainActivity.class);
-                    startActivity(i);
-                }
-                else
-                {
+//                Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
+                if (preferences.contains(UserPrefrences.PASSWORD)) {
+                    if (preferences.getString(UserPrefrences.PASSWORD, "").length() > 0) {
+                        Intent i = new Intent(SignUp.this, MainActivity.class);
+                        startActivity(i);
+                    }
+                } else {
                     Intent i = new Intent(SignUp.this, FarmerSignup.class);
                     startActivity(i);
                 }
-
             }
         });
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {

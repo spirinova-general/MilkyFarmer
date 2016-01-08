@@ -34,7 +34,6 @@ import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
-import com.milky.ui.adapters.AutocompleteAreaArrayAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
@@ -66,8 +65,6 @@ public class CustomerAddActivity extends AppCompatActivity {
     private ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
-    private AreaCityAdapter adapter1;
-    private AutocompleteAreaArrayAdapter adapter;
     private TextView _pickdate;
     private Calendar myCalendar;
     private int myear;
@@ -193,6 +190,9 @@ public class CustomerAddActivity extends AppCompatActivity {
                         CustomerAddActivity.this.finish();
                     }
                 } catch (NullPointerException npe) {
+                }
+                finally {
+                    _dbHelper.close();
                 }
             }
         });
@@ -357,6 +357,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 
 
         }
+        _dbHelper.close();
         _cityAreaAutocomplete.setThreshold(1);//will start working from first character
 
         AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
