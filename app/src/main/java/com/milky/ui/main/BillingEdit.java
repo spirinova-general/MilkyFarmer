@@ -16,6 +16,10 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.utils.AppUtil;
+import com.milky.utils.Constants;
+
+import java.text.ParseException;
+import java.util.Calendar;
 
 /**
  * Created by Neha on 11/20/2015.
@@ -27,8 +31,8 @@ public class BillingEdit extends AppCompatActivity {
     private EditText rate;
     private EditText balance_amount;
     private EditText tax;
-    private Button save;
-    private TextView start_date, end_date, total_amount;
+    private Button save, clear_bill;
+    private TextView start_date, end_date, total_amount, clera_bill_text;
 
     private void getview() {
         milk_quantity = (EditText) findViewById(R.id.milk_quantity);
@@ -41,12 +45,31 @@ public class BillingEdit extends AppCompatActivity {
 
         start_date.setText(intent.getStringExtra("start_date"));
         end_date.setText(intent.getStringExtra("end_date"));
+        Calendar cal = Calendar.getInstance();
+        try {
+            cal.setTime(Constants._display_format.parse(intent.getStringExtra("end_date")));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         rate.setText(intent.getStringExtra("totalPrice"));
         start_date.setEnabled(false);
         end_date.setEnabled(false);
         milk_quantity.setText(intent.getStringExtra("quantity"));
         milk_quantity.setFocusable(false);
         milk_quantity.setFocusableInTouchMode(false);
+        clear_bill = (Button) findViewById(R.id.clear_bill);
+        clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
+        if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+            clera_bill_text.setVisibility(View.GONE);
+            clear_bill.setEnabled(true);
+            clear_bill.setTextColor(getResources().getColor(R.color.white));
+        } else {
+            clera_bill_text.setText("You can clear this bill once the final bill is generated on " + cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+            +" "+Constants.MONTHS[cal.get(Calendar.MONTH)]);
+            clear_bill.setEnabled(false);
+            clear_bill.setTextColor(getResources().getColor(R.color.gray_lighter));
+        }
 
         balance_amount.setText(intent.getStringExtra("balance"));
         balance_amount.setFocusable(false);
@@ -84,7 +107,7 @@ public class BillingEdit extends AppCompatActivity {
 
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
 
-        title.setText(intent.getStringExtra("titleString"));
+        title.setText(intent.getStringExtra("titleString") + "(Bill)");
         LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 
         saveManu.setVisibility(View.GONE);

@@ -25,8 +25,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
@@ -46,6 +48,7 @@ import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.UserPrefrences;
+import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
 
@@ -65,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     private FragmentTransaction mFragmentTransaction;
     private Toolbar _mToolbar;
     private DatabaseHelper _dbHelper;
-
+    private View _headerView;
+    private ArrayList<VAreaMapper> selectedareacityList = new ArrayList<>();
     public static DrawerLayout mDrawerLayout;
     public static NavigationView mNavigationView;
 
@@ -87,7 +91,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         /**
          * Setup click events on the Navigation View Items.
          */
+        _headerView = mNavigationView.inflateHeaderView(R.layout.nav_headers);
+//        mNavigationView.addHeaderView(_headerView);
 
+        TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
+        VAccount dataHolder = Account.getFarmerName(_dbHelper.getReadableDatabase());
+        name.setText(dataHolder.getFirstName() + " " + dataHolder.getLastName());
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -134,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     View view1, searchView;
     Spinner spinner;
     int selectedPosition = 0;
-    public static String selectedAreaId = "";
     public static String selectedArea = "";
     Menu menu = null;
     boolean expended = false;
@@ -145,66 +153,72 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         MenuInflater mi = getMenuInflater();
         mi.inflate(R.menu.customers_menu, menu);
         this.menu = menu;
-        final MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
+//        final MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
         final MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
 
-        view1 = mSpinnerItem1.getActionView();
+//        view1 = mSpinnerItem1.getActionView();
         searchView = mSpinnerItem2.getActionView();
-        if (view1 instanceof Spinner) {
-            spinner = (Spinner) view1;
-            spinner.setAdapter(adp1);
-            spinner.setSelection(selectedPosition);
-            spinner.setGravity(Gravity.CENTER);
-
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-                @Override
-                public void onItemSelected(AdapterView<?> arg0, View arg1,
-                                           int arg2, long arg3) {
-
-                    selectedPosition = arg2;
-                    selectedAreaId = _areacityList.get(arg2).getAreaId();
-                    selectedArea = _areacityList.get(arg2).getArea() + ", " + _areacityList.get(arg2).getCity();
-                    if (getFragmentRefreshListener() != null) {
-                        getFragmentRefreshListener().onRefresh();
-                    }
-
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> arg0) {
-                    // TODO Auto-generated method stub
-
-
-                }
-            });
-
-        }
+//        if (view1 instanceof Spinner) {
+//            spinner = (Spinner) view1;
+//            spinner.setAdapter(adp1);
+//            spinner.setSelection(selectedPosition);
+//            spinner.setGravity(Gravity.CENTER);
+//
+//            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//
+//                @Override
+//                public void onItemSelected(AdapterView<?> arg0, View arg1,
+//                                           int arg2, long arg3) {
+//
+//                    selectedPosition = arg2;
+//                    selectedAreaId = _areacityList.get(arg2).getAreaId();
+//                    selectedArea = _areacityList.get(arg2).getArea() + ", " + _areacityList.get(arg2).getCity();
+//                    if (getFragmentRefreshListener() != null) {
+//                        getFragmentRefreshListener().onRefresh();
+//                    }
+//
+//                }
+//
+//                @Override
+//                public void onNothingSelected(AdapterView<?> arg0) {
+//                    // TODO Auto-generated method stub
+//
+//
+//                }
+//            });
+//
+//        }
         MenuItemCompat.expandActionView(mSpinnerItem2);
 
 
         if (searchView instanceof SearchView) {
             final SearchView actionSearchView = (SearchView) searchView;
-            final EditText editSearch;
-            editSearch = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-            editSearch.setHintTextColor(getResources().getColor(R.color.white));
+            final AutoCompleteTextView editSearch;
+            editSearch = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+            editSearch.setHintTextColor(getResources().getColor(R.color.gray_lighter));
+            editSearch.setHint("Type Area Or Customer Name");
+            editSearch.setTextSize(13);
             actionSearchView.setOnSearchClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     expended = true;
-                    mSpinnerItem1.setVisible(false);
+//                    mSpinnerItem1.setVisible(false);
                 }
             });
+            editSearch.setThreshold(1);
+            AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
+            editSearch.setAdapter(adapter1);
 
-            actionSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            editSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public boolean onClose() {
-                    if (expended) {
-                        expended = false;
-                        mSpinnerItem1.setVisible(true);
-                        mSpinnerItem2.collapseActionView();
-                    }
-                    return true;
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    editSearch.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                    Constants.selectedAreaId = _areacityList.get(position).getAreaId();
+                    Constants.selectedCityId = _areacityList.get(position).getCityId();
+                    selectedareacityList.add(_areacityList.get(position));
+                    editSearch.setSelection(editSearch.getText().length());
+                    if (CustomersFragment._mAdapter != null)
+                        CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
                 }
             });
 
@@ -216,8 +230,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if(CustomersFragment._mAdapter!=null)
-                    CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
+                    if (CustomersFragment._mAdapter != null)
+                        CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
+                    if(s.length()==0)
+                    {
+                        Constants.selectedAreaId = "";
+                        Constants.selectedCityId = "";
+                    }
 
                 }
 
@@ -236,8 +255,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                         }
 
                     } else {
-                        if(CustomersFragment._mAdapter!=null)
-                        CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
+                        if (CustomersFragment._mAdapter != null)
+                            CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
 
                     }
                     return true;
@@ -258,6 +277,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     @Override
     protected void onResume() {
         super.onResume();
+
+        mNavigationView.removeHeaderView(_headerView);
+        _headerView = mNavigationView.inflateHeaderView(R.layout.nav_headers);
+
+        TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
+        VAccount dataHolder = Account.getFarmerName(_dbHelper.getReadableDatabase());
+        name.setText(dataHolder.getFirstName() + " " + dataHolder.getLastName());
         if (getFragmentRefreshListener() != null) {
             getFragmentRefreshListener().onRefresh();
         }
@@ -312,19 +338,19 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         switch (page) {
             case 0:
                 menu.findItem(R.id.action_search).setVisible(false);
-                menu.findItem(R.id.areaSpinner).setVisible(false);
+//                menu.findItem(R.id.areaSpinner).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
 
 
                 break;
             case 1:
                 menu.findItem(R.id.action_search).setVisible(true);
-                menu.findItem(R.id.areaSpinner).setVisible(true);
+//                menu.findItem(R.id.areaSpinner).setVisible(true);
                 menu.findItem(R.id.save).setVisible(false);
                 break;
             case 2:
                 menu.findItem(R.id.action_search).setVisible(false);
-                menu.findItem(R.id.areaSpinner).setVisible(false);
+//                menu.findItem(R.id.areaSpinner).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
                 break;
         }
@@ -533,8 +559,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
         return nameValuePair;
     }
+
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
@@ -548,9 +575,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(expended)
-        if (getFragmentRefreshListener() != null) {
-            getFragmentRefreshListener().onRefresh();
-        }
+        if (expended)
+            if (getFragmentRefreshListener() != null) {
+                getFragmentRefreshListener().onRefresh();
+            }
     }
 }

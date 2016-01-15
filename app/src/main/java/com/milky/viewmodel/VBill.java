@@ -21,6 +21,23 @@ public class VBill {
     private String dateAdded;
     private String dateModified;
     private double totalPrice;
+    private String isOutstanding;
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String isOutstanding() {
+        return isOutstanding;
+    }
+
+    public void setIsOutstanding(String isOutstanding) {
+        this.isOutstanding = isOutstanding;
+    }
 
     public String getRate() {
         return rate;

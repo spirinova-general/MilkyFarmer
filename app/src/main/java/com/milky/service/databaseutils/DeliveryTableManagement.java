@@ -80,6 +80,7 @@ public class DeliveryTableManagement {
                 " ='" + holder.getCustomerId() + "'", null);
     }
 
+
     public static void updateDeletedCustomer(SQLiteDatabase db, String deletedon, String custId) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DELETED_ON, deletedon);
@@ -162,7 +163,7 @@ public class DeliveryTableManagement {
     }
 
     public static boolean isDeletedCustomer(SQLiteDatabase db, String day) {
-        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ='"
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.DELETED_ON + " ='"
                 + "1" + "' AND " + TableColumns.START_DATE + " ='" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -171,6 +172,7 @@ public class DeliveryTableManagement {
         cursor.close();
         return result;
     }
+
     public static double getQuantityOfDayByDateForCustomer(SQLiteDatabase db, String day,String CustId) {
         String selectquery = "";
         if (isDeletedCustomer(db, day))
@@ -188,7 +190,6 @@ public class DeliveryTableManagement {
 
             }
             while (cursor.moveToNext());
-
 
         }
         cursor.close();

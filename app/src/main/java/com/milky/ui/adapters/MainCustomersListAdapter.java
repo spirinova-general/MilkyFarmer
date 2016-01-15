@@ -14,25 +14,30 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.CustomersFragment;
+import com.milky.ui.main.MainActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
  * Created by Neha on 11/18/2015.
  */
-public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
-    private List<VCustomersList> mCustomersList, items,tempList,tempItems, suggestions;
+public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
+    private List<VCustomersList> mCustomersList, tempItems, suggestions;
     private CustomersFragmentListAdapter mListAdapter;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
-    public MainCustomersListAdapter(Activity act,int resource,int textViewResourceId, List<VCustomersList> listData) {
+
+    public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<VCustomersList> listData) {
         super(act, resource, textViewResourceId, listData);
         this.mCustomersList = listData;
         this.mActivity = act;
@@ -40,11 +45,11 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
         tempItems = new ArrayList<VCustomersList>(mCustomersList); // this makes the difference.
         suggestions = new ArrayList<>();
     }
+
     @Override
     public int getCount() {
         return mCustomersList.size();
     }
-
 
 
     @Override
@@ -85,8 +90,15 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Calendar c = Calendar.getInstance();
+                try {
+                    c.setTime(Constants.work_format.parse(customer.getStart_date()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                String deliveryDate = c.get(Calendar.DAY_OF_MONTH) + "-" + Constants.MONTHS[c.get(Calendar.MONTH)] + "-" + c.get(Calendar.YEAR);
                 Intent intent = new Intent(mActivity, com.milky.ui.main.CustomersActivity.class)
-                        .putExtra("fname",customer.getFirstName())
+                        .putExtra("fname", customer.getFirstName())
                         .putExtra("lname", customer.getLastName())
                         .putExtra("quantity", customer.get_mQuantity())
                         .putExtra("areaId", customer.getAreaId())
@@ -94,12 +106,13 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
                         .putExtra("istoAddCustomer", false)
                         .putExtra("cityId", customer.getCityId())
                         .putExtra("mobile", customer.getMobile())
-                        .putExtra("defaultrate",customer.getRate())
+                        .putExtra("defaultrate", customer.getRate())
                         .putExtra("address2", customer.getAddress2())
                         .putExtra("added_date", customer.getDateAdded())
                         .putExtra("balance", customer.getBalance_amount())
                         .putExtra("cust_id", customer.getCustomerId())
-                        .putExtra("delivery_date",customer.getStart_date());
+                        .putExtra("delivery_date", deliveryDate)
+                        .putExtra("start_delivery_date", customer.getStart_date());
                 mActivity.startActivity(intent);
             }
         });
@@ -111,6 +124,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
     public Filter getFilter() {
         return nameFilter;
     }
+
     /**
      * Custom Filter implementation for custom suggestions we provide.
      */
@@ -127,7 +141,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
             if (constraint != null) {
                 suggestions.clear();
                 for (VCustomersList Area : tempItems) {
-                    if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase())||
+                    if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase()) ||
                             Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
                         suggestions.add(Area);
                     }
@@ -153,21 +167,39 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
                     add(Area);
                     notifyDataSetChanged();
                 }
-                if(results.count==1)
-                CustomersFragment.mTotalCustomers.setText(results.count+" Customer");
-                else if(results.count>1)
-                    CustomersFragment.mTotalCustomers.setText(results.count+" Customers");
-            }
-            else
-            {
+                if (results.count == 1)
+                    CustomersFragment.mTotalCustomers.setText(results.count + " Customer");
+                else if (results.count > 1)
+                    CustomersFragment.mTotalCustomers.setText(results.count + " Customers");
+            } else {
                 clear();
-                CustomersFragment.mTotalCustomers.setText("No Customers");
                 notifyDataSetChanged();
             }
+            if (!Constants.selectedAreaId.equals("")) {
+                clear();
+
+                VAreaMapper holder = AreaMapTableManagement.getAreabyAreaId(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
+
+                filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
+                for (VCustomersList Area : filterList) {
+                    add(Area);
+                    notifyDataSetChanged();
+                }
+                if (filterList.size() == 1) {
+
+                    CustomersFragment.mTotalCustomers.setText(filterList.size() + " Customer in " + holder.getArea()
+                            + ", " + AreaMapTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), Constants.selectedCityId));
+
+                } else if (filterList.size() > 1)
+                    CustomersFragment.mTotalCustomers.setText(filterList.size() + " Customers");
+            }
+            notifyDataSetChanged();
+
+
         }
     };
-    class ViewHolder
-    {
+
+    class ViewHolder {
         protected TextView userFirstName, userLastName;
         protected TextView userFlatNo;
         protected TextView userAreaName;
@@ -175,4 +207,6 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList>{
         protected TextView userCity;
         protected TextView _nameView;
     }
+
+
 }

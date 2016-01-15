@@ -45,6 +45,7 @@
                 android:background="@drawable/transparent_button_click"
                 android:gravity="center"
                 android:text="Sign in"
+                android:visibility="gone"
                 android:textColor="@color/white" />
 
         </LinearLayout>

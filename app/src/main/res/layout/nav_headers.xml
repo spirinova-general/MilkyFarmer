@@ -8,26 +8,23 @@
     android:orientation="vertical"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-<ImageView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:src="@drawable/logo"
-    />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo" />
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/farmer_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:gravity="bottom"
-        android:text="FarmerX"
-        android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/white"
-        android:textSize="14sp" />
-
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
 
 </LinearLayout>

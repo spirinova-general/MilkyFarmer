@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,8 +29,10 @@ import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.ui.adapters.GlobalDeliveryAdapter;
+import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
@@ -63,8 +69,8 @@ public class CustomersList extends AppCompatActivity {
         setActionBar();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(),"");
-            _mAdaapter = new GlobalDeliveryAdapter(this, String.valueOf(Constants.SELECTED_DAY));
+            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
+            _mAdaapter = new GlobalDeliveryAdapter(this, 0,0,String.valueOf(Constants.SELECTED_DAY),_mCustomersList);
             _mCustomers.setItemsCanFocus(true);
             _mCustomers.setAdapter(_mAdaapter);
         }
@@ -133,8 +139,7 @@ public class CustomersList extends AppCompatActivity {
         if (id == android.R.id.home) {
             finish();
         }
-        if(id == R.id.save)
-        {
+        if (id == R.id.save) {
             if (_mDeliveryList.size() > 0)
                 for (int i = 0; i < _mDeliveryList.size(); i++) {
 
@@ -159,7 +164,6 @@ public class CustomersList extends AppCompatActivity {
     View view1, searchView;
     Spinner spinner;
     int selectedPosition = 0;
-    public static String selectedAreaId = "";
     public static String selectedArea = "";
     AreaCitySpinnerAdapter adp1;
 
@@ -168,64 +172,108 @@ public class CustomersList extends AppCompatActivity {
 
         MenuInflater mi = getMenuInflater();
         mi.inflate(R.menu.customers_menu, menu);
-        MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
+//        MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
         MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
-        view1 = mSpinnerItem1.getActionView();
+//        view1 = mSpinnerItem1.getActionView();
         searchView = mSpinnerItem2.getActionView();
         MenuItem search = menu.findItem(R.id.save);
 
 
-        if (view1 instanceof Spinner) {
-            spinner = (Spinner) view1;
-            spinner.setAdapter(adp1);
-            spinner.setSelection(selectedPosition);
-            spinner.setGravity(Gravity.CENTER);
+//        if (view1 instanceof Spinner) {
+//            spinner = (Spinner) view1;
+//            spinner.setAdapter(adp1);
+//            spinner.setSelection(selectedPosition);
+//            spinner.setGravity(Gravity.CENTER);
+//
+//            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//
+//                @Override
+//                public void onItemSelected(AdapterView<?> arg0, View arg1,
+//                                           int arg2, long arg3) {
+//
+//                    selectedPosition = arg2;
+//                    selectedAreaId = _areacityList.get(arg2).getAreaId();
+//                    selectedArea = _areacityList.get(arg2).getArea() + ", " + _areacityList.get(arg2).getCity();
+//
+//                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+//                        if (arg2 == 0) {
+//                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
+//                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
+//                            _mCustomers.setItemsCanFocus(true);
+//                            _mCustomers.setAdapter(_mAdaapter);
+//                        } else {
+//                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), selectedAreaId);
+//                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
+//                            _mCustomers.setItemsCanFocus(true);
+//                            _mCustomers.setAdapter(_mAdaapter);
+//                        }
+//                    }
+//                    _dbHelper.close();
+//
+//                }
+//                @Override
+//                public void onNothingSelected(AdapterView<?> arg0) {
+//                    // TODO Auto-generated method stub
+//
+//
+//                }
+//            });
+//
+//        }
+        if (searchView instanceof SearchView) {
+            final SearchView actionSearchView = (SearchView) searchView;
+            final AutoCompleteTextView editSearch;
+            editSearch = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+            editSearch.setHintTextColor(getResources().getColor(R.color.gray_lighter));
+            editSearch.setHint("Type Area Or Customer Name");
+            editSearch.setTextSize(13);
 
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            editSearch.setThreshold(1);
+            AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
+            editSearch.setAdapter(adapter1);
 
+            editSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onItemSelected(AdapterView<?> arg0, View arg1,
-                                           int arg2, long arg3) {
-
-                    selectedPosition = arg2;
-                    selectedAreaId = _areacityList.get(arg2).getAreaId();
-                    selectedArea = _areacityList.get(arg2).getArea() + ", " + _areacityList.get(arg2).getCity();
-
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                        if (arg2 == 0) {
-                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
-                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
-                            _mCustomers.setItemsCanFocus(true);
-                            _mCustomers.setAdapter(_mAdaapter);
-                        } else {
-                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), selectedAreaId);
-                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
-                            _mCustomers.setItemsCanFocus(true);
-                            _mCustomers.setAdapter(_mAdaapter);
-                        }
-                    }
-                    _dbHelper.close();
-
-                }
-                @Override
-                public void onNothingSelected(AdapterView<?> arg0) {
-                    // TODO Auto-generated method stub
-
-
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    editSearch.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                    Constants.selectedAreaId = _areacityList.get(position).getAreaId();
+                    Constants.selectedCityId = _areacityList.get(position).getCityId();
+                    editSearch.setSelection(editSearch.getText().length());
+                    if (_mAdaapter != null)
+                        _mAdaapter.getFilter().filter(editSearch.getText().toString());
                 }
             });
 
-        }
-        if (view1 instanceof SearchView) {
-            SearchView actionSearchView = (SearchView) searchView;
-            final EditText editSearch;
-            actionSearchView.setIconifiedByDefault(false);
-            editSearch = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-            editSearch.setHintTextColor(getResources().getColor(R.color.white));
+            editSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (_mAdaapter != null)
+                        _mAdaapter.getFilter().filter(editSearch.getText().toString());
+                    if (s.length() == 0) {
+                        Constants.selectedAreaId = "";
+                        Constants.selectedCityId = "";
+                    }
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
             actionSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
-                public boolean onQueryTextSubmit(String newText) {
-                    _mAdaapter.getFilter().filter(newText);
+                public boolean onQueryTextSubmit(String query) {
+
+                        if (_mAdaapter != null)
+                            _mAdaapter.getFilter().filter(editSearch.getText().toString());
+
+
                     return true;
                 }
 
@@ -234,7 +282,6 @@ public class CustomersList extends AppCompatActivity {
                     return false;
                 }
             });
-            //Set up your OnQueryTextListener here);
 
         }
         return true;

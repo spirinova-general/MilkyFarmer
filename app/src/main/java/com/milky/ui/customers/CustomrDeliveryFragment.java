@@ -1,9 +1,11 @@
 package com.milky.ui.customers;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -15,9 +17,12 @@ import android.widget.EditText;
 
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
+import com.milky.utils.Constants;
+import com.milky.viewmodel.VCustomersList;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
@@ -25,6 +30,7 @@ import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 import com.milky.R;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -36,6 +42,8 @@ public class CustomrDeliveryFragment extends Fragment {
     private TextInputLayout bill_amount_layout;
     private int dataCount = 0;
     private String custId = "";
+    private DatabaseHelper db;
+    private String selected_date;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,6 +55,7 @@ public class CustomrDeliveryFragment extends Fragment {
                 getActivity().getIntent().getStringExtra("cust_id")));
         custId = getActivity().getIntent().getStringExtra("cust_id");
         _mCalenderView.setForCustomersDelivery(true);
+        db = AppUtil.getInstance().getDatabaseHandler();
 
         initResources();
         if (totalData.size() > 0) {
@@ -62,18 +71,61 @@ public class CustomrDeliveryFragment extends Fragment {
         AppUtil.getInstance().getDatabaseHandler().close();
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
-            public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
-//                Constants.SELECTED_DAY = day;
-//                Constants.QUANTITY_UPDATED_DAY = String.valueOf(day.getDay());
-//                Constants.QUANTITY_UPDATED_MONTH = String.valueOf(day.getMonth());
-//                Constants.QUANTITY_UPDATED_YEAR = String.valueOf(day.getYear());
-//                Constants.DELIVERY_DATE = String.valueOf(day.getDay()) + "-" + String.valueOf(day.getMonth()) + "-" + String.valueOf(day.getYear());
-//                String balance = CustomersTableMagagement.getBalanceForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-//                onCreateDialog(balance);
-//                String month = new DateFormatSymbols().getMonths()[day.getMonth()];
-//                Intent intent = new Intent(getActivity(), CustomersList.class).putExtra("day", day.getDay()).putExtra("month", month);
-//                startActivity(intent);
+            public void onDayClicked(AdapterView<?> adapterView, View view, final int i, long l, final Day day) {
+                selected_date = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
+                        String.format("%02d", day.getDay());
 
+                Calendar deliveryDate = Calendar.getInstance();
+                try {
+                    deliveryDate.setTime(Constants.work_format.parse(getActivity().getIntent().getStringExtra("start_delivery_date")));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if(day.getDay()>=deliveryDate.get(Calendar.DAY_OF_MONTH)) {
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+                    final AlertDialog dialog = alertBuilder.create();
+                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
+                    dialog.setView(view1);
+
+                    final EditText quantity = (EditText) view1.findViewById(R.id.milk_quantity);
+                    final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
+                    quantity.setText(String.valueOf(totalData.get(day.getDay() - 1).getCalculatedQuqantity()));
+                    ((Button) view1.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (quantity.getText().toString().equals("")) {
+                                quantity_layout.setError("Enter quantity!");
+                            } else {
+                                VCustomersList holder = new VCustomersList();
+                                holder.setQuantity(quantity.getText().toString());
+                                holder.setStart_date(selected_date);
+                                holder.setCustomerId(custId);
+                                if (DeliveryTableManagement.isHasData(db.getReadableDatabase(),
+                                        custId, selected_date)) {
+
+                                    DeliveryTableManagement.updateCustomerDetail(db.getWritableDatabase(), holder);
+                                } else
+                                    DeliveryTableManagement.insertCustomerDetail(db.getWritableDatabase(), holder);
+
+                                DateQuantityModel holder1 = new DateQuantityModel();
+                                holder1.setDeliveryDate(selected_date);
+                                holder1.setCalculatedQuqantity(round(Double.parseDouble(quantity.getText().toString()), 1));
+                                totalData.set(day.getDay() - 1, holder1);
+                                _mCalenderView.refreshAdapter();
+                                dialog.hide();
+                            }
+
+                        }
+                    });
+                    ((Button) view1.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.hide();
+                        }
+                    });
+                    dialog.show();
+                }
             }
         });
     }
@@ -144,9 +196,9 @@ public class CustomrDeliveryFragment extends Fragment {
     public ArrayList<DateQuantityModel> getTotalQuantity() {
         totalData.clear();
         for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-            quantity = getDeliveryOfCustomer(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+            quantity = getDeliveryOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
             DateQuantityModel holder = new DateQuantityModel();
-            holder.setDeliveryDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+            holder.setDeliveryDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
             holder.setCalculatedQuqantity(round(quantity, 1));
             totalData.add(holder);
         }

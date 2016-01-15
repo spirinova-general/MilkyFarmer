@@ -73,9 +73,9 @@ public class AppUtil extends Application {
     public static ArrayList<DateQuantityModel> getTotalQuantity() {
         totalData.clear();
         for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-            quantity = getDeliveryOfCustomer(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+            quantity = getDeliveryOfCustomer(cal.get(Calendar.YEAR)+"-"+String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
             DateQuantityModel holder = new DateQuantityModel();
-            holder.setDeliveryDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+            holder.setDeliveryDate(cal.get(Calendar.YEAR)+"-"+String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
             holder.setCalculatedQuqantity(round(quantity, 1));
             totalData.add(holder);
         }
@@ -95,9 +95,11 @@ public class AppUtil extends Application {
         custIds.clear();
         double qty = 0;
         double adjustedQty = 0;
-        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_DELIVERY))
+//        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_DELIVERY))
+        if(DeliveryTableManagement.isDeletedCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),day))
             qty = DeliveryTableManagement.getQuantityOfDayByDate(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day);
-        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+
+        if(AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
             if (custIds.size() > 0)
                 for (int i = 0; i < custIds.size(); i++)
                     adjustedQty += CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
@@ -108,25 +110,12 @@ public class AppUtil extends Application {
         return qty;
     }
 
-    public static String generateOTP() {
-        List<Integer> numbers = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            numbers.add(i);
-        }
 
-        Collections.shuffle(numbers);
-
-        String result = "";
-        for (int i = 0; i < 4; i++) {
-            result += numbers.get(i).toString();
-        }
-        return result;
-    }
     public static void showNotification(Context context, String title, String content, Intent intent) {
         intent.setFlags(0);
         int notificationId = (new Random()).nextInt();
         PendingIntent contentIntent = PendingIntent.getBroadcast(context, notificationId, intent, 0);
-        Constants.OTP=generateOTP();
+        Constants.OTP=Constants.generateOTP();
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.logo)

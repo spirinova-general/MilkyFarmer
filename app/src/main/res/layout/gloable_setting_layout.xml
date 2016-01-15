@@ -21,7 +21,6 @@
         android:layout_weight="1">
 
 
-
         <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -29,7 +28,6 @@
 
 
             <LinearLayout
-                android:padding="3dp"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -37,53 +35,51 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:orientation="vertical"
+                android:padding="3dp"
                 android:paddingTop="5dp">
+
+
+                <!--  <ImageView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:background="@color/gray"
+                      android:padding="5dp"
+                      android:src="@drawable/ic_user" />-->
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/custCode_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:padding="0dp">
+
+                    <EditText
+                        android:id="@+id/custCode"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:enabled="false"
+                        android:hint="Code"
+                        android:paddingTop="0dp"
+                        android:singleLine="true"
+                        android:textColor="@color/textfield_enable" />
+                </android.support.design.widget.TextInputLayout>
 
 
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                 >
-
-                  <!--  <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@color/gray"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_user" />-->
-
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/custCode_layout"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-
-                        android:padding="0dp">
-
-                        <EditText
-                            android:textColor="@color/textfield_enable"                            android:enabled="false"
-                            android:id="@+id/custCode"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Code"
-                            android:singleLine="true" />
-                    </android.support.design.widget.TextInputLayout>
-
-
-                </LinearLayout>
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
-
+                    android:orientation="horizontal">
 
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/name_layout"
-                        android:layout_weight="1"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        >
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:padding="0dp">
 
                         <EditText
                             android:id="@+id/first_name"
@@ -92,15 +88,19 @@
                             android:hint="First Name"
                             android:inputType="textCapSentences"
                             android:nextFocusDown="@+id/last_name"
-                            android:singleLine="true" />
+                            android:paddingTop="0dp"
+                            android:singleLine="true"
+                            android:text="kdksmd" />
                     </android.support.design.widget.TextInputLayout>
 
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/last_name_layout"
                         android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content">
+                        android:padding="0dp">
 
                         <EditText
                             android:id="@+id/last_name"
@@ -108,50 +108,86 @@
                             android:layout_height="wrap_content"
                             android:hint="Last Name"
                             android:inputType="textCapSentences"
+                            android:paddingTop="0dp"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
 
 
                 </LinearLayout>
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/mobile_layout"
+
+                <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:padding="0dp">
 
-                    <EditText
-                        android:id="@+id/mobile"
+                    <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Mobile"
-                        android:inputType="number"
-                        android:singleLine="true" />
-                </android.support.design.widget.TextInputLayout>
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:text="Mobile"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/mobile"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@null"
+                            android:inputType="number"
+                            android:padding="0dp"
+                            android:singleLine="true"
+                            android:textSize="18sp"
+                            android:layout_gravity="center_vertical" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/change_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:background="@drawable/transparent_button_click"
+                        android:padding="5dp"
+                        android:text="Change"
+
+                        android:gravity="center"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/balanceLayout"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
 
-                   <!-- <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@color/gray"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_balance" />-->
+                    <!-- <ImageView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_gravity="center"
+                         android:background="@color/gray"
+                         android:padding="5dp"
+                         android:src="@drawable/ic_balance" />-->
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/rate_layout"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
                         android:padding="0dp">
 
                         <EditText
                             android:id="@+id/rate"
+
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:hint="Rate(Rs)"
                             android:inputType="numberDecimal"
+                            android:paddingTop="0dp"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
                 </LinearLayout>
@@ -160,18 +196,19 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
 
-                   <!-- <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@color/gray"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_balance" />-->
+                    <!-- <ImageView
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_gravity="center"
+                         android:background="@color/gray"
+                         android:padding="5dp"
+                         android:src="@drawable/ic_balance" />-->
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/tax_percent_layout"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
                         android:padding="0dp">
 
                         <EditText
@@ -180,6 +217,7 @@
                             android:layout_height="wrap_content"
                             android:hint="Service Tax(%)"
                             android:inputType="numberDecimal"
+                            android:paddingTop="0dp"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
                 </LinearLayout>
@@ -192,7 +230,9 @@
                         android:id="@+id/autocomplete_layout"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:padding="0dp">
 
                         <AutoCompleteTextView
                             android:id="@+id/autocomplete_city_area"
@@ -200,48 +240,50 @@
                             android:layout_height="wrap_content"
                             android:completionThreshold="1"
                             android:hint="Seach area and city"
-                            android:inputType="textAutoComplete"
                             android:imeOptions="actionNext"
+                            android:inputType="textAutoComplete"
+                            android:paddingTop="0dp"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
 
                     <Button
+                        android:id="@+id/add_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/add_button"
                         android:text="Add" />
                 </LinearLayout>
+
                 <HorizontalScrollView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp">
-                <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="5dp"
-    android:id="@+id/linearview"
-    android:weightSum="1">
-</LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/linearview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="5dp"
+                        android:weightSum="1"></LinearLayout>
                 </HorizontalScrollView>
 
             </LinearLayout>
 
         </ScrollView>
 
-      <!--  <android.support.design.widget.FloatingActionButton
-            android:id="@+id/editFab"
-            android:layout_width="wrap_content"
+        <!--  <android.support.design.widget.FloatingActionButton
+              android:id="@+id/editFab"
+              android:layout_width="wrap_content"
 
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/fab_margin"
-            android:onClick="onClick"
-            android:src="@drawable/edit_white"
-            android:visibility="visible"
-            app:backgroundTint="@color/colorPrimary"
-            app:borderWidth="0dp" />-->
+              android:layout_height="wrap_content"
+              android:layout_gravity="end|bottom"
+              android:layout_margin="@dimen/fab_margin"
+              android:onClick="onClick"
+              android:src="@drawable/edit_white"
+              android:visibility="visible"
+              app:backgroundTint="@color/colorPrimary"
+              app:borderWidth="0dp" />-->
 
     </android.support.design.widget.CoordinatorLayout>
 

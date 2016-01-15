@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.milky.R;
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -48,7 +49,7 @@ public class CalenderFragment extends Fragment {
         _mCalenderView.setForCustomersDelivery(false);
 
         _mCalenderView.refreshCalendar();
-        if(AppUtil.totalData.size()>0)
+        if (AppUtil.totalData.size() > 0)
             _mCalenderView.totalQuantityCalculated(AppUtil.totalData);
 
 
@@ -56,11 +57,14 @@ public class CalenderFragment extends Fragment {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
                 Constants.SELECTED_DAY = day;
-
-                Constants.DELIVERY_DATE = String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay())
-                        + "-" + String.format("%02d", day.getYear());
-                Intent intent = new Intent(getActivity(), CustomersList.class);
-                startActivity(intent);
+                Constants.DELIVERY_DATE = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
+                        String.format("%02d", day.getDay());
+                if ((CustomerSettingTableManagement.isHasDataForDay(_dbHelper.getReadableDatabase(), Constants.DELIVERY_DATE))
+                        ||  Calendar.getInstance().get(Calendar.YEAR) == day.getYear())
+                {
+                    Intent intent = new Intent(getActivity(), CustomersList.class);
+                    startActivity(intent);
+                }
             }
         });
          /*

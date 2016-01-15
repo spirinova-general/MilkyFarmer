@@ -100,12 +100,11 @@ public class FarmerSignup extends AppCompatActivity {
                     holder.setMobile(_mobile.getText().toString());
                     holder.setRate("0");
                     holder.setTax("0");
-                    if(Constants.OTP.equals(""))
-                    {
+                    holder.setFarmerCode(Constants.generateOTP());
+                    if (Constants.OTP.equals("")) {
                         otp_layout.setError("OTP expired, Get OTP again");
-                    }
-                    else if (Constants.OTP.equals(otp.getText().toString().trim())) {
-                        edit.putString(UserPrefrences.PASSWORD, _password.getText().toString());
+                    } else if (Constants.OTP.equals(otp.getText().toString().trim())) {
+                        edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
                         edit.commit();
 
                         if (_dbhelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
@@ -159,7 +158,7 @@ public class FarmerSignup extends AppCompatActivity {
             public void onClick(View v) {
                 otpButton.setEnabled(false);
                 otp_layout.setError(null);
-                ((LinearLayout)findViewById(R.id.textOtp)).setVisibility(View.VISIBLE);
+                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.VISIBLE);
                 startTimer();
                 AppUtil.getInstance().showNotification(FarmerSignup.this, "Milky ", "Your OTP for Milky is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
             }
@@ -185,11 +184,11 @@ public class FarmerSignup extends AppCompatActivity {
             @Override
             public void onFinish() {
                 otpButton.setEnabled(true);
-                ((LinearLayout)findViewById(R.id.textOtp)).setVisibility(View.GONE);
+                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.GONE);
 
-                Constants.OTP="";
+                Constants.OTP = "";
                 otp_layout.setError("OTP expired, Get OTP again");
-                _count =59;
+                _count = 59;
             }
         }.start();
     }

@@ -5,14 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomersList;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by Neha on 11/30/2015.
@@ -48,6 +46,15 @@ public class BillTableManagement {
         db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
                 + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
     }
+    public static void updateOutstandingBills(SQLiteDatabase db, VCustomersList holder) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.QUANTITY, holder.getQuantity());
+        values.put(TableColumns.END_DATE, holder.getEnd_date());
+
+        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
+                + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
+    }
 
     public static void updateCurrentDateData(SQLiteDatabase db, VCustomersList holder) {
         ContentValues values = new ContentValues();
@@ -70,9 +77,9 @@ public class BillTableManagement {
                 + " AND " + TableColumns.END_DATE + " ='" + enddate + "'", null);
     }
 
-    public static boolean isHasDataForDay(SQLiteDatabase db, String custId,String day) {
+    public static boolean isHasDataForDay(SQLiteDatabase db, String custId, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE "
-                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE + " ='"+day+"'";
+                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE + " ='" + day + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
 
@@ -82,7 +89,7 @@ public class BillTableManagement {
 
     public static boolean isToBeOutstanding(SQLiteDatabase db, String custId, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE "
-                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.END_DATE + " ='" + day + "'" ;
+                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.END_DATE + " ='" + day + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
 
@@ -308,12 +315,12 @@ public class BillTableManagement {
                     String s = cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE));
                     Calendar c = Calendar.getInstance();
 
-                        try {
+                    try {
 
-                            c.setTime( Constants.format.parse(s));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                        c.setTime(Constants.work_format.parse(s));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
 
 //                    holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
                     holder.setEndDate(String.format("%02d", c.get(Calendar.MONTH)) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
@@ -336,8 +343,8 @@ public class BillTableManagement {
                     holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)) != null)
                     holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
-
-
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)) != null)
+                    holder.setIsOutstanding(cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)));
                 list.add(holder);
             }
             while (cursor.moveToNext());

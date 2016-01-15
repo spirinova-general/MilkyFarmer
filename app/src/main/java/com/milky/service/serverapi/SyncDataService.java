@@ -14,7 +14,6 @@ import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
 import com.milky.viewmodel.VAccount;
@@ -298,7 +297,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                 holder.setQuantity(list.get(i).getQuantity());
                 holder.setTax(list.get(i).getTax());
                 holder.setIsCleared("1");
-                if (!CustomerSettingTableManagement.isHasDataForDay(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
+                if (!CustomerSettingTableManagement.isHasDataForDayById(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
                         + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR))))
                     CustomerSettingTableManagement.insertNewCustomersSetting(db.getWritableDatabase(), holder);
                 if (!BillTableManagement.isHasDataForDay(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"

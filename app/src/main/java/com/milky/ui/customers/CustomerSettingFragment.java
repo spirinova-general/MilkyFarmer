@@ -36,9 +36,7 @@ import com.milky.utils.EnableEditableFields;
 import com.milky.utils.TextValidationMessage;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
-import com.tyczj.extendedcalendarview.DateQuantityModel;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -389,76 +387,77 @@ public class CustomerSettingFragment extends Fragment {
                     flat_number_layout.setError("Enter flat number!");
                 else if (_mAddress2.getText().toString().equals(""))
                     street_layout.setError("Enter street !");
-                else if (!previousSelectedArea.equals(_autocomplete_city_area.getText().toString())) {
+                else if (!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()))
                     if (tempCityId.equals("") && tempAreaId.equals(""))
                         autocomplete_layout.setError("Select valid area!");
-                } else if (_mMobile.getText().toString().equals(""))
-                    _phone_textinput_layout.setError("Enter mobile number!");
-                else if (_mQuantuty.getText().toString().equals(""))
-                    milk_quantity_layout.setError("Enter milk quantity!");
-                else if (!_mFirstName.getText().toString().equals("")
-                        && !_mLastName.getText().toString().equals("") &&
-                        !_mBalance.getText().toString().equals("") &&
-                        !_mAddress1.getText().toString().equals("")
-                        && !_mRate.getText().toString().equals("")
-                        && !_mAddress2.getText().toString().equals("")
-                        && !selectedCityId.equals("") && !selectedAreaId.equals("")
-                        && !_mMobile.getText().toString().equals("") &&
-                        !_mQuantuty.getText().toString().equals("")
-                        ) {
+
+                    else if (_mMobile.getText().toString().equals(""))
+                        _phone_textinput_layout.setError("Enter mobile number!");
+                    else if (_mQuantuty.getText().toString().equals(""))
+                        milk_quantity_layout.setError("Enter milk quantity!");
+                    else if (!_mFirstName.getText().toString().equals("")
+                            && !_mLastName.getText().toString().equals("") &&
+                            !_mBalance.getText().toString().equals("") &&
+                            !_mAddress1.getText().toString().equals("")
+                            && !_mRate.getText().toString().equals("")
+                            && !_mAddress2.getText().toString().equals("")
+                            && !selectedCityId.equals("") && !selectedAreaId.equals("")
+                            && !_mMobile.getText().toString().equals("") &&
+                            !_mQuantuty.getText().toString().equals("")
+                            ) {
 
 
-                    VCustomersList holder = new VCustomersList();
-                    holder.setFirstName(_mFirstName.getText().toString());
-                    holder.setLastName(_mLastName.getText().toString());
-                    holder.setBalance_amount(_mBalance.getText().toString());
-                    holder.setAddress1(_mAddress1.getText().toString());
-                    holder.setAddress2(_mAddress2.getText().toString());
-                    holder.setCityId(selectedCityId);
-                    holder.setAreaId(selectedAreaId);
-                    holder.setMobile(_mMobile.getText().toString());
-                    holder.setQuantity(_mQuantuty.getText().toString());
-                    holder.setCustomerId(getActivity().getIntent().getStringExtra("cust_id"));
-                    holder.setAccountId(Constants.ACCOUNT_ID);
-                    holder.setRate(_mRate.getText().toString());
-                    holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
-                    holder.setStart_date(getActivity().getIntent().getStringExtra("delivery_date"));
-                    Calendar c = Calendar.getInstance();
-                    SimpleDateFormat df = Constants.format;
-                    String formattedDate = df.format(c.getTime());
-                    holder.setDateModified(formattedDate);
-                    holder.setEnd_date(String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
-                    CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
+                        VCustomersList holder = new VCustomersList();
+                        holder.setFirstName(_mFirstName.getText().toString());
+                        holder.setLastName(_mLastName.getText().toString());
+                        holder.setBalance_amount(_mBalance.getText().toString());
+                        holder.setAddress1(_mAddress1.getText().toString());
+                        holder.setAddress2(_mAddress2.getText().toString());
+                        holder.setCityId(selectedCityId);
+                        holder.setAreaId(selectedAreaId);
+                        holder.setMobile(_mMobile.getText().toString());
+                        holder.setQuantity(_mQuantuty.getText().toString());
+                        holder.setCustomerId(getActivity().getIntent().getStringExtra("cust_id"));
+                        holder.setAccountId(Constants.ACCOUNT_ID);
+                        holder.setRate(_mRate.getText().toString());
+                        holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
+                        holder.setStart_date(getActivity().getIntent().getStringExtra("delivery_date"));
+                        Calendar c = Calendar.getInstance();
+                        SimpleDateFormat df = Constants.work_format;
+                        String formattedDate = df.format(c.getTime());
+                        holder.setDateModified(formattedDate);
+                        holder.setEnd_date(String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+                                String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+                        CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
 
-                    if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
-                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
-                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
+                        if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
+                                getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
+                            CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
 
 
-                    } else {
-                        if (updatedQtyRate) {
-                            String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
-                            CustomerSettingTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
-//                            BillTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
-                            holder.setStart_date(formattedDate);
-                            CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
-//                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
                         } else {
-                            CustomerSettingTableManagement.updateAllData(_dbHelper.getWritableDatabase(), holder);
+                            if (updatedQtyRate) {
+                                String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
+                                CustomerSettingTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
+//                            BillTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
+                                holder.setStart_date(formattedDate);
+                                CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
+//                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
+                            } else {
+                                CustomerSettingTableManagement.updateAllData(_dbHelper.getWritableDatabase(), holder);
+
+                            }
 
                         }
+                        BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
+                        Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
+//                    EnableEditableFields.setIsEnabled(false);
+                        getActivity().finish();
+
+                    } else {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.fill_require_fields), Toast.LENGTH_SHORT).show();
 
                     }
-                    BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
-                    Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
-//                    EnableEditableFields.setIsEnabled(false);
-                    getActivity().finish();
-
-                } else {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.fill_require_fields), Toast.LENGTH_SHORT).show();
-
-                }
 
 
             }
@@ -480,6 +479,7 @@ public class CustomerSettingFragment extends Fragment {
         new EnableEditableFields(_mAddress1, getActivity(), inputMethodManager).blockDefaultKeys();
         new EnableEditableFields(_mAddress2, getActivity(), inputMethodManager).blockDefaultKeys();
     }
+
     public double getQtyOfCustomer(String day) {
         double qty = 0;
         double adjustedQty = 0;

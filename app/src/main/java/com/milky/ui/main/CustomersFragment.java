@@ -58,7 +58,7 @@ public class CustomersFragment extends Fragment {
                 @Override
                 public void onRefresh() {
 
-                    if (MainActivity.selectedAreaId.equals("")) {
+                    if (Constants.selectedAreaId.equals("")) {
                         _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
                         if(_mCustomersList.size()==1)
                             mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
@@ -67,7 +67,7 @@ public class CustomersFragment extends Fragment {
                         _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.te1, _mCustomersList);
                         recList.setAdapter(_mAdapter);
                     } else {
-                        _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), MainActivity.selectedAreaId);
+                        _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
                       if(_mCustomersList.size()==1)
                           mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in "+MainActivity.selectedArea);
                         else

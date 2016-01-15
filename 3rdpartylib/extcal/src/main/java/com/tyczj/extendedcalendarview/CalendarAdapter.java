@@ -106,7 +106,7 @@ public class CalendarAdapter extends BaseAdapter {
             FrameLayout today = (FrameLayout) v.findViewById(R.id.today_frame);
             Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
             Day d = dayList.get(position);
-
+//today
             if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
@@ -127,9 +127,11 @@ public class CalendarAdapter extends BaseAdapter {
             } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() < cal.get(Calendar.MONTH)) {
                 today.setVisibility(View.GONE);
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() < cal.get(Calendar.MONTH)) {
-                quantitiTV.setText("");
-                today.setVisibility(View.GONE);
+            } else if ((d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() > cal.get(Calendar.MONTH)) ||d.getYear() > cal.get(Calendar.YEAR)) {
+                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
+                }
             } else if (d.getYear() < cal.get(Calendar.YEAR)) {
                 quantitiTV.setText("");
                 today.setVisibility(View.GONE);
@@ -317,7 +319,7 @@ public class CalendarAdapter extends BaseAdapter {
     }
 
     ArrayList<String> arrayCustId, dateList;
-    String FORMAT_DATETIME = "MM-dd-yyyy";
+    String FORMAT_DATETIME = "yyyy-MM-dd";
     SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_DATETIME);
     java.util.Date date = null, deletedDate = null;
 
@@ -730,27 +732,27 @@ public class CalendarAdapter extends BaseAdapter {
 
     private BigDecimal getQuantity(final Day d) {
         if (!isForCustomers) {
-            if(totalData!=null)
-            for (int i = 0; i < totalData.size(); ++i) {
-                //Check if deliverydate is same as of calander
+            if (totalData != null)
+                for (int i = 0; i < totalData.size(); ++i) {
+                    //Check if deliverydate is same as of calander
 
-                try {
-                    date = sdf.parse(totalData.get(i).getDeliveryDate());
+                    try {
+                        date = sdf.parse(totalData.get(i).getDeliveryDate());
 
-                    cal.setTime(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                        cal.setTime(date);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+                            .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+                            ) {
+                        bigDecimal = totalData.get(i).getCalculatedQuqantity();
+                        return bigDecimal;
+                    } else {
+
+                    }
                 }
-                if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
-                        .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
-                        ) {
-                    bigDecimal = totalData.get(i).getCalculatedQuqantity();
-                    return bigDecimal;
-                } else {
-
-                }
-            }
-        } else if(customerMillkQuantity!=null){
+        } else if (customerMillkQuantity != null) {
             for (int i = 0; i < customerMillkQuantity.size(); ++i) {
                 //Check if deliverydate is same as of calander
 

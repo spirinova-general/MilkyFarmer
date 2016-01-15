@@ -25,6 +25,10 @@ import com.milky.ui.customers.CustomerTabFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Locale;
+
 /**
  * Created by Neha on 11/19/2015.
  */
@@ -88,7 +92,15 @@ public class CustomersActivity extends AppCompatActivity {
 
         title.setText(_mIntent.getStringExtra("fname") + " " + _mIntent.getStringExtra("lname"));
         titleString = _mIntent.getStringExtra("fname") + " " + _mIntent.getStringExtra("lname");
-        subTitle.setText("Date Added- " + _mIntent.getStringExtra("added_date"));
+        Calendar shownDate = Calendar.getInstance();
+
+        try {
+            shownDate.setTime(Constants._display_format.parse(_mIntent.getStringExtra("added_date")));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        subTitle.setText("Date Added- " + Constants._display_format.format(shownDate.getTime()));
         subTitle.setVisibility(View.VISIBLE);
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -138,17 +150,18 @@ public class CustomersActivity extends AppCompatActivity {
         switch (page) {
             case 0:
                 saveManu.setVisibility(View.VISIBLE);
+                fabDelete.setVisibility(View.VISIBLE);
 
 
                 break;
             case 1:
                 saveManu.setVisibility(View.GONE);
-
+                fabDelete.setVisibility(View.GONE);
 
                 break;
             case 2:
                 saveManu.setVisibility(View.GONE);
-
+                fabDelete.setVisibility(View.GONE);
                 break;
         }
 

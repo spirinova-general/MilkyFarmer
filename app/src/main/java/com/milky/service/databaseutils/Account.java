@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class Account {
     public static void insertAccountDetails(SQLiteDatabase db, VAccount holder) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.FARMER_CODE, System.currentTimeMillis());
+        values.put(TableColumns.FARMER_CODE, holder.getFarmerCode());
         values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
         values.put(TableColumns.DATE_ADDED, holder.getDateAdded());
         values.put(TableColumns.FIRST_NAME, holder.getFirstName());
@@ -56,9 +56,10 @@ public class Account {
         db.update(TableNames.TABLE_ACCOUNT, values, TableColumns.SYNC_STATUS + " ='" + "0" + "'"
                 + " AND " + TableColumns.DIRTY + " ='" + "0" + "'", null);
     }
+
     public static void updateAccountDetails(SQLiteDatabase db, VAccount holder) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.FARMER_CODE, System.currentTimeMillis());
+
         values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
         values.put(TableColumns.DATE_ADDED, holder.getDateAdded());
         values.put(TableColumns.FIRST_NAME, holder.getFirstName());
@@ -66,6 +67,15 @@ public class Account {
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.TAX, holder.getTax());
+        values.put(TableColumns.SYNC_STATUS, "0");
+        values.put(TableColumns.DIRTY, "0");
+
+        db.update(TableNames.TABLE_ACCOUNT, values, null, null);
+    }
+
+    public static void updateMobileNumber(SQLiteDatabase db, String mobile) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.MOBILE, mobile);
         values.put(TableColumns.SYNC_STATUS, "0");
         values.put(TableColumns.DIRTY, "0");
 
@@ -92,7 +102,7 @@ public class Account {
     }
 
     public static VAccount getAccountDetailsToSync(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT+" WHERE "+ TableColumns.SYNC_STATUS+" ='0'";
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT + " WHERE " + TableColumns.SYNC_STATUS + " ='0'";
         Cursor cursor = db.rawQuery(selectquery, null);
         VAccount holder = new VAccount();
         if (cursor.moveToFirst()) {
@@ -115,6 +125,29 @@ public class Account {
             db.close();
         return holder;
     }
+
+    public static VAccount getFarmerName(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        VAccount holder = null;
+        Cursor cursor = db.rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                holder = new VAccount();
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
+                    holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
+                    holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return holder;
+    }
+
     public static VAccount getAccountDetails(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
         Cursor cursor = db.rawQuery(selectquery, null);

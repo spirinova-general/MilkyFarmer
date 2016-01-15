@@ -22,5 +22,13 @@
         android:visibility="gone"
         app:backgroundTint="@color/colorPrimary"
         app:borderWidth="0dp" />
-
+    <TextView
+        android:id="@+id/preivousBills"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="end|bottom"
+        android:background="@color/material_blue_grey_800"
+        android:gravity="center"
+        android:text="No previous bills"
+        android:textColor="@color/white" />
 </FrameLayout>

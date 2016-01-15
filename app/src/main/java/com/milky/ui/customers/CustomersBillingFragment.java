@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
@@ -44,6 +45,7 @@ public class CustomersBillingFragment extends Fragment {
     private DatabaseHelper _dbHelper;
     private String custId = "";
     private ArrayList<String> names = new ArrayList<>();
+    private boolean hasPreviousBills = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,8 +55,10 @@ public class CustomersBillingFragment extends Fragment {
         generateBill();
         if (payment.size() > 0) {
 //            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-            _mListView.setAdapter(new BillingAdapter(payment, getActivity(),names));
+            _mListView.setAdapter(new BillingAdapter(payment, getActivity(), names));
         }
+        if (hasPreviousBills)
+            ((TextView) view.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         _dbHelper.close();
         return view;
     }
@@ -73,7 +77,6 @@ public class CustomersBillingFragment extends Fragment {
             }
         });
 
-
     }
 
     ArrayList<VBill> payment = new ArrayList<>();
@@ -89,11 +92,13 @@ public class CustomersBillingFragment extends Fragment {
         VBill holder = new VBill();
 
         ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase());
+        if(bills.size()>0)
+            hasPreviousBills = true;
         for (int x = 0; x < bills.size(); x++) {
             payment.add(bills.get(x));
-            String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-            String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-            names.add(a+b);
+//            String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
+//            String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
+            names.add(custId);
         }
 
         ArrayList<String> startDates = CustomerSettingTableManagement.getStartDeliveryDate(_dbHelper.getReadableDatabase(), custId);
@@ -101,45 +106,43 @@ public class CustomersBillingFragment extends Fragment {
             for (int j = 0; j < startDates.size(); j++) {
 
                 try {
-                    Date date = Constants.format.parse(startDates.get(j));
+                    Date date = Constants.work_format.parse(startDates.get(j));
                     c.setTime(date);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
 
                 for (int i = c.get(Calendar.DAY_OF_MONTH); i <= cal.get(Calendar.DAY_OF_MONTH); ++i) {
-                    double quantity = getQtyOfCustomer(
-                            String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+                    double quantity = getQtyOfCustomer(cal.get(Calendar.YEAR) + "-" +
+                            String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
                     totalQuantity += quantity;
 
                     holder.setStartDate(startDates.get(j));
                     holder.setBalance(CustomersTableMagagement.getBalanceForCustomer(_dbHelper.getReadableDatabase(), custId));
-                    holder.setEndDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
-                    totalRate = BillTableManagement.getTotalRate(_dbHelper.getReadableDatabase(), custId, String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+                    holder.setEndDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+                    totalRate = BillTableManagement.getTotalRate(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
                     holder.setRate(String.valueOf(totalRate));
                     holder.setQuantity(String.valueOf(totalQuantity));
-
-
 
                 }
 
             }
-        payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + String.format("%02d", cal.get(Calendar.YEAR)), totalQuantity);
+        payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity);
 
         holder.setPaymentMode(String.valueOf(round(payMade, 2)));
         BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), custId);
-        if (BillTableManagement.isToBeOutstanding(_dbHelper.getReadableDatabase(), custId, String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.YEAR)))) {
-            BillTableManagement.updateOutstandingBill(_dbHelper.getWritableDatabase(), custId, String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
-//            holder.setStartDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", 1) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
-//            holder.setEndDate(String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.format("%02d", cal.get(Calendar.YEAR)));
+        if (BillTableManagement.isToBeOutstanding(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1))) {
+            BillTableManagement.updateOutstandingBill(_dbHelper.getWritableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
+//            holder.setStartDate(String.work_format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.work_format("%02d", 1) + "-" + String.work_format("%02d", cal.get(Calendar.YEAR)));
+//            holder.setEndDate(String.work_format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.work_format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.work_format("%02d", cal.get(Calendar.YEAR)));
 //            BillTableManagement.insertNewBills(_dbHelper.getWritableDatabase(), holder);
 //            CustomerSettingTableManagement.insertNewCustomersSetting(_dbHelper.getWritableDatabase(),holder);
 
         }
         payment.add(holder);
-        String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-        String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-        names.add(a+b);
+//        String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
+//        String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
+        names.add(custId);
     }
 
     public static BigDecimal round(double d, int decimalPlace) {

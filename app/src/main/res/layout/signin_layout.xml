@@ -75,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Mobile"
                 android:inputType="number"
+                android:maxLength="10"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
 
@@ -83,6 +84,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
+            android:visibility="gone"
             android:paddingRight="5dp">
 
             <EditText
@@ -90,6 +92,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="Password"
+                android:text="123456"
+
                 android:inputType="textPassword"
                 android:maxLength="8"
                 android:nextFocusDown="@+id/last_name"

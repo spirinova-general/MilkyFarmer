@@ -1,11 +1,14 @@
 package com.milky.ui.main;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -43,7 +46,7 @@ import java.util.Calendar;
 public class GlobalSetting extends AppCompatActivity {
     private Toolbar _mToolbar;
     private TextInputLayout rate_layout, custCode_layout, tax_layouts, autocomplete_layout, name_layout, lastname_layout, mobile_layout;
-    private EditText custCode, rate, tax, firstname, lastname, mobile;
+    private EditText custCode, rate, tax, firstname, lastname;
     private InputMethodManager inputMethodManager;
     private LinearLayout _mBottomLayout;
     private DatabaseHelper _dbHelper;
@@ -55,7 +58,15 @@ public class GlobalSetting extends AppCompatActivity {
     private String selectedCityId = "", selectedAreaId = "";
     private AreaCityAdapter adapter1;
     private Vibrator myVib;
-    private InputMethodManager inputManager;
+    private String mob = "";
+    private TextView mobile, changeNumber;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+            /*init xml resources*/
+        initResources();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,19 +76,13 @@ public class GlobalSetting extends AppCompatActivity {
 
        /*Set Actionbar to layut*/
         setActionBar();
-        /*init xml resources*/
-        initResources();
+
 
         /*
         * disable keyboard*/
 //        disableKeyBoard();
 
-        custCode.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+
 
     }
 
@@ -93,7 +98,9 @@ public class GlobalSetting extends AppCompatActivity {
         tax = (EditText) findViewById(R.id.tax);
         firstname = (EditText) findViewById(R.id.first_name);
         lastname = (EditText) findViewById(R.id.last_name);
-        mobile = (EditText) findViewById(R.id.mobile);
+        mobile = (TextView) findViewById(R.id.mobile);
+        changeNumber = (TextView) findViewById(R.id.change_number);
+
 
         AreaAutocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete_city_area);
         _mBottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
@@ -104,8 +111,7 @@ public class GlobalSetting extends AppCompatActivity {
         lastname_layout = (TextInputLayout) findViewById(R.id.last_name_layout);
         mobile_layout = (TextInputLayout) findViewById(R.id.mobile_layout);
         myVib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-        inputManager = (InputMethodManager)
-                getSystemService(Context.INPUT_METHOD_SERVICE);
+
 
         /*Get DBhelper*/
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
@@ -116,7 +122,6 @@ public class GlobalSetting extends AppCompatActivity {
         tax.addTextChangedListener(new TextValidationMessage(rate, tax_layouts, this, false));
         firstname.addTextChangedListener(new TextValidationMessage(firstname, name_layout, this, false));
         lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this, false));
-        mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this, true));
 
 
          /* Let fields be enabled if edit button has been clicked only.
@@ -135,6 +140,12 @@ public class GlobalSetting extends AppCompatActivity {
             custCode.setText(holder.getFarmerCode());
 
         }
+        custCode.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
         /*Fill fields from db*/
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
             ArrayList<String> list = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
@@ -150,7 +161,7 @@ public class GlobalSetting extends AppCompatActivity {
                 areacity.setAreaId(selectedareasList.get(j).getAreaId());
                 areacity.setCityId(selectedareasList.get(j).getCityId());
                 areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), selectedareasList.get(j).getCityId()));
-                areacity.setCityArea(areacity.getArea() + areacity.getCity());
+                areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
                 selectedareacityList.add(areacity);
 
 
@@ -159,7 +170,49 @@ public class GlobalSetting extends AppCompatActivity {
                 addLabel(selectedareacityList.get(x).getCityArea(), false);
             }
         }
+        mob = mobile.getText().toString();
+        changeNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSetting.this);
+                View view = LayoutInflater.from(GlobalSetting.this).inflate(R.layout.change_number_popup, null);
+                final AlertDialog alertDialog = builder.create();
 
+                alertDialog.setView(view);
+                final EditText mobileNumber = (EditText) view.findViewById(R.id.number);
+                mobileNumber.setText(mob);
+                final TextInputLayout layout = (TextInputLayout) view.findViewById(R.id.layout);
+                ((Button) view.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!mobileNumber.getText().toString().equals("")) {
+                            if (mob.equals(mobileNumber.getText().toString()))
+                                layout.setError("You must change number to update !");
+                            else if (mobileNumber.getText().length() < 10)
+                                layout.setError("Invalid number");
+                            else {
+                                Account.updateMobileNumber(_dbHelper.getWritableDatabase(), mobileNumber.getText().toString());
+                                Toast.makeText(GlobalSetting.this, "Number changed successfully !", Toast.LENGTH_SHORT).show();
+                                layout.setError(null);
+                                alertDialog.dismiss();
+                            }
+
+                        } else mobileNumber.setError("Enter mobile number !");
+                    }
+                });
+                ((Button) view.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
+                    }
+                });
+
+
+                alertDialog.show();
+
+
+            }
+        });
         _areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
         _dbHelper.close();
         autoCompleteData = new String[_areaList.size()];
@@ -229,14 +282,12 @@ public class GlobalSetting extends AppCompatActivity {
             {
                 if (rate.getText().toString().trim().equals("")) {
                     rate_layout.setError(getResources().getString(R.string.field_cant_empty));
-                }
-                else if(Float.parseFloat(rate.getText().toString().trim())<=0)
-                {
+                } else if (Float.parseFloat(rate.getText().toString().trim()) <= 0) {
                     rate_layout.setError(getResources().getString(R.string.fill_valid_amount));
-                }else if (tax.getText().toString().trim().equals("")) {
+                } else if (tax.getText().toString().trim().equals("")) {
                     tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
                 } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
-                    autocomplete_layout.setError("Please select some area !");
+                    autocomplete_layout.setError("Please add atleast one area !");
                 } else {
                     Calendar cl = Calendar.getInstance();
                     String date = String.valueOf(cl.get(Calendar.MONTH))

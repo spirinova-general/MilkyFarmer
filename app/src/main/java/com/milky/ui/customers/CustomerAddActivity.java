@@ -40,6 +40,7 @@ import com.milky.utils.TextValidationMessage;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,6 +71,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private int myear;
     private int mmonth;
     private int mday;
+    private String pickedDate = "";
     static final int DATE_DIALOG_ID = 999;
 
     @Override
@@ -105,7 +107,7 @@ public class CustomerAddActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         c = Calendar.getInstance();
-        SimpleDateFormat df = Constants.format;
+        SimpleDateFormat df = Constants.work_format;
         formattedDate = df.format(c.getTime());
         getSupportActionBar().setSubtitle(formattedDate);
          /*
@@ -114,6 +116,7 @@ public class CustomerAddActivity extends AppCompatActivity {
         LayoutInflater mInflater = LayoutInflater.from(this);
         View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
+        title.setText("New Customer");
         TextView subTitle = (TextView) mCustomView.findViewById(R.id.date);
 //        subTitle.setVisibility(View.GONE);
 //        title.setText("Add Customer");
@@ -130,7 +133,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         last_name_layout.setError("Enter name!");
                     else if (_rate.getText().toString().equals(""))
                         rate_layout.setError("Enter amount!");
-                    else if(Float.parseFloat(_rate.getText().toString().trim())<=0)
+                    else if (Float.parseFloat(_rate.getText().toString().trim()) <= 0)
                         rate_layout.setError("Enter valid amount!");
 
                     else if (_mBalance.getText().toString().equals(""))
@@ -146,7 +149,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         _phone_textinput_layout.setError("Enter mobile number!");
                     else if (_mQuantuty.getText().toString().equals(""))
                         milk_quantity_layout.setError("Enter milk quantity!");
-                    else if(Float.parseFloat(_mQuantuty.getText().toString().trim())<=0)
+                    else if (Float.parseFloat(_mQuantuty.getText().toString().trim()) <= 0)
                         milk_quantity_layout.setError("Enter valid quantity!");
                     else if ((!_firstName.getText().toString().equals("")
                             && !_lastName.getText().toString().equals("") &&
@@ -171,12 +174,22 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setAccountId(Constants.ACCOUNT_ID);
                         holder.setRate(_rate.getText().toString());
                         c = Calendar.getInstance();
-                        SimpleDateFormat df = Constants.format;
+                        SimpleDateFormat df = Constants.work_format;
                         formattedDate = df.format(c.getTime());
                         holder.setDateAdded(formattedDate);
-                        holder.setStart_date(_pickdate.getText().toString().trim());
-                        holder.setEnd_date(String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                                String.format("%02d",Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)+1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+                        holder.setStart_date(pickedDate);
+                        Calendar deliveryDateTime = Calendar.getInstance();
+
+                        try {
+                            deliveryDateTime.setTime(df.parse(pickedDate));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        holder.setEnd_date( deliveryDateTime.get(Calendar.YEAR)+"-"+
+                                String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 1) + "-" +
+                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 1));
                         holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
@@ -190,8 +203,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         CustomerAddActivity.this.finish();
                     }
                 } catch (NullPointerException npe) {
-                }
-                finally {
+                } finally {
                     _dbHelper.close();
                 }
             }
@@ -215,10 +227,12 @@ public class CustomerAddActivity extends AppCompatActivity {
 
         // set current date into textview
 
-        _pickdate.setText(new StringBuilder()
-                // Month is 0 based, just add 1
-                .append( String.format("%02d",mmonth+1)).append("-").append( String.format("%02d",mday)).append("-")
-                .append(myear).append(" "));
+//        _pickdate.setText(new StringBuilder()
+//                // Month is 0 based, just add 1
+//                .append( String.format("%02d",mmonth+1)).append("-").append( String.format("%02d",mday)).append("-")
+//                .append(myear).append(" "));
+        pickedDate = myear+"-"+String.format("%02d",mmonth+1)+"-"+ String.format("%02d",mday);
+        _pickdate.setText(Constants._display_format.format(c.getTime()));
 
     }
 
@@ -276,12 +290,14 @@ public class CustomerAddActivity extends AppCompatActivity {
             myear = selectedYear;
             mmonth = selectedMonth;
             mday = selectedDay;
+            Calendar c = Calendar.getInstance();
+            pickedDate = myear+"-"+String.format("%02d",mmonth+1)+"-"+ String.format("%02d",mday);
 
             // set selected date into textview
             _pickdate.setText(new StringBuilder()
-                    .append( String.format("%02d",mmonth+1)).append("-")
-                    .append( String.format("%02d",mday))
-                    .append("-")
+
+                    .append(String.format("%02d", mday))
+                    .append("-").append(Constants.MONTHS[mmonth]).append("-")
                     .append(myear).append(" "));
 
         }

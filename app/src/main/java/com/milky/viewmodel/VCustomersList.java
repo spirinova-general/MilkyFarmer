@@ -29,7 +29,15 @@ public class VCustomersList {
     private String isCleared;
     private String paymentMade;
     private String dirty;
+    private String outstanding;
 
+    public String getOutstanding() {
+        return outstanding;
+    }
+
+    public void setOutstanding(String outstanding) {
+        this.outstanding = outstanding;
+    }
 
     public String getDirty() {
         return dirty;

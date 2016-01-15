@@ -11,13 +11,17 @@ import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
+import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.BillingEdit;
+import com.milky.ui.main.BillingFragment;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomersList;
+
+import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -37,12 +41,6 @@ public class BillingAdapter extends BaseAdapter {
     private Context mContext;
     private boolean _mIsCustomer = false;
     private ArrayList<String> names = new ArrayList<>();
-
-    public BillingAdapter(final List<VCustomersList> dataList, final Context con, final boolean isCustomer) {
-        this.mContext = con;
-        this.mCustomersData = dataList;
-        this._mIsCustomer = isCustomer;
-    }
 
     public BillingAdapter(final List<VBill> dataList, final Context con, ArrayList<String> name) {
         this.mContext = con;
@@ -83,21 +81,43 @@ public class BillingAdapter extends BaseAdapter {
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
         holder.name = (TextView) convertView.findViewById(R.id.name);
+        holder.custName = (TextView) convertView.findViewById(R.id.quantityText);
+        holder.history = (TextView) convertView.findViewById(R.id.history);
+        String nfNAme = CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), names.get(position));
+        String lfNAme = CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), names.get(position));
+        String a = Character.toString(nfNAme.charAt(0));
+        String b = Character.toString(lfNAme.charAt(0));
+        holder.custName.setText(nfNAme + " " + lfNAme);
 
-        holder.name.setText(names.get(position));
-        holder.startDate.setText(totalBill.get(position).getStartDate());
-        holder.endDate.setText(totalBill.get(position).getEndDate());
+        holder.name.setText(a + b);
+        if (("0").equals(totalBill.get(position).isOutstanding()))
+            holder.history.setVisibility(View.VISIBLE);
+        final Calendar showDatePattern = Calendar.getInstance();
+        final Calendar shownEndDate = Calendar.getInstance();
+        try {
+            showDatePattern.setTime(Constants.work_format.parse(totalBill.get(position).getStartDate()));
+            shownEndDate.setTime(Constants.work_format.parse(totalBill.get(position).getEndDate()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        holder.startDate.setText(showDatePattern.get(Calendar.DAY_OF_MONTH) + "-" +
+                Constants.MONTHS[showDatePattern.get(Calendar.MONTH)] + "-" + showDatePattern.get(Calendar.YEAR));
+        holder.endDate.setText(shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +
+                Constants.MONTHS[shownEndDate.get(Calendar.MONTH)] + "-" + shownEndDate.get(Calendar.YEAR));
         holder.amount.setText(totalBill.get(position).getPaymentMode());
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, BillingEdit.class);
-                intent.putExtra("start_date", totalBill.get(position).getStartDate())
-                        .putExtra("end_date", totalBill.get(position).getEndDate())
+                intent.putExtra("start_date", showDatePattern.get(Calendar.DAY_OF_MONTH) + "-" +
+                        Constants.MONTHS[showDatePattern.get(Calendar.MONTH)] + "-" + showDatePattern.get(Calendar.YEAR))
+                        .putExtra("end_date", shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +
+                                Constants.MONTHS[shownEndDate.get(Calendar.MONTH)] + "-" + shownEndDate.get(Calendar.YEAR))
                         .putExtra("quantity", totalBill.get(position).getQuantity())
                         .putExtra("amount", "0")
                         .putExtra("balance", totalBill.get(position).getBalance())
-                        .putExtra("titleString", CustomersActivity.titleString)
+                        .putExtra("titleString", holder.custName.getText())
                         .putExtra("totalPrice", totalBill.get(position).getRate())
                         .putExtra("total", totalBill.get(position).getPaymentMode());
                 mContext.startActivity(intent);
@@ -109,7 +129,7 @@ public class BillingAdapter extends BaseAdapter {
     }
 
     class ViewHolder {
-        TextView startDate, endDate, amount, name;
+        TextView startDate, endDate, amount, name, custName, history;
     }
 
     private DatabaseHelper databaseHelper = AppUtil.getInstance().getDatabaseHandler();
@@ -118,7 +138,7 @@ public class BillingAdapter extends BaseAdapter {
         Date todaydate = null, deliverydate = null, enddate = null, tempdate = null;
         String billAmount = "0";
         float previousBill = 0;
-        SimpleDateFormat sdf = Constants.format;
+        SimpleDateFormat sdf = Constants.work_format;
         Float tax = (Float.parseFloat(rate) * Float.parseFloat(Account.getDefautTax(databaseHelper.getReadableDatabase()))) / 100;
         try {
             todaydate = sdf.parse(currentDate);

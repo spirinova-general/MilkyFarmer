@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
@@ -16,13 +17,16 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.milky.R;
+import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.customers.CustomersList;
+import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
 
 import java.util.ArrayList;
@@ -31,27 +35,28 @@ import java.util.List;
 /**
  * Created by Neha on 11/17/2015.
  */
-public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
+public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
     private Context mContext;
     private String date;
-    private List<VCustomersList> filteredList;
+    private List<VCustomersList> filteredList, tempItems, suggestions;
     private VCustomersList filetrHolder;
+    private DatabaseHelper _dbHelper;
 
-    public GlobalDeliveryAdapter(final Context con, final String quantityEditDate) {
+    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate,final List<VCustomersList>_mCustomersList) {
+        super(con, resource, textViewResourceId);
         this.mContext = con;
         this.date = quantityEditDate;
-
+        this.filteredList = _mCustomersList;
+        tempItems = new ArrayList<VCustomersList>(filteredList); // this makes the difference.
+        suggestions = new ArrayList<>();
+        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
     }
 
     @Override
     public int getCount() {
-        return CustomersList._mCustomersList.size();
+        return filteredList.size();
     }
 
-    @Override
-    public Object getItem(int position) {
-        return position;
-    }
 
     @Override
     public long getItemId(int position) {
@@ -77,31 +82,31 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
         }
         DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
         if (db.isTableNotEmpty(TableNames.TABLE_DELIVERY)) {
-            if (DeliveryTableManagement.isHasData(db.getReadableDatabase(), CustomersList._mCustomersList
+            if (DeliveryTableManagement.isHasData(db.getReadableDatabase(), filteredList
                     .get(position).getCustomerId(), Constants.DELIVERY_DATE)) {
-                holder._quantity.setText(DeliveryTableManagement.getQuantityBySelectedDay(db.getReadableDatabase(), CustomersList._mCustomersList
+                holder._quantity.setText(DeliveryTableManagement.getQuantityBySelectedDay(db.getReadableDatabase(), filteredList
                         .get(position).getCustomerId(), Constants.DELIVERY_DATE));
             } else {
-                holder._quantity.setText(CustomersList._mCustomersList.get(position).getQuantity());
+                holder._quantity.setText(filteredList.get(position).getQuantity());
             }
         } else {
-            holder._quantity.setText(CustomersList._mCustomersList.get(position).getQuantity());
+            holder._quantity.setText(filteredList.get(position).getQuantity());
         }
         holder._quantity.setTag(position);
         holder._quantity.setId(position);
         String a = Character.toString(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                CustomersList._mCustomersList.get(position).getCustomerId()).charAt(0));
+                filteredList.get(position).getCustomerId()).charAt(0));
         String b = Character.toString(CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                CustomersList._mCustomersList.get(position).getCustomerId()).charAt(0));
+                filteredList.get(position).getCustomerId()).charAt(0));
 
         //get first name and last name letters
         holder._nameView.setText(a + b);
 /*
         * Set text field listeners*/
         holder._firstName.setText(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                CustomersList._mCustomersList.get(position).getCustomerId()));
+                filteredList.get(position).getCustomerId()));
         holder._latsName.setText(" " + CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                CustomersList._mCustomersList.get(position).getCustomerId()));
+                filteredList.get(position).getCustomerId()));
         final ViewHolder finalHolder = holder;
         holder._quantity.addTextChangedListener(new TextWatcher() {
             @Override
@@ -135,16 +140,6 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
         return convertView;
     }
 
-    private CustomerFilter friendFilter;
-
-    @Override
-    public Filter getFilter() {
-        if (filteredList == null) {
-            friendFilter = new CustomerFilter();
-        }
-
-        return friendFilter;
-    }
 
     private class ViewHolder {
         private TextView _firstName, _latsName, _nameView;
@@ -152,47 +147,72 @@ public class GlobalDeliveryAdapter extends BaseAdapter implements Filterable {
         private TextInputLayout _quantity_input_layout;
     }
 
+    @Override
+    public Filter getFilter() {
+        return nameFilter;
+    }
+
     /**
-     * Custom filter for friend list
-     * Filter content in friend list according to the search text
+     * Custom Filter implementation for custom suggestions we provide.
      */
-    private class CustomerFilter extends Filter {
+    Filter nameFilter = new Filter() {
+        @Override
+        public CharSequence convertResultToString(Object resultValue) {
+            String str = ((VCustomersList) resultValue).getFirstName();
+            notifyDataSetChanged();
+            return str;
+        }
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            FilterResults filterResults = new FilterResults();
-            if (constraint != null && constraint.length() > 0) {
-                List<VCustomersList> tempList = new ArrayList<>();
-
-                // search content in friend list
-                for (VCustomersList user : CustomersList._mCustomersList) {
-                    if (user.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        tempList.add(user);
+            if (constraint != null) {
+                suggestions.clear();
+                for (VCustomersList Area : tempItems) {
+                    if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase()) ||
+                            Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
+                        suggestions.add(Area);
                     }
                 }
 
-                filterResults.count = tempList.size();
-                filterResults.values = tempList;
-            } else {
-                filterResults.count = CustomersList._mCustomersList.size();
-                filterResults.values = CustomersList._mCustomersList;
-            }
 
-            return filterResults;
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = suggestions;
+                filterResults.count = suggestions.size();
+                return filterResults;
+            } else {
+                suggestions.clear();
+                return new FilterResults();
+            }
         }
 
-        /**
-         * Notify about filtered list to ui
-         *
-         * @param constraint text
-         * @param results    filtered result
-         */
-        @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            filteredList = (List<VCustomersList>) results.values;
+            List<VCustomersList> filterList = (ArrayList<VCustomersList>) results.values;
+            if (results != null && results.count > 0) {
+                clear();
+                for (VCustomersList Area : filterList) {
+                    add(Area);
+                    notifyDataSetChanged();
+                }
+
+            } else {
+                clear();
+                notifyDataSetChanged();
+            }
+            if (!Constants.selectedAreaId.equals("")) {
+                clear();
+
+
+                filterList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+                for (VCustomersList Area : filterList) {
+                    add(Area);
+                    notifyDataSetChanged();
+                }
+            }
             notifyDataSetChanged();
+
+
         }
-    }
+    };
 }
 

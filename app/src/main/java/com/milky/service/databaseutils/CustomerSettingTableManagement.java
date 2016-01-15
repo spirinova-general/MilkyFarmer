@@ -34,9 +34,20 @@ public class CustomerSettingTableManagement {
 
     }
 
-    public static boolean isHasDataForDay(SQLiteDatabase db, String custId, String day) {
+    public static boolean isHasDataForDayById(SQLiteDatabase db, String custId, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE + " ='" + day+"'";
+                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE + " ='" + day + "'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        db.close();
+        return result;
+    }
+
+    public static boolean isHasDataForDay(SQLiteDatabase db, String day) {
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+                + TableColumns.START_DATE + " <='" + day + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
 
@@ -334,12 +345,14 @@ public class CustomerSettingTableManagement {
         String selectquery = "";
         if (isDeletedCustomer(db, id, day)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'" + " AND "
+                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE +
+                    " >'" + day + "'" + " AND "
                     + TableColumns.CUSTOMER_ID + " ='" + id + "'" + " AND " + TableColumns.DELETED_ON + " ='1'";
         } else
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'" + " AND "
-                    + TableColumns.CUSTOMER_ID + " ='" + id + "'" + " AND " + TableColumns.DELETED_ON + " >'" + day + "'";
+                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE
+                    + " >'" + day + "'" + " AND "
+                    + TableColumns.CUSTOMER_ID + " ='" + id + "'";
 
         double qty = 0;
 
@@ -423,7 +436,8 @@ public class CustomerSettingTableManagement {
 
     public static boolean isDeletedCustomer(SQLiteDatabase db, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ="
-                + "'1'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + "'1'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE +
+                " >'" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;

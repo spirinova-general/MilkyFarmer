@@ -34,6 +34,7 @@ public class SignUp extends AppCompatActivity {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(getApplicationContext(), getResources().getString(R.string.facebook_app_id));
+
     }
 
     @Override
@@ -41,6 +42,14 @@ public class SignUp extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        preferences = getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+        if(preferences.contains(UserPrefrences.MOBILE_NUMBER)) {
+            if (preferences.getString(UserPrefrences.MOBILE_NUMBER, "").length() > 0) {
+                Intent i = new Intent(SignUp.this, MainActivity.class);
+                startActivity(i);
+                finish();
+            }
+        }
         initResources();
         _signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,8 +59,8 @@ public class SignUp extends AppCompatActivity {
 //                    startActivity(i);
 //                } else
 //                    Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
-                if (preferences.contains(UserPrefrences.PASSWORD)) {
-                    if (preferences.getString(UserPrefrences.PASSWORD, "").length() > 0) {
+                if (preferences.contains(UserPrefrences.MOBILE_NUMBER)) {
+                    if (preferences.getString(UserPrefrences.MOBILE_NUMBER, "").length() > 0) {
                         Intent i = new Intent(SignUp.this, MainActivity.class);
                         startActivity(i);
                     }
@@ -82,8 +91,8 @@ public class SignUp extends AppCompatActivity {
 //                } else
 //                    Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
 //                Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
-                if (preferences.contains(UserPrefrences.PASSWORD)) {
-                    if (preferences.getString(UserPrefrences.PASSWORD, "").length() > 0) {
+                if (preferences.contains(UserPrefrences.MOBILE_NUMBER)) {
+                    if (preferences.getString(UserPrefrences.MOBILE_NUMBER, "").length() > 0) {
                         Intent i = new Intent(SignUp.this, MainActivity.class);
                         startActivity(i);
                     }
@@ -129,7 +138,7 @@ public class SignUp extends AppCompatActivity {
         loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
         callbackManager = CallbackManager.Factory.create();
-        preferences = getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+
         edit = preferences.edit();
         // Callback registration
 
