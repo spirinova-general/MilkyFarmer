@@ -61,14 +61,15 @@ public class BillingEdit extends AppCompatActivity {
         clear_bill = (Button) findViewById(R.id.clear_bill);
         clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
         if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+            clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
+
             clear_bill.setEnabled(true);
             clear_bill.setTextColor(getResources().getColor(R.color.white));
         } else {
             clera_bill_text.setText("You can clear this bill once the final bill is generated on " + cal.getActualMaximum(Calendar.DAY_OF_MONTH)
             +" "+Constants.MONTHS[cal.get(Calendar.MONTH)]);
             clear_bill.setEnabled(false);
-            clear_bill.setTextColor(getResources().getColor(R.color.gray_lighter));
         }
 
         balance_amount.setText(intent.getStringExtra("balance"));

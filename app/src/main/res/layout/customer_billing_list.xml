@@ -23,6 +23,7 @@
         app:backgroundTint="@color/colorPrimary"
         app:borderWidth="0dp" />
     <TextView
+        android:visibility="gone"
         android:id="@+id/preivousBills"
         android:layout_width="fill_parent"
         android:layout_height="40dp"

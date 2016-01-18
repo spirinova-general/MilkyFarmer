@@ -25,6 +25,8 @@ public class CustomerSettingTableManagement {
         values.put(TableColumns.START_DATE, holder.getStart_date());
         values.put(TableColumns.BALANCE, holder.getBalance_amount());
         values.put(TableColumns.END_DATE, holder.getEnd_date());
+        values.put(TableColumns.FIRST_NAME, holder.getFirstName());
+        values.put(TableColumns.LAST_NAME, holder.getLastName());
         values.put(TableColumns.ADJUSTMENTS, "0");
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
@@ -66,6 +68,8 @@ public class CustomerSettingTableManagement {
         values.put(TableColumns.BALANCE, holder.getBalance());
         values.put(TableColumns.END_DATE, holder.getEndDate());
         values.put(TableColumns.ADJUSTMENTS, "0");
+        values.put(TableColumns.FIRST_NAME, holder.getFirstname());
+        values.put(TableColumns.LAST_NAME, holder.getLastName());
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.DELETED_ON, "1");
@@ -164,6 +168,10 @@ public class CustomerSettingTableManagement {
 
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
                     holder.setIs_deleted(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
+                    holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
+                    holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
                 list.add(holder);
             }
             while (cursor.moveToNext());

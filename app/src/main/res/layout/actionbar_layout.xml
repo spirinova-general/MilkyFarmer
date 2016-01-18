@@ -3,75 +3,77 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
-    android:orientation="horizontal"
-    >
+    android:orientation="horizontal">
 
-      <TextView
-          android:id="@+id/title"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Save"
-          android:textSize="20sp"
-          android:layout_gravity="center"
-          android:textColor="@color/white"
-          android:layout_centerVertical="true"
-          />
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:text="Save"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
     <!--<LinearLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="vertical">-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="vertical">-->
 
-        <!--<TextView-->
-            <!--android:id="@+id/title"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:textSize="20sp" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/title"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textColor="@color/white"-->
+    <!--android:textSize="20sp" />-->
 
 
-        <!--<TextView-->
-            <!--android:layout_below="@+id/title"-->
-            <!--android:id="@+id/date"-->
-            <!--android:visibility="gone"-->
-            <!--android:layout_width="fill_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:textSize="10sp" />-->
+    <!--<TextView-->
+    <!--android:layout_below="@+id/title"-->
+    <!--android:id="@+id/date"-->
+    <!--android:visibility="gone"-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textColor="@color/white"-->
+    <!--android:textSize="10sp" />-->
 
     <!--</LinearLayout>-->
 
 
     <ImageView
-        android:padding="5dp"
         android:id="@+id/deleteCustomer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:padding="5dp"
         android:src="@drawable/ic_action_discard"
         android:visibility="gone" />
-<LinearLayout
-    android:id="@+id/saveManu"
-    android:layout_alignParentRight="true"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:visibility="visible"
-    android:layout_marginRight="5dp">
-    <ImageView
-        android:padding="5dp"
-        android:id="@+id/saveBtn"
+
+    <LinearLayout
+        android:id="@+id/saveManu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_save"
-        android:visibility="visible" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_gravity="center"
-        android:textColor="@color/white"/>
+        android:layout_marginRight="5dp"
+        android:visibility="visible">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/saveBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:padding="5dp"
+            android:src="@drawable/ic_save"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/savetext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Save"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
 
 </RelativeLayout>

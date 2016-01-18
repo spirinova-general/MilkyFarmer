@@ -129,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/transparent_button_click"
-                android:text="Get OTP"
+                android:text="Resend OTP"
                 android:textColor="@color/white" />
 
 
@@ -140,6 +140,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingLeft="5dp"
+        android:visibility="gone"
         android:paddingRight="5dp">
         <TextView
             android:layout_width="wrap_content"

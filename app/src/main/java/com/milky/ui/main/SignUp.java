@@ -63,10 +63,12 @@ public class SignUp extends AppCompatActivity {
                     if (preferences.getString(UserPrefrences.MOBILE_NUMBER, "").length() > 0) {
                         Intent i = new Intent(SignUp.this, MainActivity.class);
                         startActivity(i);
+                        finish();
                     }
                 } else {
                     Intent i = new Intent(SignUp.this, FarmerSignup.class);
                     startActivity(i);
+                    finish();
                 }
 //                if(_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
 //                {

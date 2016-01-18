@@ -47,7 +47,7 @@ public class TableColumsDetail {
     public static final String CUSTOMER_SETTINGS = "CREATE TABLE " + TableNames.TABLE_CUSTOMER_SETTINGS + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.ACCOUNT_ID + " TEXT,"
             + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.DEFAULT_RATE + " TEXT,"
             + TableColumns.DEFAULT_QUANTITY + " TEXT,"
-            + TableColumns.BALANCE + " TEXT,"
+            + TableColumns.BALANCE + " TEXT,"+TableColumns.FIRST_NAME+" TEXT,"+TableColumns.LAST_NAME+" TEXT,"
             + TableColumns.START_DATE + " DATETIME," + TableColumns.AREA_ID + " TEXT,"
             + TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
 

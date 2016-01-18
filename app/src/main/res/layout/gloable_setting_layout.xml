@@ -53,6 +53,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="10dp"
+                    android:visibility="gone"
                     android:padding="0dp">
 
                     <EditText
@@ -121,33 +122,53 @@
                     android:orientation="horizontal"
                     android:padding="0dp">
 
-                    <LinearLayout
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="fill_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_marginLeft="5dp"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:orientation="vertical">-->
+
+                        <!--<TextView-->
+                            <!--android:layout_width="fill_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginLeft="5dp"-->
+                            <!--android:text="Mobile"-->
+                            <!--android:textSize="12sp" />-->
+
+                        <!--<TextView-->
+                            <!--android:id="@+id/mobile"-->
+                            <!--android:layout_width="fill_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginLeft="5dp"-->
+                            <!--android:background="@null"-->
+                            <!--android:inputType="number"-->
+                            <!--android:padding="0dp"-->
+                            <!--android:singleLine="true"-->
+                            <!--android:textSize="18sp"-->
+                            <!--android:layout_gravity="center_vertical" />-->
+                  <!--<View-->
+                      <!--android:layout_width="fill_parent"-->
+                      <!--android:layout_height="0.5dp"-->
+                      <!--android:background="@color/darken_gray"/>-->
+                    <!--</LinearLayout>-->
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/mobile_layout"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:padding="0dp">
 
-                        <TextView
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:text="Mobile"
-                            android:textSize="12sp" />
-
-                        <TextView
+                        <EditText
                             android:id="@+id/mobile"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:background="@null"
-                            android:inputType="number"
-                            android:padding="0dp"
-                            android:singleLine="true"
-                            android:textSize="18sp"
-                            android:layout_gravity="center_vertical" />
-                    </LinearLayout>
-
+                            android:hint="Mobile"
+                            android:inputType="textCapSentences"
+                            android:paddingTop="0dp"
+                            android:singleLine="true" />
+                    </android.support.design.widget.TextInputLayout>
                     <TextView
                         android:id="@+id/change_number"
                         android:layout_width="wrap_content"

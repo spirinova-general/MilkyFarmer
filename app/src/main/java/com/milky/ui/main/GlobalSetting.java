@@ -28,6 +28,7 @@ import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
@@ -46,7 +47,7 @@ import java.util.Calendar;
 public class GlobalSetting extends AppCompatActivity {
     private Toolbar _mToolbar;
     private TextInputLayout rate_layout, custCode_layout, tax_layouts, autocomplete_layout, name_layout, lastname_layout, mobile_layout;
-    private EditText custCode, rate, tax, firstname, lastname;
+    private EditText custCode, rate, tax, firstname, lastname, mobile;
     private InputMethodManager inputMethodManager;
     private LinearLayout _mBottomLayout;
     private DatabaseHelper _dbHelper;
@@ -59,7 +60,7 @@ public class GlobalSetting extends AppCompatActivity {
     private AreaCityAdapter adapter1;
     private Vibrator myVib;
     private String mob = "";
-    private TextView mobile, changeNumber;
+    private TextView changeNumber;
 
     @Override
     protected void onResume() {
@@ -83,7 +84,6 @@ public class GlobalSetting extends AppCompatActivity {
 //        disableKeyBoard();
 
 
-
     }
 
 
@@ -98,7 +98,7 @@ public class GlobalSetting extends AppCompatActivity {
         tax = (EditText) findViewById(R.id.tax);
         firstname = (EditText) findViewById(R.id.first_name);
         lastname = (EditText) findViewById(R.id.last_name);
-        mobile = (TextView) findViewById(R.id.mobile);
+        mobile = (EditText) findViewById(R.id.mobile);
         changeNumber = (TextView) findViewById(R.id.change_number);
 
 
@@ -122,7 +122,7 @@ public class GlobalSetting extends AppCompatActivity {
         tax.addTextChangedListener(new TextValidationMessage(rate, tax_layouts, this, false));
         firstname.addTextChangedListener(new TextValidationMessage(firstname, name_layout, this, false));
         lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this, false));
-
+        mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this, true));
 
          /* Let fields be enabled if edit button has been clicked only.
         * */
@@ -405,12 +405,14 @@ public class GlobalSetting extends AppCompatActivity {
 
 
                     a = remove.getId();
-
-                    if (AccountAreaMapping.deleteArea(_dbHelper.getWritableDatabase(), selectedareacityList.get(a).getAreaId())) {
-                        Toast.makeText(GlobalSetting.this, "Area removed!", Toast.LENGTH_SHORT).show();
-                        ((ViewGroup) label.getParent()).removeView(label);
-                        ((ViewGroup) remove.getParent()).removeView(remove);
-                    }
+                    if (!CustomersTableMagagement.isAreaAssociated(_dbHelper.getReadableDatabase(), selectedareacityList.get(a).getAreaId())) {
+                        if (AccountAreaMapping.deleteArea(_dbHelper.getWritableDatabase(), selectedareacityList.get(a).getAreaId())) {
+                            Toast.makeText(GlobalSetting.this, "Area removed!", Toast.LENGTH_SHORT).show();
+                            ((ViewGroup) label.getParent()).removeView(label);
+                            ((ViewGroup) remove.getParent()).removeView(remove);
+                        }
+                    } else
+                        Toast.makeText(GlobalSetting.this, "Area is associated with customer !", Toast.LENGTH_SHORT).show();
                     _dbHelper.close();
 
                 }

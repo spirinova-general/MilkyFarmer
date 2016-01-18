@@ -58,7 +58,7 @@ public class FarmerSignup extends AppCompatActivity {
     private void setActionBar() {
         Toolbar _mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(_mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         /*
         * Set Custome action bar
@@ -67,7 +67,8 @@ public class FarmerSignup extends AppCompatActivity {
         View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
 
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
-
+        TextView savetext = (TextView) mCustomView.findViewById(R.id.savetext);
+        savetext.setText("Next");
         title.setText("Sign Up");
         LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 
@@ -133,6 +134,9 @@ public class FarmerSignup extends AppCompatActivity {
     Button otpButton;
 
     private void initResources() {
+        AppUtil.getInstance().startTimer();
+        AppUtil.getInstance().showNotification(FarmerSignup.this, "Milky ", "Your OTP for Milky is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
+
         _firstName = (EditText) findViewById(R.id.first_name);
         _lastName = (EditText) findViewById(R.id.last_name);
         _mobile = (EditText) findViewById(R.id.mobile);
@@ -156,40 +160,17 @@ public class FarmerSignup extends AppCompatActivity {
         otpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                otpButton.setEnabled(false);
+//                otpButton.setEnabled(false);
                 otp_layout.setError(null);
-                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.VISIBLE);
-                startTimer();
+//                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.VISIBLE);
+                AppUtil.getInstance().cancelTimer(FarmerSignup.this);
+                AppUtil.getInstance().startTimer();
                 AppUtil.getInstance().showNotification(FarmerSignup.this, "Milky ", "Your OTP for Milky is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
             }
         });
     }
 
-    private int _count = 59;
-
-    private void startTimer() {
-        new CountDownTimer(61000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                if (_count < 10) {
-                    ((TextView) findViewById(R.id.countDown)).setText(String.valueOf("00:0" + _count));
-                } else {
-                    ((TextView) findViewById(R.id.countDown)).setText(String.valueOf("00:" + _count));
-                }
 
 
-                _count--;
-            }
 
-            @Override
-            public void onFinish() {
-                otpButton.setEnabled(true);
-                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.GONE);
-
-                Constants.OTP = "";
-                otp_layout.setError("OTP expired, Get OTP again");
-                _count = 59;
-            }
-        }.start();
-    }
 }

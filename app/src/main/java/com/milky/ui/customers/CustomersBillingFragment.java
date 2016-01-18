@@ -46,6 +46,7 @@ public class CustomersBillingFragment extends Fragment {
     private String custId = "";
     private ArrayList<String> names = new ArrayList<>();
     private boolean hasPreviousBills = false;
+    private TextView preivousBills;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +68,8 @@ public class CustomersBillingFragment extends Fragment {
         _mListView = (ListView) v.findViewById(R.id.customersListView);
         _mAddBillFab = (FloatingActionButton) v.findViewById(R.id.addBillFab);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+        preivousBills = (TextView) v.findViewById(R.id.preivousBills);
+        preivousBills.setVisibility(View.VISIBLE);
         _mAddBillFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,7 +95,7 @@ public class CustomersBillingFragment extends Fragment {
         VBill holder = new VBill();
 
         ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase());
-        if(bills.size()>0)
+        if (bills.size() > 0)
             hasPreviousBills = true;
         for (int x = 0; x < bills.size(); x++) {
             payment.add(bills.get(x));

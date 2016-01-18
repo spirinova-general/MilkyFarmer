@@ -122,6 +122,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
                     holder.setQuantity(s.toString());
                     holder.setCustomerId(CustomersList._mCustomersList.get(position2).getCustomerId());
                     holder.setStart_date(Constants.DELIVERY_DATE);
+                    holder.setAreaId(CustomersList._mCustomersList.get(position2).getAreaId());
                     CustomersList._mDeliveryList.add(holder);
                     finalHolder._quantity_input_layout.setError(null);
                 } else {

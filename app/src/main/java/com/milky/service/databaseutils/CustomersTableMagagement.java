@@ -378,6 +378,17 @@ public class CustomersTableMagagement {
         cursor.close();
         return result;
     }
+    public static boolean isAreaAssociated(SQLiteDatabase db,final String areaId) {
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.AREA_ID + " ='"
+               +areaId + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        return result;
+    }
+
 
     public static ArrayList<VCustomersList> getAllCustomersToSync(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.SYNC_STATUS + " ='" + "0'";
