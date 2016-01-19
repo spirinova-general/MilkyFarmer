@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
@@ -17,7 +16,6 @@ import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.CustomersFragment;
-import com.milky.ui.main.MainActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
@@ -33,7 +31,6 @@ import java.util.List;
  */
 public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
     private List<VCustomersList> mCustomersList, tempItems, suggestions;
-    private CustomersFragmentListAdapter mListAdapter;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
 
@@ -146,8 +143,6 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
                         suggestions.add(Area);
                     }
                 }
-
-
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = suggestions;
                 filterResults.count = suggestions.size();

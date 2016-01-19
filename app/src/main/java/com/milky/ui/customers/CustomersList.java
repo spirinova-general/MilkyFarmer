@@ -241,6 +241,8 @@ public class CustomersList extends AppCompatActivity {
                     editSearch.setSelection(editSearch.getText().length());
                     if (_mAdaapter != null)
                         _mAdaapter.getFilter().filter(editSearch.getText().toString());
+                    _mCustomers.setAdapter(_mAdaapter);
+                    _mAdaapter.notifyDataSetChanged();
                 }
             });
 
@@ -254,6 +256,8 @@ public class CustomersList extends AppCompatActivity {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (_mAdaapter != null)
                         _mAdaapter.getFilter().filter(editSearch.getText().toString());
+                    _mCustomers.setAdapter(_mAdaapter);
+                    _mAdaapter.notifyDataSetChanged();
                     if (s.length() == 0) {
                         Constants.selectedAreaId = "";
                         Constants.selectedCityId = "";
@@ -273,7 +277,8 @@ public class CustomersList extends AppCompatActivity {
                         if (_mAdaapter != null)
                             _mAdaapter.getFilter().filter(editSearch.getText().toString());
 
-
+                    _mCustomers.setAdapter(_mAdaapter);
+                    _mAdaapter.notifyDataSetChanged();
                     return true;
                 }
 

@@ -42,6 +42,7 @@ public class BillingFragment extends Fragment {
     private DatabaseHelper _dbHelper;
     private ArrayList custIdsList = new ArrayList();
     private ArrayList<String> list;
+    private boolean _hasFutureBill=false;
     private boolean hasPreviousBills = false;
 
     @Override
@@ -131,18 +132,21 @@ public class BillingFragment extends Fragment {
                     holder.setRate(String.valueOf(totalRate));
                     holder.setQuantity(String.valueOf(totalQuantity));
                     holder.setIsOutstanding("1");
+                    _hasFutureBill = true;
                 }
 
             }
-        payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity);
-
-        holder.setPaymentMode(String.valueOf(round(payMade, 2)));
-        BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), custId);
+        if(_hasFutureBill) {
+            payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity);
+            holder.setPaymentMode(String.valueOf(round(payMade, 2)));
+            BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), custId);
 
 //        String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
 //        String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-        custIdsList.add(custId);
-        payment.add(holder);
+            custIdsList.add(custId);
+            payment.add(holder);
+        }
+        _hasFutureBill = false;
     }
 
     public double getQtyOfCustomer(String day, String custId) {

@@ -50,6 +50,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
         tempItems = new ArrayList<VCustomersList>(filteredList); // this makes the difference.
         suggestions = new ArrayList<>();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+
     }
 
     @Override
@@ -153,10 +154,8 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
         return nameFilter;
     }
 
-    /**
-     * Custom Filter implementation for custom suggestions we provide.
-     */
-    Filter nameFilter = new Filter() {
+
+   /* Filter nameFilter = new Filter() {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
             String str = ((VCustomersList) resultValue).getFirstName();
@@ -214,6 +213,67 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
 
 
         }
-    };
+    };*/
+
+
+    Filter nameFilter;
+
+    {
+        nameFilter = new Filter() {
+            @Override
+            public CharSequence convertResultToString(Object resultValue) {
+                String str = ((VCustomersList) resultValue).getFirstName();
+                notifyDataSetChanged();
+                return str;
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                if (constraint != null) {
+                    suggestions.clear();
+                    for (VCustomersList Area : tempItems) {
+                        if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase()) ||
+                                Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
+                            suggestions.add(Area);
+                        }
+                    }
+                    FilterResults filterResults = new FilterResults();
+                    filterResults.values = suggestions;
+                    filterResults.count = suggestions.size();
+                    return filterResults;
+                } else {
+                    suggestions.clear();
+                    return new FilterResults();
+                }
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                List<VCustomersList> filterList;
+                filterList = (ArrayList<VCustomersList>) results.values;
+                if (results != null && results.count > 0) {
+                    clear();
+                    for (VCustomersList Area : filterList) {
+                        add(Area);
+                        notifyDataSetChanged();
+                    }
+                } else {
+                    clear();
+                    notifyDataSetChanged();
+                }
+                if (!Constants.selectedAreaId.equals("")) {
+                    clear();
+
+                    filterList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+                    for (VCustomersList Area : filterList) {
+                        add(Area);
+                        notifyDataSetChanged();
+                    }
+
+                }
+                notifyDataSetChanged();
+            }
+        };
+    }
 }
 

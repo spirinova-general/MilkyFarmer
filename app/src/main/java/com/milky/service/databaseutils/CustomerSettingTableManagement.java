@@ -10,6 +10,7 @@ import com.milky.viewmodel.VCustomersList;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Neha on 12/11/2015.
@@ -330,7 +331,19 @@ public class CustomerSettingTableManagement {
     }
 
     public static ArrayList<String> getStartDeliveryDate(SQLiteDatabase db, String custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        String selectquery = null;
+        if (isDeletedCustomerById(db, custId)) {
+            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
+                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        } else {
+            Calendar cal = Calendar.getInstance();
+            String date = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH)) + "-"
+                    + String.format("02%d", cal.get(Calendar.DAY_OF_MONTH));
+            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
+                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + TableColumns.DELETED_ON + " >'" + date + "'";
+
+        }
+
         ArrayList<String> startDate = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectquery, null);
 
@@ -454,6 +467,17 @@ public class CustomerSettingTableManagement {
         return result;
     }
 
+    public static boolean isDeletedCustomerById(SQLiteDatabase db, String id) {
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ="
+                + "'1'" + " AND " + TableColumns.CUSTOMER_ID + " ='" + id + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        return result;
+    }
+
     public static void updateEndDate(SQLiteDatabase db, VCustomersList holder, String enddate, String updatedEndDate) {
         ContentValues values = new ContentValues();
 //        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
@@ -462,6 +486,15 @@ public class CustomerSettingTableManagement {
 
         db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
                 + " AND " + TableColumns.END_DATE + " ='" + enddate + "'", null);
+    }
+
+    public static void updateDeletedCustomer(SQLiteDatabase db, String updatedEndDate, String id) {
+        ContentValues values = new ContentValues();
+//        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
+        values.put(TableColumns.DELETED_ON, updatedEndDate);
+
+        db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + id + "'"
+                , null);
     }
 
 

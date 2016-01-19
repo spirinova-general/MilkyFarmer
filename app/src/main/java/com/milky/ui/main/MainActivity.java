@@ -107,14 +107,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                         startActivity(i);
 
                         break;
-                    case R.id.nav_sign_out:
-                        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
-                        SharedPreferences.Editor edit = preferences.edit();
-                        edit.clear();
-                        edit.commit();
-                        finish();
-
-                        break;
+//                    case R.id.nav_sign_out:
+//                        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+//                        SharedPreferences.Editor edit = preferences.edit();
+//                        edit.clear();
+//                        edit.apply();
+//                        finish();
+//
+//                        break;
                 }
                 mDrawerLayout.closeDrawers();
 

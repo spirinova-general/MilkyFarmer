@@ -15,3 +15,17 @@ app/proguard-rules.pro
 3rdpartylib/extcal/build/intermediates/bundles/release/classes.jar
 3rdpartylib/extcal/build/outputs/aar/extcal-release.aar
 app/src/main/res/layout/actionbar_withsubtitle_layout.xml
+.idea/compiler.xml
+.idea/encodings.xml
+.idea/gradle.xml
+.idea/modules.xml
+.idea/vcs.xml
+3rdpartylib/extcal/build/generated/source/buildConfig/release/com/tyczj/extendedcalendarview/BuildConfig.java
+3rdpartylib/extcal/build/intermediates/bundles/release/AndroidManifest.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/aapt/AndroidManifest.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/color/date_number_text_color.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/date_number_background.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/day_selected.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/normal_day.xml
+3rdpartylib/extcal/build/intermediates/incremental/packageResourcesrelease/merger.xml
+3rdpartylib/extcal/build/intermediates/incremental/mergeAssets/release/merger.xml
