@@ -42,12 +42,12 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
     private VCustomersList filetrHolder;
     private DatabaseHelper _dbHelper;
 
-    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate,final List<VCustomersList>_mCustomersList) {
-        super(con, resource, textViewResourceId);
+    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate, final List<VCustomersList> _mCustomersList) {
+        super(con, resource, textViewResourceId,_mCustomersList);
         this.mContext = con;
         this.date = quantityEditDate;
         this.filteredList = _mCustomersList;
-        tempItems = new ArrayList<VCustomersList>(filteredList); // this makes the difference.
+        tempItems = new ArrayList<>(filteredList); // this makes the difference.
         suggestions = new ArrayList<>();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
 
@@ -133,8 +133,6 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
 
             @Override
             public void afterTextChanged(Editable s) {
-
-
             }
         });
 
@@ -232,11 +230,12 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
                 if (constraint != null) {
                     suggestions.clear();
                     for (VCustomersList Area : tempItems) {
-                        if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase()) ||
-                                Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
+                        if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase().trim()) ||
+                                Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase().trim()))) {
                             suggestions.add(Area);
                         }
                     }
+
                     FilterResults filterResults = new FilterResults();
                     filterResults.values = suggestions;
                     filterResults.count = suggestions.size();
@@ -271,7 +270,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomersList> {
                     }
 
                 }
-                notifyDataSetChanged();
+                CustomersList._mAdaapter.notifyDataSetChanged();
             }
         };
     }

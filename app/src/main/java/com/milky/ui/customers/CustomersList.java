@@ -47,7 +47,7 @@ public class CustomersList extends AppCompatActivity {
     private int _mDay;
     private String _mMonth;
     private Toolbar _mToolbar;
-    private GlobalDeliveryAdapter _mAdaapter;
+    public static GlobalDeliveryAdapter _mAdaapter;
     private DatabaseHelper _dbHelper;
     private LinearLayout _bottomLayout;
     public static List<VCustomersList> _mCustomersList, _mDeliveryList = new ArrayList<>();
@@ -112,7 +112,6 @@ public class CustomersList extends AppCompatActivity {
     private void setActionBar() {
         _mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(_mToolbar);
-
         /*
         * Set Custome action bar
         * */
@@ -124,12 +123,9 @@ public class CustomersList extends AppCompatActivity {
         ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
         deleteCustomer.setVisibility(View.GONE);
 
-
         _mToolbar.setVisibility(View.VISIBLE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
     }
 
 
@@ -176,7 +172,7 @@ public class CustomersList extends AppCompatActivity {
         MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
 //        view1 = mSpinnerItem1.getActionView();
         searchView = mSpinnerItem2.getActionView();
-        MenuItem search = menu.findItem(R.id.save);
+
 
 
 //        if (view1 instanceof Spinner) {
@@ -241,6 +237,7 @@ public class CustomersList extends AppCompatActivity {
                     editSearch.setSelection(editSearch.getText().length());
                     if (_mAdaapter != null)
                         _mAdaapter.getFilter().filter(editSearch.getText().toString());
+                    _mAdaapter.clear();
                     _mCustomers.setAdapter(_mAdaapter);
                     _mAdaapter.notifyDataSetChanged();
                 }
@@ -256,6 +253,7 @@ public class CustomersList extends AppCompatActivity {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (_mAdaapter != null)
                         _mAdaapter.getFilter().filter(editSearch.getText().toString());
+                    _mAdaapter.clear();
                     _mCustomers.setAdapter(_mAdaapter);
                     _mAdaapter.notifyDataSetChanged();
                     if (s.length() == 0) {

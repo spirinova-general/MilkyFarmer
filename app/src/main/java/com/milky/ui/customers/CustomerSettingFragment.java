@@ -387,10 +387,10 @@ public class CustomerSettingFragment extends Fragment {
                     flat_number_layout.setError("Enter flat number!");
                 else if (_mAddress2.getText().toString().equals(""))
                     street_layout.setError("Enter street !");
-                else if (!previousSelectedArea.equals(_autocomplete_city_area.getText().toString())) {
+//                else if (!previousSelectedArea.equals(_autocomplete_city_area.getText().toString())) {
                     if (tempCityId.equals("") && tempAreaId.equals(""))
                         autocomplete_layout.setError("Select valid area!");
-                }
+//                }
                     else if (_mMobile.getText().toString().equals(""))
                         _phone_textinput_layout.setError("Enter mobile number!");
                     else if (_mQuantuty.getText().toString().equals(""))
