@@ -148,7 +148,7 @@ public class CustomersTableMagagement {
         return list;
     }
     public static ArrayList<String> getAllCustomersIds(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='1'";
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER ;
         ArrayList<String> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);

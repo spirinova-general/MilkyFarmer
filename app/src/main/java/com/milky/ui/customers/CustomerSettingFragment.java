@@ -387,10 +387,10 @@ public class CustomerSettingFragment extends Fragment {
                     flat_number_layout.setError("Enter flat number!");
                 else if (_mAddress2.getText().toString().equals(""))
                     street_layout.setError("Enter street !");
-                else if (!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()))
+                else if (!previousSelectedArea.equals(_autocomplete_city_area.getText().toString())) {
                     if (tempCityId.equals("") && tempAreaId.equals(""))
                         autocomplete_layout.setError("Select valid area!");
-
+                }
                     else if (_mMobile.getText().toString().equals(""))
                         _phone_textinput_layout.setError("Enter mobile number!");
                     else if (_mQuantuty.getText().toString().equals(""))
@@ -421,13 +421,13 @@ public class CustomerSettingFragment extends Fragment {
                         holder.setAccountId(Constants.ACCOUNT_ID);
                         holder.setRate(_mRate.getText().toString());
                         holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
-                        holder.setStart_date(getActivity().getIntent().getStringExtra("delivery_date"));
+                        holder.setStart_date(getActivity().getIntent().getStringExtra("start_delivery_date"));
                         Calendar c = Calendar.getInstance();
                         SimpleDateFormat df = Constants.work_format;
                         String formattedDate = df.format(c.getTime());
                         holder.setDateModified(formattedDate);
-                        holder.setEnd_date(String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                                String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+                        holder.setEnd_date( c.get(Calendar.YEAR)+"-"+String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+                                String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 1));
                         CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
 
                         if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),

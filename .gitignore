@@ -29,3 +29,5 @@ app/src/main/res/layout/actionbar_withsubtitle_layout.xml
 3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/normal_day.xml
 3rdpartylib/extcal/build/intermediates/incremental/packageResourcesrelease/merger.xml
 3rdpartylib/extcal/build/intermediates/incremental/mergeAssets/release/merger.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/inspectionProfiles/profiles_settings.xml

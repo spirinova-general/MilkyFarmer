@@ -112,7 +112,7 @@ public class BillTableManagement {
     public static float getPreviousBill(SQLiteDatabase db, final String custId, final String day, final double quantity) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <'" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         float amount = 0;
 
@@ -277,6 +277,7 @@ public class BillTableManagement {
         values.put(TableColumns.SYNC_STATUS, "0");
         values.put(TableColumns.IS_OUTSTANDING, "1");
         values.put(TableColumns.DIRTY, "0");
+        values.put(TableColumns.QUANTITY, holder.getQuantity());
 
         db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
                 + " AND " + TableColumns.IS_OUTSTANDING + " ='1'", null);

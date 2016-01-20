@@ -39,7 +39,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
         this.mCustomersList = listData;
         this.mActivity = act;
         _dbhelper = AppUtil.getInstance().getDatabaseHandler();
-        tempItems = new ArrayList<VCustomersList>(mCustomersList); // this makes the difference.
+        tempItems = new ArrayList<>(mCustomersList); // this makes the difference.
         suggestions = new ArrayList<>();
     }
 
