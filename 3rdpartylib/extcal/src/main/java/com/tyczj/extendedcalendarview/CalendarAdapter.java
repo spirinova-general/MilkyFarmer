@@ -12,6 +12,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.format.Time;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ public class CalendarAdapter extends BaseAdapter {
     public String[] days;
 
 //	OnAddNewEventClick mAddEvent;
+    SharedPreferences preferences;
 
     ArrayList<Day> dayList = new ArrayList<Day>();
 
@@ -38,6 +40,7 @@ public class CalendarAdapter extends BaseAdapter {
         this.cal = cal;
         this.context = context;
         cal.set(Calendar.DAY_OF_MONTH, 1);
+
         refreshDays();
     }
 
@@ -112,30 +115,50 @@ public class CalendarAdapter extends BaseAdapter {
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
 
-            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
-                    && d.getDay() >= registrationDate) {
+            }
+            else if (d.getYear() <= cal.get(Calendar.YEAR) && d.getMonth() <= cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
+                   ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
                 }
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
                 today.setVisibility(View.VISIBLE);
-            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && (d.getDay() == 1 || d.getDay() < cal.get(Calendar.DAY_OF_MONTH))
-                    && d.getDay() < registrationDate) {
-                today.setVisibility(View.GONE);
+            }
+            else if (d.getYear() >= cal.get(Calendar.YEAR) && d.getMonth() >= cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH)
+                    ) {
+
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() < cal.get(Calendar.MONTH)) {
+
                 today.setVisibility(View.GONE);
-                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-            } else if ((d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() > cal.get(Calendar.MONTH)) ||d.getYear() > cal.get(Calendar.YEAR)) {
-                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
-                }
-            } else if (d.getYear() < cal.get(Calendar.YEAR)) {
-                quantitiTV.setText("");
-                today.setVisibility(View.GONE);
-            } else {
+            }
+
+
+// else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
+//                    && d.getDay() >= registrationDate) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//                    today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
+//                }
+//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+//
+//                today.setVisibility(View.VISIBLE);
+//            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && (d.getDay() == 1 || d.getDay() < cal.get(Calendar.DAY_OF_MONTH))
+//                    && d.getDay() < registrationDate) {
+//                today.setVisibility(View.GONE);
+//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+//            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() < cal.get(Calendar.MONTH)) {
+//                today.setVisibility(View.GONE);
+//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+//            } else if ((d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() > cal.get(Calendar.MONTH)) ||d.getYear() > cal.get(Calendar.YEAR)) {
+//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//                    today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
+//                }
+//            } else if (d.getYear() < cal.get(Calendar.YEAR)) {
+//                quantitiTV.setText("");
+//                today.setVisibility(View.GONE);
+//            }
+        else {
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
                 today.setVisibility(View.GONE);
             }
@@ -731,6 +754,7 @@ public class CalendarAdapter extends BaseAdapter {
     BigDecimal bigDecimal = null;
 
     private BigDecimal getQuantity(final Day d) {
+        Calendar cal = Calendar.getInstance();
         if (!isForCustomers) {
             if (totalData != null)
                 for (int i = 0; i < totalData.size(); ++i) {

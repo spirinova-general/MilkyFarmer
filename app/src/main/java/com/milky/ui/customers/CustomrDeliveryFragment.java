@@ -81,7 +81,9 @@ public class CustomrDeliveryFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if(day.getDay()>=deliveryDate.get(Calendar.DAY_OF_MONTH)) {
+                if ((CustomerSettingTableManagement.isHasDataForDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), selected_date))
+                        &&  Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR)==day.getYear())
+                {
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
                     final AlertDialog dialog = alertBuilder.create();
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -112,7 +114,7 @@ public class CustomrDeliveryFragment extends Fragment {
                                 holder1.setDeliveryDate(selected_date);
                                 holder1.setCalculatedQuqantity(round(Double.parseDouble(quantity.getText().toString()), 1));
                                 totalData.set(day.getDay() - 1, holder1);
-                                _mCalenderView.refreshAdapter();
+                                _mCalenderView.refresh();
                                 dialog.hide();
                             }
 

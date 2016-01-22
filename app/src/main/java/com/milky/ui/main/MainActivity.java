@@ -1,8 +1,6 @@
 package com.milky.ui.main;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -24,9 +22,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
         TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
         VAccount dataHolder = Account.getFarmerName(_dbHelper.getReadableDatabase());
+
         name.setText(dataHolder.getFirstName() + " " + dataHolder.getLastName());
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -366,6 +367,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.navView);
         mNavigationView.setVisibility(View.VISIBLE);
+
+//        MenuItem sync = (MenuItem) mNavigationView.findViewById(R.id.nav_sync);
+//        sync.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_image));
+
         /**
          * Lets inflate the very first fragment
          * Here , we are inflating the TabFragment as the first Fragment

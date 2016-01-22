@@ -30,6 +30,24 @@ public class VCustomersList {
     private String paymentMade;
     private String dirty;
     private String outstanding;
+    private String billMade;
+    private String balanceType;
+
+    public String getBillMade() {
+        return billMade;
+    }
+
+    public void setBillMade(String billMade) {
+        this.billMade = billMade;
+    }
+
+    public String getBalanceType() {
+        return balanceType;
+    }
+
+    public void setBalanceType(String balanceType) {
+        this.balanceType = balanceType;
+    }
 
     public String getOutstanding() {
         return outstanding;
@@ -51,7 +69,6 @@ public class VCustomersList {
 
         return is_deleted;
     }
-
 
 
     public void setIs_deleted(String is_deleted) {

@@ -48,7 +48,7 @@ public class CalenderFragment extends Fragment {
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
         _mCalenderView.setForCustomersDelivery(false);
 
-        _mCalenderView.refreshCalendar();
+        _mCalenderView.refresh();
         if (AppUtil.totalData.size() > 0)
             _mCalenderView.totalQuantityCalculated(AppUtil.totalData);
 
@@ -60,7 +60,7 @@ public class CalenderFragment extends Fragment {
                 Constants.DELIVERY_DATE = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
                         String.format("%02d", day.getDay());
                 if ((CustomerSettingTableManagement.isHasDataForDay(_dbHelper.getReadableDatabase(), Constants.DELIVERY_DATE))
-                        ||  Calendar.getInstance().get(Calendar.YEAR) == day.getYear())
+                        &&  Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR)==day.getYear())
                 {
                     Intent intent = new Intent(getActivity(), CustomersList.class);
                     startActivity(intent);

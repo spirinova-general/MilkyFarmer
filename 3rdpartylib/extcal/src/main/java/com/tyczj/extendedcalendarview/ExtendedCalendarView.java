@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -41,6 +42,8 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     public static final int UP_DOWN_GESTURE = 2;
     private static final int SWIPE_MIN_DISTANCE = 120;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
     public interface OnDayClickListener {
         public void onDayClicked(AdapterView<?> adapter, View view, int position, long id, Day day);
@@ -49,6 +52,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     public ExtendedCalendarView(Context context) {
         super(context);
         this.context = context;
+
         init();
     }
 
@@ -65,6 +69,14 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     }
 
     private void init() {
+        Calendar c = Calendar.getInstance();
+        preferences = context.getSharedPreferences("cal_pref", Context.MODE_PRIVATE);
+        if (!preferences.contains("init_year")) {
+            editor = preferences.edit();
+            editor.putInt("init_year", c.get(Calendar.YEAR));
+            editor.putInt("init_month", c.get(Calendar.MONTH));
+            editor.apply();
+        }
         cal = Calendar.getInstance();
         base = new RelativeLayout(context);
         base.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -187,7 +199,11 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     public void onClick(View v) {
         switch (v.getId()) {
             case 1:
-                previousMonth();
+                if (preferences.contains("init_year")) {
+                    if (preferences.getInt("init_year", 0) <= cal.get(Calendar.YEAR) && preferences.getInt("init_month", 0) < cal.get(Calendar.MONTH))
+                        previousMonth();
+
+                }
                 break;
             case 3:
                 nextMonth();
@@ -227,6 +243,10 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
      */
     public void refreshCalendar() {
         mAdapter.refreshDays();
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void refresh() {
         mAdapter.notifyDataSetChanged();
     }
 
@@ -302,7 +322,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
 
     /**
      * @param gestureType Allow swiping the calendar left/right or up/down to change the month.
-     *                    <p>
+     *                    <p/>
      *                    Default value no gesture
      */
     public void setGesture(int gestureType) {
@@ -322,10 +342,10 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
 
 
     }
-    public void refreshAdapter()
-    {if(mAdapter!=null)
-        calendar.setAdapter(mAdapter);
-    }
+//    public void refreshAdapter()
+//    {if(mAdapter!=null)
+//        calendar.setAdapter(mAdapter);
+//    }
 
     public void quantityByDate(final ArrayList<DateQuantityModel> totalList) {
         CalendarAdapter.quantityByDate(totalList);
@@ -350,6 +370,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     public void customersMilkQuantity(ArrayList<DateQuantityModel> quantity) {
         CalendarAdapter.customersMilkQuantity(quantity);
     }
+
     public void totalQuantityCalculated(final ArrayList<DateQuantityModel> totalList) {
         CalendarAdapter.totalDataList(totalList);
     }

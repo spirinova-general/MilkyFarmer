@@ -30,6 +30,8 @@ public class BillTableManagement {
         values.put(TableColumns.IS_CLEARED, holder.getIsCleared());
         values.put(TableColumns.PAYMENT_MADE, holder.getPaymentMade());
         values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
+        values.put(TableColumns.BILL_MADE, holder.getBillMade());
+        values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.IS_OUTSTANDING, "1");
         values.put(TableColumns.DIRTY, "1");
@@ -37,23 +39,30 @@ public class BillTableManagement {
         db.insert(TableNames.TABLE_CUSTOMER_BILL, null, values);
     }
 
-    public static void updateBillData(SQLiteDatabase db, VCustomersList holder) {
+    public static void updateBillData(SQLiteDatabase db, VBill holder) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
-        values.put(TableColumns.QUANTITY, holder.getQuantity());
-        values.put(TableColumns.END_DATE, holder.getEnd_date());
-
+        values.put(TableColumns.PAYMENT_MADE, holder.getPaymentMode());
+        values.put(TableColumns.BALANCE, holder.getBalance());
+        values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
+        values.put(TableColumns.BILL_MADE, holder.getBillMade());
         db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
-                + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
+                + " AND " + TableColumns.START_DATE + " ='" + holder.getStartDate() + "'", null);
     }
-    public static void updateOutstandingBills(SQLiteDatabase db, VCustomersList holder) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
-        values.put(TableColumns.QUANTITY, holder.getQuantity());
-        values.put(TableColumns.END_DATE, holder.getEnd_date());
 
-        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
-                + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
+    public static void updateOutstandingBills(SQLiteDatabase db, String date) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.IS_OUTSTANDING, "0");
+
+        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.END_DATE + " >'" + date + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + date + "'", null);
+    }
+
+    public static void updateClearBills(SQLiteDatabase db, String date, String custid) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.IS_CLEARED, "0");
+
+        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "' AND " + TableColumns.END_DATE + " >'" + date + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + date + "' AND " + TableColumns.IS_CLEARED + " ='1'", null);
     }
 
     public static void updateCurrentDateData(SQLiteDatabase db, VCustomersList holder) {
@@ -69,8 +78,6 @@ public class BillTableManagement {
 
     public static void updateEndDate(SQLiteDatabase db, VCustomersList holder, String enddate, String updatedEndDate) {
         ContentValues values = new ContentValues();
-//        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
-//        values.put(TableColumns.AREA_ID, holder.getAreaId());
         values.put(TableColumns.END_DATE, updatedEndDate);
 
         db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
@@ -98,21 +105,11 @@ public class BillTableManagement {
         return result;
     }
 
-    public static boolean isOutstanding(SQLiteDatabase db, String custId) {
-        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE "
-                + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND "
-                + TableColumns.IS_OUTSTANDING + " '0'";
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        Boolean result = cursor.getCount() > 0;
-
-        cursor.close();
-        return result;
-    }
 
     public static float getPreviousBill(SQLiteDatabase db, final String custId, final String day, final double quantity) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <'" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         float amount = 0;
 
@@ -124,13 +121,24 @@ public class BillTableManagement {
 //                else
 //                    amount = (Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE))) * (float) quantity)
 //                            - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+
+
+           /*jkhjkdfgj*/
+//                float totalRate = Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE))) * (float) quantity;
+//                if (Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.TAX))) > 0)
+//                    amount = ((totalRate * Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.TAX))))
+//                            / 100) + totalRate - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+//                else
+//                    amount = totalRate
+//                            - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+
+
                 float totalRate = Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE))) * (float) quantity;
                 if (Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.TAX))) > 0)
                     amount = ((totalRate * Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.TAX))))
-                            / 100) + totalRate - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+                            / 100) + totalRate;
                 else
-                    amount = totalRate
-                            - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+                    amount = totalRate;
 
 
             }
@@ -141,6 +149,19 @@ public class BillTableManagement {
         if (db.isOpen())
             db.close();
         return amount;
+    }
+
+    public static boolean isClearedBill(SQLiteDatabase db, final String custId, final String day) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
+                + custId + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
+                + " AND " + TableColumns.IS_CLEARED + " ='1'";
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        return result;
     }
 
     public static float getTotalRate(SQLiteDatabase db, final String custId, final String day) {
@@ -154,6 +175,50 @@ public class BillTableManagement {
             do {
 
                 amount = Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return amount;
+    }
+
+    public static String outstandingStatus(SQLiteDatabase db, final String custId, final String day) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
+                + custId + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+        Cursor cursor = db.rawQuery(selectquery, null);
+        String amount = "1";
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                amount = cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return amount;
+    }
+
+    public static String getPaymentMade(SQLiteDatabase db, final String custId, final String day) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
+                + custId + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+        Cursor cursor = db.rawQuery(selectquery, null);
+        String amount = "1";
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                amount = cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE));
 
             }
             while (cursor.moveToNext());
@@ -298,7 +363,7 @@ public class BillTableManagement {
     }
 
     public static ArrayList<VBill> getOutstandingsBill(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.IS_OUTSTANDING + " ='" + "0'";
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.IS_CLEARED + " ='" + "0'";
         ArrayList<VBill> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
@@ -337,7 +402,7 @@ public class BillTableManagement {
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.TAX)) != null)
                     holder.setTax(cursor.getString(cursor.getColumnIndex(TableColumns.TAX)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.IS_CLEARED)) != null)
-                    holder.setIsCleared("false");
+                    holder.setIsCleared("0");
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)) != null)
                     holder.setPaymentMode(cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
@@ -346,6 +411,11 @@ public class BillTableManagement {
                     holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)) != null)
                     holder.setIsOutstanding(cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)) != null)
+                    holder.setBalanceType(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)) != null)
+                    holder.setBillMade(cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)));
+
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -375,7 +445,8 @@ public class BillTableManagement {
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.IS_OUTSTANDING, "1");
         values.put(TableColumns.DIRTY, "1");
-
+        values.put(TableColumns.BILL_MADE, holder.getBillMade());
+        values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
         db.insert(TableNames.TABLE_CUSTOMER_BILL, null, values);
         if (db.isOpen())
             db.close();

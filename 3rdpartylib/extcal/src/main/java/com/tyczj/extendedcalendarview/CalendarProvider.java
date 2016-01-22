@@ -41,7 +41,7 @@ public class CalendarProvider extends ContentProvider {
 	private static final HashMap<String, String> mMap;
     private DatabaseHelper DBHelper;
     private SQLiteDatabase db;
-    
+
     private static class DatabaseHelper extends SQLiteOpenHelper{
         DatabaseHelper(Context context) 
         {

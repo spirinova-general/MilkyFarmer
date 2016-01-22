@@ -25,6 +25,25 @@ public class VBill {
     private String firstname;
     private String lastName;
 
+    private String billMade;
+    private String balanceType;
+
+    public String getBillMade() {
+        return billMade;
+    }
+
+    public void setBillMade(String billMade) {
+        this.billMade = billMade;
+    }
+
+    public String getBalanceType() {
+        return balanceType;
+    }
+
+    public void setBalanceType(String balanceType) {
+        this.balanceType = balanceType;
+    }
+
     public String getIsOutstanding() {
         return isOutstanding;
     }

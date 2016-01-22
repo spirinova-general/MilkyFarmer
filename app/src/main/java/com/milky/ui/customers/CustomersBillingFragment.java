@@ -47,6 +47,7 @@ public class CustomersBillingFragment extends Fragment {
     private ArrayList<String> names = new ArrayList<>();
     private boolean hasPreviousBills = false;
     private TextView preivousBills;
+    private boolean _hasFutureBill= false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -107,7 +108,6 @@ public class CustomersBillingFragment extends Fragment {
         ArrayList<String> startDates = CustomerSettingTableManagement.getStartDeliveryDate(_dbHelper.getReadableDatabase(), custId);
         if (startDates != null)
             for (int j = 0; j < startDates.size(); j++) {
-
                 try {
                     Date date = Constants.work_format.parse(startDates.get(j));
                     c.setTime(date);
@@ -116,36 +116,48 @@ public class CustomersBillingFragment extends Fragment {
                 }
 
                 for (int i = c.get(Calendar.DAY_OF_MONTH); i <= cal.get(Calendar.DAY_OF_MONTH); ++i) {
-                    double quantity = getQtyOfCustomer(cal.get(Calendar.YEAR) + "-" +
-                            String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-                    totalQuantity += quantity;
+                    if (BillTableManagement.isClearedBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i))) {
 
-                    holder.setStartDate(startDates.get(j));
-                    holder.setBalance(CustomersTableMagagement.getBalanceForCustomer(_dbHelper.getReadableDatabase(), custId));
-                    holder.setEndDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-                    totalRate = BillTableManagement.getTotalRate(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-                    holder.setRate(String.valueOf(totalRate));
-                    holder.setQuantity(String.valueOf(totalQuantity));
-
+                        double quantity = getQtyOfCustomer(cal.get(Calendar.YEAR) + "-" +
+                                String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+                        totalQuantity += quantity;
+                        holder.setCustomerId(custId);
+                        holder.setStartDate(startDates.get(j));
+                        holder.setPaymentMode(BillTableManagement.getPaymentMade(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i)));
+                        holder.setBalanceType(CustomersTableMagagement.getBalanceType(_dbHelper.getReadableDatabase(), custId));
+                        holder.setBalance(CustomersTableMagagement.getBalanceForCustomer(_dbHelper.getReadableDatabase(), custId));
+                        holder.setEndDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+                        totalRate = BillTableManagement.getTotalRate(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+                        holder.setRate(String.valueOf(totalRate));
+                        holder.setQuantity(String.valueOf(totalQuantity));
+                        _hasFutureBill = true;
+                    }
                 }
-
             }
-        payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity);
+        if(_hasFutureBill) {
+//            payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity);
 
-        holder.setPaymentMode(String.valueOf(round(payMade, 2)));
-        BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), custId);
-        if (BillTableManagement.isToBeOutstanding(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1))) {
-            BillTableManagement.updateOutstandingBill(_dbHelper.getWritableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
+            if (holder.getBalanceType().equals("1"))
+                payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity)
+                        + Float.parseFloat(holder.getBalance());
+            else
+                payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity)
+                        - Float.parseFloat(holder.getBalance());
+            holder.setPaymentMode(String.valueOf(round(payMade, 2)));
+            BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), custId);
+            if (BillTableManagement.isToBeOutstanding(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1))) {
+                BillTableManagement.updateOutstandingBill(_dbHelper.getWritableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
 //            holder.setStartDate(String.work_format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.work_format("%02d", 1) + "-" + String.work_format("%02d", cal.get(Calendar.YEAR)));
 //            holder.setEndDate(String.work_format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.work_format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.work_format("%02d", cal.get(Calendar.YEAR)));
 //            BillTableManagement.insertNewBills(_dbHelper.getWritableDatabase(), holder);
 //            CustomerSettingTableManagement.insertNewCustomersSetting(_dbHelper.getWritableDatabase(),holder);
 
-        }
-        payment.add(holder);
+            }
+            payment.add(holder);
 //        String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
 //        String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-        names.add(custId);
+            names.add(custId);
+        }
     }
 
     public static BigDecimal round(double d, int decimalPlace) {

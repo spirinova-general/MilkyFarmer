@@ -35,10 +35,21 @@ public class CustomersTableMagagement {
         values.put(TableColumns.DATE_MODIFIED, holder.getDateAdded());
         values.put(TableColumns.START_DATE, holder.getStart_date());
         values.put(TableColumns.DATE_QUANTITY_MODIFIED, holder.getDateAdded());
+        values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
         values.put(TableColumns.DELETED_ON, "1");
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
         db.insert(TableNames.TABLE_CUSTOMER, null, values);
+    }
+
+    public static void updateBalance(SQLiteDatabase db, String balance, String custId,String balanceType) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.DIRTY, "1");
+        values.put(TableColumns.SYNC_STATUS, "1");
+        values.put(TableColumns.BALANCE, balance);
+        values.put(TableColumns.BALANCE_TYPE,balanceType);
+
+        db.update(TableNames.TABLE_CUSTOMER, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
     }
 
     public static VCustomersList getCustomerById(SQLiteDatabase db, final String custId) {
@@ -147,8 +158,9 @@ public class CustomersTableMagagement {
 
         return list;
     }
+
     public static ArrayList<String> getAllCustomersIds(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER ;
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
         ArrayList<String> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
@@ -378,9 +390,10 @@ public class CustomersTableMagagement {
         cursor.close();
         return result;
     }
-    public static boolean isAreaAssociated(SQLiteDatabase db,final String areaId) {
+
+    public static boolean isAreaAssociated(SQLiteDatabase db, final String areaId) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.AREA_ID + " ='"
-               +areaId + "'";
+                + areaId + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -442,7 +455,6 @@ public class CustomersTableMagagement {
             db.close();
         return list;
     }
-
 
 
     public static int getTotalMilkQuantytyByDay(SQLiteDatabase db, String date) {
@@ -555,6 +567,31 @@ public class CustomersTableMagagement {
 
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
                     balance = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE));
+
+
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return balance;
+    }
+    public static String getBalanceType(SQLiteDatabase db, final String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        String balance = "";
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                DateQuantityModel holder = new DateQuantityModel();
+
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)) != null)
+                    balance = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE));
 
 
             }

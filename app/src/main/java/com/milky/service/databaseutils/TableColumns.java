@@ -47,6 +47,8 @@ public class TableColumns {
 
 
     public static String SYNC_STATUS = "sync_status";
+    public static String BILL_MADE = "bill_made";
+    public static String BALANCE_TYPE = "balance_type";
 
 }
 

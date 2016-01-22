@@ -1,7 +1,10 @@
 package com.milky.ui.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -15,9 +18,18 @@ import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
+import com.milky.service.databaseutils.BillTableManagement;
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
+import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.milky.viewmodel.VBill;
+import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.DateQuantityModel;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Calendar;
 
@@ -30,9 +42,13 @@ public class BillingEdit extends AppCompatActivity {
     private EditText milk_quantity;
     private EditText rate;
     private EditText balance_amount;
-    private EditText tax;
+    private EditText tax, payment_made;
     private Button save, clear_bill;
     private TextView start_date, end_date, total_amount, clera_bill_text;
+    private LinearLayout _payment;
+    private TextInputLayout _amount_layout;
+    private DatabaseHelper _dbHelper;
+    private int balanceType = 0;
 
     private void getview() {
         milk_quantity = (EditText) findViewById(R.id.milk_quantity);
@@ -42,9 +58,15 @@ public class BillingEdit extends AppCompatActivity {
         save = (Button) findViewById(R.id.save);
         start_date = (TextView) findViewById(R.id.start_date);
         end_date = (TextView) findViewById(R.id.end_date);
-
+        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         start_date.setText(intent.getStringExtra("start_date"));
         end_date.setText(intent.getStringExtra("end_date"));
+        _amount_layout = (TextInputLayout) findViewById(R.id.amount_layout);
+        _payment = (LinearLayout) findViewById(R.id.payment);
+        payment_made = (EditText) findViewById(R.id.payment_amount);
+        payment_made.setText(intent.getStringExtra("payment_made"));
+        if (intent.getStringExtra("balance_type").equals("1"))
+            balanceType = 1;
         Calendar cal = Calendar.getInstance();
         try {
             cal.setTime(Constants._display_format.parse(intent.getStringExtra("end_date")));
@@ -65,16 +87,89 @@ public class BillingEdit extends AppCompatActivity {
             clera_bill_text.setVisibility(View.GONE);
 
             clear_bill.setEnabled(true);
+
             clear_bill.setTextColor(getResources().getColor(R.color.white));
         } else {
             clera_bill_text.setText("You can clear this bill once the final bill is generated on " + cal.getActualMaximum(Calendar.DAY_OF_MONTH)
-            +" "+Constants.MONTHS[cal.get(Calendar.MONTH)]);
+                    + " " + Constants.MONTHS[cal.get(Calendar.MONTH)]);
             clear_bill.setEnabled(false);
         }
+        /*If bill is already cleared*/
+        if (intent.getStringExtra("clear").equals("0")) {
+            clear_bill.setVisibility(View.GONE);
+            clera_bill_text.setVisibility(View.GONE);
+            _payment.setVisibility(View.VISIBLE);
+        } else
+            _payment.setVisibility(View.GONE);
+
+
+        clear_bill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Calendar c = Calendar.getInstance();
+//                String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH)) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
+//                BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"));
+
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(BillingEdit.this);
+                final AlertDialog dialog = alertBuilder.create();
+                LayoutInflater inflater = (LayoutInflater) BillingEdit.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
+                dialog.setView(view1);
+
+                final EditText payment = (EditText) view1.findViewById(R.id.milk_quantity);
+                final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
+                payment.setHint("Enter payment (Rs)");
+
+                ((Button) view1.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (payment.getText().toString().equals("")) {
+                            quantity_layout.setError("Enter quantity!");
+                        } else {
+                            VBill holder = new VBill();
+
+                            float payment_made = Float.parseFloat(payment.getText().toString());
+                            float bill_amount = Float.parseFloat(intent.getStringExtra("total"));
+
+                            float bill = payment_made - bill_amount;
+                            holder.setPaymentMode(String.valueOf(round(payment_made, 2)));
+                            holder.setBalance(String.valueOf(round(bill, 2)));
+                            if (bill >= 0)
+                                holder.setBalanceType("0");
+                            else
+                                holder.setBalanceType("1");
+
+                            holder.setStartDate(intent.getStringExtra("start_date_work_format"));
+                            holder.setBillMade(String.valueOf(round(bill_amount,2)));
+                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
+                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
+                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
+
+                            Calendar c = Calendar.getInstance();
+                            String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH)+1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
+                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"));
+                            dialog.hide();
+                        }
+
+                    }
+                });
+                ((Button) view1.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.hide();
+                    }
+                });
+                dialog.show();
+
+            }
+        });
 
         balance_amount.setText(intent.getStringExtra("balance"));
         balance_amount.setFocusable(false);
         balance_amount.setFocusableInTouchMode(false);
+        if (balanceType == 1)
+            balance_amount.setHint("Balance due (Rs)");
+
         total_amount = (TextView) findViewById(R.id.total_amount);
         total_amount.setText(intent.getStringExtra("total"));
         tax.setFocusable(false);
@@ -91,9 +186,13 @@ public class BillingEdit extends AppCompatActivity {
         setActionBar();
         getview();
 
-
     }
 
+    public static BigDecimal round(double d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Double.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd;
+    }
 
     private void setActionBar() {
         _mToolbar = (Toolbar) findViewById(R.id.toolbar);

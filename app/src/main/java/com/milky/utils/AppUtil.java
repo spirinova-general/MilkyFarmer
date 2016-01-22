@@ -46,6 +46,7 @@ public class AppUtil extends Application {
         _dbHandler = new DatabaseHelper(getApplicationContext());
         _sharedPRefrences = getApplicationContext().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
         startService(new Intent(getBaseContext(), SyncDataService.class));
+
     }
 
     public static synchronized AppUtil getInstance() {

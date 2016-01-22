@@ -137,12 +137,49 @@
                                     android:id="@+id/milk_quantity"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
+                                    android:background="@null"
                                     android:enabled="false"
                                     android:hint="Milk Quantity (in Litres)"
                                     android:inputType="numberDecimal"
                                     android:padding="0dp"
-                                    android:background="@null"
                                     android:text="2"
+                                    android:textColor="@color/textfield_enable"
+
+                                    />
+                            </android.support.design.widget.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/payment"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="5dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:gravity="center"
+                                android:padding="5dp"
+                                android:text="Payment made :"
+                                android:textSize="14sp" />
+
+                            <android.support.design.widget.TextInputLayout
+                                android:id="@+id/payment_layout"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="0dp">
+
+                                <EditText
+                                    android:id="@+id/payment_amount"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@null"
+                                    android:enabled="false"
+                                    android:hint="Paid amount (in RS)"
+                                    android:inputType="numberDecimal"
+                                    android:padding="0dp"
                                     android:textColor="@color/textfield_enable"
 
                                     />
@@ -193,20 +230,20 @@
                                     android:id="@+id/rate_layout"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginLeft="3dp"
                                     android:layout_marginTop="5dp"
-                                    android:padding="0dp"
-                                    android:layout_marginLeft="3dp">
+                                    android:padding="0dp">
 
                                     <EditText
                                         android:id="@+id/rate"
                                         android:layout_width="fill_parent"
                                         android:layout_height="wrap_content"
+                                        android:background="@null"
                                         android:enabled="false"
                                         android:hint="Rate (Rs)"
                                         android:inputType="numberDecimal"
                                         android:padding="0dp"
                                         android:text="100"
-                                        android:background="@null"
                                         android:textColor="@color/textfield_enable" />
                                 </android.support.design.widget.TextInputLayout>
 
@@ -231,19 +268,19 @@
                                     android:id="@+id/amount_layout"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginLeft="3dp"
                                     android:layout_marginTop="3dp"
-                                    android:padding="0dp"
-                                    android:layout_marginLeft="3dp">
+                                    android:padding="0dp">
 
                                     <EditText
                                         android:id="@+id/balance_amount"
                                         android:layout_width="fill_parent"
                                         android:layout_height="wrap_content"
+                                        android:background="@null"
                                         android:enabled="false"
                                         android:hint="Balance Amount (Rs)"
                                         android:inputType="numberDecimal"
                                         android:padding="0dp"
-                                        android:background="@null"
                                         android:text="50"
 
                                         android:textColor="@color/textfield_enable" />
@@ -254,19 +291,19 @@
                                     android:id="@+id/tax_layout"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginLeft="3dp"
                                     android:layout_marginTop="3dp"
-                                    android:padding="0dp"
-                                    android:layout_marginLeft="3dp">
+                                    android:padding="0dp">
 
                                     <EditText
                                         android:id="@+id/tax"
                                         android:layout_width="fill_parent"
                                         android:layout_height="wrap_content"
+                                        android:background="@null"
                                         android:enabled="false"
                                         android:hint="Tax (%)"
                                         android:inputType="numberDecimal"
                                         android:padding="0dp"
-                                        android:background="@null"
                                         android:text="20"
                                         android:textColor="@color/textfield_enable" />
                                 </android.support.design.widget.TextInputLayout>
@@ -352,11 +389,11 @@
         android:id="@+id/clear_bill"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp"
         android:enabled="false"
         android:padding="5dp"
         android:text="Clear Bill"
-        android:layout_gravity="center"
-android:layout_marginBottom="5dp"
         android:textColor="@color/white" />
 
     <TextView

@@ -14,14 +14,10 @@ import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.BillingEdit;
-import com.milky.ui.main.BillingFragment;
-import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomersList;
-
-import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -46,7 +42,6 @@ public class BillingAdapter extends BaseAdapter {
         this.mContext = con;
         this.totalBill = dataList;
         this.names = name;
-
     }
 
     @Override
@@ -92,6 +87,7 @@ public class BillingAdapter extends BaseAdapter {
         holder.name.setText(a + b);
         if (("0").equals(totalBill.get(position).isOutstanding()))
             holder.history.setVisibility(View.VISIBLE);
+
         final Calendar showDatePattern = Calendar.getInstance();
         final Calendar shownEndDate = Calendar.getInstance();
         try {
@@ -105,7 +101,7 @@ public class BillingAdapter extends BaseAdapter {
                 Constants.MONTHS[showDatePattern.get(Calendar.MONTH)] + "-" + showDatePattern.get(Calendar.YEAR));
         holder.endDate.setText(shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +
                 Constants.MONTHS[shownEndDate.get(Calendar.MONTH)] + "-" + shownEndDate.get(Calendar.YEAR));
-        holder.amount.setText(totalBill.get(position).getPaymentMode());
+        holder.amount.setText(totalBill.get(position).getBillMade());
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,7 +115,13 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("balance", totalBill.get(position).getBalance())
                         .putExtra("titleString", holder.custName.getText())
                         .putExtra("totalPrice", totalBill.get(position).getRate())
-                        .putExtra("total", totalBill.get(position).getPaymentMode());
+                        .putExtra("custId", totalBill.get(position).getCustomerId())
+                        .putExtra("clear", totalBill.get(position).getIsCleared())
+                        .putExtra("total", totalBill.get(position).getBillMade())
+                        .putExtra("balance_type", totalBill.get(position).getBalanceType())
+                        .putExtra("payment_made", totalBill.get(position).getPaymentMode())
+                        .putExtra("start_date_work_format", totalBill.get(position).getStartDate())
+                        .putExtra("end_date_work_format", totalBill.get(position).getEndDate());
                 mContext.startActivity(intent);
 
             }

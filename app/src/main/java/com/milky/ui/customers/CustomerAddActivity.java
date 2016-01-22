@@ -173,6 +173,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setQuantity(_mQuantuty.getText().toString());
                         holder.setAccountId(Constants.ACCOUNT_ID);
                         holder.setRate(_rate.getText().toString());
+                        holder.setBalanceType("0");
                         c = Calendar.getInstance();
                         SimpleDateFormat df = Constants.work_format;
                         formattedDate = df.format(c.getTime());
@@ -187,7 +188,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         }
 
 
-                        holder.setEnd_date( deliveryDateTime.get(Calendar.YEAR)+"-"+
+                        holder.setEnd_date(deliveryDateTime.get(Calendar.YEAR) + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 1) + "-" +
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 1));
                         holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
@@ -197,7 +198,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
                         holder.setAdjustment("");
                         holder.setPaymentMade("0");
-                        holder.setIsCleared("0");
+                        holder.setIsCleared("1");
                         holder.setDateModified(holder.getStart_date());
                         BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
                         CustomerAddActivity.this.finish();
@@ -231,7 +232,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 //                // Month is 0 based, just add 1
 //                .append( String.format("%02d",mmonth+1)).append("-").append( String.format("%02d",mday)).append("-")
 //                .append(myear).append(" "));
-        pickedDate = myear+"-"+String.format("%02d",mmonth+1)+"-"+ String.format("%02d",mday);
+        pickedDate = myear + "-" + String.format("%02d", mmonth + 1) + "-" + String.format("%02d", mday);
         _pickdate.setText(Constants._display_format.format(c.getTime()));
 
     }
@@ -291,7 +292,7 @@ public class CustomerAddActivity extends AppCompatActivity {
             mmonth = selectedMonth;
             mday = selectedDay;
             Calendar c = Calendar.getInstance();
-            pickedDate = myear+"-"+String.format("%02d",mmonth+1)+"-"+ String.format("%02d",mday);
+            pickedDate = myear + "-" + String.format("%02d", mmonth + 1) + "-" + String.format("%02d", mday);
 
             // set selected date into textview
             _pickdate.setText(new StringBuilder()
@@ -370,8 +371,6 @@ public class CustomerAddActivity extends AppCompatActivity {
             areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
             areacity.setCityArea(areacity.getArea() + areacity.getCity());
             _areacityList.add(areacity);
-
-
         }
         _dbHelper.close();
         _cityAreaAutocomplete.setThreshold(1);//will start working from first character
