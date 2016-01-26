@@ -123,6 +123,7 @@ public class BillingEdit extends AppCompatActivity {
                 ((Button) view1.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         if (payment.getText().toString().equals("")) {
                             quantity_layout.setError("Enter quantity!");
                         } else {
@@ -149,6 +150,7 @@ public class BillingEdit extends AppCompatActivity {
                             String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH)+1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
                             BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"));
                             dialog.hide();
+                            BillingEdit.this.finish();
                         }
 
                     }
