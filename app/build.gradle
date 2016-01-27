@@ -29,6 +29,9 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
    /* compile 'com.facebook.FacebookSdk'*/
     compile project(':extcal')
+    compile 'com.google.android.gms:play-services-location:7.5.0'
+
+
 
 
 }

@@ -3,16 +3,18 @@
     android:id="@+id/nav_header"
     android:layout_width="@dimen/navigation_drawer_width"
     android:layout_height="192dp"
-    android:background="@drawable/grey_color_onfocus"
+    android:background="@color/colorPrimary"
     android:gravity="center_vertical"
     android:orientation="vertical"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
+        android:layout_marginLeft="5dp"
         android:id="@+id/sync_image"
+        android:padding="5dp"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/main_logo" />
+        android:src="@drawable/round_logo_1" />
 
     <TextView
         android:id="@+id/farmer_name"

@@ -187,7 +187,6 @@ public class CustomerAddActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-
                         holder.setEnd_date(deliveryDateTime.get(Calendar.YEAR) + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 1) + "-" +
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 1));

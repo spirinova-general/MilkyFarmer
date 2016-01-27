@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
+import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
@@ -21,8 +22,11 @@ import com.milky.service.serverapi.SyncDataService;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -70,13 +74,27 @@ public class AppUtil extends Application {
 
     public static ArrayList<DateQuantityModel> getTotalQuantity() {
         totalData.clear();
-        for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-            quantity = getDeliveryOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-            DateQuantityModel holder = new DateQuantityModel();
-            holder.setDeliveryDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-            holder.setCalculatedQuqantity(round(quantity, 1));
-            totalData.add(holder);
+        ArrayList<String> dates = CustomersTableMagagement.getDates(getInstance().getDatabaseHandler().getReadableDatabase());
+        for(int j=0; j<dates.size(); ++j)
+        {
+            Calendar calendar = Calendar.getInstance();
+            Date date;
+            try {
+                date = Constants.work_format.parse(dates.get(j));
+                calendar.setTime(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            for (int i = 1; i <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
+                quantity = getDeliveryOfCustomer(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+                DateQuantityModel holder = new DateQuantityModel();
+                holder.setDeliveryDate(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+                holder.setCalculatedQuqantity(round(quantity, 1));
+                totalData.add(holder);
+            }
         }
+
+
         AppUtil.getInstance().getDatabaseHandler().close();
 
 

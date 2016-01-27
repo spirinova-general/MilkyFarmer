@@ -90,6 +90,7 @@ public class BillingEdit extends AppCompatActivity {
 
             clear_bill.setTextColor(getResources().getColor(R.color.white));
         } else {
+            clear_bill.setBackgroundColor(getResources().getColor(R.color.gray));
             clera_bill_text.setText("You can clear this bill once the final bill is generated on " + cal.getActualMaximum(Calendar.DAY_OF_MONTH)
                     + " " + Constants.MONTHS[cal.get(Calendar.MONTH)]);
             clear_bill.setEnabled(false);
@@ -141,13 +142,13 @@ public class BillingEdit extends AppCompatActivity {
                                 holder.setBalanceType("1");
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
-                            holder.setBillMade(String.valueOf(round(bill_amount,2)));
+                            holder.setBillMade(String.valueOf(round(bill_amount, 2)));
                             BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
                             CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
                             CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
 
                             Calendar c = Calendar.getInstance();
-                            String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH)+1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
+                            String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
                             BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"));
                             dialog.hide();
                             BillingEdit.this.finish();

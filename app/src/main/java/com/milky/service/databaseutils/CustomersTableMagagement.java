@@ -178,6 +178,25 @@ public class CustomersTableMagagement {
             db.close();
         return list;
     }
+    public static ArrayList<String> getDates(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
+        ArrayList<String> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+
+                list.add(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return list;
+    }
 
     public static ArrayList<VCustomersList> getAllCustomersByArea(SQLiteDatabase db, final String areaId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='" + "1'" +
