@@ -196,5 +196,8 @@ public class BillingFragment extends Fragment {
         BigDecimal bd = new BigDecimal(Double.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd;
+
+
+
     }
 }

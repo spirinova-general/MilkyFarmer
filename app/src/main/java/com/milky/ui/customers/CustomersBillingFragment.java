@@ -50,7 +50,7 @@ public class CustomersBillingFragment extends Fragment {
     private boolean _hasFutureBill= false;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View   onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.customer_billing_list, container, false);
         initResources(view);
         custId = getActivity().getIntent().getStringExtra("cust_id");
