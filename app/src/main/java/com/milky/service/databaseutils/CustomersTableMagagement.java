@@ -562,8 +562,6 @@ public class CustomersTableMagagement {
 
         if (cursor.moveToFirst()) {
             do {
-                DateQuantityModel holder = new DateQuantityModel();
-
 
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
                     balance = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE));

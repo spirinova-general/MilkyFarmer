@@ -60,6 +60,7 @@ public class BillTableManagement {
     public static void updateClearBills(SQLiteDatabase db, String date, String custid) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.IS_CLEARED, "0");
+        values.put(TableColumns.END_DATE,date);
 
         long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "' AND " + TableColumns.END_DATE + " >'" + date + "'"
                 + " AND " + TableColumns.START_DATE + " <='" + date + "' AND " + TableColumns.IS_CLEARED + " ='1'", null);
@@ -389,7 +390,7 @@ public class BillTableManagement {
                     }
 
 //                    holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-                    holder.setEndDate(String.format("%02d", c.get(Calendar.MONTH)) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+                    holder.setEndDate(String.format("%02d", c.get(Calendar.MONTH)) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)-1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
 
 
                 }

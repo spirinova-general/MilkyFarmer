@@ -127,6 +127,7 @@ public class BillingFragment extends Fragment {
 
                 for (int i = c.get(Calendar.DAY_OF_MONTH); i <= cal.get(Calendar.DAY_OF_MONTH); ++i) {
                     if (BillTableManagement.isClearedBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i))) {
+
                         double quantity = getQtyOfCustomer(
                                 cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-"
                                         + String.format("%02d", i), custId);
