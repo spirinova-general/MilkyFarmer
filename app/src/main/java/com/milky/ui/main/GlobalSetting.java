@@ -1,24 +1,23 @@
 package com.milky.ui.main;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Message;
 import android.os.Vibrator;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -55,17 +54,18 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import android.os.Handler;
+
 /**
  * Created by Neha on 11/19/2015.
  */
 public class GlobalSetting extends AppCompatActivity {
     private Toolbar _mToolbar;
-    private TextInputLayout rate_layout, custCode_layout, tax_layouts, autocomplete_layout, name_layout, lastname_layout, mobile_layout;
+    private TextInputLayout rate_layout, google_autocomplete_layout, tax_layouts, localityInputLayout, name_layout, lastname_layout, mobile_layout;
     private EditText custCode, rate, tax, firstname, lastname, mobile;
-    private InputMethodManager inputMethodManager;
     private LinearLayout _mBottomLayout;
     private DatabaseHelper _dbHelper;
-    private AutoCompleteTextView AreaAutocomplete;
+    //    private AutoCompleteTextView AreaAutocomplete;
     private ArrayList<VAreaMapper> _areaList, _areacityList = new ArrayList<>(), selectedareasList = new ArrayList<>(), selectedareacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Button add;
@@ -75,6 +75,7 @@ public class GlobalSetting extends AppCompatActivity {
     private Vibrator myVib;
     private String mob = "";
     private TextView changeNumber;
+    private EditText _cityArea, _locality;
 
     @Override
     protected void onResume() {
@@ -102,10 +103,9 @@ public class GlobalSetting extends AppCompatActivity {
 
 
     private void initResources() {
-        inputMethodManager =
-                (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+
         rate_layout = (TextInputLayout) findViewById(R.id.rate_layout);
-        custCode_layout = (TextInputLayout) findViewById(R.id.custCode_layout);
+        google_autocomplete_layout = (TextInputLayout) findViewById(R.id.google_autocomplete_layout);
         tax_layouts = (TextInputLayout) findViewById(R.id.tax_percent_layout);
         custCode = (EditText) findViewById(R.id.custCode);
         rate = (EditText) findViewById(R.id.rate);
@@ -115,12 +115,13 @@ public class GlobalSetting extends AppCompatActivity {
         mobile = (EditText) findViewById(R.id.mobile);
         changeNumber = (TextView) findViewById(R.id.change_number);
 
-
-        AreaAutocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete_city_area);
+        changeNumber.setVisibility(View.GONE);
+        _cityArea = (EditText) findViewById(R.id.autocomplete_city_area);
+        _locality = (EditText) findViewById(R.id.locality);
         _mBottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
 //        _editFab = (FloatingActionButton) findViewById(R.id.editFab);
         add = (Button) findViewById(R.id.add_button);
-        autocomplete_layout = (TextInputLayout) findViewById(R.id.autocomplete_layout);
+        localityInputLayout = (TextInputLayout) findViewById(R.id.autocomplete_layout);
         name_layout = (TextInputLayout) findViewById(R.id.name_layout);
         lastname_layout = (TextInputLayout) findViewById(R.id.last_name_layout);
         mobile_layout = (TextInputLayout) findViewById(R.id.mobile_layout);
@@ -137,14 +138,41 @@ public class GlobalSetting extends AppCompatActivity {
         firstname.addTextChangedListener(new TextValidationMessage(firstname, name_layout, this, false));
         lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this, false));
         mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this, true));
+        _cityArea.setOnTouchListener(new View.OnTouchListener() {
+                                         @Override
+                                         public boolean onTouch(View v, MotionEvent event) {
+                                             if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                                                 _cityArea.clearFocus();
+                                                 if (Constants.isConnectingToInternet(GlobalSetting.this)) {
+                                                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                     imm.hideSoftInputFromWindow(_cityArea.getWindowToken(), 0);
 
+                                                     google_autocomplete_layout.setHint("Search area and city");
+                                                     openWebView();
+                                                 } else {
+                                                     _cityArea.requestFocus();
+                                                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                     imm.showSoftInput(_cityArea, InputMethodManager.SHOW_IMPLICIT);
+                                                     google_autocomplete_layout.setHint("Add area and city");
+                                                 }
+                                             }
+
+
+                                             return true;
+                                         }
+
+                                     }
+
+        );
          /* Let fields be enabled if edit button has been clicked only.
         * */
 
 //        rate.setOnTouchListener(new EnableEditableFields(rate, this, inputMethodManager));
 //        tax.setOnTouchListener(new EnableEditableFields(tax, this, inputMethodManager));
         /*Set default cust code*/
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
+
+        {
             VAccount holder = Account.getAccountDetails(_dbHelper.getReadableDatabase());
             firstname.setText(holder.getFirstName());
             lastname.setText(holder.getLastName());
@@ -154,14 +182,21 @@ public class GlobalSetting extends AppCompatActivity {
             custCode.setText(holder.getFarmerCode());
 
         }
-        custCode.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+
+        custCode.setOnTouchListener(new View.OnTouchListener()
+
+                                    {
+                                        @Override
+                                        public boolean onTouch(View v, MotionEvent event) {
+                                            return true;
+                                        }
+                                    }
+
+        );
         /*Fill fields from db*/
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING))
+
+        {
             ArrayList<String> list = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
             for (int i = 0; i < list.size(); ++i) {
 
@@ -184,53 +219,66 @@ public class GlobalSetting extends AppCompatActivity {
                 addLabel(selectedareacityList.get(x).getCityArea(), false);
             }
         }
-        mob = mobile.getText().toString();
-        changeNumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSetting.this);
-                View view = LayoutInflater.from(GlobalSetting.this).inflate(R.layout.change_number_popup, null);
-                final AlertDialog alertDialog = builder.create();
 
-                alertDialog.setView(view);
-                final EditText mobileNumber = (EditText) view.findViewById(R.id.number);
-                mobileNumber.setText(mob);
-                final TextInputLayout layout = (TextInputLayout) view.findViewById(R.id.layout);
-                ((Button) view.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!mobileNumber.getText().toString().equals("")) {
-                            if (mob.equals(mobileNumber.getText().toString()))
-                                layout.setError("You must change number to update !");
-                            else if (mobileNumber.getText().length() < 10)
-                                layout.setError("Invalid number");
-                            else {
-                                Account.updateMobileNumber(_dbHelper.getWritableDatabase(), mobileNumber.getText().toString());
-                                Toast.makeText(GlobalSetting.this, "Number changed successfully !", Toast.LENGTH_SHORT).show();
-                                layout.setError(null);
-                                alertDialog.dismiss();
-                            }
+        mob = mobile.getText().
 
-                        } else mobileNumber.setError("Enter mobile number !");
-                    }
-                });
-                ((Button) view.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alertDialog.dismiss();
-                    }
-                });
+                toString();
+
+        changeNumber.setOnClickListener(new View.OnClickListener()
+
+                                        {
+                                            @Override
+                                            public void onClick(View v) {
+                                                final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSetting.this);
+                                                View view = LayoutInflater.from(GlobalSetting.this).inflate(R.layout.change_number_popup, null);
+                                                final AlertDialog alertDialog = builder.create();
+
+                                                alertDialog.setView(view);
+                                                final EditText mobileNumber = (EditText) view.findViewById(R.id.number);
+                                                mobileNumber.setText(mob);
+                                                final TextInputLayout layout = (TextInputLayout) view.findViewById(R.id.layout);
+                                                ((Button) view.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        if (!mobileNumber.getText().toString().equals("")) {
+                                                            if (mob.equals(mobileNumber.getText().toString()))
+                                                                layout.setError("You must change number to update !");
+                                                            else if (mobileNumber.getText().length() < 10)
+                                                                layout.setError("Invalid number");
+                                                            else {
+                                                                Account.updateMobileNumber(_dbHelper.getWritableDatabase(), mobileNumber.getText().toString());
+                                                                Toast.makeText(GlobalSetting.this, "Number changed successfully !", Toast.LENGTH_SHORT).show();
+                                                                layout.setError(null);
+                                                                alertDialog.dismiss();
+                                                            }
+
+                                                        } else
+                                                            mobileNumber.setError("Enter mobile number !");
+                                                    }
+                                                });
+                                                ((Button) view.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        alertDialog.dismiss();
+                                                    }
+                                                });
 
 
-                alertDialog.show();
+                                                alertDialog.show();
 
 
-            }
-        });
+                                            }
+                                        }
+
+        );
         _areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
         _dbHelper.close();
         autoCompleteData = new String[_areaList.size()];
-        for (int i = 0; i < _areaList.size(); i++) {
+        for (
+                int i = 0;
+                i < _areaList.size(); i++)
+
+        {
             VAreaMapper areacity = new VAreaMapper();
             areacity.setArea(_areaList.get(i).getArea());
             areacity.setAreaId(_areaList.get(i).getAreaId());
@@ -239,32 +287,52 @@ public class GlobalSetting extends AppCompatActivity {
             areacity.setCityArea(areacity.getArea() + areacity.getCity());
             _areacityList.add(areacity);
         }
+
         _dbHelper.close();
 //        AreaAutocomplete.setFocusable(false);
 //        AreaAutocomplete.setFocusableInTouchMode(false);
-        AreaAutocomplete.setThreshold(1);
-        adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
-        AreaAutocomplete.setAdapter(adapter1);
-        AreaAutocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Position = position;
-                AreaAutocomplete.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
-                selectedAreaId = _areacityList.get(position).getAreaId();
-                selectedCityId = _areacityList.get(position).getCityId();
-                selectedareacityList.add(_areacityList.get(position));
+//        AreaAutocomplete.setThreshold(1);
+//        adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
+//        AreaAutocomplete.setAdapter(adapter1);
+//        AreaAutocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Position = position;
+//                AreaAutocomplete.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+//                selectedAreaId = _areacityList.get(position).getAreaId();
+//                selectedCityId = _areacityList.get(position).getCityId();
+//                selectedareacityList.add(_areacityList.get(position));
+//
+//                AreaAutocomplete.setSelection(AreaAutocomplete.getText().length());
+//            }
+//        });
 
-                AreaAutocomplete.setSelection(AreaAutocomplete.getText().length());
-            }
-        });
+        add.setOnClickListener(new View.OnClickListener()
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addLabel(AreaAutocomplete.getText().toString(), true);
+                               {
+                                   @Override
+                                   public void onClick(View v) {
+                                       if (_cityArea.getText().toString().equals("")) {
+                                           google_autocomplete_layout.setError("Enter area and city");
+                                       } else if (!_cityArea.getText().toString().contains(",")) {
+                                           google_autocomplete_layout.setError("Valid format - <AREA> , <CITY>");
+                                       }
+                                       else
+                                       {
+                                           google_autocomplete_layout.setError(null);
+                                       }
+                                        if(_locality.getText().toString().equals(""))
+                                       {
+                                           localityInputLayout.setError("Enter Locality");
+                                       }
+                                       else
+                                            localityInputLayout.setError(null);
+//                                       addLabel(AreaAutocomplete.getText().toString(), true);
 
-            }
-        });
+                                   }
+                               }
+
+        );
 
 
     }
@@ -301,7 +369,7 @@ public class GlobalSetting extends AppCompatActivity {
                 } else if (tax.getText().toString().trim().equals("")) {
                     tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
                 } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT_AREA_MAPPING)) {
-                    autocomplete_layout.setError("Please add atleast one area !");
+                    localityInputLayout.setError("Please add atleast one area !");
                 } else {
                     Calendar cl = Calendar.getInstance();
                     String date = String.valueOf(cl.get(Calendar.MONTH))
@@ -433,7 +501,7 @@ public class GlobalSetting extends AppCompatActivity {
             });
             if (isNewAdded && !selectedAreaId.equals("")) {
                 if (!AccountAreaMapping.hasData(_dbHelper.getReadableDatabase(), _areacityList.get(Position).getAreaId())) {
-                    AreaAutocomplete.setText("");
+//                    AreaAutocomplete.setText("");
                     label.setTextColor(getResources().getColor(R.color.white));
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     layoutParams.leftMargin = 10;
@@ -443,18 +511,18 @@ public class GlobalSetting extends AppCompatActivity {
                     Params.leftMargin = 10;
                     Params.topMargin = 10;
                     root.addView(remove, layoutParams);
-                    autocomplete_layout.setError(null);
+                    localityInputLayout.setError(null);
                     selectedAreaId = "";
                     selectedCityId = "";
                     AccountAreaMapping.insertmappedareas(_dbHelper.getWritableDatabase(), _areacityList.get(Position));
                     _dbHelper.close();
                 } else {
-                    autocomplete_layout.setError("This Area is already Selected");
+                    localityInputLayout.setError("This Area is already Selected");
                     myVib.vibrate(100);
                 }
             } else if (!isNewAdded) {
-                AreaAutocomplete.setText("");
-                autocomplete_layout.setError(null);
+//                AreaAutocomplete.setText("");
+                localityInputLayout.setError(null);
                 label.setTextColor(getResources().getColor(R.color.white));
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.leftMargin = 10;
@@ -465,11 +533,12 @@ public class GlobalSetting extends AppCompatActivity {
                 Params.topMargin = 10;
                 root.addView(remove, layoutParams);
             } else {
-                autocomplete_layout.setError("Select valid area!");
+                localityInputLayout.setError("Select valid area!");
             }
 
         }
     }
+
     private class PlacesTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -480,7 +549,7 @@ public class GlobalSetting extends AppCompatActivity {
 
                 // Obtain browser key from https://code.google.com/apis/console
                 String key = "key=AIzaSyDApFkqc2Dnd--IzmqQgRqPlqaug8R3qU4";
-                String input="";
+                String input = "";
                 input = "input=" + URLEncoder.encode(place[0], "utf8");
                 // place type to be searched
                 String types = "types=geocode";
@@ -489,13 +558,13 @@ public class GlobalSetting extends AppCompatActivity {
                 String sensor = "sensor=false";
 
                 // Building the parameters to the web service
-                String parameters = input+"&"+types+"&"+sensor+"&"+key;
+                String parameters = input + "&" + types + "&" + sensor + "&" + key;
 
                 // Output format
                 String output = "json";
 
                 // Building the url to the web service
-                String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
+                String url = "https://maps.googleapis.com/maps/api/place/autocomplete/" + output + "?" + parameters;
                 try {
                     data = downloadUrl(url);
                 } catch (IOException e) {
@@ -517,8 +586,10 @@ public class GlobalSetting extends AppCompatActivity {
             }
         }
     }
+
     PlaceAdapter adapter;
-    private void parseAndBindDataToListview(String result){
+
+    private void parseAndBindDataToListview(String result) {
         try {
             JSONObject jsonObject2 = new JSONObject(result);
             JSONArray array = jsonObject2.getJSONArray("predictions");
@@ -534,12 +605,14 @@ public class GlobalSetting extends AppCompatActivity {
         }
     }
 
-    /** A method to download json data from url */
-    private String downloadUrl(String strUrl) throws IOException{
+    /**
+     * A method to download json data from url
+     */
+    private String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
-        try{
+        try {
             URL url = new URL(strUrl);
 
             // Creating an http connection to communicate with url
@@ -553,10 +626,10 @@ public class GlobalSetting extends AppCompatActivity {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
 
-            StringBuffer sb  = new StringBuffer();
+            StringBuffer sb = new StringBuffer();
 
             String line = "";
-            while( ( line = br.readLine())  != null){
+            while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
 
@@ -564,9 +637,9 @@ public class GlobalSetting extends AppCompatActivity {
 
             br.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.d("Exception while downloading url", e.toString());
-        }finally{
+        } finally {
             iStream.close();
             urlConnection.disconnect();
         }
@@ -574,4 +647,112 @@ public class GlobalSetting extends AppCompatActivity {
     }
 
 
+    AlertDialog dialog;
+
+    private void openWebView() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        dialog = alert.create();
+//        alert.setTitle("Title here");
+
+        WebView wv = new WebView(this) {
+            @Override
+            public boolean onCheckIsTextEditor() {
+                return true;
+            }
+        };
+        wv.loadUrl("file:///android_asset/places.html");
+        wv.getSettings().setJavaScriptEnabled(true);
+//        wv.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        wv.addJavascriptInterface(new JavaScriptInterface(this), "android");
+//        wv.setWebViewClient(new WebViewClient() {
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                view.loadUrl(url);
+//
+//                return true;
+//            }
+//
+//            @Override
+//            public void onPageFinished(WebView view, String url) {
+//                super.onPageFinished(view, url);
+//
+//            }
+//        });
+//        wv.requestFocus(View.FOCUS_DOWN);
+//        wv.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                    case MotionEvent.ACTION_UP:
+//                        if (!v.hasFocus()) {
+//                            v.requestFocus();
+//                        }
+//                        break;
+//                }
+//                return false;
+//            }
+//        });
+
+//        dialog.setCancelable(false);
+        dialog.setView(wv);
+
+        dialog.show();
+    }
+
+    public class JavaScriptInterface {
+        Context mContext;
+
+        /**
+         * Instantiate the interface and set the context
+         */
+        JavaScriptInterface(Context c) {
+            mContext = c;
+        }
+
+        /**
+         * Show a toast from the web page
+         */
+        @JavascriptInterface
+        public void showToast(String toast) {
+            place = toast;
+            new pdHandler().sendEmptyMessage(0);
+        }
+    }
+
+    private String place = "";
+    private String[] placesArray;
+    private String areaSelected = "", citySelected = "";
+
+    class pdHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            if (dialog != null) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        _cityArea.setText(place);
+                        google_autocomplete_layout.setHint("Area and city");
+                        placesArray = _cityArea.getText().toString().split(",");
+                        if (placesArray.length == 2) {
+                            areaSelected = placesArray[0];
+                        } else {
+                            areaSelected = placesArray[0];
+                            citySelected = placesArray[1];
+                        }
+                    }
+                });
+                dialog.dismiss();
+                dialog = null;
+
+            }
+        }
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

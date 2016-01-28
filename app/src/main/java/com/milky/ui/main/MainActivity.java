@@ -141,11 +141,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     ActionBarDrawerToggle mDrawerToggle;
 
     ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
-    View view1, searchView;
+
     Spinner spinner;
     int selectedPosition = 0;
     public static String selectedArea = "";
     Menu menu = null;
+    View view1, searchView;
     boolean expended = false;
 
     @Override
