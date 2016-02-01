@@ -111,6 +111,9 @@ public class CalendarAdapter extends BaseAdapter {
 //today
             if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
+                if(getQuantity(d)==null)
+                    quantitiTV.setText("0L");
+                else
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
 
@@ -119,14 +122,18 @@ public class CalendarAdapter extends BaseAdapter {
                    ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
-                }
+                } if(getQuantity(d)==null)
+                    quantitiTV.setText("0L");
+                else
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
                 today.setVisibility(View.VISIBLE);
             }
             else if (d.getYear() >= cal.get(Calendar.YEAR) && d.getMonth() >= cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH)
                     ) {
-
+                if(getQuantity(d)==null)
+                    quantitiTV.setText("0L");
+                else
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
                 today.setVisibility(View.GONE);
@@ -158,6 +165,9 @@ public class CalendarAdapter extends BaseAdapter {
 //                today.setVisibility(View.GONE);
 //            }
         else {
+                if(getQuantity(d)==null)
+                    quantitiTV.setText("0L");
+                else
                 quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
                 today.setVisibility(View.GONE);
             }

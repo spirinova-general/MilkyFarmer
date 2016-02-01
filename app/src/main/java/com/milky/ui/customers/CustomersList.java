@@ -5,9 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -23,8 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.AccountAreaMapping;
-import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DeliveryTableManagement;
@@ -32,7 +28,6 @@ import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.ui.adapters.GlobalDeliveryAdapter;
-import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
@@ -80,15 +75,14 @@ public class CustomersList extends AppCompatActivity {
         _areaList.clear();
         _areacityList.clear();
 
-        ArrayList<String> areas = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
+        ArrayList<String> areas = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
         if (areas != null) {
             for (int i = 0; i < areas.size(); ++i) {
-                _areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
+                _areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areas.get(i)));
             }
             VAreaMapper areacity = new VAreaMapper();
             areacity.setArea("");
             areacity.setAreaId("");
-            areacity.setCityId("");
             areacity.setCity("");
             areacity.setCityArea("All");
             _areacityList.add(areacity);
@@ -96,8 +90,8 @@ public class CustomersList extends AppCompatActivity {
                 areacity = new VAreaMapper();
                 areacity.setArea(_areaList.get(i).getArea());
                 areacity.setAreaId(_areaList.get(i).getAreaId());
-                areacity.setCityId(_areaList.get(i).getCityId());
-                areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
+                areacity.setCity(_areaList.get(i).getCity());
+                areacity.setLocality(_areaList.get(i).getLocality());
                 areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
                 _areacityList.add(areacity);
 
@@ -146,6 +140,7 @@ public class CustomersList extends AppCompatActivity {
                         DeliveryTableManagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), _mDeliveryList.get(i));
                 }
             _dbHelper.close();
+            Constants.REFRESH_CALANDER = true;
             finish();
         }
 
@@ -233,7 +228,6 @@ public class CustomersList extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     editSearch.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
                     Constants.selectedAreaId = _areacityList.get(position).getAreaId();
-                    Constants.selectedCityId = _areacityList.get(position).getCityId();
                     editSearch.setSelection(editSearch.getText().length());
                     if (_mAdaapter != null)
                         _mAdaapter.getFilter().filter(editSearch.getText().toString());
@@ -258,7 +252,6 @@ public class CustomersList extends AppCompatActivity {
                     _mAdaapter.notifyDataSetChanged();
                     if (s.length() == 0) {
                         Constants.selectedAreaId = "";
-                        Constants.selectedCityId = "";
                     }
 
                 }

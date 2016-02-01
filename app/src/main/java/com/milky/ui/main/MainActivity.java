@@ -15,27 +15,20 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
-import com.milky.service.databaseutils.AccountAreaMapping;
 import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
@@ -47,7 +40,6 @@ import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
 import com.milky.viewmodel.VCustomersList;
@@ -216,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     editSearch.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
                     Constants.selectedAreaId = _areacityList.get(position).getAreaId();
-                    Constants.selectedCityId = _areacityList.get(position).getCityId();
+//                    Constants.selectedCityId = _areacityList.get(position).getCityId();
                     selectedareacityList.add(_areacityList.get(position));
                     editSearch.setSelection(editSearch.getText().length());
                     if (CustomersFragment._mAdapter != null)
@@ -234,10 +226,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (CustomersFragment._mAdapter != null)
                         CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
-                    if(s.length()==0)
-                    {
+                    if (s.length() == 0) {
                         Constants.selectedAreaId = "";
-                        Constants.selectedCityId = "";
+//                        Constants.selectedCityId = "";
                     }
 
                 }
@@ -291,15 +282,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         }
         _areaList.clear();
         _areacityList.clear();
-        areas = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
+        areas = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
         for (int i = 0; i < areas.size(); ++i) {
-            _areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
+            _areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areas.get(i)));
         }
         _dbHelper.close();
         VAreaMapper areacity = new VAreaMapper();
         areacity.setArea("");
         areacity.setAreaId("");
-        areacity.setCityId("");
         areacity.setCity("");
         areacity.setCityArea("All");
         _areacityList.add(areacity);
@@ -307,8 +297,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             areacity = new VAreaMapper();
             areacity.setArea(_areaList.get(i).getArea());
             areacity.setAreaId(_areaList.get(i).getAreaId());
-            areacity.setCityId(_areaList.get(i).getCityId());
-            areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
+//            areacity.setCityId(_areaList.get(i).getCityId());
+            areacity.setCity(_areaList.get(i).getCity());
             areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
             _areacityList.add(areacity);
 
@@ -389,39 +379,39 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             _dbHelper.close();
         }
 
-        String Area[] = new String[]{"Hadaspar", "Worli", "Baner", "Phase5", "Sector 71"};
-        int AreaID[] = new int[]{1, 2, 3, 4, 5};
-        String City[] = new String[]{"Pune", "Mumbai", "Mohali"};
-        int CityId[] = new int[]{1, 2, 3};
-
-        if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
-            for (int i = 0; i < 5; i++) {
-                VAreaMapper holder = new VAreaMapper();
-                holder.setArea(Area[i]);
-                holder.setAreaId(String.valueOf(AreaID[i]));
-                if ((i == 0 || i == 2)) {
-                    holder.setCity(City[0]);
-                    holder.setCityId(String.valueOf(CityId[0]));
-                } else if (i == 1) {
-                    holder.setCity(City[1]);
-                    holder.setCityId(String.valueOf(CityId[1]));
-                } else {
-                    holder.setCity(City[2]);
-                    holder.setCityId(String.valueOf(CityId[2]));
-                }
-
-                holder.setAccountId(Constants.ACCOUNT_ID);
-                AreaCityTableManagement.insertAreaDetail(_dbHelper.getWritableDatabase(), holder);
-            }
-        _dbHelper.close();
-        for (int i = 0; i < City.length; i++) {
-            VAreaMapper holder = new VAreaMapper();
-            holder.setCityId(String.valueOf(CityId[i]));
-            holder.setCity(City[i]);
-            holder.setAccountId(Constants.ACCOUNT_ID);
-            AreaCityTableManagement.insertCityDetail(_dbHelper.getWritableDatabase(), holder);
-        }
-        _dbHelper.close();
+//        String Area[] = new String[]{"Hadaspar", "Worli", "Baner", "Phase5", "Sector 71"};
+//        int AreaID[] = new int[]{1, 2, 3, 4, 5};
+//        String City[] = new String[]{"Pune", "Mumbai", "Mohali"};
+//        int CityId[] = new int[]{1, 2, 3};
+//
+//        if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
+//            for (int i = 0; i < 5; i++) {
+//                VAreaMapper holder = new VAreaMapper();
+//                holder.setArea(Area[i]);
+//                holder.setAreaId(String.valueOf(AreaID[i]));
+//                if ((i == 0 || i == 2)) {
+//                    holder.setCity(City[0]);
+//                    holder.setCityId(String.valueOf(CityId[0]));
+//                } else if (i == 1) {
+//                    holder.setCity(City[1]);
+//                    holder.setCityId(String.valueOf(CityId[1]));
+//                } else {
+//                    holder.setCity(City[2]);
+//                    holder.setCityId(String.valueOf(CityId[2]));
+//                }
+//
+//                holder.setAccountId(Constants.ACCOUNT_ID);
+//                AreaCityTableManagement.insertAreaDetail(_dbHelper.getWritableDatabase(), holder);
+//            }
+//        _dbHelper.close();
+//        for (int i = 0; i < City.length; i++) {
+//            VAreaMapper holder = new VAreaMapper();
+//            holder.setCityId(String.valueOf(CityId[i]));
+//            holder.setCity(City[i]);
+//            holder.setAccountId(Constants.ACCOUNT_ID);
+//            AreaCityTableManagement.insertCityDetail(_dbHelper.getWritableDatabase(), holder);
+//        }
+//        _dbHelper.close();
 
 
     }

@@ -32,11 +32,11 @@ public class Constants {
     public static SimpleDateFormat work_format = new SimpleDateFormat("yyyy-MM-dd");
     public static SimpleDateFormat _display_format = new SimpleDateFormat("dd-MMM-yyyy");
     public static boolean validArea = false;
-    public static String OTP ="";
-    public static String selectedAreaId="";
-    public static String selectedCityId="";
+    public static String OTP = "";
+    public static String selectedAreaId = "";
     public static String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
+    public static boolean REFRESH_CALANDER = false;
+    public static boolean REFRESH_DELIVRY_CALANDER = false;
 
     static Calendar cal = Calendar.getInstance();
 
@@ -44,9 +44,10 @@ public class Constants {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         df.format(cal.getTime());
-        return ( cal.get(Calendar.YEAR)+"-"+String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" +
+        return (cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" +
                 String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
     }
+
     public static String generateOTP() {
         List<Integer> numbers = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -61,15 +62,14 @@ public class Constants {
         }
         return result;
     }
-    public static boolean isConnectingToInternet(Context _context){
+
+    public static boolean isConnectingToInternet(Context _context) {
         ConnectivityManager connectivity = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null)
-        {
+        if (connectivity != null) {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
             if (info != null)
                 for (int i = 0; i < info.length; i++)
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
-                    {
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
                         return true;
                     }
 

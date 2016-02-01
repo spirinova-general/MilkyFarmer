@@ -20,8 +20,7 @@ import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
-import com.milky.service.databaseutils.AccountAreaMapping;
-import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
@@ -53,7 +52,7 @@ public class CustomerSettingFragment extends Fragment {
     private int dataCount = 0;
     private TextInputLayout _phone_textinput_layout;
     private AutoCompleteTextView _autocomplete_city_area;
-    private String selectedCityId = "", selectedAreaId = "", tempAreaId = "", tempCityId = "";
+    private String selectedAreaId = "", tempAreaId = "";
     private TextInputLayout name_layout, last_name_layout, balance_layout, flat_number_layout, street_layout, milk_quantity_layout, rate_layout;
     private VCustomersList dataHolder;
     private DatabaseHelper _dbHelper;
@@ -223,9 +222,16 @@ public class CustomerSettingFragment extends Fragment {
         _mAddress2.setText(getActivity().getIntent().getStringExtra("address2"));
         _mAddress1.setText(getActivity().getIntent().getStringExtra("address1"));
         _mRate.setText(getActivity().getIntent().getStringExtra("defaultrate"));
-        _autocomplete_city_area.setText(AreaMapTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")) + ", " + AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cityId")));
-        previousSelectedArea = AreaMapTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")) + ", " + AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cityId"));
+        if (!AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")).equals(""))
+            _autocomplete_city_area.setText(AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId"))
+                    + ", " +
+                    AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")) +
+                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")));
+        else
+            _autocomplete_city_area.setText(AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")) +
+                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")));
 
+        previousSelectedArea = _autocomplete_city_area.getText().toString();
         _mFirstName.setSelection(getActivity().getIntent().getStringExtra("fname").length());
         _mLastName.setSelection(getActivity().getIntent().getStringExtra("lname").length());
         _mRate.setSelection(getActivity().getIntent().getStringExtra("defaultrate").length());
@@ -239,9 +245,9 @@ public class CustomerSettingFragment extends Fragment {
         custId = getActivity().getIntent().getStringExtra("cust_id");
 
         //        areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
-        ArrayList<String> areas = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
-        for (int i = 0; i < areas.size(); ++i) {
-            areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
+        ArrayList<String> areasId = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
+        for (int i = 0; i < areasId.size(); ++i) {
+            areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areasId.get(i)));
         }
         autoCompleteData = new String[areaList.size()];
 //        for (int i = 0; i < areaList.size(); i++) {
@@ -255,9 +261,9 @@ public class CustomerSettingFragment extends Fragment {
             VAreaMapper areacity = new VAreaMapper();
             areacity.setArea(areaList.get(i).getArea());
             areacity.setAreaId(areaList.get(i).getAreaId());
-            areacity.setCityId(areaList.get(i).getCityId());
-            areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), areaList.get(i).getCityId()));
-            areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
+            areacity.setLocality(areaList.get(i).getLocality());
+            areacity.setCity(areaList.get(i).getCity());
+            areacity.setCityArea(areaList.get(i).getLocality() + areacity.getArea() + ", " + areacity.getCity());
             _areacityList.add(areacity);
         }
 
@@ -294,18 +300,15 @@ public class CustomerSettingFragment extends Fragment {
         //  _autocomplete_city_area.setAdapter(adapter);
         //setting the adapter data into the AutoCompleteTextView
         selectedAreaId = getActivity().getIntent().getStringExtra("areaId");
-        selectedCityId = getActivity().getIntent().getStringExtra("cityId");
 
         _autocomplete_city_area.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                _autocomplete_city_area.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                _autocomplete_city_area.setText(_areacityList.get(position).getLocality() + ", " + _areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
 
                 //  _autocomplete_city_area.append(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
                 selectedAreaId = _areacityList.get(position).getAreaId();
-                selectedCityId = _areacityList.get(position).getCityId();
                 tempAreaId = _areacityList.get(position).getAreaId();
-                tempCityId = _areacityList.get(position).getCityId();
                 _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
                 // int selection = parent.getSelectedItemPosition();
 
@@ -390,9 +393,11 @@ public class CustomerSettingFragment extends Fragment {
                     flat_number_layout.setError("Enter flat number!");
                 else if (_mAddress2.getText().toString().equals(""))
                     street_layout.setError("Enter street !");
-                else if (!previousSelectedArea.equals(_autocomplete_city_area.getText().toString())) {
-                    if (tempCityId.equals("") && tempAreaId.equals(""))
-                        autocomplete_layout.setError("Select valid area!");
+                else if ((!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()) && tempAreaId.equals(""))) {
+
+                    autocomplete_layout.setError("Select valid area!");
+
+
                 } else if (_mMobile.getText().toString().equals(""))
                     _phone_textinput_layout.setError("Enter mobile number!");
                 else if (_mQuantuty.getText().toString().equals(""))
@@ -403,7 +408,7 @@ public class CustomerSettingFragment extends Fragment {
                         !_mAddress1.getText().toString().equals("")
                         && !_mRate.getText().toString().equals("")
                         && !_mAddress2.getText().toString().equals("")
-                        && !selectedCityId.equals("") && !selectedAreaId.equals("")
+                        && !selectedAreaId.equals("")
                         && !_mMobile.getText().toString().equals("") &&
                         !_mQuantuty.getText().toString().equals("")
                         ) {
@@ -413,7 +418,7 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setBalance_amount(_mBalance.getText().toString());
                     holder.setAddress1(_mAddress1.getText().toString());
                     holder.setAddress2(_mAddress2.getText().toString());
-                    holder.setCityId(selectedCityId);
+
                     holder.setAreaId(selectedAreaId);
                     holder.setMobile(_mMobile.getText().toString());
                     holder.setQuantity(_mQuantuty.getText().toString());
@@ -427,7 +432,7 @@ public class CustomerSettingFragment extends Fragment {
                     String formattedDate = df.format(c.getTime());
                     holder.setDateModified(formattedDate);
                     holder.setEnd_date(c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 1));
+                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
 
                     if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
@@ -452,6 +457,7 @@ public class CustomerSettingFragment extends Fragment {
                     BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
 //                    EnableEditableFields.setIsEnabled(false);
+                    Constants.REFRESH_CALANDER = true;
                     getActivity().finish();
 
                 } else {

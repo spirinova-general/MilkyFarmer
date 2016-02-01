@@ -8,9 +8,17 @@ public class VAreaMapper {
     private String area;
     private String areaId;
     private String city;
-    private String cityId;
     private String accountId;
     private String cityArea;
+    private String locality;
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
 
     public String getCityArea() {
         return cityArea;
@@ -52,13 +60,7 @@ public class VAreaMapper {
         this.city = city;
     }
 
-    public String getCityId() {
-        return cityId;
-    }
 
-    public void setCityId(String cityId) {
-        this.cityId = cityId;
-    }
 
     public String getAccountId() {
         return accountId;

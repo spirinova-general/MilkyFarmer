@@ -129,7 +129,7 @@ public class CustomerSettingTableManagement {
         if (areaid.equals("")) {
 //            if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
-                    + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'"
+                    + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >='" + Constants.DELIVERY_DATE + "'"
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + Constants.DELIVERY_DATE + "')";
 //            } else
 //                selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
@@ -138,7 +138,7 @@ public class CustomerSettingTableManagement {
 // else if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
         else
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
-                    + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
+                    + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >='" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + Constants.DELIVERY_DATE + "')";
 //        } else
 //            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
@@ -382,7 +382,7 @@ public class CustomerSettingTableManagement {
         if (isDeletedCustomer(db, id, day)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
                     + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE +
-                    " >'" + day + "'" + " AND "
+                    " >='" + day + "'" + " AND "
                     + TableColumns.CUSTOMER_ID + " ='" + id + "'" + " AND " + TableColumns.DELETED_ON + " ='1'";
         } else
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
@@ -416,7 +416,7 @@ public class CustomerSettingTableManagement {
         String selectquery = "";
 //        if (isDeletedCustomer(db, day)) {
         selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
+                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
                 + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')"
         ;
 //        } else
@@ -473,7 +473,7 @@ public class CustomerSettingTableManagement {
     public static boolean isDeletedCustomer(SQLiteDatabase db, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ="
                 + "'1'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE +
-                " >'" + day + "'";
+                " >='" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -592,7 +592,7 @@ public class CustomerSettingTableManagement {
 
     public static boolean isDeletedCustomer(SQLiteDatabase db, String custId, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.DELETED_ON + " ='"
-                + "1" + "'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + "1" + "'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -605,7 +605,7 @@ public class CustomerSettingTableManagement {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
                 " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId
                 + " AND " + TableColumns.START_DATE + " <=" + deliveryDate + "' AND( " + TableColumns.END_DATE + " ='0' OR " +
-                TableColumns.END_DATE + " >'" + deliveryDate + "')";
+                TableColumns.END_DATE + " >='" + deliveryDate + "')";
         VCustomersList list = null;
 
         Cursor cursor = db.rawQuery(selectquery, null);

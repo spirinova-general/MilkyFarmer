@@ -7,12 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.CustomersFragment;
@@ -73,9 +71,13 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
-        holder.userAreaName.setText(AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
+        if (!AreaCityTableManagement.getLocalityById(_dbhelper.getReadableDatabase(), customer.getAreaId()).equals(""))
+            holder.userAreaName.setText(AreaCityTableManagement.getLocalityById(_dbhelper.getReadableDatabase(), customer.getAreaId())
+                    + ", " + AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
+        else
+            holder.userAreaName.setText(AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
         holder.userStreet.setText(customer.getAddress2() + ", ");
-        holder.userCity.setText(AreaCityTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), customer.getCityId()));
+        holder.userCity.setText(AreaCityTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()));
         String a = Character.toString(customer.getFirstName().charAt(0));
         String b = Character.toString(customer.getLastName().charAt(0));
 
@@ -101,7 +103,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
                         .putExtra("areaId", customer.getAreaId())
                         .putExtra("address1", customer.getAddress1())
                         .putExtra("istoAddCustomer", false)
-                        .putExtra("cityId", customer.getCityId())
+
                         .putExtra("mobile", customer.getMobile())
                         .putExtra("defaultrate", customer.getRate())
                         .putExtra("address2", customer.getAddress2())
@@ -173,7 +175,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
             if (!Constants.selectedAreaId.equals("")) {
                 clear();
 
-                VAreaMapper holder = AreaMapTableManagement.getAreabyAreaId(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
+                VAreaMapper holder = AreaCityTableManagement.getAreaById(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
 
                 filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
                 for (VCustomersList Area : filterList) {
@@ -182,8 +184,8 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
                 }
                 if (filterList.size() == 1) {
 
-                    CustomersFragment.mTotalCustomers.setText(filterList.size() + " Customer in " + holder.getArea()
-                            + ", " + AreaMapTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), Constants.selectedCityId));
+                    CustomersFragment.mTotalCustomers.setText(filterList.size() + " Customer in " + holder.getLocality() + ", " + holder.getArea()
+                            + ", " + holder.getCity());
 
                 } else if (filterList.size() > 1)
                     CustomersFragment.mTotalCustomers.setText(filterList.size() + " Customers");

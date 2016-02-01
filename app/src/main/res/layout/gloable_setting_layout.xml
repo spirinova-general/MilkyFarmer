@@ -22,6 +22,7 @@
 
 
         <ScrollView
+            android:id="@+id/scrollView"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1">
@@ -53,8 +54,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="10dp"
-                    android:visibility="gone"
-                    android:padding="0dp">
+                    android:padding="0dp"
+                    android:visibility="gone">
 
                     <EditText
                         android:id="@+id/custCode"
@@ -123,34 +124,34 @@
                     android:padding="0dp">
 
                     <!--<LinearLayout-->
-                        <!--android:layout_width="fill_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_marginLeft="5dp"-->
-                        <!--android:layout_weight="1"-->
-                        <!--android:orientation="vertical">-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="5dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:orientation="vertical">-->
 
-                        <!--<TextView-->
-                            <!--android:layout_width="fill_parent"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_marginLeft="5dp"-->
-                            <!--android:text="Mobile"-->
-                            <!--android:textSize="12sp" />-->
+                    <!--<TextView-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="5dp"-->
+                    <!--android:text="Mobile"-->
+                    <!--android:textSize="12sp" />-->
 
-                        <!--<TextView-->
-                            <!--android:id="@+id/mobile"-->
-                            <!--android:layout_width="fill_parent"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_marginLeft="5dp"-->
-                            <!--android:background="@null"-->
-                            <!--android:inputType="number"-->
-                            <!--android:padding="0dp"-->
-                            <!--android:singleLine="true"-->
-                            <!--android:textSize="18sp"-->
-                            <!--android:layout_gravity="center_vertical" />-->
-                  <!--<View-->
-                      <!--android:layout_width="fill_parent"-->
-                      <!--android:layout_height="0.5dp"-->
-                      <!--android:background="@color/darken_gray"/>-->
+                    <!--<TextView-->
+                    <!--android:id="@+id/mobile"-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="5dp"-->
+                    <!--android:background="@null"-->
+                    <!--android:inputType="number"-->
+                    <!--android:padding="0dp"-->
+                    <!--android:singleLine="true"-->
+                    <!--android:textSize="18sp"-->
+                    <!--android:layout_gravity="center_vertical" />-->
+                    <!--<View-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="0.5dp"-->
+                    <!--android:background="@color/darken_gray"/>-->
                     <!--</LinearLayout>-->
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/mobile_layout"
@@ -169,15 +170,16 @@
                             android:paddingTop="0dp"
                             android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
+
                     <TextView
                         android:id="@+id/change_number"
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:background="@drawable/transparent_button_click"
-                        android:padding="5dp"
-                        android:text="Change"
-
                         android:gravity="center"
+                        android:padding="5dp"
+
+                        android:text="Change"
                         android:textColor="@color/white" />
                 </LinearLayout>
 
@@ -244,85 +246,134 @@
                 </LinearLayout>
 
 
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/google_autocomplete_layout"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_weight="1"
-                        android:padding="0dp">
-
-                        <EditText
-                            android:id="@+id/autocomplete_city_area"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:completionThreshold="1"
-                            android:hint="Seach area and city"
-                            android:imeOptions="actionNext"
-                            android:inputType="textAutoComplete"
-                            android:paddingTop="0dp"
-                            android:singleLine="true" />
-                    </android.support.design.widget.TextInputLayout>
-
-
                 <!--<android.support.design.widget.TextInputLayout-->
-                    <!--android:id="@+id/autocomplete_layout"-->
-                    <!--android:layout_width="fill_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginLeft="5dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:padding="0dp">-->
+                <!--android:id="@+id/autocomplete_layout"-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="5dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:padding="0dp">-->
 
-                    <!--<AutoCompleteTextView-->
-                        <!--android:id="@+id/autocomplete_city_area"-->
-                        <!--android:layout_width="fill_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:completionThreshold="1"-->
-                        <!--android:hint="Seach area and city"-->
-                        <!--android:imeOptions="actionNext"-->
-                        <!--android:inputType="textAutoComplete"-->
-                        <!--android:paddingTop="0dp"-->
-                        <!--android:singleLine="true" />-->
+                <!--<AutoCompleteTextView-->
+                <!--android:id="@+id/autocomplete_city_area"-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:completionThreshold="1"-->
+                <!--android:hint="Seach area and city"-->
+                <!--android:imeOptions="actionNext"-->
+                <!--android:inputType="textAutoComplete"-->
+                <!--android:paddingTop="0dp"-->
+                <!--android:singleLine="true" />-->
                 <!--</android.support.design.widget.TextInputLayout>-->
                 <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
-
-                <android.support.design.widget.TextInputLayout
-                android:id="@+id/autocomplete_layout"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_weight="1"
-                android:padding="0dp">
-                <EditText
-                    android:id="@+id/locality"
-                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Add locality"/>
-                </android.support.design.widget.TextInputLayout>
-                    <Button
-                        android:id="@+id/add_button"
-                        android:layout_width="wrap_content"
+                    android:layout_marginTop="5dp"
+
+                    android:background="@color/colorPrimaryLight"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:text="Add" />
-                </LinearLayout>
+                        android:layout_marginLeft="3dp"
+                        android:layout_marginRight="3dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@color/colorPrimaryLight"
+                        android:padding="3dp"
+                        android:text="Add areas of delivery" />
+                    <LinearLayout
+                        android:layout_margin="3dp"
+                        android:background="@color/white"
+                        android:orientation="horizontal"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        ><LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <android.support.design.widget.TextInputLayout
+                            android:background="@color/white"
+                            android:id="@+id/google_autocomplete_layout"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp"
+                            android:layout_weight="1"
+                            android:padding="0dp">
 
-                <HorizontalScrollView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp">
+                            <AutoCompleteTextView
+                                android:id="@+id/autocomplete_city_area"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:completionThreshold="1"
+                                android:hint="Area and City"
+                                android:imeOptions="actionNext"
+                                android:inputType="textAutoComplete"
+                                android:singleLine="true" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+
+
+                            <android.support.design.widget.TextInputLayout
+                                android:id="@+id/autocomplete_layout"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_weight="1"
+                                android:background="@color/white"
+                                android:padding="0dp">
+
+                                <EditText
+                                    android:id="@+id/locality"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Locality" />
+                            </android.support.design.widget.TextInputLayout>
+
+
+                            <!--<Button-->
+                            <!--android:layout_gravity="center"-->
+                            <!--android:id="@+id/add_button"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:text="Add" />-->
+                        </LinearLayout>
+                        <ImageView
+
+                            android:id="@+id/add_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="5dp"
+                            android:src="@drawable/add" />
+                    </LinearLayout>
+
+                </LinearLayout>
+                <!--<HorizontalScrollView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:paddingLeft="5dp"-->
+                <!--android:paddingRight="5dp">-->
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+                <ScrollView
+                    android:id="@+id/ScrollView01"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
 
                     <LinearLayout
                         android:id="@+id/linearview"
-                        android:layout_width="match_parent"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:padding="5dp"
                         android:weightSum="1"></LinearLayout>
-                </HorizontalScrollView>
-
+                </ScrollView>
+                </LinearLayout>
             </LinearLayout>
 
         </ScrollView>

@@ -18,7 +18,6 @@ public class VCustomersList {
     private String address1;
     private String address2;
     private String customerId;
-    private String cityId;
     private String areaId;
     private String accountId;
     private String rate;
@@ -32,6 +31,15 @@ public class VCustomersList {
     private String outstanding;
     private String billMade;
     private String balanceType;
+    private String locality;
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
 
     public String getBillMade() {
         return billMade;
@@ -133,13 +141,7 @@ public class VCustomersList {
         this.accountId = accountId;
     }
 
-    public String getCityId() {
-        return cityId;
-    }
 
-    public void setCityId(String cityId) {
-        this.cityId = cityId;
-    }
 
     public String getMobile() {
         return mobile;

@@ -26,8 +26,7 @@ import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
-import com.milky.service.databaseutils.AccountAreaMapping;
-import com.milky.service.databaseutils.AreaMapTableManagement;
+import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
@@ -62,7 +61,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private AutoCompleteTextView _cityAreaAutocomplete;
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
-    private String selectedCityId = "", selectedAreaId = "";
+    private String  selectedAreaId = "";
     private ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
@@ -143,7 +142,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                     else if (_address2.getText().toString().equals(""))
                         street_layout.setError("Enter street !");
 
-                    else if (selectedCityId.equals("") && selectedAreaId.equals(""))
+                    else if (selectedAreaId.equals(""))
                         autocomplete_layout.setError("Select valid area");
                     else if (_mPhone.getText().toString().equals(""))
                         _phone_textinput_layout.setError("Enter mobile number!");
@@ -156,7 +155,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                             !_mBalance.getText().toString().equals("") &&
                             !_mAddress1.getText().toString().equals("")
                             && !_address2.getText().toString().equals("")
-                            && !selectedCityId.equals("") && !selectedAreaId.equals("")
+                            &&!selectedAreaId.equals("")
                             && !_mPhone.getText().toString().equals("") &&
                             !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
                     )) {
@@ -166,7 +165,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setBalance_amount(_mBalance.getText().toString());
                         holder.setAddress1(_mAddress1.getText().toString());
                         holder.setAddress2(_address2.getText().toString());
-                        holder.setCityId(selectedCityId);
+//                        holder.setCityId(selectedCityId);
                         autocomplete_layout.setError(null);
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
@@ -189,7 +188,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 
                         holder.setEnd_date(deliveryDateTime.get(Calendar.YEAR) + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 1) + "-" +
-                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 1));
+                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH)));
                         holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
@@ -200,6 +199,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setIsCleared("1");
                         holder.setDateModified(holder.getStart_date());
                         BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
+                        Constants.REFRESH_CALANDER = true;
                         CustomerAddActivity.this.finish();
                     }
                 } catch (NullPointerException npe) {
@@ -357,18 +357,22 @@ public class CustomerAddActivity extends AppCompatActivity {
         flat_number_layout = (TextInputLayout) findViewById(R.id.flat_number_layout);
         autocomplete_layout = (TextInputLayout) findViewById(R.id.autocomplete_layout);
         milk_quantity_layout = (TextInputLayout) findViewById(R.id.milk_quantity_layout);
-        ArrayList<String> areas = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
-        for (int i = 0; i < areas.size(); ++i) {
-            _areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
-        }
+//        ArrayList<String> areas = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
+//        for (int i = 0; i < areas.size(); ++i) {
+//            _areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
+//        }
+        _areaList = AreaCityTableManagement.getAddress(_dbHelper.getReadableDatabase());
         autoCompleteData = new String[_areaList.size()];
         for (int i = 0; i < _areaList.size(); i++) {
             VAreaMapper areacity = new VAreaMapper();
             areacity.setArea(_areaList.get(i).getArea());
             areacity.setAreaId(_areaList.get(i).getAreaId());
-            areacity.setCityId(_areaList.get(i).getCityId());
-            areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
-            areacity.setCityArea(areacity.getArea() + areacity.getCity());
+//            areacity.setCityId(_areaList.get(i).getCityId());
+//            areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
+//            areacity.setCityArea(areacity.getArea() + areacity.getCity());
+            areacity.setCity(_areaList.get(i).getCity());
+            areacity.setLocality(_areaList.get(i).getLocality());
+            areacity.setCityArea(areacity.getLocality()+areacity.getArea()+areacity.getCity());
             _areacityList.add(areacity);
         }
         _dbHelper.close();
@@ -380,9 +384,13 @@ public class CustomerAddActivity extends AppCompatActivity {
         _cityAreaAutocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(_areacityList.get(position).getLocality().equals(""))
                 _cityAreaAutocomplete.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                else
+                    _cityAreaAutocomplete.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity()
+                    +", "+_areacityList.get(position).getLocality());
                 selectedAreaId = _areacityList.get(position).getAreaId();
-                selectedCityId = _areacityList.get(position).getCityId();
+//                selectedCityId = _areacityList.get(position).getCityId();
                 _cityAreaAutocomplete.setSelection(_cityAreaAutocomplete.getText().length());
             }
         });
@@ -396,7 +404,7 @@ public class CustomerAddActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
                     selectedAreaId = "";
-                    selectedCityId = "";
+//                    selectedCityId = "";
 
                 }
             }
@@ -428,8 +436,6 @@ public class CustomerAddActivity extends AppCompatActivity {
         //replaces the default 'Back' button action
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             finish();
-
-
         }
         return true;
     }

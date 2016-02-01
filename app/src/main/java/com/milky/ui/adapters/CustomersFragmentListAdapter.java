@@ -12,9 +12,7 @@ import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.ui.customers.CustomersList;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
@@ -22,7 +20,6 @@ import com.milky.viewmodel.VCustomersList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -38,7 +35,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         this.mCustomersList = listData;
         this.mActivity = act;
         _dbhelper = AppUtil.getInstance().getDatabaseHandler();
-        tempItems = new ArrayList<VCustomersList>(mCustomersList); // this makes the difference.
+        tempItems = new ArrayList<>(mCustomersList); // this makes the difference.
         suggestions = new ArrayList<>();
     }
 
@@ -61,7 +58,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
         holder.userAreaName.setText(AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
         holder.userStreet.setText(customer.getAddress2() + ", ");
-        holder.userCity.setText(AreaCityTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), customer.getCityId()));
+        holder.userCity.setText(AreaCityTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()));
         String a = Character.toString(customer.getFirstName().charAt(0));
         String b = Character.toString(customer.getLastName().charAt(0));
 
@@ -153,7 +150,6 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
                     .putExtra("areaId", mCustomersList.get(getPosition()).getAreaId())
                     .putExtra("address1", mCustomersList.get(getPosition()).getAddress1())
                     .putExtra("istoAddCustomer", false)
-                    .putExtra("cityId", mCustomersList.get(getPosition()).getCityId())
                     .putExtra("mobile", mCustomersList.get(getPosition()).getMobile())
                     .putExtra("defaultrate", mCustomersList.get(getPosition()).getRate())
                     .putExtra("address2", mCustomersList.get(getPosition()).getAddress2())

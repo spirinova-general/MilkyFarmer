@@ -44,6 +44,7 @@ public class TableColumns {
     public static final String DIRTY = "dirty";
     public static final String TOTAL_AMOUNT = "total_amount";
     public static final String IS_OUTSTANDING = "is_outstanding";
+    public static final String LOCALITY ="locality" ;
 
 
     public static String SYNC_STATUS = "sync_status";

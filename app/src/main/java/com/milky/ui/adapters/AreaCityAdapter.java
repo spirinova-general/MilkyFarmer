@@ -13,7 +13,6 @@ import android.widget.Filter;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.AreaMapTableManagement;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
@@ -52,8 +51,12 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
             TextView lblName = (TextView) view.findViewById(R.id.te1);
             TextView lblName2 = (TextView) view.findViewById(R.id.te2);
             if (lblName != null)
-                lblName.setText(Area.getArea()+",");
-            lblName2.setText(AreaMapTableManagement.getCityNameById(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), Area.getCityId()));
+                if(!Area.getLocality().equals(""))
+                lblName.setText(Area.getLocality()+", "+Area.getArea()+",");
+            else
+                    lblName.setText(Area.getArea()+",");
+//            lblName2.setText(AreaMapTableManagement.getCityNameById(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), Area.getCityId()));
+            lblName2.setText(Area.getCity());
             AppUtil.getInstance().getDatabaseHandler().close();
         }
         return view;

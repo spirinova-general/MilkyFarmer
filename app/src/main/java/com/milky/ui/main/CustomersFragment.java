@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,19 +18,12 @@ import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
-import com.milky.service.serverapi.HttpAsycTask;
-import com.milky.service.serverapi.OnTaskCompleteListner;
-import com.milky.service.serverapi.ServerApis;
-import com.milky.ui.adapters.CustomersFragmentListAdapter;
 import com.milky.ui.adapters.MainCustomersListAdapter;
 import com.milky.ui.customers.CustomerAddActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VCustomersList;
 
-import org.json.JSONArray;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**

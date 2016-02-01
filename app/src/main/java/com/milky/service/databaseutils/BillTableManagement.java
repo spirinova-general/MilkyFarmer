@@ -53,7 +53,7 @@ public class BillTableManagement {
         ContentValues values = new ContentValues();
         values.put(TableColumns.IS_OUTSTANDING, "0");
 
-        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.END_DATE + " >'" + date + "'"
+        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.END_DATE + " >='" + date + "'"
                 + " AND " + TableColumns.START_DATE + " <='" + date + "'", null);
     }
 
@@ -62,7 +62,7 @@ public class BillTableManagement {
         values.put(TableColumns.IS_CLEARED, "0");
         values.put(TableColumns.END_DATE,date);
 
-        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "' AND " + TableColumns.END_DATE + " >'" + date + "'"
+        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "' AND " + TableColumns.END_DATE + " >='" + date + "'"
                 + " AND " + TableColumns.START_DATE + " <='" + date + "' AND " + TableColumns.IS_CLEARED + " ='1'", null);
     }
 
@@ -110,7 +110,7 @@ public class BillTableManagement {
     public static float getPreviousBill(SQLiteDatabase db, final String custId, final String day, final double quantity) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         float amount = 0;
 
@@ -155,7 +155,7 @@ public class BillTableManagement {
     public static boolean isClearedBill(SQLiteDatabase db, final String custId, final String day) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
                 + " AND " + TableColumns.IS_CLEARED + " ='1'";
         Cursor cursor = db.rawQuery(selectquery, null);
 
@@ -168,7 +168,7 @@ public class BillTableManagement {
     public static float getTotalRate(SQLiteDatabase db, final String custId, final String day) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         float amount = 0;
 
@@ -190,7 +190,7 @@ public class BillTableManagement {
     public static String outstandingStatus(SQLiteDatabase db, final String custId, final String day) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         String amount = "1";
 
@@ -212,7 +212,7 @@ public class BillTableManagement {
     public static String getPaymentMade(SQLiteDatabase db, final String custId, final String day) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         String amount = "1";
 
@@ -390,7 +390,7 @@ public class BillTableManagement {
                     }
 
 //                    holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-                    holder.setEndDate(String.format("%02d", c.get(Calendar.MONTH)) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)-1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+                    holder.setEndDate(String.format("%02d", c.get(Calendar.MONTH)) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
 
 
                 }

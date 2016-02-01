@@ -25,7 +25,6 @@ public class CustomersTableMagagement {
         values.put(TableColumns.BALANCE, holder.getBalance_amount());
         values.put(TableColumns.ADDRESS_1, holder.getAddress1());
         values.put(TableColumns.ADDRESS_2, holder.getAddress2());
-        values.put(TableColumns.CITY_ID, holder.getCityId());
         values.put(TableColumns.AREA_ID, holder.getAreaId());
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.QUANTITY, holder.getQuantity());
@@ -77,8 +76,7 @@ public class CustomersTableMagagement {
                     holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
                     holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)) != null)
-                    holder.setCityId(cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)));
+
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
                     holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
@@ -133,8 +131,7 @@ public class CustomersTableMagagement {
                     holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
                     holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)) != null)
-                    holder.setCityId(cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)));
+
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
                     holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
@@ -224,8 +221,7 @@ public class CustomersTableMagagement {
                     holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
                     holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)) != null)
-                    holder.setCityId(cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)));
+
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
                     holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
@@ -296,8 +292,7 @@ public class CustomersTableMagagement {
                     holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
                     holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)) != null)
-                    holder.setCityId(cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)));
+
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
                     holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
@@ -379,7 +374,6 @@ public class CustomersTableMagagement {
         values.put(TableColumns.BALANCE, holder.getBalance_amount());
         values.put(TableColumns.ADDRESS_1, holder.getAddress1());
         values.put(TableColumns.ADDRESS_2, holder.getAddress2());
-        values.put(TableColumns.CITY_ID, holder.getCityId());
         values.put(TableColumns.AREA_ID, holder.getAreaId());
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.QUANTITY, holder.getQuantity());
@@ -447,8 +441,7 @@ public class CustomersTableMagagement {
                     holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
                     holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)) != null)
-                    holder.setCityId(cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)));
+
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
                     holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)

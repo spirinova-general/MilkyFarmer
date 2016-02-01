@@ -70,13 +70,12 @@ public class AppUtil extends Application {
     public static double quantity = 0;
     static Calendar cal = Calendar.getInstance();
     public static ArrayList<String> custIds = new ArrayList<>();
-
+    private static BigDecimal previousQty = null;
 
     public static ArrayList<DateQuantityModel> getTotalQuantity() {
         totalData.clear();
         ArrayList<String> dates = CustomersTableMagagement.getDates(getInstance().getDatabaseHandler().getReadableDatabase());
-        for(int j=0; j<dates.size(); ++j)
-        {
+        for (int j = 0; j < dates.size(); ++j) {
             Calendar calendar = Calendar.getInstance();
             Date date;
             try {
@@ -85,16 +84,27 @@ public class AppUtil extends Application {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
             for (int i = 1; i <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
                 quantity = getDeliveryOfCustomer(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
                 DateQuantityModel holder = new DateQuantityModel();
                 holder.setDeliveryDate(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
                 holder.setCalculatedQuqantity(round(quantity, 1));
+
+//                 if(previousQty==null)
+//                 {
+//                     previousQty = round(quantity, 1);
+//                 }
+//
+//                if (quantity == 0 && previousQty != null) {
+//                    holder.setCalculatedQuqantity(previousQty);
+//                    previousQty=null;
+//                }
+
                 totalData.add(holder);
+
             }
         }
-
-
         AppUtil.getInstance().getDatabaseHandler().close();
 
 
@@ -122,6 +132,7 @@ public class AppUtil extends Application {
                             , custIds.get(i));
 
             qty += CustomerSettingTableManagement.getAllCustomersByDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day) - adjustedQty;
+
         }
         return qty;
     }
