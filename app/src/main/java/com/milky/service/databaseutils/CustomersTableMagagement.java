@@ -51,48 +51,18 @@ public class CustomersTableMagagement {
         db.update(TableNames.TABLE_CUSTOMER, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
     }
 
-    public static VCustomersList getCustomerById(SQLiteDatabase db, final String custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.CUSTOMER_ID +
-                " ='" + custId + "'";
-        VCustomersList holder = new VCustomersList();
+    public static ArrayList<String> getCustomerId(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER ;
+        ArrayList<String> holder = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
-                    holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
-                    holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
-                    holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
-                    holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
-                    holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
-                    holder.setBalance_amount(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)) != null)
-                    holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
-                    holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
 
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
-                    holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
-                    holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)) != null)
-                    holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
-                    holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)) != null)
-                    holder.setQuantityModifiedDate(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
-                    holder.setIs_deleted(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
-                    holder.setStart_date(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DIRTY)) != null)
-                    holder.setDirty(cursor.getString(cursor.getColumnIndex(TableColumns.DIRTY)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
+                    holder.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+
             }
 
 
@@ -174,6 +144,25 @@ public class CustomersTableMagagement {
         if (db.isOpen())
             db.close();
         return list;
+    }
+    public static String getAccountId(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
+        String id ="";
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+
+               id = cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return id;
     }
     public static ArrayList<String> getDates(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
@@ -364,6 +353,56 @@ public class CustomersTableMagagement {
         if (db.isOpen())
             db.close();
         return name;
+    }
+    public static VCustomersList getAllCustomersByCustId(SQLiteDatabase db, final String areaId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='" + "1'" +
+                " AND " + TableColumns.CUSTOMER_ID + " ='" + areaId + "'";
+        VCustomersList holder=new VCustomersList();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
+                    holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
+                    holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
+                    holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
+                    holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
+                    holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
+                    holder.setBalance_amount(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)) != null)
+                    holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
+                    holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
+                    holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
+                    holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)) != null)
+                    holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
+                    holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)) != null)
+                    holder.setQuantityModifiedDate(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
+                    holder.setIs_deleted(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
+                    holder.setStart_date(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return holder;
     }
 
     public static void updateCustomerDetail(SQLiteDatabase db, VCustomersList holder, String custId) {

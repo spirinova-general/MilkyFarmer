@@ -3,6 +3,7 @@ package com.milky.service.databaseutils;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.TableRow;
 
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
@@ -345,17 +346,38 @@ public class CustomerSettingTableManagement {
         return list;
     }
 
+    public static ArrayList<String> getDates(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS;
+        ArrayList<String> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+
+                list.add(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return list;
+    }
     public static ArrayList<String> getStartDeliveryDate(SQLiteDatabase db, String custId) {
         String selectquery = null;
+        Calendar cal = Calendar.getInstance();
+        String date = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-"
+                + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH));
         if (isDeletedCustomerById(db, custId)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
-                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" +" AND "+TableColumns.START_DATE+" <='"+date+"'";
         } else {
-            Calendar cal = Calendar.getInstance();
-            String date = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-"
-                    + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH));
+
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
-                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.DELETED_ON + " >='" + date + "'";
+                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE+" <='"+date+"' AND"
+                    + TableColumns.DELETED_ON + " >='" + date + "'";
 
         }
 
@@ -376,7 +398,6 @@ public class CustomerSettingTableManagement {
         return startDate;
 
     }
-
     public static double getAllCustomersByCustId(SQLiteDatabase db, String day, String id) {
         String selectquery = "";
         if (isDeletedCustomer(db, id, day)) {
@@ -417,8 +438,7 @@ public class CustomerSettingTableManagement {
 //        if (isDeletedCustomer(db, day)) {
         selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
                 + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
-                + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')"
-        ;
+                + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
 //        } else
 //            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
 //                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
@@ -430,7 +450,6 @@ public class CustomerSettingTableManagement {
         if (cursor.moveToFirst()) {
             do {
                 qty += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
-
 
             }
             while (cursor.moveToNext());

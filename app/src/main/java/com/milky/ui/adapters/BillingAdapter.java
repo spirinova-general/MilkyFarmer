@@ -85,8 +85,14 @@ public class BillingAdapter extends BaseAdapter {
         holder.custName.setText(nfNAme + " " + lfNAme);
 
         holder.name.setText(a + b);
-        if (("0").equals(totalBill.get(position).isOutstanding()))
+        if (("0").equals(totalBill.get(position).isOutstanding())) {
             holder.history.setVisibility(View.VISIBLE);
+            holder.history.setText("Outstanding");
+        }
+        if ("0".equals(totalBill.get(position).getIsCleared())) {
+            holder.history.setVisibility(View.VISIBLE);
+            holder.history.setText("History");
+        }
 
         final Calendar showDatePattern = Calendar.getInstance();
         final Calendar shownEndDate = Calendar.getInstance();

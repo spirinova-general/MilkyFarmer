@@ -2,12 +2,14 @@ package com.milky.ui.main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
@@ -21,6 +23,7 @@ import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomersList;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -46,6 +49,12 @@ public class BillingFragment extends Fragment {
     private boolean hasPreviousBills = false;
 
     @Override
+    public void onResume() {
+        super.onResume();
+        populateBills();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_customers_list, container, false);
         initResources(view);
@@ -53,10 +62,7 @@ public class BillingFragment extends Fragment {
 
     }
 
-    private void initResources(View v) {
-        _mListView = (ListView) v.findViewById(R.id.customersList);
-        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-        TextView _mTotalBills = (TextView) v.findViewById(R.id.total_pending_bills);
+    private void populateBills() {
         payment.clear();
         custIdsList.clear();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
@@ -70,6 +76,13 @@ public class BillingFragment extends Fragment {
 //            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
             _mListView.setAdapter(new BillingAdapter(payment, getActivity(), custIdsList));
         }
+    }
+
+    private void initResources(View v) {
+        _mListView = (ListView) v.findViewById(R.id.customersList);
+        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+        TextView _mTotalBills = (TextView) v.findViewById(R.id.total_pending_bills);
+        populateBills();
         if (hasPreviousBills)
             ((TextView) v.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         _dbHelper.close();
@@ -90,10 +103,28 @@ public class BillingFragment extends Fragment {
         double totalQuantity = 0, totalRate = 0;
         VBill holder = new VBill();
         /*Bill is to be outstanding*/
-        if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-            // update outstanding bills
-            BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
-        }
+//        if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+//            // update outstanding bills
+//            BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
+//            VCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), custId);
+//            Calendar nextMonth = Calendar.getInstance();
+//            nextMonth.add(Calendar.MONTH, 1);
+//            custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+//                    "01");
+//
+//            custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+//                    String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH)));
+//           //Insert new bill and setting for customer
+//            CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), custHolder);
+//            custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+//            custHolder.setAdjustment("");
+//            custHolder.setPaymentMade("0");
+//            custHolder.setIsCleared("1");
+//            custHolder.setDateModified(custHolder.getStart_date());
+//            BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+//
+//
+//        }
 
 //        if (BillTableManagement.isToBeOutstanding(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1))) {
 //            BillTableManagement.updateOutstandingBill(_dbHelper.getWritableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
@@ -197,7 +228,6 @@ public class BillingFragment extends Fragment {
         BigDecimal bd = new BigDecimal(Double.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd;
-
 
 
     }

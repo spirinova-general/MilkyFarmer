@@ -95,7 +95,7 @@ public class CustomersBillingFragment extends Fragment {
         double totalQuantity = 0, totalRate = 0;
         VBill holder = new VBill();
 
-        ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase());
+        ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase(),custId);
         if (bills.size() > 0)
             hasPreviousBills = true;
         for (int x = 0; x < bills.size(); x++) {

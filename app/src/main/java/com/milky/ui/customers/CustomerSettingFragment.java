@@ -245,29 +245,32 @@ public class CustomerSettingFragment extends Fragment {
         custId = getActivity().getIntent().getStringExtra("cust_id");
 
         //        areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
-        ArrayList<String> areasId = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
-        for (int i = 0; i < areasId.size(); ++i) {
-            areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areasId.get(i)));
-        }
-        autoCompleteData = new String[areaList.size()];
-//        for (int i = 0; i < areaList.size(); i++) {
-//            // Get City for area
-//            // autoCompleteData[i] = AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getArea()) + " " + _areaList.get(i).getCity();
-//            autoCompleteData[i] = areaList.get(i).getArea()+" "+AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(),areaList.get(i).getCityId());
+//        ArrayList<String> areasId = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
+//        for (int i = 0; i < areasId.size(); ++i) {
+//            areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areasId.get(i)));
 //        }
-        /*adapter1 = new AreaCityAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line, R.id.te1, areaList);
-        _autocomplete_city_area.setAdapter(adapter1);*/
-        for (int i = 0; i < areaList.size(); i++) {
-            VAreaMapper areacity = new VAreaMapper();
-            areacity.setArea(areaList.get(i).getArea());
-            areacity.setAreaId(areaList.get(i).getAreaId());
-            areacity.setLocality(areaList.get(i).getLocality());
-            areacity.setCity(areaList.get(i).getCity());
-            areacity.setCityArea(areaList.get(i).getLocality() + areacity.getArea() + ", " + areacity.getCity());
-            _areacityList.add(areacity);
-        }
-
-        AreaCityAdapter adapter1 = new AreaCityAdapter(getActivity(), 0, R.id.te1, _areacityList);
+//        autoCompleteData = new String[areaList.size()];
+////        for (int i = 0; i < areaList.size(); i++) {
+////            // Get City for area
+////            // autoCompleteData[i] = AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getArea()) + " " + _areaList.get(i).getCity();
+////            autoCompleteData[i] = areaList.get(i).getArea()+" "+AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(),areaList.get(i).getCityId());
+////        }
+//        /*adapter1 = new AreaCityAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line, R.id.te1, areaList);
+//        _autocomplete_city_area.setAdapter(adapter1);*/
+//        for (int i = 0; i < areaList.size(); i++) {
+//            VAreaMapper areacity = new VAreaMapper();
+//            areacity.setArea(areaList.get(i).getArea());
+//            areacity.setAreaId(areaList.get(i).getAreaId());
+//            areacity.setLocality(areaList.get(i).getLocality());
+//            areacity.setCity(areaList.get(i).getCity());
+//            if(areacity.getLocality().equals(""))
+//                areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
+//            else
+//            areacity.setCityArea(areaList.get(i).getLocality()+", " + areacity.getArea() + ", " + areacity.getCity());
+//            _areacityList.add(areacity);
+//        }
+        _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
+        AreaCityAdapter adapter1 = new AreaCityAdapter(getActivity(), 0, R.id.address, _areacityList);
         _autocomplete_city_area.setAdapter(adapter1);
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
         // final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, autoCompleteData);
@@ -304,7 +307,10 @@ public class CustomerSettingFragment extends Fragment {
         _autocomplete_city_area.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                _autocomplete_city_area.setText(_areacityList.get(position).getLocality() + ", " + _areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                if (!_areacityList.get(position).getLocality().equals(""))
+                    _autocomplete_city_area.setText(_areacityList.get(position).getLocality() + ", " + _areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                else
+                    _autocomplete_city_area.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
 
                 //  _autocomplete_city_area.append(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
                 selectedAreaId = _areacityList.get(position).getAreaId();

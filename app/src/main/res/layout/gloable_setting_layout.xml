@@ -326,10 +326,11 @@
                                 android:padding="0dp">
 
                                 <EditText
+                                    android:singleLine="true"
                                     android:id="@+id/locality"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
-                                    android:hint="Locality" />
+                                    android:hint="Locality(Optional)" />
                             </android.support.design.widget.TextInputLayout>
 
 

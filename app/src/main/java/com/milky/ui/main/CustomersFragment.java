@@ -55,7 +55,7 @@ public class CustomersFragment extends Fragment {
                             mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
                         else
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
-                        _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.te1, _mCustomersList);
+                        _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.address, _mCustomersList);
                         recList.setAdapter(_mAdapter);
                     } else {
                         _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
@@ -63,7 +63,7 @@ public class CustomersFragment extends Fragment {
                           mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in "+MainActivity.selectedArea);
                         else
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in "+MainActivity.selectedArea);
-                        _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.te1, _mCustomersList);
+                        _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.address, _mCustomersList);
                         recList.setAdapter(_mAdapter);
                     }
 
@@ -75,7 +75,7 @@ public class CustomersFragment extends Fragment {
                 mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
             else
                 mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers ");
-                _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.te1, _mCustomersList);
+                _mAdapter = new MainCustomersListAdapter(getActivity(),0, R.id.address, _mCustomersList);
                 recList.setAdapter(_mAdapter);
 
 

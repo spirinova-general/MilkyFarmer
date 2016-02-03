@@ -50,6 +50,12 @@ public class BillingEdit extends AppCompatActivity {
     private DatabaseHelper _dbHelper;
     private int balanceType = 0;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getview();
+    }
+
     private void getview() {
         milk_quantity = (EditText) findViewById(R.id.milk_quantity);
         rate = (EditText) findViewById(R.id.rate);
@@ -82,7 +88,10 @@ public class BillingEdit extends AppCompatActivity {
         milk_quantity.setFocusableInTouchMode(false);
         clear_bill = (Button) findViewById(R.id.clear_bill);
         clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
-        if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+        //TODo changed roll date
+//                if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+        if ((cal.get(Calendar.DAY_OF_MONTH)) == 4)
+       {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
 
@@ -134,8 +143,14 @@ public class BillingEdit extends AppCompatActivity {
                             float bill_amount = Float.parseFloat(intent.getStringExtra("total"));
 
                             float bill = payment_made - bill_amount;
+                            if(bill_amount>payment_made)
+                            {
+                                holder.setBalance(String.valueOf(round(bill_amount-payment_made, 2)));
+                            }
+                            else
+                                holder.setBalance(String.valueOf(round(bill, 2)));
                             holder.setPaymentMode(String.valueOf(round(payment_made, 2)));
-                            holder.setBalance(String.valueOf(round(bill, 2)));
+
                             if (bill >= 0)
                                 holder.setBalanceType("0");
                             else
@@ -143,13 +158,14 @@ public class BillingEdit extends AppCompatActivity {
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
                             holder.setBillMade(String.valueOf(round(bill_amount, 2)));
-                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
+                            holder.setRate(intent.getStringExtra("totalPrice"));
+//                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
                             CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
                             CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
 
                             Calendar c = Calendar.getInstance();
                             String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
-                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"));
+                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"),holder);
                             dialog.hide();
                             BillingEdit.this.finish();
                         }
@@ -170,8 +186,8 @@ public class BillingEdit extends AppCompatActivity {
         balance_amount.setText(intent.getStringExtra("balance"));
         balance_amount.setFocusable(false);
         balance_amount.setFocusableInTouchMode(false);
-        if (balanceType == 1)
-            balance_amount.setHint("Balance due (Rs)");
+//        if (balanceType == 1)
+//            balance_amount.setHint("Balance due (Rs)");
 
         total_amount = (TextView) findViewById(R.id.total_amount);
         total_amount.setText(intent.getStringExtra("total"));

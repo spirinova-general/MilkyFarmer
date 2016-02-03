@@ -75,31 +75,32 @@ public class CustomersList extends AppCompatActivity {
         _areaList.clear();
         _areacityList.clear();
 
-        ArrayList<String> areas = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
-        if (areas != null) {
-            for (int i = 0; i < areas.size(); ++i) {
-                _areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areas.get(i)));
-            }
-            VAreaMapper areacity = new VAreaMapper();
-            areacity.setArea("");
-            areacity.setAreaId("");
-            areacity.setCity("");
-            areacity.setCityArea("All");
-            _areacityList.add(areacity);
-            for (int i = 0; i < _areaList.size(); i++) {
-                areacity = new VAreaMapper();
-                areacity.setArea(_areaList.get(i).getArea());
-                areacity.setAreaId(_areaList.get(i).getAreaId());
-                areacity.setCity(_areaList.get(i).getCity());
-                areacity.setLocality(_areaList.get(i).getLocality());
-                areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
-                _areacityList.add(areacity);
-
-
-            }
+//        ArrayList<String> areas = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
+//        if (areas != null) {
+//            for (int i = 0; i < areas.size(); ++i) {
+//                _areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areas.get(i)));
+//            }
+//            VAreaMapper areacity = new VAreaMapper();
+////            areacity.setArea("");
+////            areacity.setAreaId("");
+////            areacity.setCity("");
+////            areacity.setCityArea("All");
+////            _areacityList.add(areacity);
+//            for (int i = 0; i < _areaList.size(); i++) {
+//                areacity = new VAreaMapper();
+//                areacity.setArea(_areaList.get(i).getArea());
+//                areacity.setAreaId(_areaList.get(i).getAreaId());
+//                areacity.setCity(_areaList.get(i).getCity());
+//                areacity.setLocality(_areaList.get(i).getLocality());
+//                areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
+//                _areacityList.add(areacity);
+//
+//
+//            }
+        _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
             adp1 = new AreaCitySpinnerAdapter(CustomersList.this, R.id.spinnerText
                     , _areacityList);
-        }
+//        }
 
     }
 
@@ -220,13 +221,13 @@ public class CustomersList extends AppCompatActivity {
             editSearch.setTextSize(13);
 
             editSearch.setThreshold(1);
-            AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
+            AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.address, _areacityList);
             editSearch.setAdapter(adapter1);
 
             editSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    editSearch.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                    editSearch.setText(_areacityList.get(position).getCityArea());
                     Constants.selectedAreaId = _areacityList.get(position).getAreaId();
                     editSearch.setSelection(editSearch.getText().length());
                     if (_mAdaapter != null)

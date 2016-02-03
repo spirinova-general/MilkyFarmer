@@ -74,7 +74,7 @@ public class AppUtil extends Application {
 
     public static ArrayList<DateQuantityModel> getTotalQuantity() {
         totalData.clear();
-        ArrayList<String> dates = CustomersTableMagagement.getDates(getInstance().getDatabaseHandler().getReadableDatabase());
+        ArrayList<String> dates = CustomerSettingTableManagement.getDates(getInstance().getDatabaseHandler().getReadableDatabase());
         for (int j = 0; j < dates.size(); ++j) {
             Calendar calendar = Calendar.getInstance();
             Date date;

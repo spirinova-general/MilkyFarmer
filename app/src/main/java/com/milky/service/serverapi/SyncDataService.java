@@ -4,6 +4,7 @@ package com.milky.service.serverapi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -16,6 +17,8 @@ import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
+import com.milky.utils.Constants;
+import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomersList;
@@ -48,10 +51,51 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         handler = new Handler();
         runnable = new Runnable() {
+            SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+            SharedPreferences.Editor edit = preferences.edit();
+
             public void run() {
-                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+                //TODo changed roll date
+//                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
+                if ((c.get(Calendar.DAY_OF_MONTH)) == 4)
+                {
 
 //                    updateDataForNewMonth();
+                    Calendar cal = Calendar.getInstance();
+
+        /*Bill is to be outstanding*/
+                    if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "").equals("1")) {
+
+                        // update outstanding bills
+                        BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
+                        ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
+                        for (int i = 0; i < list.size(); ++i) {
+                            VCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
+                            Calendar nextMonth = Calendar.getInstance();
+                            nextMonth.add(Calendar.MONTH, 1);
+                            custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+                                    "01");
+
+                            custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+                                    String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH)));
+                            //Insert new bill and setting for customer
+                            CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), custHolder);
+                            custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+                            custHolder.setAdjustment("");
+                            custHolder.setPaymentMade("0");
+                            custHolder.setIsCleared("1");
+                            custHolder.setDateModified(custHolder.getStart_date());
+                            BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+                        }
+                        edit.putString(UserPrefrences.INSERT_BILL, "1");
+                        edit.apply();
+
+//                        Toast.makeText(SyncDataService.this, "Bill inserted", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    edit.putString(UserPrefrences.INSERT_BILL, "0");
+                    edit.apply();
+//                    Toast.makeText(SyncDataService.this, "Bill not inserted", Toast.LENGTH_SHORT).show();
                 }
                 SyncNow();
                 handler.postDelayed(runnable, 50000);

@@ -35,8 +35,8 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
         this.resource = resource;
         this.textViewResourceId = textViewResourceId;
         this.items = items;
-        tempItems = new ArrayList<VAreaMapper>(items); // this makes the difference.
-        suggestions = new ArrayList<VAreaMapper>();
+        tempItems = new ArrayList<>(items); // this makes the difference.
+        suggestions = new ArrayList<>();
     }
 
     @Override
@@ -48,15 +48,13 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
         }
         VAreaMapper Area = items.get(position);
         if (Area != null) {
-            TextView lblName = (TextView) view.findViewById(R.id.te1);
-            TextView lblName2 = (TextView) view.findViewById(R.id.te2);
-            if (lblName != null)
-                if(!Area.getLocality().equals(""))
-                lblName.setText(Area.getLocality()+", "+Area.getArea()+",");
-            else
-                    lblName.setText(Area.getArea()+",");
+            TextView lblName = (TextView) view.findViewById(R.id.address);
+//            TextView lblName2 = (TextView) view.findViewById(R.id.te2);
+            lblName.setText(Area.getCityArea());
+
+
 //            lblName2.setText(AreaMapTableManagement.getCityNameById(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), Area.getCityId()));
-            lblName2.setText(Area.getCity());
+//            lblName2.setText(Area.getArea()+", "+Area.getCity());
             AppUtil.getInstance().getDatabaseHandler().close();
         }
         return view;
@@ -87,17 +85,17 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
                         suggestions.add(Area);
                     }
                 }
-                if(suggestions.size()>0)
+                if (suggestions.size() > 0)
                     Constants.validArea = true;
                 else
-                Constants.validArea=false;
+                    Constants.validArea = false;
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = suggestions;
                 filterResults.count = suggestions.size();
                 return filterResults;
             } else {
                 suggestions.clear();
-                Constants.validArea=false;
+                Constants.validArea = false;
                 return new FilterResults();
             }
         }

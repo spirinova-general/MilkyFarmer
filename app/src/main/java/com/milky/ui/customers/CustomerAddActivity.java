@@ -62,7 +62,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
     private String  selectedAreaId = "";
-    private ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
+    private ArrayList<VAreaMapper>  _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
     private TextView _pickdate;
@@ -361,34 +361,32 @@ public class CustomerAddActivity extends AppCompatActivity {
 //        for (int i = 0; i < areas.size(); ++i) {
 //            _areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
 //        }
-        _areaList = AreaCityTableManagement.getAddress(_dbHelper.getReadableDatabase());
-        autoCompleteData = new String[_areaList.size()];
-        for (int i = 0; i < _areaList.size(); i++) {
-            VAreaMapper areacity = new VAreaMapper();
-            areacity.setArea(_areaList.get(i).getArea());
-            areacity.setAreaId(_areaList.get(i).getAreaId());
-//            areacity.setCityId(_areaList.get(i).getCityId());
-//            areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
-//            areacity.setCityArea(areacity.getArea() + areacity.getCity());
-            areacity.setCity(_areaList.get(i).getCity());
-            areacity.setLocality(_areaList.get(i).getLocality());
-            areacity.setCityArea(areacity.getLocality()+areacity.getArea()+areacity.getCity());
-            _areacityList.add(areacity);
-        }
+        _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
+        autoCompleteData = new String[_areacityList.size()];
+//        for (int i = 0; i < _areaList.size(); i++) {
+//            VAreaMapper areacity = new VAreaMapper();
+//            areacity.setArea(_areaList.get(i).getArea());
+//            areacity.setAreaId(_areaList.get(i).getAreaId());
+////            areacity.setCityId(_areaList.get(i).getCityId());
+////            areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
+////            areacity.setCityArea(areacity.getArea() + areacity.getCity());
+//            areacity.setCity(_areaList.get(i).getCity());
+//            areacity.setLocality(_areaList.get(i).getLocality());
+//            areacity.setCityArea(areacity.getLocality()+areacity.getArea()+areacity.getCity());
+//            _areacityList.add(areacity);
+//        }
         _dbHelper.close();
         _cityAreaAutocomplete.setThreshold(1);//will start working from first character
 
-        AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
+        AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.address, _areacityList);
         _cityAreaAutocomplete.setAdapter(adapter1);
 
         _cityAreaAutocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(_areacityList.get(position).getLocality().equals(""))
-                _cityAreaAutocomplete.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
-                else
-                    _cityAreaAutocomplete.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity()
-                    +", "+_areacityList.get(position).getLocality());
+
+                _cityAreaAutocomplete.setText(_areacityList.get(position).getCityArea()+ ", " + _areacityList.get(position).getCity());
+
                 selectedAreaId = _areacityList.get(position).getAreaId();
 //                selectedCityId = _areacityList.get(position).getCityId();
                 _cityAreaAutocomplete.setSelection(_cityAreaAutocomplete.getText().length());
