@@ -17,6 +17,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.DatabaseVersioControl;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
@@ -42,15 +43,22 @@ public class SignUp extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        preferences = getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
-        if(preferences.contains(UserPrefrences.MOBILE_NUMBER)) {
+        initResources();
+        if (preferences.contains(UserPrefrences.PRE_VERSION)) {
+            if (preferences.getInt(UserPrefrences.PRE_VERSION, 0) < DatabaseVersioControl.DATABASE_VERSION) {
+                edit.clear();
+            }
+        }
+        edit.putInt(UserPrefrences.PRE_VERSION, DatabaseVersioControl.DATABASE_VERSION);
+        edit.commit();
+        if (preferences.contains(UserPrefrences.MOBILE_NUMBER)) {
             if (preferences.getString(UserPrefrences.MOBILE_NUMBER, "").length() > 0) {
                 Intent i = new Intent(SignUp.this, MainActivity.class);
                 startActivity(i);
                 finish();
             }
         }
-        initResources();
+
         _signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,11 +147,13 @@ public class SignUp extends AppCompatActivity {
     private void initResources() {
         _signIn = (Button) findViewById(R.id.signin);
         _signUp = (Button) findViewById(R.id.signup);
+        preferences = getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
         loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
         callbackManager = CallbackManager.Factory.create();
 
         edit = preferences.edit();
+
         // Callback registration
 
     }

@@ -2,10 +2,14 @@ package com.milky.service.databaseutils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
+
+import com.milky.utils.AppUtil;
+import com.milky.utils.UserPrefrences;
 
 import java.io.File;
 
@@ -58,6 +62,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         for (String tableName : tables) {
             db.execSQL(String.format("DROP TABLE IF EXISTS %s", tableName));
         }
+//        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES,Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.clear();
+//        editor.commit();
 
         onCreate(db);
     }

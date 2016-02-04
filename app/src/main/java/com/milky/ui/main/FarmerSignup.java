@@ -106,6 +106,7 @@ public class FarmerSignup extends AppCompatActivity {
                         otp_layout.setError("OTP expired, Get OTP again");
                     } else if (Constants.OTP.equals(otp.getText().toString().trim())) {
                         edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
+                        edit.putString(UserPrefrences.INSERT_BILL,"0");
                         edit.commit();
 
                         if (_dbhelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
@@ -135,7 +136,7 @@ public class FarmerSignup extends AppCompatActivity {
 
     private void initResources() {
         AppUtil.getInstance().startTimer();
-        AppUtil.getInstance().showNotification(FarmerSignup.this, "Milky ", "Your OTP for Milky is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
+        AppUtil.getInstance().showNotification(FarmerSignup.this, getResources().getString(R.string.app_name), "Your OTP for Milky is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
 
         _firstName = (EditText) findViewById(R.id.first_name);
         _lastName = (EditText) findViewById(R.id.last_name);

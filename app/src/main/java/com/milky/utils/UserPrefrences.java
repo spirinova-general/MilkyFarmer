@@ -10,4 +10,5 @@ public class UserPrefrences {
     public static final String MOBILE_NUMBER = "mob_no";
     public static final String OTP = "otp";
     public static final String INSERT_BILL = "insert_bill";
+    public static final String PRE_VERSION="version";
 }

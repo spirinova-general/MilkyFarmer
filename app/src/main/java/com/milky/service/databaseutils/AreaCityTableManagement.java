@@ -244,10 +244,10 @@ public class AreaCityTableManagement {
     public static boolean hasAddress(SQLiteDatabase db, String locality,String area,String city) {
         String selectQuery="";
         if(locality.equals(""))
-            selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE "+TableColumns.CITY_NAME+" ='"+city+"' COLLATE NOCASE"
-                    + " AND "+TableColumns.AREA_NAME+" ='"+area+"' COLLATE NOCASE OR ("
+            selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE "+TableColumns.LOCALITY+" ='' AND (("+TableColumns.CITY_NAME+" ='"+city+"' COLLATE NOCASE"
+                    + " AND "+TableColumns.AREA_NAME+" ='"+area+"' COLLATE NOCASE )OR ("
                +TableColumns.CITY_NAME+" ='"+area+"' COLLATE NOCASE"
-                + " AND "+TableColumns.AREA_NAME+" ='"+city+"' COLLATE NOCASE)";
+                + " AND "+TableColumns.AREA_NAME+" ='"+city+"' COLLATE NOCASE))";
 
         else
             selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE "+TableColumns.LOCALITY+" ='"+locality+"' COLLATE NOCASE"

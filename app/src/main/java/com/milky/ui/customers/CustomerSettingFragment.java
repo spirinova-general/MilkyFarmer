@@ -45,7 +45,7 @@ import java.util.Calendar;
  * Created by Neha on 11/19/2015.
  */
 public class CustomerSettingFragment extends Fragment {
-    private EditText _mFirstName, _mLastName, _mAddress1, _mBalance, _mQuantuty, _mAddress2, _mMobile, _mRate;
+    private EditText _mFirstName, _mLastName, _mAddress1, _mBalance, _mQuantuty,  _mMobile, _mRate;
     private InputMethodManager inputMethodManager;
     private Button _mSave, _mCancel;
     //    private FloatingActionButton _mEdit;
@@ -94,7 +94,7 @@ public class CustomerSettingFragment extends Fragment {
 //        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, getActivity(), false));
         _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, getActivity(), false));
         _mMobile.addTextChangedListener(new TextValidationMessage(_mMobile, _phone_textinput_layout, getActivity(), true));
-        _mAddress2.addTextChangedListener(new TextValidationMessage(_mMobile, street_layout, getActivity(), false));
+//        _mAddress2.addTextChangedListener(new TextValidationMessage(_mMobile, street_layout, getActivity(), false));
 //        _mRate.addTextChangedListener(new TextValidationMessage(_mMobile, rate_layout, getActivity(), false));
 
         _mQuantuty.addTextChangedListener(new TextWatcher() {
@@ -182,7 +182,7 @@ public class CustomerSettingFragment extends Fragment {
         _mMobile = (EditText) view.findViewById(R.id.phone);
         // et_phone=(FormEditText)view.findViewById(R.id.et_phone);
         _mQuantuty = (EditText) view.findViewById(R.id.milk_quantity);
-        _mAddress2 = (EditText) view.findViewById(R.id.street);
+//        _mAddress2 = (EditText) view.findViewById(R.id.street);
         _mBalance = (EditText) view.findViewById(R.id.balance);
         _autocomplete_city_area = (AutoCompleteTextView) view.findViewById(R.id.autocomplete_city_area);
 //        _autocomplete_city_area.setFocusable(false);
@@ -219,7 +219,7 @@ public class CustomerSettingFragment extends Fragment {
         _mFirstName.setText(getActivity().getIntent().getStringExtra("fname"));
         _mLastName.setText(getActivity().getIntent().getStringExtra("lname"));
         _mBalance.setText(getActivity().getIntent().getStringExtra("balance"));
-        _mAddress2.setText(getActivity().getIntent().getStringExtra("address2"));
+//        _mAddress2.setText(getActivity().getIntent().getStringExtra("address2"));
         _mAddress1.setText(getActivity().getIntent().getStringExtra("address1"));
         _mRate.setText(getActivity().getIntent().getStringExtra("defaultrate"));
         if (!AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")).equals(""))
@@ -239,7 +239,7 @@ public class CustomerSettingFragment extends Fragment {
 
         _mBalance.setSelection(getActivity().getIntent().getStringExtra("balance").length());
         _mAddress1.setSelection(getActivity().getIntent().getStringExtra("address1").length());
-        _mAddress2.setSelection(getActivity().getIntent().getStringExtra("address2").length());
+//        _mAddress2.setSelection(getActivity().getIntent().getStringExtra("address2").length());
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
         _mQuantuty.setSelection(getActivity().getIntent().getStringExtra("quantity").length());
         custId = getActivity().getIntent().getStringExtra("cust_id");
@@ -307,11 +307,11 @@ public class CustomerSettingFragment extends Fragment {
         _autocomplete_city_area.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!_areacityList.get(position).getLocality().equals(""))
-                    _autocomplete_city_area.setText(_areacityList.get(position).getLocality() + ", " + _areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
-                else
-                    _autocomplete_city_area.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
-
+//                if (!_areacityList.get(position).getLocality().equals(""))
+//                    _autocomplete_city_area.setText(_areacityList.get(position).getLocality() + ", " + _areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+//                else
+//                    _autocomplete_city_area.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
+                _autocomplete_city_area.setText(_areacityList.get(position).getCityArea());
                 //  _autocomplete_city_area.append(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
                 selectedAreaId = _areacityList.get(position).getAreaId();
                 tempAreaId = _areacityList.get(position).getAreaId();
@@ -397,8 +397,7 @@ public class CustomerSettingFragment extends Fragment {
                     balance_layout.setError("Enter balance amount");
                 else if (_mAddress1.getText().toString().equals(""))
                     flat_number_layout.setError("Enter flat number!");
-                else if (_mAddress2.getText().toString().equals(""))
-                    street_layout.setError("Enter street !");
+
                 else if ((!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()) && tempAreaId.equals(""))) {
 
                     autocomplete_layout.setError("Select valid area!");
@@ -413,7 +412,6 @@ public class CustomerSettingFragment extends Fragment {
                         !_mBalance.getText().toString().equals("") &&
                         !_mAddress1.getText().toString().equals("")
                         && !_mRate.getText().toString().equals("")
-                        && !_mAddress2.getText().toString().equals("")
                         && !selectedAreaId.equals("")
                         && !_mMobile.getText().toString().equals("") &&
                         !_mQuantuty.getText().toString().equals("")
@@ -423,7 +421,7 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setLastName(_mLastName.getText().toString());
                     holder.setBalance_amount(_mBalance.getText().toString());
                     holder.setAddress1(_mAddress1.getText().toString());
-                    holder.setAddress2(_mAddress2.getText().toString());
+//                    holder.setAddress2(_mAddress2.getText().toString());
 
                     holder.setAreaId(selectedAreaId);
                     holder.setMobile(_mMobile.getText().toString());
@@ -489,7 +487,7 @@ public class CustomerSettingFragment extends Fragment {
         new EnableEditableFields(_mBalance, getActivity(), inputMethodManager).blockDefaultKeys();
         new EnableEditableFields(_mMobile, getActivity(), inputMethodManager).blockDefaultKeys();
         new EnableEditableFields(_mAddress1, getActivity(), inputMethodManager).blockDefaultKeys();
-        new EnableEditableFields(_mAddress2, getActivity(), inputMethodManager).blockDefaultKeys();
+//        new EnableEditableFields(_mAddress2, getActivity(), inputMethodManager).blockDefaultKeys();
     }
 
     public double getQtyOfCustomer(String day) {

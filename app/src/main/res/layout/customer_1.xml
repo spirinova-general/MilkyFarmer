@@ -199,7 +199,8 @@
                                 android:id="@+id/street_layout"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
-                                android:padding="0dp">
+                                android:padding="0dp"
+                                android:visibility="gone">
 
                                 <EditText
                                     android:id="@+id/street"
@@ -234,7 +235,7 @@
                             android:layout_height="wrap_content"
                             android:id="@+id/autocomplete_layout"
                             android:background="@color/colorPrimaryLight"
-
+                            android:padding="0dp"
                             >
 
                             <AutoCompleteTextView
@@ -245,8 +246,7 @@
                                 android:completionThreshold="1"
                                 android:imeOptions="actionNext"
                                 android:textColor="#212121"
-
-                                android:hint="Seach area and city"
+                                android:hint="Enter Area and City"
                                 />
                         </android.support.design.widget.TextInputLayout>
                     </LinearLayout>

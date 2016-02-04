@@ -90,8 +90,7 @@ public class BillingEdit extends AppCompatActivity {
         clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
         //TODo changed roll date
 //                if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH))
-        if ((cal.get(Calendar.DAY_OF_MONTH)) == 4)
-       {
+        if ((cal.get(Calendar.DAY_OF_MONTH)) == 4) {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
 
@@ -143,29 +142,27 @@ public class BillingEdit extends AppCompatActivity {
                             float bill_amount = Float.parseFloat(intent.getStringExtra("total"));
 
                             float bill = payment_made - bill_amount;
-                            if(bill_amount>payment_made)
-                            {
-                                holder.setBalance(String.valueOf(round(bill_amount-payment_made, 2)));
-                            }
-                            else
+                            if (bill_amount > payment_made) {
+                                holder.setBalance(String.valueOf(round(bill_amount - payment_made, 2)));
+                                holder.setBalanceType("0");
+                            } else {
                                 holder.setBalance(String.valueOf(round(bill, 2)));
+                                holder.setBalanceType("1");
+                            }
                             holder.setPaymentMode(String.valueOf(round(payment_made, 2)));
 
-                            if (bill >= 0)
-                                holder.setBalanceType("0");
-                            else
-                                holder.setBalanceType("1");
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
                             holder.setBillMade(String.valueOf(round(bill_amount, 2)));
                             holder.setRate(intent.getStringExtra("totalPrice"));
 //                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
-                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
-                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
-
                             Calendar c = Calendar.getInstance();
                             String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
-                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"),holder);
+
+                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
+                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
+
+                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"), holder);
                             dialog.hide();
                             BillingEdit.this.finish();
                         }

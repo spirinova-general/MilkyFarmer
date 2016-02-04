@@ -201,13 +201,14 @@ public class CustomerSettingTableManagement {
                 + " AND " + TableColumns.DIRTY + " ='" + "0" + "'", null);
     }
 
-    public static void updateBalance(SQLiteDatabase db, String balance, String custId,String balanceType) {
+    public static void updateBalance(SQLiteDatabase db, String balance, String custId,String balanceType,String day) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.BALANCE, balance);
         values.put(TableColumns.BALANCE_TYPE,balanceType);
-        db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
+        values.put(TableColumns.END_DATE,day);
+        long i =db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
     }
 
     public static ArrayList<VCustomersList> getAllCustomersByCustomerId(SQLiteDatabase db, String custId) {

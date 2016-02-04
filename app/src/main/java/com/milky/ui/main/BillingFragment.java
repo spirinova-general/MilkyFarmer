@@ -182,10 +182,10 @@ public class BillingFragment extends Fragment {
         if (_hasFutureBill) {
             if (holder.getBalanceType().equals("1"))
                 payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity)
-                        + Float.parseFloat(holder.getBalance());
+                        - Float.parseFloat(holder.getBalance());
             else
                 payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity)
-                        - Float.parseFloat(holder.getBalance());
+                        + Float.parseFloat(holder.getBalance());
 
 
             holder.setBillMade(String.valueOf(round(payMade, 2)));

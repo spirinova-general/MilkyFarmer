@@ -57,44 +57,60 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
             public void run() {
                 //TODo changed roll date
 //                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
-                if ((c.get(Calendar.DAY_OF_MONTH)) == 4)
+                 if ((c.get(Calendar.DAY_OF_MONTH)) == 4)
                 {
 
 //                    updateDataForNewMonth();
                     Calendar cal = Calendar.getInstance();
 
         /*Bill is to be outstanding*/
-                    if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "").equals("1")) {
 
                         // update outstanding bills
-                        BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
-                        ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
-                        for (int i = 0; i < list.size(); ++i) {
-                            VCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
-                            Calendar nextMonth = Calendar.getInstance();
-                            nextMonth.add(Calendar.MONTH, 1);
-                            custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
-                                    "01");
+                        if(_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+                            if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
 
-                            custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
-                                    String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH)));
-                            //Insert new bill and setting for customer
-                            CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), custHolder);
-                            custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
-                            custHolder.setAdjustment("");
-                            custHolder.setPaymentMade("0");
-                            custHolder.setIsCleared("1");
-                            custHolder.setDateModified(custHolder.getStart_date());
-                            BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+                                BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
+                            ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
+                            for (int i = 0; i < list.size(); ++i) {
+                                VCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
+//                            Calendar nextMonth = Calendar.getInstance();
+//                            nextMonth.add(Calendar.MONTH, 1);
+//                            custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+//                                    "01");
+//
+//                            custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+//                                    String.format("%02d", 5));
+
+                                custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+                                        "05");
+
+                                custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+                                        String.format("%02d", 29));
+
+                                //Insert new bill and setting for customer
+                                CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), custHolder);
+                                custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+                                custHolder.setAdjustment("");
+                                custHolder.setPaymentMade("0");
+                                custHolder.setIsCleared("1");
+                                custHolder.setDateModified(custHolder.getStart_date());
+                                BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+                            }
+                            edit.putString(UserPrefrences.INSERT_BILL, "1");
+                            edit.commit();
                         }
-                        edit.putString(UserPrefrences.INSERT_BILL, "1");
-                        edit.apply();
 
 //                        Toast.makeText(SyncDataService.this, "Bill inserted", Toast.LENGTH_SHORT).show();
                     }
-                } else {
+                    else {
+                        edit.putString(UserPrefrences.INSERT_BILL, "0");
+                        edit.commit();
+//                    Toast.makeText(SyncDataService.this, "Bill not inserted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else {
                     edit.putString(UserPrefrences.INSERT_BILL, "0");
-                    edit.apply();
+                    edit.commit();
 //                    Toast.makeText(SyncDataService.this, "Bill not inserted", Toast.LENGTH_SHORT).show();
                 }
                 SyncNow();

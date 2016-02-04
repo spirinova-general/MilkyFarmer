@@ -638,6 +638,13 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 //                    }
 ////
 //                }
+                ScrollView01.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        ScrollView01.fullScroll(ScrollView.FOCUS_DOWN);
+                    }
+                });
 
             } else if (!isNewAdded) {
                 _cityArea.setText("");
@@ -661,13 +668,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             }
 
         }
-        ScrollView01.post(new Runnable() {
 
-            @Override
-            public void run() {
-                ScrollView01.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
     }
 
     @Override

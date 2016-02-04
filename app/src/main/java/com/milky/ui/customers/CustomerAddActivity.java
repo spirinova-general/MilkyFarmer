@@ -49,7 +49,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private EditText _firstName;
     private EditText _lastName;
     private EditText _mAddress1;
-    private EditText _address2;
+//    private EditText _address2;
     private EditText _rate;
     private EditText _mPhone;
     private EditText _mBalance;
@@ -91,7 +91,7 @@ public class CustomerAddActivity extends AppCompatActivity {
         _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, this, false));
         _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, this, false));
         _mPhone.addTextChangedListener(new TextValidationMessage(_mPhone, _phone_textinput_layout, this, true));
-        _address2.addTextChangedListener(new TextValidationMessage(_mPhone, street_layout, this, false));
+//        _address2.addTextChangedListener(new TextValidationMessage(_mPhone, street_layout, this, false));
         _lastName.addTextChangedListener(new TextValidationMessage(_mPhone, last_name_layout, this, false));
         _cityAreaAutocomplete.addTextChangedListener(new TextValidationMessage(_mPhone, autocomplete_layout, this, false));
         _rate.addTextChangedListener(new TextValidationMessage(_mPhone, rate_layout, this, false));
@@ -139,8 +139,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                         balance_layout.setError("Enter balance amount");
                     else if (_mAddress1.getText().toString().equals(""))
                         flat_number_layout.setError("Enter flat number!");
-                    else if (_address2.getText().toString().equals(""))
-                        street_layout.setError("Enter street !");
+//                    else if (_address2.getText().toString().equals(""))
+//                        street_layout.setError("Enter street !");
 
                     else if (selectedAreaId.equals(""))
                         autocomplete_layout.setError("Select valid area");
@@ -154,7 +154,6 @@ public class CustomerAddActivity extends AppCompatActivity {
                             && !_lastName.getText().toString().equals("") &&
                             !_mBalance.getText().toString().equals("") &&
                             !_mAddress1.getText().toString().equals("")
-                            && !_address2.getText().toString().equals("")
                             &&!selectedAreaId.equals("")
                             && !_mPhone.getText().toString().equals("") &&
                             !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
@@ -164,7 +163,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setLastName(_lastName.getText().toString());
                         holder.setBalance_amount(_mBalance.getText().toString());
                         holder.setAddress1(_mAddress1.getText().toString());
-                        holder.setAddress2(_address2.getText().toString());
+//                        holder.setAddress2(_address2.getText().toString());
 //                        holder.setCityId(selectedCityId);
                         autocomplete_layout.setError(null);
                         holder.setAreaId(selectedAreaId);
@@ -327,7 +326,7 @@ public class CustomerAddActivity extends AppCompatActivity {
         _firstName = (EditText) findViewById(R.id.first_name);
         _lastName = (EditText) findViewById(R.id.last_name);
         _mAddress1 = (EditText) findViewById(R.id.flat_number);
-        _address2 = (EditText) findViewById(R.id.street);
+//        _address2 = (EditText) findViewById(R.id.street);
         _mPhone = (EditText) findViewById(R.id.phone);
         _mQuantuty = (EditText) findViewById(R.id.milk_quantity);
         _mBalance = (EditText) findViewById(R.id.balance);
@@ -385,7 +384,7 @@ public class CustomerAddActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                _cityAreaAutocomplete.setText(_areacityList.get(position).getCityArea()+ ", " + _areacityList.get(position).getCity());
+                _cityAreaAutocomplete.setText(_areacityList.get(position).getCityArea());
 
                 selectedAreaId = _areacityList.get(position).getAreaId();
 //                selectedCityId = _areacityList.get(position).getCityId();
