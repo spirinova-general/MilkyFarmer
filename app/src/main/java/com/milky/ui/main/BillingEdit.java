@@ -89,8 +89,8 @@ public class BillingEdit extends AppCompatActivity {
         clear_bill = (Button) findViewById(R.id.clear_bill);
         clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
         //TODo changed roll date
-//                if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH))
-        if ((cal.get(Calendar.DAY_OF_MONTH)) == 4) {
+                if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)){
+//        if ((cal.get(Calendar.DAY_OF_MONTH)) == 5) {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
 
@@ -142,7 +142,7 @@ public class BillingEdit extends AppCompatActivity {
                             float bill_amount = Float.parseFloat(intent.getStringExtra("total"));
 
                             float bill = payment_made - bill_amount;
-                            if (bill_amount > payment_made) {
+                            if (bill_amount >=payment_made) {
                                 holder.setBalance(String.valueOf(round(bill_amount - payment_made, 2)));
                                 holder.setBalanceType("0");
                             } else {
@@ -175,6 +175,7 @@ public class BillingEdit extends AppCompatActivity {
                         dialog.hide();
                     }
                 });
+                if(dialog != null)
                 dialog.show();
 
             }

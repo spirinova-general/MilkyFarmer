@@ -159,7 +159,7 @@ public class AppUtil extends Application {
         Constants.OTP = Constants.generateOTP();
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.main_logo)
+                        .setSmallIcon(R.drawable.k_logo)
                         .setContentTitle(title).setAutoCancel(true).setContentIntent(contentIntent)
                         .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
                         .setContentText(content.replaceAll("<[^<>]+>", "") + Constants.OTP);

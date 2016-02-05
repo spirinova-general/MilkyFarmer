@@ -56,8 +56,8 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
             public void run() {
                 //TODo changed roll date
-//                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
-                 if ((c.get(Calendar.DAY_OF_MONTH)) == 4)
+                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
+//                 if ((c.get(Calendar.DAY_OF_MONTH)) == 5)
                 {
 
 //                    updateDataForNewMonth();
@@ -73,19 +73,19 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                             ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
                             for (int i = 0; i < list.size(); ++i) {
                                 VCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
-//                            Calendar nextMonth = Calendar.getInstance();
-//                            nextMonth.add(Calendar.MONTH, 1);
-//                            custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
-//                                    "01");
+                            Calendar nextMonth = Calendar.getInstance();
+                            nextMonth.add(Calendar.MONTH, 1);
+                            custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+                                    "01");
+
+                            custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+                                    String.format("%02d",nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH)));
+
+//                                custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+//                                        "06");
 //
-//                            custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
-//                                    String.format("%02d", 5));
-
-                                custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                                        "05");
-
-                                custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                                        String.format("%02d", 29));
+//                                custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
+//                                        String.format("%02d", 29));
 
                                 //Insert new bill and setting for customer
                                 CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), custHolder);
@@ -131,7 +131,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
+
     }
 
     public void SyncNow() {

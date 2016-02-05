@@ -36,7 +36,7 @@ public class BillTableManagement {
         values.put(TableColumns.IS_OUTSTANDING, "1");
         values.put(TableColumns.DIRTY, "1");
 
-        db.insert(TableNames.TABLE_CUSTOMER_BILL, null, values);
+        long i =db.insert(TableNames.TABLE_CUSTOMER_BILL, null, values);
     }
 
 //    public static void updateBillData(SQLiteDatabase db, VBill holder) {
@@ -112,7 +112,35 @@ public class BillTableManagement {
         return result;
     }
 
+    public static double getAllCustomersByCustIdForBill(SQLiteDatabase db, String day, String id) {
+        String selectquery =
 
+            "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE "
+                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE
+                    + " >='" + day + "'" + " AND "
+                    + TableColumns.CUSTOMER_ID + " ='" + id + "' AND "+TableColumns.IS_CLEARED+" ='1'";
+
+        double qty = 0;
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                qty = Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+
+
+            }
+            while (cursor.moveToNext());
+
+
+        }
+
+
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return qty;
+    }
     public static float getPreviousBill(SQLiteDatabase db, final String custId, final String day, final double quantity) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"

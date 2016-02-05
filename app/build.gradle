@@ -30,6 +30,4 @@ dependencies {
     /* compile 'com.facebook.FacebookSdk'*/
     compile project(':extcal')
     compile 'com.google.android.gms:play-services-location:8.4.0'
-
-
 }

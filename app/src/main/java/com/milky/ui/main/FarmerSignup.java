@@ -136,7 +136,7 @@ public class FarmerSignup extends AppCompatActivity {
 
     private void initResources() {
         AppUtil.getInstance().startTimer();
-        AppUtil.getInstance().showNotification(FarmerSignup.this, getResources().getString(R.string.app_name), "Your OTP for Milky is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
+        AppUtil.getInstance().showNotification(FarmerSignup.this, getResources().getString(R.string.app_name), "Your OTP for "+getResources().getString(R.string.app_name)+" is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
 
         _firstName = (EditText) findViewById(R.id.first_name);
         _lastName = (EditText) findViewById(R.id.last_name);
@@ -166,12 +166,10 @@ public class FarmerSignup extends AppCompatActivity {
 //                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.VISIBLE);
                 AppUtil.getInstance().cancelTimer(FarmerSignup.this);
                 AppUtil.getInstance().startTimer();
-                AppUtil.getInstance().showNotification(FarmerSignup.this, "Milky ", "Your OTP for Milky is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
+                AppUtil.getInstance().showNotification(FarmerSignup.this, FarmerSignup.this.getResources().getString(R.string.app_name), "Your OTP for "+FarmerSignup.this.getResources().getString(R.string.app_name)+" is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
             }
         });
     }
-
-
 
 
 }

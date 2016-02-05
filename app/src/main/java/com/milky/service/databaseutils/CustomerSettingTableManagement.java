@@ -201,14 +201,15 @@ public class CustomerSettingTableManagement {
                 + " AND " + TableColumns.DIRTY + " ='" + "0" + "'", null);
     }
 
-    public static void updateBalance(SQLiteDatabase db, String balance, String custId,String balanceType,String day) {
+    public static void updateBalance(SQLiteDatabase db, String balance, String custId, String balanceType, String day) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.BALANCE, balance);
-        values.put(TableColumns.BALANCE_TYPE,balanceType);
-        values.put(TableColumns.END_DATE,day);
-        long i =db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
+        values.put(TableColumns.BALANCE_TYPE, balanceType);
+        values.put(TableColumns.END_DATE, day);
+        long i = db.update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + custId + "' AND "
+                + TableColumns.START_DATE + " <='" + day + "'", null);
     }
 
     public static ArrayList<VCustomersList> getAllCustomersByCustomerId(SQLiteDatabase db, String custId) {
@@ -366,6 +367,7 @@ public class CustomerSettingTableManagement {
             db.close();
         return list;
     }
+
     public static ArrayList<String> getStartDeliveryDate(SQLiteDatabase db, String custId) {
         String selectquery = null;
         Calendar cal = Calendar.getInstance();
@@ -373,11 +375,11 @@ public class CustomerSettingTableManagement {
                 + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH));
         if (isDeletedCustomerById(db, custId)) {
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
-                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" +" AND "+TableColumns.START_DATE+" <='"+date+"'";
+                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE + " <='" + date + "'";
         } else {
 
             selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
-                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE+" <='"+date+"' AND"
+                    " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.START_DATE + " <='" + date + "' AND"
                     + TableColumns.DELETED_ON + " >='" + date + "'";
 
         }
@@ -399,19 +401,23 @@ public class CustomerSettingTableManagement {
         return startDate;
 
     }
+
     public static double getAllCustomersByCustId(SQLiteDatabase db, String day, String id) {
         String selectquery = "";
-        if (isDeletedCustomer(db, id, day)) {
-            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE +
-                    " >='" + day + "'" + " AND "
-                    + TableColumns.CUSTOMER_ID + " ='" + id + "'" + " AND " + TableColumns.DELETED_ON + " ='1'";
-        } else
-            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE
-                    + " >'" + day + "'" + " AND "
-                    + TableColumns.CUSTOMER_ID + " ='" + id + "'";
-
+//        if (isDeletedCustomer(db, id, day)) {
+//            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+//                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE +
+//                    " >'" + day + "'" + " AND "
+//                    + TableColumns.CUSTOMER_ID + " ='" + id + "'" + " AND " + TableColumns.DELETED_ON + " ='1'";
+//        } else
+//            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+//                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE
+//                    + " >'" + day + "'" + " AND "
+//                    + TableColumns.CUSTOMER_ID + " ='" + id + "'";
+        selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+                + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')" + " AND "
+                + TableColumns.CUSTOMER_ID + " ='" + id + "'";
         double qty = 0;
 
         Cursor cursor = db.rawQuery(selectquery, null);
@@ -433,6 +439,7 @@ public class CustomerSettingTableManagement {
             db.close();
         return qty;
     }
+
 
     public static double getAllCustomersByDay(SQLiteDatabase db, String day) {
         String selectquery = "";
@@ -474,9 +481,7 @@ public class CustomerSettingTableManagement {
         if (cursor.moveToFirst()) {
             do {
 
-
                 enddate = cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE));
-
 
             }
             while (cursor.moveToNext());
