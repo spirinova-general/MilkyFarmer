@@ -2,28 +2,22 @@ package com.milky.ui.main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.ui.adapters.CustomersListAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomersList;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -32,6 +26,10 @@ import java.util.Date;
 import java.util.List;
 
 import com.milky.R;
+import com.tyczj.extendedcalendarview.DeliveryTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 
 /**
@@ -40,13 +38,14 @@ import com.milky.R;
 public class BillingFragment extends Fragment {
 
     private CustomersListAdapter _mAdapter;
-    private List<VCustomersList> _mCustomersList;
+    private List<ExtcalVCustomersList> _mCustomersList;
     public static ListView _mListView;
     private DatabaseHelper _dbHelper;
     private ArrayList<String> custIdsList = new ArrayList();
     private ArrayList<String> list;
     private boolean _hasFutureBill = false;
     private boolean hasPreviousBills = false;
+    private ExtcalDatabaseHelper _exDb;
 
     @Override
     public void onResume() {
@@ -80,6 +79,7 @@ public class BillingFragment extends Fragment {
 
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersList);
+        _exDb = new ExtcalDatabaseHelper(getActivity());
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         TextView _mTotalBills = (TextView) v.findViewById(R.id.total_pending_bills);
         populateBills();
@@ -144,8 +144,8 @@ public class BillingFragment extends Fragment {
 //            custIdsList.add(custId);
 //
 //        }
-
-        ArrayList<String> startDates = CustomerSettingTableManagement.getStartDeliveryDate(_dbHelper.getReadableDatabase(), custId);
+//TODO ExtCal SETTINGS DB
+        ArrayList<String> startDates = ExtcalCustomerSettingTableManagement.getStartDeliveryDate(_exDb.getReadableDatabase(), custId);
         if (startDates != null)
             for (int j = 0; j < startDates.size(); j++) {
 
@@ -182,10 +182,10 @@ public class BillingFragment extends Fragment {
         if (_hasFutureBill) {
             if (holder.getBalanceType().equals("1"))
                 payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity)
-                        - Float.parseFloat(holder.getBalance());
+                        + Float.parseFloat(holder.getBalance());
             else
                 payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity)
-                        + Float.parseFloat(holder.getBalance());
+                        - Float.parseFloat(holder.getBalance());
 
 
             holder.setBillMade(String.valueOf(round(payMade, 2)));
@@ -201,23 +201,26 @@ public class BillingFragment extends Fragment {
 
     public double getQtyOfCustomer(String day, String custId) {
         double qty = 0;
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_DELIVERY)) {
-            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_dbHelper.getReadableDatabase(), day, custId) == 0) {
-                if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-
-                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+        if (_exDb.isTableNotEmpty("delivery")) {
+            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId) == 0) {
+                if (_exDb.isTableNotEmpty("customers")) {
+//TODO ExtCal SETTINGS DB
+//                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+//                            , custId);
+                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                             , custId);
 
                 }
             } else
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_dbHelper.getReadableDatabase(), day, custId);
+                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
 
 
-        } else if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-
-            qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+        } else if (_exDb.isTableNotEmpty("customers")) {
+//TODO ExtCal SETTINGS DB
+//            qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+//                    , custId);
+            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                     , custId);
-
         }
 
 
@@ -228,7 +231,5 @@ public class BillingFragment extends Fragment {
         BigDecimal bd = new BigDecimal(Double.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd;
-
-
     }
 }

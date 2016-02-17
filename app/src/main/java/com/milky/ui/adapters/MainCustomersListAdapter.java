@@ -17,7 +17,7 @@ import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -27,12 +27,12 @@ import java.util.List;
 /**
  * Created by Neha on 11/18/2015.
  */
-public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
-    private List<VCustomersList> mCustomersList, tempItems, suggestions;
+public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList> {
+    private List<ExtcalVCustomersList> mCustomersList, tempItems, suggestions;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
 
-    public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<VCustomersList> listData) {
+    public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<ExtcalVCustomersList> listData) {
         super(act, resource, textViewResourceId, listData);
         this.mCustomersList = listData;
         this.mActivity = act;
@@ -67,7 +67,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
         holder._nameView = (TextView) convertView.findViewById(R.id.nameView);
 
 
-        final VCustomersList customer = mCustomersList.get(position);
+        final ExtcalVCustomersList customer = mCustomersList.get(position);
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
@@ -130,7 +130,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
     Filter nameFilter = new Filter() {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
-            String str = ((VCustomersList) resultValue).getFirstName();
+            String str = ((ExtcalVCustomersList) resultValue).getFirstName();
             notifyDataSetChanged();
             return str;
         }
@@ -139,7 +139,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
                 suggestions.clear();
-                for (VCustomersList Area : tempItems) {
+                for (ExtcalVCustomersList Area : tempItems) {
                     if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase()) ||
                             Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
                         suggestions.add(Area);
@@ -157,10 +157,10 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            List<VCustomersList> filterList = (ArrayList<VCustomersList>) results.values;
+            List<ExtcalVCustomersList> filterList = (ArrayList<ExtcalVCustomersList>) results.values;
             if (results != null && results.count > 0) {
                 clear();
-                for (VCustomersList Area : filterList) {
+                for (ExtcalVCustomersList Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }
@@ -178,7 +178,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomersList> {
                 VAreaMapper holder = AreaCityTableManagement.getAreaById(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
 
                 filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
-                for (VCustomersList Area : filterList) {
+                for (ExtcalVCustomersList Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }

@@ -1,9 +1,9 @@
-package com.milky.viewmodel;
+package com.tyczj.extendedcalendarview;
 
 /**
  * Created by Neha on 11/17/2015.
  */
-public class VCustomersList {
+public class ExtcalVCustomersList {
     private String firstName;
     private String lastName;
 

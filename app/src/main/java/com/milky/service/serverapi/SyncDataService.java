@@ -8,20 +8,17 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
-import com.milky.utils.Constants;
 import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -72,7 +69,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                                 BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
                             ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
                             for (int i = 0; i < list.size(); ++i) {
-                                VCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
+                                ExtcalVCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
                             Calendar nextMonth = Calendar.getInstance();
                             nextMonth.add(Calendar.MONTH, 1);
                             custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
@@ -88,13 +85,13 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 //                                        String.format("%02d", 29));
 
                                 //Insert new bill and setting for customer
-                                CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), custHolder);
-                                custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
-                                custHolder.setAdjustment("");
-                                custHolder.setPaymentMade("0");
-                                custHolder.setIsCleared("1");
-                                custHolder.setDateModified(custHolder.getStart_date());
-                                BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+//                                CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), custHolder);
+//                                custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+//                                custHolder.setAdjustment("");
+//                                custHolder.setPaymentMade("0");
+//                                custHolder.setIsCleared("1");
+//                                custHolder.setDateModified(custHolder.getStart_date());
+//                                BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
                             }
                             edit.putString(UserPrefrences.INSERT_BILL, "1");
                             edit.commit();
@@ -183,7 +180,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
 
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            ArrayList<VCustomersList> custList = CustomersTableMagagement.getAllCustomersToSync(_dbHelper.getReadableDatabase());
+            ArrayList<ExtcalVCustomersList> custList = CustomersTableMagagement.getAllCustomersToSync(_dbHelper.getReadableDatabase());
             if (custList.size() == 0) {
 
                 requestedList.put("Customer_List", "1");
@@ -223,7 +220,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
         }
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
-            ArrayList<VCustomersList> billList = BillTableManagement.getCustomersBillToSync(_dbHelper.getReadableDatabase());
+            ArrayList<ExtcalVCustomersList> billList = BillTableManagement.getCustomersBillToSync(_dbHelper.getReadableDatabase());
             if (billList.size() == 0) {
 
                 requestedList.put("Customer_List", "1");
@@ -267,41 +264,41 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
         }
 
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-            ArrayList<VCustomersList> custList = CustomerSettingTableManagement.getAllCustomersByCustomerIdToSync(_dbHelper.getReadableDatabase());
-            if (custList == null) {
-
-                requestedList.put("CustomerSetting_List", "1");
-
-            } else {
-                jsonArray = new JSONArray();
-                for (int i = 0; i < custList.size(); ++i) {
-                    JSONObject obj = new JSONObject();
-                    try {
-                        obj.put("AccountId", custList.get(i).getAccountId());
-                        obj.put("CustomerId", custList.get(i).getCustomerId());
-                        obj.put("Rate", custList.get(i).getRate());
-                        obj.put("DefaultQuantity", custList.get(i).getQuantity());
-                        obj.put("DateModified", custList.get(i).getDateModified());
-                        obj.put("Dirty", "0");
-
-                        jsonArray.put(obj);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                try {
-                    jsonObject.put("CustomerSetting_List", jsonArray);
-                    requestedList.put("CustomerSetting_List", "0");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-        }
+//        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+//            ArrayList<VCustomersList> custList = CustomerSettingTableManagement.getAllCustomersByCustomerIdToSync(_dbHelper.getReadableDatabase());
+//            if (custList == null) {
+//
+//                requestedList.put("CustomerSetting_List", "1");
+//
+//            } else {
+//                jsonArray = new JSONArray();
+//                for (int i = 0; i < custList.size(); ++i) {
+//                    JSONObject obj = new JSONObject();
+//                    try {
+//                        obj.put("AccountId", custList.get(i).getAccountId());
+//                        obj.put("CustomerId", custList.get(i).getCustomerId());
+//                        obj.put("Rate", custList.get(i).getRate());
+//                        obj.put("DefaultQuantity", custList.get(i).getQuantity());
+//                        obj.put("DateModified", custList.get(i).getDateModified());
+//                        obj.put("Dirty", "0");
+//
+//                        jsonArray.put(obj);
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                try {
+//                    jsonObject.put("CustomerSetting_List", jsonArray);
+//                    requestedList.put("CustomerSetting_List", "0");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//
+//        }
 
         List<NameValuePair> nameValuePair = new ArrayList<>();
         if (jsonObject.length() > 0)
@@ -321,9 +318,10 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                     BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
                 } else if (requestType.get("Account_List").equals("0")) {
                     Account.updateSyncedData(_dbHelper.getWritableDatabase());
-                } else if (requestType.get("CustomerSetting_List").equals("0")) {
-                    CustomerSettingTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
                 }
+// else if (requestType.get("CustomerSetting_List").equals("0")) {
+//                    CustomerSettingTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
+//                }
             }
         } else {
 
@@ -338,7 +336,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
         DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
         if (db.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            ArrayList<VCustomersList> list = CustomersTableMagagement.getAllCustomers(db.getReadableDatabase());
+            ArrayList<ExtcalVCustomersList> list = CustomersTableMagagement.getAllCustomers(db.getReadableDatabase());
             db.close();
             for (int i = 0; i < list.size(); ++i) {
                 // update customers setting
@@ -357,9 +355,9 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                 holder.setQuantity(list.get(i).getQuantity());
                 holder.setTax(list.get(i).getTax());
                 holder.setIsCleared("1");
-                if (!CustomerSettingTableManagement.isHasDataForDayById(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
-                        + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR))))
-                    CustomerSettingTableManagement.insertNewCustomersSetting(db.getWritableDatabase(), holder);
+//                if (!CustomerSettingTableManagement.isHasDataForDayById(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
+//                        + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR))))
+//                    CustomerSettingTableManagement.insertNewCustomersSetting(db.getWritableDatabase(), holder);
                 if (!BillTableManagement.isHasDataForDay(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
                         + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR))))
                     BillTableManagement.insertNewBills(db.getWritableDatabase(), holder);

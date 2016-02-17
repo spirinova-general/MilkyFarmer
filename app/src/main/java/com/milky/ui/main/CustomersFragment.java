@@ -22,7 +22,7 @@ import com.milky.ui.adapters.MainCustomersListAdapter;
 import com.milky.ui.customers.CustomerAddActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class CustomersFragment extends Fragment {
 
-    private List<VCustomersList> _mCustomersList;
+    private List<ExtcalVCustomersList> _mCustomersList;
     public static MainCustomersListAdapter _mAdapter;
     private FloatingActionButton mFab;
     public static TextView mTotalCustomers;
@@ -81,7 +81,7 @@ public class CustomersFragment extends Fragment {
 
 
         } else
-            mTotalCustomers.setText(String.valueOf("No customer added yet !"));
+            mTotalCustomers.setText(getResources().getString(R.string.no_customer_added));
         _dbHelper.close();
 
 
@@ -128,7 +128,7 @@ public class CustomersFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.customers_menu, menu);
+        inflater.inflate(R.menu.main_menu, menu);
     }
 
 

@@ -22,10 +22,8 @@ import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.main.CustomersActivity;
@@ -34,7 +32,9 @@ import com.milky.utils.Constants;
 import com.milky.utils.EnableEditableFields;
 import com.milky.utils.TextValidationMessage;
 import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import java.util.Calendar;
  * Created by Neha on 11/19/2015.
  */
 public class CustomerSettingFragment extends Fragment {
-    private EditText _mFirstName, _mLastName, _mAddress1, _mBalance, _mQuantuty,  _mMobile, _mRate;
+    private EditText _mFirstName, _mLastName, _mAddress1, _mBalance, _mQuantuty, _mMobile, _mRate;
     private InputMethodManager inputMethodManager;
     private Button _mSave, _mCancel;
     //    private FloatingActionButton _mEdit;
@@ -54,7 +54,7 @@ public class CustomerSettingFragment extends Fragment {
     private AutoCompleteTextView _autocomplete_city_area;
     private String selectedAreaId = "", tempAreaId = "";
     private TextInputLayout name_layout, last_name_layout, balance_layout, flat_number_layout, street_layout, milk_quantity_layout, rate_layout;
-    private VCustomersList dataHolder;
+    private ExtcalVCustomersList dataHolder;
     private DatabaseHelper _dbHelper;
     private String itemName;
     private String[] autoCompleteData;
@@ -66,6 +66,7 @@ public class CustomerSettingFragment extends Fragment {
     private TextView pick_date;
     private String custId = "";
     //   private FormEditText et_phone;
+    private ExtcalDatabaseHelper extDb;
     private boolean updatedQtyRate = false;
 
     public CustomerSettingFragment() {
@@ -174,7 +175,7 @@ public class CustomerSettingFragment extends Fragment {
 
 
     private void initResources(View view) {
-
+        extDb = new ExtcalDatabaseHelper(getActivity());
         _mFirstName = (EditText) view.findViewById(R.id.first_name);
         _mLastName = (EditText) view.findViewById(R.id.last_name);
         _mRate = (EditText) view.findViewById(R.id.rate);
@@ -416,7 +417,7 @@ public class CustomerSettingFragment extends Fragment {
                         && !_mMobile.getText().toString().equals("") &&
                         !_mQuantuty.getText().toString().equals("")
                         ) {
-                    VCustomersList holder = new VCustomersList();
+                    ExtcalVCustomersList holder = new ExtcalVCustomersList();
                     holder.setFirstName(_mFirstName.getText().toString());
                     holder.setLastName(_mLastName.getText().toString());
                     holder.setBalance_amount(_mBalance.getText().toString());
@@ -434,26 +435,32 @@ public class CustomerSettingFragment extends Fragment {
                     Calendar c = Calendar.getInstance();
                     SimpleDateFormat df = Constants.work_format;
                     String formattedDate = df.format(c.getTime());
+                    holder.setBalanceType("1");
                     holder.setDateModified(formattedDate);
                     holder.setEnd_date(c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
                             String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
 
-                    if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
-                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
-                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
+//                    if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
+//                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
+//                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
+//TODO ExtCal SETTINGS DB
+                    if (ExtcalCustomerSettingTableManagement.isHasStartDate(extDb.getReadableDatabase(),
+                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)){
+//                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
+                        ExtcalCustomerSettingTableManagement.updateData(extDb.getWritableDatabase(), holder);
 
 
-                    } else {
+                    }else{
                         if (updatedQtyRate) {
-                            String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
-                            CustomerSettingTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
+                            String enddate = ExtcalCustomerSettingTableManagement.getOldEndDate(extDb.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
+                            ExtcalCustomerSettingTableManagement.updateEndDate(extDb.getWritableDatabase(), holder, enddate, formattedDate);
 //                            BillTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
                             holder.setStart_date(formattedDate);
-                            CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
+                            ExtcalCustomerSettingTableManagement.insertCustomersSetting(extDb.getWritableDatabase(), holder);
 //                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
                         } else {
-                            CustomerSettingTableManagement.updateAllData(_dbHelper.getWritableDatabase(), holder);
+                            ExtcalCustomerSettingTableManagement.updateAllData(extDb.getWritableDatabase(), holder);
 
                         }
 
@@ -490,30 +497,5 @@ public class CustomerSettingFragment extends Fragment {
 //        new EnableEditableFields(_mAddress2, getActivity(), inputMethodManager).blockDefaultKeys();
     }
 
-    public double getQtyOfCustomer(String day) {
-        double qty = 0;
-        double adjustedQty = 0;
-        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_DELIVERY)) {
-            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId) == 0) {
-                if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-
-                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
-                            , custId);
-
-                }
-            } else
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId);
-
-
-        } else if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-
-            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
-                    , custId);
-
-        }
-
-
-        return qty;
-    }
 
 }

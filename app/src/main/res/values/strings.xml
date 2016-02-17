@@ -26,6 +26,8 @@
     <string name="title_activity_farmer_signup">FarmerSignup</string>
     <string name="facebook_app_id">1104501639590760</string>
     <string name="fill_valid_amount">Fill valid amount!</string>
+    <string name="no_customer_added">No customer added yet !</string>
+    <string name="title_activity_expiry">ExpiryActivity</string>
 
 </resources>
 

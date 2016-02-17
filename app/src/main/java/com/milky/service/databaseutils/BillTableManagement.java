@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.Calendar;
  * Created by Neha on 11/30/2015.
  */
 public class BillTableManagement {
-    public static void insertBillData(SQLiteDatabase db, VCustomersList holder) {
+    public static void insertBillData(SQLiteDatabase db, ExtcalVCustomersList holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.ACCOUNT_ID, holder.getAccountId());
         values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
@@ -72,7 +72,7 @@ public class BillTableManagement {
                 + " AND " + TableColumns.START_DATE + " <='" + date + "' AND " + TableColumns.IS_CLEARED + " ='1'", null);
     }
 
-    public static void updateCurrentDateData(SQLiteDatabase db, VCustomersList holder) {
+    public static void updateCurrentDateData(SQLiteDatabase db, ExtcalVCustomersList holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
@@ -83,7 +83,7 @@ public class BillTableManagement {
                 + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
     }
 
-    public static void updateEndDate(SQLiteDatabase db, VCustomersList holder, String enddate, String updatedEndDate) {
+    public static void updateEndDate(SQLiteDatabase db, ExtcalVCustomersList holder, String enddate, String updatedEndDate) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.END_DATE, updatedEndDate);
 
@@ -265,15 +265,15 @@ public class BillTableManagement {
         return amount;
     }
 
-    public static ArrayList<VCustomersList> getCustomersBill(SQLiteDatabase db) {
+    public static ArrayList<ExtcalVCustomersList> getCustomersBill(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.SYNC_STATUS + " ='" + "0'" + " AND " + TableColumns.DIRTY + " ='0'";
-        ArrayList<VCustomersList> list = new ArrayList<>();
+        ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                VCustomersList holder = new VCustomersList();
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
                     holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
@@ -314,15 +314,15 @@ public class BillTableManagement {
         return list;
     }
 
-    public static ArrayList<VCustomersList> getCustomersBillToSync(SQLiteDatabase db) {
+    public static ArrayList<ExtcalVCustomersList> getCustomersBillToSync(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.SYNC_STATUS + " ='" + "0'" + " AND " + TableColumns.DIRTY + " ='0'";
-        ArrayList<VCustomersList> list = new ArrayList<>();
+        ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                VCustomersList holder = new VCustomersList();
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
                     holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
@@ -370,7 +370,7 @@ public class BillTableManagement {
                 + " AND " + TableColumns.DIRTY + " ='" + "1" + "'", null);
     }
 
-    public static void updateData(SQLiteDatabase db, VCustomersList holder) {
+    public static void updateData(SQLiteDatabase db, ExtcalVCustomersList holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.BALANCE, holder.getBalance_amount());

@@ -14,17 +14,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VCustomersList;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.Day;
+import com.tyczj.extendedcalendarview.DeliveryTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import com.milky.R;
@@ -43,25 +45,29 @@ public class CustomrDeliveryFragment extends Fragment {
     private int dataCount = 0;
     private String custId = "";
     private DatabaseHelper db;
+    private ExtcalDatabaseHelper _exDb;
     private String selected_date;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        _exDb = new ExtcalDatabaseHelper(getActivity());
         View view = inflater.inflate(R.layout.calender_layout, container, false);
         _mCalenderView = (ExtendedCalendarView) view.findViewById(R.id.calendar);
-        _mCalenderView.setTotalQuantity(CustomersTableMagagement.getTotalMilkQuantytyForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                getActivity().getIntent().getStringExtra("cust_id")));
-        _mCalenderView.customersMilkQuantity(DeliveryTableManagement.getMilkQuantityofCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                getActivity().getIntent().getStringExtra("cust_id")));
+//        _mCalenderView.setTotalQuantity(CustomersTableMagagement.getTotalMilkQuantytyForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
+//                getActivity().getIntent().getStringExtra("cust_id")));
+//        _mCalenderView.customersMilkQuantity(DeliveryTableManagement.getMilkQuantityofCustomer(_exDb.getReadableDatabase(),
+//                getActivity().getIntent().getStringExtra("cust_id")));
         custId = getActivity().getIntent().getStringExtra("cust_id");
         _mCalenderView.setForCustomersDelivery(true);
+
         db = AppUtil.getInstance().getDatabaseHandler();
 
         initResources();
-        if (totalData.size() > 0) {
-            _mCalenderView.setForCustomersDelivery(true);
-            _mCalenderView.customersMilkQuantity(totalData);
-        }
+
+//        if (totalData.size() > 0) {
+//            _mCalenderView.setForCustomersDelivery(true);
+//            _mCalenderView.customersMilkQuantity(totalData);
+//        }
         return view;
 
     }
@@ -81,34 +87,37 @@ public class CustomrDeliveryFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if ((CustomerSettingTableManagement.isHasDataForDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), selected_date))
-                        &&  Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR)==day.getYear())
-                {
-                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+                if ((ExtcalCustomerSettingTableManagement.isHasDataForDay(_exDb.getReadableDatabase(), selected_date))
+                        && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
                     final AlertDialog dialog = alertBuilder.create();
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
                     dialog.setView(view1);
 
                     final EditText quantity = (EditText) view1.findViewById(R.id.milk_quantity);
+                    quantity.setHint("Quantity");
+                    final TextView title = (TextView) view1.findViewById(R.id.title);
+                    title.setText("Edit Quantity");
                     final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
                     quantity.setText(String.valueOf(totalData.get(day.getDay() - 1).getCalculatedQuqantity()));
+                    ((Button) view1.findViewById(R.id.save)).setText("Save");
                     ((Button) view1.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if (quantity.getText().toString().equals("")) {
                                 quantity_layout.setError("Enter quantity!");
                             } else {
-                                VCustomersList holder = new VCustomersList();
+                                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                                 holder.setQuantity(quantity.getText().toString());
                                 holder.setStart_date(selected_date);
                                 holder.setCustomerId(custId);
-                                if (DeliveryTableManagement.isHasData(db.getReadableDatabase(),
+                                if (DeliveryTableManagement.isHasData(_exDb.getReadableDatabase(),
                                         custId, selected_date)) {
 
-                                    DeliveryTableManagement.updateCustomerDetail(db.getWritableDatabase(), holder);
+                                    DeliveryTableManagement.updateCustomerDetail(_exDb.getWritableDatabase(), holder, "");
                                 } else
-                                    DeliveryTableManagement.insertCustomerDetail(db.getWritableDatabase(), holder);
+                                    DeliveryTableManagement.insertCustomerDetail(_exDb.getWritableDatabase(), holder, "", Constants.ACCOUNT_ID);
 
                                 DateQuantityModel holder1 = new DateQuantityModel();
                                 holder1.setDeliveryDate(selected_date);
@@ -220,21 +229,26 @@ public class CustomrDeliveryFragment extends Fragment {
     public double getDeliveryOfCustomer(String day) {
         double qty = 0;
         double adjustedQty = 0;
-        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_DELIVERY)) {
-            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId) == 0) {
-                if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-
-                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+        if (_exDb.isTableNotEmpty("delivery")) {
+            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId) == 0) {
+                if (_exDb.isTableNotEmpty("customers")) {
+                    //TODO ExtCal SETTINGS DB
+                    //                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+                    //                            , custId);
+                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                             , custId);
 
                 }
             } else
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day, custId);
+                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
 
 
-        } else if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+        } else if (_exDb.isTableNotEmpty("customers")) {
 
-            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+//            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+//                    , custId);
+            //TODO ExtCal SETTINGS DB
+            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                     , custId);
 
         }

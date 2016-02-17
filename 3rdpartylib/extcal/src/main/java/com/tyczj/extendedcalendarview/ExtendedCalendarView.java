@@ -214,6 +214,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     }
 
     private void previousMonth() {
+        CalendarAdapter.isPost = false;
         if (cal.get(Calendar.MONTH) == cal.getActualMinimum(Calendar.MONTH)) {
             cal.set((cal.get(Calendar.YEAR) - 1), cal.getActualMaximum(Calendar.MONTH), 1);
         } else {
@@ -223,6 +224,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     }
 
     private void nextMonth() {
+        CalendarAdapter.isPost = true;
         if (cal.get(Calendar.MONTH) == cal.getActualMaximum(Calendar.MONTH)) {
             cal.set((cal.get(Calendar.YEAR) + 1), cal.getActualMinimum(Calendar.MONTH), 1);
         } else {
@@ -337,11 +339,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
         CalendarAdapter.setRegistrationTime(value);
     }
 
-    public void setTotalQuantity(final float totalQuantity) {
-        CalendarAdapter.totalData(totalQuantity);
 
-
-    }
 //    public void refreshAdapter()
 //    {if(mAdapter!=null)
 //        calendar.setAdapter(mAdapter);
@@ -367,11 +365,11 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
         CalendarAdapter.isForCustomerDelivery(custDelivery);
     }
 
-    public void customersMilkQuantity(ArrayList<DateQuantityModel> quantity) {
-        CalendarAdapter.customersMilkQuantity(quantity);
-    }
-
     public void totalQuantityCalculated(final ArrayList<DateQuantityModel> totalList) {
         CalendarAdapter.totalDataList(totalList);
+    }
+    public void setCustomerId(final String id)
+    {
+        CalendarAdapter. setcustId(id);
     }
 }

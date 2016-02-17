@@ -4,20 +4,12 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.DeliveryTableManagement;
-import com.milky.service.databaseutils.TableColumns;
-import com.milky.service.databaseutils.TableNames;
-import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.Day;
 
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**

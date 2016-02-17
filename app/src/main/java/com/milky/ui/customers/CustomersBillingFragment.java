@@ -12,10 +12,8 @@ import android.widget.TextView;
 
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.ui.adapters.CustomersListAdapter;
@@ -23,7 +21,6 @@ import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomersList;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -33,13 +30,17 @@ import java.util.Date;
 import java.util.List;
 
 import com.milky.R;
+import com.tyczj.extendedcalendarview.DeliveryTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 /**
  * Created by Neha on 11/20/2015.
  */
 public class CustomersBillingFragment extends Fragment {
     private CustomersListAdapter _mAdapter;
-    private List<VCustomersList> _mCustomersList;
+    private List<ExtcalVCustomersList> _mCustomersList;
     public static ListView _mListView;
     private FloatingActionButton _mAddBillFab;
     private DatabaseHelper _dbHelper;
@@ -47,12 +48,15 @@ public class CustomersBillingFragment extends Fragment {
     private ArrayList<String> names = new ArrayList<>();
     private boolean hasPreviousBills = false;
     private TextView preivousBills;
-    private boolean _hasFutureBill= false;
+    private boolean _hasFutureBill = false;
+
+    private ExtcalDatabaseHelper db;
 
     @Override
-    public View   onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.customer_billing_list, container, false);
         initResources(view);
+        db = new ExtcalDatabaseHelper(getActivity());
         custId = getActivity().getIntent().getStringExtra("cust_id");
         generateBill();
         if (payment.size() > 0) {
@@ -95,7 +99,7 @@ public class CustomersBillingFragment extends Fragment {
         double totalQuantity = 0, totalRate = 0;
         VBill holder = new VBill();
 
-        ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase(),custId);
+        ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase(), custId);
         if (bills.size() > 0)
             hasPreviousBills = true;
         for (int x = 0; x < bills.size(); x++) {
@@ -104,8 +108,10 @@ public class CustomersBillingFragment extends Fragment {
 //            String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
             names.add(custId);
         }
+//TODO ExtCal SETTINGS DB
+//        ArrayList<String> startDates = CustomerSettingTableManagement.getStartDeliveryDate(_dbHelper.getReadableDatabase(), custId);
 
-        ArrayList<String> startDates = CustomerSettingTableManagement.getStartDeliveryDate(_dbHelper.getReadableDatabase(), custId);
+        ArrayList<String> startDates = ExtcalCustomerSettingTableManagement.getStartDeliveryDate(db.getReadableDatabase(), custId);
         if (startDates != null)
             for (int j = 0; j < startDates.size(); j++) {
 
@@ -138,7 +144,7 @@ public class CustomersBillingFragment extends Fragment {
                     }
                 }
             }
-        if(_hasFutureBill) {
+        if (_hasFutureBill) {
 //            payMade = BillTableManagement.getPreviousBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQuantity);
 
             if (holder.getBalanceType().equals("1"))
@@ -150,8 +156,8 @@ public class CustomersBillingFragment extends Fragment {
             holder.setBillMade(String.valueOf(round(payMade, 2)));
 //            holder.setPaymentMode(String.valueOf(round(payMade, 2)));
             BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), custId);
-            if (BillTableManagement.isToBeOutstanding(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) ))) {
-                BillTableManagement.updateOutstandingBill(_dbHelper.getWritableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) ));
+            if (BillTableManagement.isToBeOutstanding(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))) {
+                BillTableManagement.updateOutstandingBill(_dbHelper.getWritableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
 //            holder.setStartDate(String.work_format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.work_format("%02d", 1) + "-" + String.work_format("%02d", cal.get(Calendar.YEAR)));
 //            holder.setEndDate(String.work_format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.work_format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)) + "-" + String.work_format("%02d", cal.get(Calendar.YEAR)));
 //            BillTableManagement.insertNewBills(_dbHelper.getWritableDatabase(), holder);
@@ -176,21 +182,25 @@ public class CustomersBillingFragment extends Fragment {
     public double getQtyOfCustomer(String day) {
         double qty = 0;
         double adjustedQty = 0;
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_DELIVERY)) {
-            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_dbHelper.getReadableDatabase(), day, custId) == 0) {
-                if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-
-                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+        if (db.isTableNotEmpty("delivery")) {
+            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), day, custId) == 0) {
+                if (db.isTableNotEmpty("customers")) {
+                    //TODO ExtCal SETTINGS DB
+//                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+//                            , custId);
+                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), day
                             , custId);
 
                 }
             } else
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_dbHelper.getReadableDatabase(), day, custId);
+                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), day, custId);
 
 
-        } else if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-
-            qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+        } else if (db.isTableNotEmpty("customers")) {
+            //TODO ExtCal SETTINGS DB
+//            qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
+//                    , custId);
+            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), day
                     , custId);
 
         }

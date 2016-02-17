@@ -28,7 +28,6 @@ import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -37,7 +36,9 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,7 +50,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private EditText _firstName;
     private EditText _lastName;
     private EditText _mAddress1;
-//    private EditText _address2;
+    //    private EditText _address2;
     private EditText _rate;
     private EditText _mPhone;
     private EditText _mBalance;
@@ -61,8 +62,8 @@ public class CustomerAddActivity extends AppCompatActivity {
     private AutoCompleteTextView _cityAreaAutocomplete;
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
-    private String  selectedAreaId = "";
-    private ArrayList<VAreaMapper>  _areacityList = new ArrayList<>();
+    private String selectedAreaId = "";
+    private ArrayList<VAreaMapper> _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
     private TextView _pickdate;
@@ -154,11 +155,44 @@ public class CustomerAddActivity extends AppCompatActivity {
                             && !_lastName.getText().toString().equals("") &&
                             !_mBalance.getText().toString().equals("") &&
                             !_mAddress1.getText().toString().equals("")
-                            &&!selectedAreaId.equals("")
+                            && !selectedAreaId.equals("")
                             && !_mPhone.getText().toString().equals("") &&
                             !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
                     )) {
-                        VCustomersList holder = new VCustomersList();
+                        c = Calendar.getInstance();
+                        SimpleDateFormat df = Constants.work_format;
+                        formattedDate = df.format(c.getTime());
+                        Calendar deliveryDateTime = Calendar.getInstance();
+
+                        try {
+                            deliveryDateTime.setTime(df.parse(pickedDate));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        ExtcalVCustomersList holder = new ExtcalVCustomersList();
+                        ExtcalVCustomersList hol = new ExtcalVCustomersList();
+                        hol.setFirstName(_firstName.getText().toString());
+                        hol.setLastName(_lastName.getText().toString());
+                        hol.setAddress1(_mAddress1.getText().toString());
+                        hol.setBalance_amount(_mBalance.getText().toString());
+                        hol.setAreaId(selectedAreaId);
+                        hol.setMobile(_mPhone.getText().toString());
+                        hol.setQuantity(_mQuantuty.getText().toString());
+                        hol.setAccountId(Constants.ACCOUNT_ID);
+                        hol.setRate(_rate.getText().toString());
+                        hol.setBalanceType("1");
+                        hol.setDateAdded(formattedDate);
+                        hol.setStart_date(pickedDate);
+                        hol.setEnd_date("2250" + "-" +
+                                String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
+                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH)+5));
+                        hol.setCustomerId(String.valueOf(System.currentTimeMillis()));
+
+                        ExtcalDatabaseHelper db = new ExtcalDatabaseHelper(CustomerAddActivity.this);
+                        ExtcalCustomerSettingTableManagement.insertCustomersSetting(db.getWritableDatabase(), hol);
+
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
                         holder.setBalance_amount(_mBalance.getText().toString());
@@ -171,26 +205,16 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setQuantity(_mQuantuty.getText().toString());
                         holder.setAccountId(Constants.ACCOUNT_ID);
                         holder.setRate(_rate.getText().toString());
-                        holder.setBalanceType("0");
-                        c = Calendar.getInstance();
-                        SimpleDateFormat df = Constants.work_format;
-                        formattedDate = df.format(c.getTime());
+                        holder.setBalanceType("1");
                         holder.setDateAdded(formattedDate);
                         holder.setStart_date(pickedDate);
-                        Calendar deliveryDateTime = Calendar.getInstance();
-
-                        try {
-                            deliveryDateTime.setTime(df.parse(pickedDate));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-
                         holder.setEnd_date(deliveryDateTime.get(Calendar.YEAR) + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 1) + "-" +
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH)));
-                        holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
+                        holder.setCustomerId(hol.getCustomerId());
+
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
-                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
+//                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
 
                         holder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
                         holder.setAdjustment("");

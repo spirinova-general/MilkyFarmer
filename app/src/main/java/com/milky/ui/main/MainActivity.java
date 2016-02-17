@@ -42,7 +42,7 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     public boolean onCreateOptionsMenu(final Menu menu) {
 
         MenuInflater mi = getMenuInflater();
-        mi.inflate(R.menu.customers_menu, menu);
+        mi.inflate(R.menu.main_menu, menu);
         this.menu = menu;
 //        final MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
         final MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             editSearch = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
             editSearch.setHintTextColor(getResources().getColor(R.color.gray_lighter));
             editSearch.setHint("Type Area Or Customer Name");
+            editSearch.clearFocus();
             editSearch.setTextSize(13);
             actionSearchView.setOnSearchClickListener(new View.OnClickListener() {
                 @Override
@@ -312,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
-        AppUtil.getTotalQuantity();
+//        AppUtil.getTotalQuantity();
 
     }
 
@@ -334,20 +335,21 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         int page = POSITION;
         switch (page) {
             case 0:
+
                 menu.findItem(R.id.action_search).setVisible(false);
-//                menu.findItem(R.id.areaSpinner).setVisible(false);
+                menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
 
 
                 break;
             case 1:
                 menu.findItem(R.id.action_search).setVisible(true);
-//                menu.findItem(R.id.areaSpinner).setVisible(true);
+                menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
                 break;
             case 2:
                 menu.findItem(R.id.action_search).setVisible(false);
-//                menu.findItem(R.id.areaSpinner).setVisible(false);
+                menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
                 break;
         }
@@ -457,7 +459,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     }
 
     public void SyncNow() {
-
         HttpAsycTask dataTask = new HttpAsycTask();
         dataTask.runRequest(ServerApis.SYNC, getAllDataToSync(), MainActivity.this, true, requestedList);
     }
@@ -468,7 +469,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         JSONArray jsonArray;
         JSONObject jsonObject = new JSONObject();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            ArrayList<VCustomersList> custList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+            ArrayList<ExtcalVCustomersList> custList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
             if (custList.size() == 0) {
 
                 requestedList.put("Customer_List", "1");
@@ -508,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             _dbHelper.close();
         }
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
-            ArrayList<VCustomersList> billList = BillTableManagement.getCustomersBill(_dbHelper.getReadableDatabase());
+            ArrayList<ExtcalVCustomersList> billList = BillTableManagement.getCustomersBill(_dbHelper.getReadableDatabase());
             if (billList.size() == 0) {
 
                 requestedList.put("Customer_List", "1");

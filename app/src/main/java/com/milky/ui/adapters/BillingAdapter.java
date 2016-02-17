@@ -17,7 +17,7 @@ import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class BillingAdapter extends BaseAdapter {
 
-    private List<VCustomersList> mCustomersData;
+    private List<ExtcalVCustomersList> mCustomersData;
     private List<VBill> totalBill;
     private Context mContext;
     private boolean _mIsCustomer = false;

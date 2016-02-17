@@ -5,11 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VCustomersList;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by Neha on 11/30/2015.
@@ -17,7 +16,7 @@ import java.util.Calendar;
 public class CustomersTableMagagement {
 
 
-    public static void insertCustomerDetail(SQLiteDatabase db, VCustomersList holder) {
+    public static void insertCustomerDetail(SQLiteDatabase db, ExtcalVCustomersList holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.FIRST_NAME, holder.getFirstName());
         values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
@@ -41,18 +40,18 @@ public class CustomersTableMagagement {
         db.insert(TableNames.TABLE_CUSTOMER, null, values);
     }
 
-    public static void updateBalance(SQLiteDatabase db, String balance, String custId,String balanceType) {
+    public static void updateBalance(SQLiteDatabase db, String balance, String custId, String balanceType) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.BALANCE, balance);
-        values.put(TableColumns.BALANCE_TYPE,balanceType);
+        values.put(TableColumns.BALANCE_TYPE, balanceType);
 
         db.update(TableNames.TABLE_CUSTOMER, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
     }
 
     public static ArrayList<String> getCustomerId(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER ;
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
         ArrayList<String> holder = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
@@ -76,15 +75,15 @@ public class CustomersTableMagagement {
         return holder;
     }
 
-    public static ArrayList<VCustomersList> getAllCustomers(SQLiteDatabase db) {
+    public static ArrayList<ExtcalVCustomersList> getAllCustomers(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='1'";
-        ArrayList<VCustomersList> list = new ArrayList<>();
+        ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                VCustomersList holder = new VCustomersList();
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
                     holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
@@ -145,9 +144,10 @@ public class CustomersTableMagagement {
             db.close();
         return list;
     }
+
     public static String getAccountId(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
-        String id ="";
+        String id = "";
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
@@ -155,7 +155,7 @@ public class CustomersTableMagagement {
             do {
 
 
-               id = cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID));
+                id = cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID));
             }
             while (cursor.moveToNext());
         }
@@ -164,6 +164,7 @@ public class CustomersTableMagagement {
             db.close();
         return id;
     }
+
     public static ArrayList<String> getDates(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
         ArrayList<String> list = new ArrayList<>();
@@ -184,16 +185,16 @@ public class CustomersTableMagagement {
         return list;
     }
 
-    public static ArrayList<VCustomersList> getAllCustomersByArea(SQLiteDatabase db, final String areaId) {
+    public static ArrayList<ExtcalVCustomersList> getAllCustomersByArea(SQLiteDatabase db, final String areaId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='" + "1'" +
                 " AND " + TableColumns.AREA_ID + " ='" + areaId + "'";
-        ArrayList<VCustomersList> list = new ArrayList<>();
+        ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                VCustomersList holder = new VCustomersList();
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
                     holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
@@ -238,7 +239,7 @@ public class CustomersTableMagagement {
     }
 
 
-    public static ArrayList<VCustomersList> getAllCustomersBySelectedDate(SQLiteDatabase db, String areaid) {
+    public static ArrayList<ExtcalVCustomersList> getAllCustomersBySelectedDate(SQLiteDatabase db, String areaid) {
         String selectquery = "";
         if (areaid.equals("")) {
             if (isDeletedCustomer(db)) {
@@ -256,13 +257,13 @@ public class CustomersTableMagagement {
                     + " AND " + TableColumns.DELETED_ON + " >='" + Constants.DELIVERY_DATE + "'";
 
 
-        ArrayList<VCustomersList> list = new ArrayList<>();
+        ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                VCustomersList holder = new VCustomersList();
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
                     holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
@@ -354,10 +355,11 @@ public class CustomersTableMagagement {
             db.close();
         return name;
     }
-    public static VCustomersList getAllCustomersByCustId(SQLiteDatabase db, final String areaId) {
+
+    public static ExtcalVCustomersList getAllCustomersByCustId(SQLiteDatabase db, final String areaId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='" + "1'" +
                 " AND " + TableColumns.CUSTOMER_ID + " ='" + areaId + "'";
-        VCustomersList holder=new VCustomersList();
+        ExtcalVCustomersList holder = new ExtcalVCustomersList();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
@@ -405,7 +407,7 @@ public class CustomersTableMagagement {
         return holder;
     }
 
-    public static void updateCustomerDetail(SQLiteDatabase db, VCustomersList holder, String custId) {
+    public static void updateCustomerDetail(SQLiteDatabase db, ExtcalVCustomersList holder, String custId) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.FIRST_NAME, holder.getFirstName());
         values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
@@ -455,15 +457,15 @@ public class CustomersTableMagagement {
     }
 
 
-    public static ArrayList<VCustomersList> getAllCustomersToSync(SQLiteDatabase db) {
+    public static ArrayList<ExtcalVCustomersList> getAllCustomersToSync(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.SYNC_STATUS + " ='" + "0'";
-        ArrayList<VCustomersList> list = new ArrayList<>();
+        ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
 
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                VCustomersList holder = new VCustomersList();
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
                     holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
@@ -596,8 +598,6 @@ public class CustomersTableMagagement {
                 quantityList.add(holder);
             }
             while (cursor.moveToNext());
-
-
         }
         cursor.close();
         if (db.isOpen())
@@ -608,9 +608,7 @@ public class CustomersTableMagagement {
     public static String getBalanceForCustomer(SQLiteDatabase db, final String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
         String balance = "";
-
         Cursor cursor = db.rawQuery(selectquery, null);
-
         if (cursor.moveToFirst()) {
             do {
 
@@ -628,6 +626,7 @@ public class CustomersTableMagagement {
             db.close();
         return balance;
     }
+
     public static String getBalanceType(SQLiteDatabase db, final String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
         String balance = "";
@@ -683,5 +682,24 @@ public class CustomersTableMagagement {
         return list;
     }
 
+    public static ArrayList<String> getAllCustomersMobileNo(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
+        ArrayList<String> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return list;
+    }
 
 }

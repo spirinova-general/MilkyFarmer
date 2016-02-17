@@ -16,7 +16,7 @@ import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomersList;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +26,12 @@ import java.util.List;
  * Created by Neha on 11/18/2015.
  */
 public class CustomersFragmentListAdapter extends RecyclerView.Adapter<CustomersFragmentListAdapter.CustomersViewHolder> implements Filterable{
-    private List<VCustomersList> mCustomersList, items,tempList,tempItems, suggestions;
+    private List<ExtcalVCustomersList> mCustomersList, items,tempList,tempItems, suggestions;
     private CustomersFragmentListAdapter mListAdapter;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
 
-    public CustomersFragmentListAdapter(Activity act, List<VCustomersList> listData) {
+    public CustomersFragmentListAdapter(Activity act, List<ExtcalVCustomersList> listData) {
         this.mCustomersList = listData;
         this.mActivity = act;
         _dbhelper = AppUtil.getInstance().getDatabaseHandler();
@@ -52,7 +52,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
 
     @Override
     public void onBindViewHolder(CustomersViewHolder holder, int position) {
-        VCustomersList customer = mCustomersList.get(position);
+        ExtcalVCustomersList customer = mCustomersList.get(position);
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
@@ -84,7 +84,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
                 suggestions.clear();
-                for (VCustomersList Area : tempItems) {
+                for (ExtcalVCustomersList Area : tempItems) {
                     if (Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         suggestions.add(Area);
                     }
@@ -106,10 +106,10 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            List<VCustomersList> filterList = (ArrayList<VCustomersList>) results.values;
+            List<ExtcalVCustomersList> filterList = (ArrayList<ExtcalVCustomersList>) results.values;
             if (results != null && results.count > 0) {
                 filterList.clear();
-                for (VCustomersList Area : filterList) {
+                for (ExtcalVCustomersList Area : filterList) {
                     filterList.add(Area);
                     notifyDataSetChanged();
                 }

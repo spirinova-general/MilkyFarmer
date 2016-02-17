@@ -1,19 +1,15 @@
-package com.milky.service.databaseutils;
+package com.tyczj.extendedcalendarview;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
 
-import com.milky.utils.AppUtil;
-import com.milky.utils.UserPrefrences;
-
-import java.io.File;
-
-public class DatabaseHelper extends SQLiteOpenHelper {
+/**
+ * Created by Lead1 on 2/16/2016.
+ */
+public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
 
     Context context;
     SQLiteDatabase db;
@@ -24,9 +20,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //                + File.separator + DatabaseVersioControl.DATABASE_NAME, null, DatabaseVersioControl.DATABASE_VERSION);
 //    }
 
-    public DatabaseHelper(Context context) {
-        super(context, DatabaseVersioControl.DATABASE_NAME, null,
-                DatabaseVersioControl.DATABASE_VERSION);
+    public ExtcalDatabaseHelper(Context context) {
+        super(context, "Extcal", null,
+                1);
         this.context = context;
 
     }
@@ -34,27 +30,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TableColumsDetail.ACCOUNT);
-        db.execSQL(TableColumsDetail.AREA);
-        db.execSQL(TableColumsDetail.BILL);
-        db.execSQL(TableColumsDetail.CITY);
-        db.execSQL(TableColumsDetail.CUSTOMER);
-//        db.execSQL(TableColumsDetail.CUSTOMER_SETTINGS);
-//        db.execSQL(TableColumsDetail.DELIVERY);
-        db.execSQL(TableColumsDetail.CUSTOMERS_BILL);
-        db.execSQL(TableColumsDetail.AREA_ACCOUNT_MAPPING);
+       String cs = "CREATE TABLE " + "customers" + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.ACCOUNT_ID + " TEXT,"
+               + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.DEFAULT_RATE + " TEXT,"
+               + TableColumns.DEFAULT_QUANTITY + " TEXT," + TableColumns.BALANCE_TYPE
+               + " TEXT,"
+               + TableColumns.BALANCE + " TEXT," + TableColumns.FIRST_NAME + " TEXT," + TableColumns.LAST_NAME + " TEXT,"
+               + TableColumns.START_DATE + " DATETIME," + TableColumns.AREA_ID + " TEXT,"
+               + TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
+        db.execSQL(cs);
+        //DELIVERY
+        String DELIVERY = "CREATE TABLE " + "delivery" + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.ACCOUNT_ID + " TEXT," + TableColumns.QUANTITY + " TEXT,"
+                + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.START_DATE + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
+                ")";
+        db.execSQL(DELIVERY);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         String[] tables = {
-                TableNames.TABLE_ACCOUNT,
-                TableNames.TABLE_ACCOUNT_AREA_MAPPING,
-                TableNames.TABLE_CUSTOMER,
-                TableNames.TABLE_AREA,
-                TableNames.TABLE_BILL,
-                TableNames.TABLE_CITY,
-                TableNames.TABLE_CUSTOMER_BILL
+                "customers","delivery"
 
         };
         for (String tableName : tables) {

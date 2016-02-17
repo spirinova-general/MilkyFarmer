@@ -18,16 +18,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.ui.customers.CustomerTabFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.tyczj.extendedcalendarview.DeliveryTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Locale;
 
 /**
  * Created by Neha on 11/19/2015.
@@ -42,6 +42,7 @@ public class CustomersActivity extends AppCompatActivity {
     private FloatingActionButton fabDelete;
     public static Intent _mIntent;
     public static String titleString = "";
+    private ExtcalDatabaseHelper exDb ;
 
     @Override
     protected void onResume() {
@@ -95,7 +96,7 @@ public class CustomersActivity extends AppCompatActivity {
         Calendar shownDate = Calendar.getInstance();
 
         try {
-            shownDate.setTime(Constants._display_format.parse(_mIntent.getStringExtra("added_date")));
+            shownDate.setTime(Constants.work_format.parse(_mIntent.getStringExtra("added_date")));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -109,6 +110,7 @@ public class CustomersActivity extends AppCompatActivity {
 
     private void initResources() {
         _mIntent = this.getIntent();
+        exDb = new ExtcalDatabaseHelper(this);
         _mIsToAddCustomer = _mIntent.getBooleanExtra("istoAddCustomer", false);
         fabDelete = (FloatingActionButton) findViewById(R.id.fabDelete);
         fabDelete.setOnClickListener(new View.OnClickListener() {
@@ -126,8 +128,12 @@ public class CustomersActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         CustomersTableMagagement.updatedeletedCustomerDetail(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-                        CustomerSettingTableManagement.updateDeletetdCustomer(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-                        DeliveryTableManagement.updateDeletedCustomer(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
+                        //TODO ExtCal SETTINGS DB
+//                        CustomerSettingTableManagement.updateDeletetdCustomer(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
+                        ExtcalCustomerSettingTableManagement.updateDeletetdCustomer(exDb.getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
+
+
+                        DeliveryTableManagement.updateDeletedCustomer(exDb.getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
                         finish();
                     }
                 });
@@ -141,7 +147,7 @@ public class CustomersActivity extends AppCompatActivity {
                 builder.show();
             }
         });
-        AppUtil.getInstance().getDatabaseHandler().close();
+        exDb.close();
     }
 
     @Override

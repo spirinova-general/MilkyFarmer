@@ -19,15 +19,13 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomersList;
-import com.tyczj.extendedcalendarview.DateQuantityModel;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -49,7 +47,7 @@ public class BillingEdit extends AppCompatActivity {
     private TextInputLayout _amount_layout;
     private DatabaseHelper _dbHelper;
     private int balanceType = 0;
-
+    private ExtcalDatabaseHelper _exDb;
     @Override
     protected void onResume() {
         super.onResume();
@@ -58,6 +56,7 @@ public class BillingEdit extends AppCompatActivity {
 
     private void getview() {
         milk_quantity = (EditText) findViewById(R.id.milk_quantity);
+        _exDb = new ExtcalDatabaseHelper(this);
         rate = (EditText) findViewById(R.id.rate);
         balance_amount = (EditText) findViewById(R.id.balance_amount);
         tax = (EditText) findViewById(R.id.tax);
@@ -160,7 +159,9 @@ public class BillingEdit extends AppCompatActivity {
                             String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
 
                             CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
-                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
+//                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
+                            //TODO ExtCal SETTINGS DB
+                            ExtcalCustomerSettingTableManagement.updateBalance(_exDb.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
 
                             BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"), holder);
                             dialog.hide();

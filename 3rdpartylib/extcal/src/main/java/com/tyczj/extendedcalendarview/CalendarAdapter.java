@@ -29,17 +29,18 @@ public class CalendarAdapter extends BaseAdapter {
     Context context;
     Calendar cal, deletedCal;
     public String[] days;
+    public static boolean isPost = false;
 
-//	OnAddNewEventClick mAddEvent;
+    //	OnAddNewEventClick mAddEvent;
     SharedPreferences preferences;
-
+    ExtcalDatabaseHelper db;
     ArrayList<Day> dayList = new ArrayList<Day>();
 
     public CalendarAdapter(Context context, Calendar cal) {
         this.cal = cal;
         this.context = context;
         cal.set(Calendar.DAY_OF_MONTH, 1);
-
+        db = new ExtcalDatabaseHelper(context);
         refreshDays();
     }
 
@@ -111,30 +112,29 @@ public class CalendarAdapter extends BaseAdapter {
 //today
             if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
-                if(getQuantity(d)==null)
-                    quantitiTV.setText("0L");
+                if (getQuantity(d) == 0)
+                    quantitiTV.setText("0.0L");
                 else
-                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
 
-            }
-            else if (d.getYear() <= cal.get(Calendar.YEAR) && d.getMonth() <= cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
-                   ) {
+            } else if (d.getYear() <= cal.get(Calendar.YEAR) && d.getMonth() <= cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
+                    ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
-                } if(getQuantity(d)==null)
-                    quantitiTV.setText("0L");
+                }
+                if (getQuantity(d) == 0)
+                    quantitiTV.setText("0.0L");
                 else
-                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
                 today.setVisibility(View.VISIBLE);
-            }
-            else if (d.getYear() >= cal.get(Calendar.YEAR) && d.getMonth() >= cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH)
+            } else if (d.getYear() >= cal.get(Calendar.YEAR) && d.getMonth() >= cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH)
                     ) {
-                if(getQuantity(d)==null)
-                    quantitiTV.setText("0L");
+                if (getQuantity(d) == 0)
+                    quantitiTV.setText("0.0L");
                 else
-                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 
                 today.setVisibility(View.GONE);
             }
@@ -164,11 +164,11 @@ public class CalendarAdapter extends BaseAdapter {
 //                quantitiTV.setText("");
 //                today.setVisibility(View.GONE);
 //            }
-        else {
-                if(getQuantity(d)==null)
+            else {
+                if (getQuantity(d) == 0)
                     quantitiTV.setText("0L");
                 else
-                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
                 today.setVisibility(View.GONE);
             }
 
@@ -316,13 +316,13 @@ public class CalendarAdapter extends BaseAdapter {
         registrationDate = value;
     }
 
-    static float totalQuantity;
+    //    static float totalQuantity;
     static boolean isForCustomers = false;
     static ArrayList<DateQuantityModel> quantityByDateList, totalData;
 
-    public static void totalData(final float totalList) {
-        totalQuantity = totalList;
-    }
+//    public static void totalData(final float totalList) {
+//        totalQuantity = totalList;
+//    }
 
     public static void quantityByDate(final ArrayList<DateQuantityModel> totalList) {
         quantityByDateList = totalList;
@@ -340,11 +340,11 @@ public class CalendarAdapter extends BaseAdapter {
         registeredMonth = month;
     }
 
-    static ArrayList<DateQuantityModel> customerMillkQuantity;
+//    static ArrayList<DateQuantityModel> customerMillkQuantity;
 
-    public static void customersMilkQuantity(ArrayList<DateQuantityModel> list) {
-        customerMillkQuantity = list;
-    }
+//    public static void customersMilkQuantity(ArrayList<DateQuantityModel> list) {
+//        customerMillkQuantity = list;
+//    }
 
     public static void setRegisteredYear(final int year) {
         registeredYear = year;
@@ -762,52 +762,113 @@ public class CalendarAdapter extends BaseAdapter {
 //    }
     BigDecimal bigDecimal = null;
 
-    private BigDecimal getQuantity(final Day d) {
-        Calendar cal = Calendar.getInstance();
+    //    private BigDecimal getQuantity(final Day d) {
+//        Calendar cal = Calendar.getInstance();
+//        if (!isForCustomers) {
+//            if (totalData != null)
+//                for (int i = 0; i < totalData.size(); ++i) {
+//                    //Check if deliverydate is same as of calander
+//
+//                    try {
+//                        date = sdf.parse(totalData.get(i).getDeliveryDate());
+//
+//                        cal.setTime(date);
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//                    if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+//                            .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+//                            ) {
+//                        bigDecimal = totalData.get(i).getCalculatedQuqantity();
+//                        return bigDecimal;
+//                    } else {
+//
+//                    }
+//                }
+//        } else if (customerMillkQuantity != null) {
+//            for (int i = 0; i < customerMillkQuantity.size(); ++i) {
+//                //Check if deliverydate is same as of calander
+//
+//                try {
+//                    date = sdf.parse(customerMillkQuantity.get(i).getDeliveryDate());
+//
+//                    cal.setTime(date);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//                if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
+//                        .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
+//                        ) {
+//                    bigDecimal = customerMillkQuantity.get(i).getCalculatedQuqantity();
+//                    return bigDecimal;
+//                } else {
+//
+//                }
+//            }
+//        }
+//
+//        return bigDecimal;
+//    }
+    private static String custId = "";
+
+    public static void setcustId(String id) {
+        custId = id;
+    }
+
+    private double getQuantity(Day day) {
+        double qty = 0, adjustedQty = 0;
+        DeliveryTableManagement.custIds.clear();
+        String date = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay());
         if (!isForCustomers) {
-            if (totalData != null)
-                for (int i = 0; i < totalData.size(); ++i) {
-                    //Check if deliverydate is same as of calander
+            if (DeliveryTableManagement.isDeletedCustomer(db.getReadableDatabase(), date))
+                qty = DeliveryTableManagement.getQuantityOfDayByDate(db.getReadableDatabase(), date);
 
-                    try {
-                        date = sdf.parse(totalData.get(i).getDeliveryDate());
-
-                        cal.setTime(date);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
-                            .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
-                            ) {
-                        bigDecimal = totalData.get(i).getCalculatedQuqantity();
-                        return bigDecimal;
-                    } else {
-
-                    }
+            if (db.isTableNotEmpty("customers")) {
+                if (DeliveryTableManagement.custIds != null) {
+                    if (DeliveryTableManagement.custIds.size() > 0)
+                        for (int i = 0; i < DeliveryTableManagement.custIds.size(); i++)
+                            //TODO ExtCal SETTINGS DB
+                            adjustedQty += ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
+                                    , DeliveryTableManagement.custIds.get(i));
+                    //            adjustedQty += CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+                    //                    , custIds.get(i));
+                    //TODO ExtCal SETTINGS DB
+                    //            qty += CustomerSettingTableManagement.getAllCustomersByDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day) - adjustedQty;
+                    qty += ExtcalCustomerSettingTableManagement.getAllCustomersByDay(db.getReadableDatabase(), date) - adjustedQty;
                 }
-        } else if (customerMillkQuantity != null) {
-            for (int i = 0; i < customerMillkQuantity.size(); ++i) {
-                //Check if deliverydate is same as of calander
 
-                try {
-                    date = sdf.parse(customerMillkQuantity.get(i).getDeliveryDate());
-
-                    cal.setTime(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                if (d.getDay() == cal.get(Calendar.DAY_OF_MONTH) && d.getMonth() == cal
-                        .get(Calendar.MONTH) && d.getYear() == cal.get(Calendar.YEAR)
-                        ) {
-                    bigDecimal = customerMillkQuantity.get(i).getCalculatedQuqantity();
-                    return bigDecimal;
-                } else {
-
-                }
             }
-        }
 
-        return bigDecimal;
+//            bigDecimal = BigDecimal.valueOf(ExtcalCustomerSettingTableManagement.getAllCustomersByDay(db.getReadableDatabase(), String.valueOf(day.getYear()) + "-"
+//                    + String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay())));
+        } else {
+            if (db.isTableNotEmpty("delivery")) {
+                if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, custId) == 0) {
+                    if (db.isTableNotEmpty("customers")) {
+                    //TODO ExtCal SETTINGS DB
+                    //                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+                    //                            , custId);
+                        qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
+                                , custId);
+
+                    }
+                } else
+                    qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, custId);
+
+
+            } else if (db.isTableNotEmpty("customers")) {
+
+//            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+//                    , custId);
+                //TODO ExtCal SETTINGS DB
+                qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
+                        , custId);
+
+            }
+
+
+        }
+        return qty;
     }
 
 

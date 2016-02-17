@@ -3,8 +3,6 @@ package com.milky.ui.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,24 +12,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.milky.ui.customers.CustomersList;
 import com.milky.ui.main.BillingEdit;
-import com.milky.viewmodel.VCustomersList;
 
 import java.util.List;
 
 import com.milky.R;
 import com.milky.utils.DialogScreen;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 /**
  * Created by Neha on 11/17/2015.
  */
 public class CustomersListAdapter extends BaseAdapter {
-    private List<VCustomersList> mCustomersData;
+    private List<ExtcalVCustomersList> mCustomersData;
     private Context mContext;
     private boolean _mIsCustomer = false;
 
-    public CustomersListAdapter(final List<VCustomersList> dataList, final Context con, final boolean isCustomer) {
+    public CustomersListAdapter(final List<ExtcalVCustomersList> dataList, final Context con, final boolean isCustomer) {
         this.mContext = con;
         this.mCustomersData = dataList;
         this._mIsCustomer = isCustomer;

@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -20,6 +19,8 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.UserPrefrences;
 import com.tyczj.extendedcalendarview.Day;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import java.util.Calendar;
@@ -78,8 +79,9 @@ public class CalenderFragment extends Fragment {
                 Constants.SELECTED_DAY = day;
                 Constants.DELIVERY_DATE = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
                         String.format("%02d", day.getDay());
-                if ((CustomerSettingTableManagement.isHasDataForDay(_dbHelper.getReadableDatabase(), Constants.DELIVERY_DATE))
-                        && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
+                //TODO ExtCal SETTINGS DB
+                if ((ExtcalCustomerSettingTableManagement.isHasDataForDay(new ExtcalDatabaseHelper(getActivity()).getReadableDatabase(), Constants.DELIVERY_DATE))
+                        && day.getDay()<=Calendar.getInstance().get(Calendar.DAY_OF_MONTH)  && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
                     Intent intent = new Intent(getActivity(), CustomersList.class);
                     startActivity(intent);
                 }
@@ -97,7 +99,7 @@ public class CalenderFragment extends Fragment {
             _editor.commit();
             _mCalenderView.setRegistrationDate(cl.get(Calendar.DAY_OF_MONTH));
             _mCalenderView.setRegistrationYear(cl.get(Calendar.YEAR));
-            _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
+            _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH)) ;
         }
         /*
         * Check if has customers added
