@@ -29,7 +29,7 @@ import com.milky.viewmodel.VAccount;
 import java.util.Calendar;
 import java.util.TimerTask;
 
-public class FarmerSignup extends AppCompatActivity {
+public class  FarmerSignup extends AppCompatActivity {
     private TextInputLayout _nameLayout, _lastnameLayout, _mobileLayout, _passwordLayout, otp_layout;
     private EditText _firstName, _lastName, _mobile, _password, otp;
     private DatabaseHelper _dbhelper;

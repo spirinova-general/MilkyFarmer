@@ -57,9 +57,10 @@ public class CustomrDeliveryFragment extends Fragment {
 //                getActivity().getIntent().getStringExtra("cust_id")));
 //        _mCalenderView.customersMilkQuantity(DeliveryTableManagement.getMilkQuantityofCustomer(_exDb.getReadableDatabase(),
 //                getActivity().getIntent().getStringExtra("cust_id")));
+
         custId = getActivity().getIntent().getStringExtra("cust_id");
         _mCalenderView.setForCustomersDelivery(true);
-
+        _mCalenderView.setCustomerId(custId);
         db = AppUtil.getInstance().getDatabaseHandler();
 
         initResources();
@@ -71,6 +72,8 @@ public class CustomrDeliveryFragment extends Fragment {
         return view;
 
     }
+
+    private AlertDialog dialog;
 
     private void initResources() {
         getTotalQuantity();
@@ -87,10 +90,10 @@ public class CustomrDeliveryFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if ((ExtcalCustomerSettingTableManagement.isHasDataForDay(_exDb.getReadableDatabase(), selected_date))
+                if ((ExtcalCustomerSettingTableManagement.isHasDataForDayOfCust(_exDb.getReadableDatabase(), selected_date, custId))
                         && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
-                    final AlertDialog dialog = alertBuilder.create();
+                    dialog = alertBuilder.create();
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
                     dialog.setView(view1);
@@ -124,6 +127,7 @@ public class CustomrDeliveryFragment extends Fragment {
                                 holder1.setCalculatedQuqantity(round(Double.parseDouble(quantity.getText().toString()), 1));
                                 totalData.set(day.getDay() - 1, holder1);
                                 _mCalenderView.refresh();
+                                Constants.REFRESH_CALANDER = true;
                                 dialog.hide();
                             }
 
@@ -135,7 +139,8 @@ public class CustomrDeliveryFragment extends Fragment {
                             dialog.hide();
                         }
                     });
-                    dialog.show();
+                    if (dialog != null)
+                        dialog.show();
                 }
             }
         });
@@ -255,5 +260,12 @@ public class CustomrDeliveryFragment extends Fragment {
 
 
         return qty;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (dialog != null)
+            dialog.dismiss();
     }
 }

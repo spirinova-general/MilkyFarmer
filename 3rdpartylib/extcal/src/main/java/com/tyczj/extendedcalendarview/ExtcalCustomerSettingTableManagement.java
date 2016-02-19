@@ -37,9 +37,65 @@ public class ExtcalCustomerSettingTableManagement {
     public static ArrayList<ExtcalVCustomersList> getAllCustomersBySelectedDate(SQLiteDatabase db, String areaid, String date) {
         String selectquery = "";
         if (areaid.equals("")) {
+
+            selectquery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.START_DATE
+                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'" + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
+        } else
+            selectquery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.START_DATE
+                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
+                    + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
+
+        ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
+//                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
+//                    holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
+                    holder.setStart_date(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
+                    holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
+                    holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
+                    holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
+                    holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
+                    holder.setBalance_amount(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
+                    holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)) != null)
+                    holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
+                    holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+
+                list.add(holder);
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
+                    holder.setIs_deleted(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)));
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+        if (db.isOpen())
+            db.close();
+        return list;
+    }
+
+    public static ArrayList<ExtcalVCustomersList> customersForSelectedDates(SQLiteDatabase db, String areaid, String date) {
+        String selectquery = "";
+        if (areaid.equals("")) {
 //            if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
             selectquery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.START_DATE
-                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >='" + date + "'"
+                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'"
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
 //            } else
 //                selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
@@ -48,7 +104,7 @@ public class ExtcalCustomerSettingTableManagement {
 // else if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
         else
             selectquery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.START_DATE
-                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >='" + date + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
+                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
 //        } else
 //            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
@@ -89,6 +145,8 @@ public class ExtcalCustomerSettingTableManagement {
                     holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
                     holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)) != null)
+                    holder.setEnd_date(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -115,6 +173,17 @@ public class ExtcalCustomerSettingTableManagement {
     public static boolean isHasDataForDay(SQLiteDatabase db, String day) {
         String selectQuery = "SELECT * FROM customers WHERE "
                 + TableColumns.START_DATE + " <='" + day + "'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        db.close();
+        return result;
+    }
+
+    public static boolean isHasDataForDayOfCust(SQLiteDatabase db, String day, String custId) {
+        String selectQuery = "SELECT * FROM customers WHERE "
+                + TableColumns.START_DATE + " <='" + day + "' AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
 
@@ -409,7 +478,7 @@ public class ExtcalCustomerSettingTableManagement {
 //                    + " >'" + day + "'" + " AND "
 //                    + TableColumns.CUSTOMER_ID + " ='" + id + "'";
         selectquery = "SELECT * FROM " + "customers" + " WHERE "
-                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
                 + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')" + " AND "
                 + TableColumns.CUSTOMER_ID + " ='" + id + "'";
         double qty = 0;
@@ -419,12 +488,8 @@ public class ExtcalCustomerSettingTableManagement {
         if (cursor.moveToFirst()) {
             do {
                 qty = Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
-
-
             }
             while (cursor.moveToNext());
-
-
         }
 
 
@@ -439,7 +504,7 @@ public class ExtcalCustomerSettingTableManagement {
         String selectquery = "";
 //        if (isDeletedCustomer(db, day)) {
         selectquery = "SELECT * FROM " + "customers" + " WHERE "
-                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
                 + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
 //        } else
 //            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
@@ -469,7 +534,7 @@ public class ExtcalCustomerSettingTableManagement {
         String selectquery = "SELECT * FROM " + "customers" +
                 " WHERE " + TableColumns.CUSTOMER_ID + " ='" + cId + "' AND "
                 + TableColumns.START_DATE + " <='" + date + "'" + " AND " +
-                TableColumns.END_DATE + " >='" + date + "'";
+                TableColumns.END_DATE + " >'" + date + "'";
         String enddate = "";
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
@@ -492,7 +557,7 @@ public class ExtcalCustomerSettingTableManagement {
     public static boolean isDeletedCustomer(SQLiteDatabase db, String day) {
         String selectQuery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.DELETED_ON + " ="
                 + "'1'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE +
-                " >='" + day + "'";
+                " >'" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -578,12 +643,6 @@ public class ExtcalCustomerSettingTableManagement {
         values.put(TableColumns.DELETED_ON, "1");
         values.put(TableColumns.AREA_ID, holder.getAreaId());
 
-
-        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
-        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
-        values.put(TableColumns.END_DATE, holder.getEnd_date());
-        values.put(TableColumns.AREA_ID, holder.getAreaId());
-
         db.update("customers", values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
                 + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
     }
@@ -619,7 +678,7 @@ public class ExtcalCustomerSettingTableManagement {
 
     public static boolean isDeletedCustomer(SQLiteDatabase db, String custId, String day) {
         String selectQuery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.DELETED_ON + " ='"
-                + "1" + "'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
+                + "1" + "'" + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -632,7 +691,7 @@ public class ExtcalCustomerSettingTableManagement {
         String selectquery = "SELECT * FROM " + "customers" +
                 " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId
                 + " AND " + TableColumns.START_DATE + " <=" + deliveryDate + "' AND( " + TableColumns.END_DATE + " ='0' OR " +
-                TableColumns.END_DATE + " >='" + deliveryDate + "')";
+                TableColumns.END_DATE + " >'" + deliveryDate + "')";
         ExtcalVCustomersList list = null;
 
         Cursor cursor = db.rawQuery(selectquery, null);

@@ -21,6 +21,7 @@ import com.milky.ui.customers.CustomersList;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.DeliveryTableManagement;
+import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
@@ -260,7 +261,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
                 if (!Constants.selectedAreaId.equals("")) {
                     clear();
 
-                    filterList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+                    filterList = ExtcalCustomerSettingTableManagement.getAllCustomersBySelectedDate(exDb.getReadableDatabase(), Constants.selectedAreaId,Constants.DELIVERY_DATE);
                     CustomersList.selectedCustomersId = new ArrayList<>();
                     for (ExtcalVCustomersList Area : filterList) {
                         add(Area);

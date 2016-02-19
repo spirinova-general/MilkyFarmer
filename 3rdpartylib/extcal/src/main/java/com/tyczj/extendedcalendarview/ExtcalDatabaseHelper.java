@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+
+import java.io.File;
 
 /**
  * Created by Lead1 on 2/16/2016.
@@ -14,10 +17,10 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
     Context context;
     SQLiteDatabase db;
 
-//    public DatabaseHelper(final Context context) {
+//    public ExtcalDatabaseHelper(final Context context) {
 //        super(context, Environment.getExternalStorageDirectory()
 //                + File.separator + "milky"
-//                + File.separator + DatabaseVersioControl.DATABASE_NAME, null, DatabaseVersioControl.DATABASE_VERSION);
+//                + File.separator + "Extcal", null, 1);
 //    }
 
     public ExtcalDatabaseHelper(Context context) {

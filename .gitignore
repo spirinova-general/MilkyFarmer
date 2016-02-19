@@ -32,3 +32,6 @@ app/src/main/res/layout/actionbar_withsubtitle_layout.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/inspectionProfiles/profiles_settings.xml
 app/src/main/res/anim/rotate_image.xml
+3rdpartylib/extcal
+3rdpartylib\extcal\build\generated
+

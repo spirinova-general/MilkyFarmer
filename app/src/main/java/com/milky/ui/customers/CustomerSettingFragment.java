@@ -437,8 +437,8 @@ public class CustomerSettingFragment extends Fragment {
                     String formattedDate = df.format(c.getTime());
                     holder.setBalanceType("1");
                     holder.setDateModified(formattedDate);
-                    holder.setEnd_date(c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)));
+                    holder.setEnd_date(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
+                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
 
 //                    if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
@@ -446,12 +446,12 @@ public class CustomerSettingFragment extends Fragment {
 //                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
 //TODO ExtCal SETTINGS DB
                     if (ExtcalCustomerSettingTableManagement.isHasStartDate(extDb.getReadableDatabase(),
-                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)){
+                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
 //                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                         ExtcalCustomerSettingTableManagement.updateData(extDb.getWritableDatabase(), holder);
 
 
-                    }else{
+                    } else {
                         if (updatedQtyRate) {
                             String enddate = ExtcalCustomerSettingTableManagement.getOldEndDate(extDb.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
                             ExtcalCustomerSettingTableManagement.updateEndDate(extDb.getWritableDatabase(), holder, enddate, formattedDate);

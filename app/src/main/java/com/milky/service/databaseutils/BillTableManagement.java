@@ -144,7 +144,7 @@ public class BillTableManagement {
     public static float getPreviousBill(SQLiteDatabase db, final String custId, final String day, final double quantity) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         float amount = 0;
 
@@ -189,7 +189,7 @@ public class BillTableManagement {
     public static boolean isClearedBill(SQLiteDatabase db, final String custId, final String day) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
                 + " AND " + TableColumns.IS_CLEARED + " ='1'";
         Cursor cursor = db.rawQuery(selectquery, null);
 
@@ -224,7 +224,7 @@ public class BillTableManagement {
     public static String outstandingStatus(SQLiteDatabase db, final String custId, final String day) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         String amount = "1";
 
@@ -246,7 +246,7 @@ public class BillTableManagement {
     public static String getPaymentMade(SQLiteDatabase db, final String custId, final String day) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.CUSTOMER_ID + " ='"
                 + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'";
+                + " AND " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         String amount = "1";
 

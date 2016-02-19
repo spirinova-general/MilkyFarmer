@@ -582,4 +582,5 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 getFragmentRefreshListener().onRefresh();
             }
     }
+
 }

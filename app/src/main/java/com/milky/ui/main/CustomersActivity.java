@@ -42,7 +42,7 @@ public class CustomersActivity extends AppCompatActivity {
     private FloatingActionButton fabDelete;
     public static Intent _mIntent;
     public static String titleString = "";
-    private ExtcalDatabaseHelper exDb ;
+    private ExtcalDatabaseHelper exDb;
 
     @Override
     protected void onResume() {
@@ -100,7 +100,7 @@ public class CustomersActivity extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
+        String date = Constants._display_format.format(shownDate.getTime());
         subTitle.setText("Date Added- " + Constants._display_format.format(shownDate.getTime()));
         subTitle.setVisibility(View.VISIBLE);
         getSupportActionBar().setCustomView(mCustomView);

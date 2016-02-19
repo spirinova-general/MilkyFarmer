@@ -121,11 +121,11 @@ public class DeliveryTableManagement {
     public  static ArrayList<String> custIds = new ArrayList<>();
     public static double getQuantityOfDayByDate(SQLiteDatabase db, String day) {
         String selectquery = "";
-        if (isDeletedCustomer(db, day))
-            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'";
-        else
-            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
-                    + " AND " + TableColumns.DELETED_ON + " >'" + day + "'";
+//        if (isDeletedCustomer(db, day))
+            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "' AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
+//        else
+//            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
+//                    + " AND " + TableColumns.DELETED_ON + " >'" + day + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         double quantity = 0;
         if (cursor.moveToFirst()) {

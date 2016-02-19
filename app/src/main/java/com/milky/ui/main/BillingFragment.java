@@ -101,6 +101,7 @@ public class BillingFragment extends Fragment {
         Calendar cal = Calendar.getInstance();
         Calendar c = Calendar.getInstance();
         double totalQuantity = 0, totalRate = 0;
+        String startDeliveryDate="";
         VBill holder = new VBill();
         /*Bill is to be outstanding*/
 //        if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
@@ -146,6 +147,7 @@ public class BillingFragment extends Fragment {
 //        }
 //TODO ExtCal SETTINGS DB
         ArrayList<String> startDates = ExtcalCustomerSettingTableManagement.getStartDeliveryDate(_exDb.getReadableDatabase(), custId);
+
         if (startDates != null)
             for (int j = 0; j < startDates.size(); j++) {
 
@@ -155,7 +157,10 @@ public class BillingFragment extends Fragment {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-
+                if(totalQuantity>0 && startDates.get(j).equals(startDeliveryDate))
+                {
+                    return;
+                }
                 for (int i = c.get(Calendar.DAY_OF_MONTH); i <= cal.get(Calendar.DAY_OF_MONTH); ++i) {
                     if (BillTableManagement.isClearedBill(_dbHelper.getReadableDatabase(), custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i))) {
 
@@ -164,6 +169,7 @@ public class BillingFragment extends Fragment {
                                         + String.format("%02d", i), custId);
                         totalQuantity += quantity;
                         holder.setCustomerId(custId);
+                        startDeliveryDate =startDates.get(j);
                         holder.setStartDate(startDates.get(j));
                         holder.setBalance(CustomersTableMagagement.getBalanceForCustomer(_dbHelper.getReadableDatabase(), custId));
                         holder.setEndDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));

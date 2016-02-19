@@ -33,7 +33,6 @@ public class Constants {
     static Calendar cal = Calendar.getInstance();
 
     public static String getCurrentDate() {
-
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         df.format(cal.getTime());
         return (cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" +

@@ -208,9 +208,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setBalanceType("1");
                         holder.setDateAdded(formattedDate);
                         holder.setStart_date(pickedDate);
-                        holder.setEnd_date(deliveryDateTime.get(Calendar.YEAR) + "-" +
-                                String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 1) + "-" +
-                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH)));
+                        holder.setEnd_date(hol.getEnd_date());
                         holder.setCustomerId(hol.getCustomerId());
 
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);

@@ -530,7 +530,7 @@ public class CalendarAdapter extends BaseAdapter {
 //    }
 
 
-    //    private BigDecimal getQuantity(final Day d) {
+//    private BigDecimal getQuantity(final Day d) {
 //        float quantity = 0;
 //        BigDecimal bigDecimal = round(quantity, 1);
 //        arrayCustId = new ArrayList<>();
@@ -748,9 +748,8 @@ public class CalendarAdapter extends BaseAdapter {
 //
 //        }
 //
-//
-//
-//
+
+
 ///*//Check if deleted customer
 //        if(totaldata.getIsDeletedCustomer().equals("1"))
 //        {
@@ -762,7 +761,7 @@ public class CalendarAdapter extends BaseAdapter {
 //    }
     BigDecimal bigDecimal = null;
 
-    //    private BigDecimal getQuantity(final Day d) {
+//    private BigDecimal getQuantity(final Day d) {
 //        Calendar cal = Calendar.getInstance();
 //        if (!isForCustomers) {
 //            if (totalData != null)
@@ -809,6 +808,7 @@ public class CalendarAdapter extends BaseAdapter {
 //
 //        return bigDecimal;
 //    }
+
     private static String custId = "";
 
     public static void setcustId(String id) {

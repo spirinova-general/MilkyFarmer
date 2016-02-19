@@ -77,8 +77,8 @@ public class CustomersList extends AppCompatActivity {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
             //TODO ExtCal SETTINGS DB
-//            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
-            _mCustomersList = ExtcalCustomerSettingTableManagement.getAllCustomersBySelectedDate(exDb.getReadableDatabase(), "", Constants.DELIVERY_DATE);
+//            _mCustomersList = CustomerSettingTableManagement.customersForSelectedDates(_dbHelper.getReadableDatabase(), "");
+            _mCustomersList = ExtcalCustomerSettingTableManagement.customersForSelectedDates(exDb.getReadableDatabase(), "", Constants.DELIVERY_DATE);
             _mAdaapter = new GlobalDeliveryAdapter(this, 0, 0, String.valueOf(Constants.SELECTED_DAY), _mCustomersList);
             selectedCustomersId = _mCustomersList;
             _mCustomers.setItemsCanFocus(true);
@@ -132,10 +132,14 @@ public class CustomersList extends AppCompatActivity {
         title.setText(Constants.DELIVERY_DATE);
         ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
         deleteCustomer.setVisibility(View.GONE);
-
+        ((LinearLayout) mCustomView.findViewById(R.id.saveManu)).setVisibility(View.GONE);
         _mToolbar.setVisibility(View.VISIBLE);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setCustomView(mCustomView);
     }
 
 
@@ -203,12 +207,12 @@ public class CustomersList extends AppCompatActivity {
 //
 //                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
 //                        if (arg2 == 0) {
-//                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), "");
+//                            _mCustomersList = CustomerSettingTableManagement.customersForSelectedDates(_dbHelper.getReadableDatabase(), "");
 //                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
 //                            _mCustomers.setItemsCanFocus(true);
 //                            _mCustomers.setAdapter(_mAdaapter);
 //                        } else {
-//                            _mCustomersList = CustomerSettingTableManagement.getAllCustomersBySelectedDate(_dbHelper.getReadableDatabase(), selectedAreaId);
+//                            _mCustomersList = CustomerSettingTableManagement.customersForSelectedDates(_dbHelper.getReadableDatabase(), selectedAreaId);
 //                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
 //                            _mCustomers.setItemsCanFocus(true);
 //                            _mCustomers.setAdapter(_mAdaapter);
