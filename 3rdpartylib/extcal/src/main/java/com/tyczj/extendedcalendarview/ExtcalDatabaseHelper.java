@@ -17,29 +17,29 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
     Context context;
     SQLiteDatabase db;
 
-//    public ExtcalDatabaseHelper(final Context context) {
-//        super(context, Environment.getExternalStorageDirectory()
-//                + File.separator + "milky"
-//                + File.separator + "Extcal", null, 1);
-//    }
-
-    public ExtcalDatabaseHelper(Context context) {
-        super(context, "Extcal", null,
-                1);
-        this.context = context;
-
+    public ExtcalDatabaseHelper(final Context context) {
+        super(context, Environment.getExternalStorageDirectory()
+                + File.separator + "milky"
+                + File.separator + "Extcal", null, 1);
     }
+
+//    public ExtcalDatabaseHelper(Context context) {
+//        super(context, "Extcal", null,
+//                1);
+//        this.context = context;
+//
+//    }
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-       String cs = "CREATE TABLE " + "customers" + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.ACCOUNT_ID + " TEXT,"
-               + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.DEFAULT_RATE + " TEXT,"
-               + TableColumns.DEFAULT_QUANTITY + " TEXT," + TableColumns.BALANCE_TYPE
-               + " TEXT,"
-               + TableColumns.BALANCE + " TEXT," + TableColumns.FIRST_NAME + " TEXT," + TableColumns.LAST_NAME + " TEXT,"
-               + TableColumns.START_DATE + " DATETIME," + TableColumns.AREA_ID + " TEXT,"
-               + TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
+        String cs = "CREATE TABLE " + "customers" + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.ACCOUNT_ID + " TEXT,"
+                + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.DEFAULT_RATE + " TEXT,"
+                + TableColumns.DEFAULT_QUANTITY + " TEXT," + TableColumns.BALANCE_TYPE
+                + " TEXT,"
+                + TableColumns.BALANCE + " TEXT," + TableColumns.FIRST_NAME + " TEXT," + TableColumns.LAST_NAME + " TEXT,"
+                + TableColumns.START_DATE + " DATETIME," + TableColumns.AREA_ID + " TEXT,"
+                + TableColumns.END_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.ADJUSTMENTS + " TEXT," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" + ")";
         db.execSQL(cs);
         //DELIVERY
         String DELIVERY = "CREATE TABLE " + "delivery" + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.ACCOUNT_ID + " TEXT," + TableColumns.QUANTITY + " TEXT,"
@@ -52,7 +52,7 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         String[] tables = {
-                "customers","delivery"
+                "customers", "delivery"
 
         };
         for (String tableName : tables) {
@@ -75,7 +75,7 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
         Boolean result = cursor.getCount() > 0;
 
         cursor.close();
-        db.close();
+
         return result;
     }
 

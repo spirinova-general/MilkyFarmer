@@ -1,14 +1,20 @@
 package com.milky.ui.main;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -16,13 +22,15 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.Spinner;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,31 +48,25 @@ import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.milky.viewmodel.SendMessage;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleteListner {
 
-    private FragmentManager mFragmentManager;
-    private FragmentTransaction mFragmentTransaction;
-    private Toolbar _mToolbar;
     private DatabaseHelper _dbHelper;
     private View _headerView;
-    private ArrayList<VAreaMapper> selectedareacityList = new ArrayList<>();
+    protected ArrayList<VAreaMapper> selectedareacityList;
     public static DrawerLayout mDrawerLayout;
     public static NavigationView mNavigationView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
         VAccount dataHolder = Account.getFarmerName(_dbHelper.getReadableDatabase());
 
-        name.setText(dataHolder.getFirstName() + " " + dataHolder.getLastName());
+        name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -127,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
+        //To get the current data
 
     }
 
@@ -134,11 +137,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
     ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
 
-    Spinner spinner;
-    int selectedPosition = 0;
     public static String selectedArea = "";
     Menu menu = null;
-    View view1, searchView;
+    View searchView;
     boolean expended = false;
 
     @Override
@@ -189,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             final SearchView actionSearchView = (SearchView) searchView;
             final AutoCompleteTextView editSearch;
             editSearch = (AutoCompleteTextView) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-            editSearch.setHintTextColor(getResources().getColor(R.color.gray_lighter));
+            editSearch.setHintTextColor(ContextCompat.getColor(this, R.color.gray_lighter));
             editSearch.setHint("Type Area Or Customer Name");
             editSearch.clearFocus();
             editSearch.setTextSize(13);
@@ -198,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 public void onClick(View v) {
                     expended = true;
 //                    mSpinnerItem1.setVisible(false);
+
                 }
             });
             editSearch.setThreshold(1);
@@ -277,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
         TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
         VAccount dataHolder = Account.getFarmerName(_dbHelper.getReadableDatabase());
-        name.setText(dataHolder.getFirstName() + " " + dataHolder.getLastName());
+        name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
         if (getFragmentRefreshListener() != null) {
             getFragmentRefreshListener().onRefresh();
         }
@@ -319,12 +321,15 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
 
     private void supportActionBar() {
-        _mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar _mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(_mToolbar);
         final ActionBar actionBar = this.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
+
     }
 
 
@@ -338,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
                 menu.findItem(R.id.action_search).setVisible(false);
                 menu.findItem(R.id.bulk_edit).setVisible(false);
+                menu.findItem(R.id.sens_sms).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
 
 
@@ -345,11 +351,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             case 1:
                 menu.findItem(R.id.action_search).setVisible(true);
                 menu.findItem(R.id.bulk_edit).setVisible(false);
+                menu.findItem(R.id.sens_sms).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
                 break;
             case 2:
                 menu.findItem(R.id.action_search).setVisible(false);
                 menu.findItem(R.id.bulk_edit).setVisible(false);
+                menu.findItem(R.id.sens_sms).setVisible(true);
                 menu.findItem(R.id.save).setVisible(false);
                 break;
         }
@@ -357,25 +365,37 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     }
 
     AreaCitySpinnerAdapter adp1;
+    ProgressDialog progressBar;
 
     private void initResources() {/**
      *Setup the DrawerLayout and NavigationView
      */
+        progressBar = new ProgressDialog(MainActivity.this);
+        progressBar.setCancelable(true);
+        progressBar.setMessage("Checking in ...");
+        //progress dialog type
+        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar.setProgress(0);
+        progressBar.setMax(100);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.navView);
         mNavigationView.setVisibility(View.VISIBLE);
-
+        selectedareacityList = new ArrayList<>();
 //        MenuItem sync = (MenuItem) mNavigationView.findViewById(R.id.nav_sync);
 //        sync.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_image));
-
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+            if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
+//                expiryDialog();
+            }
+        }
         /**
          * Lets inflate the very first fragment
          * Here , we are inflating the TabFragment as the first Fragment
          */
 
-        mFragmentManager = getSupportFragmentManager();
-        mFragmentTransaction = mFragmentManager.beginTransaction();
+        FragmentManager mFragmentManager = getSupportFragmentManager();
+        FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.containerView, new MainTabFragment()).commit();
 
 
@@ -385,61 +405,94 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             Toast.makeText(MainActivity.this, getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
             _dbHelper.close();
         }
+/*
+String Area[] = new String[]{"Hadaspar", "Worli", "Baner", "Phase5", "Sector 71"};
+int AreaID[] = new int[]{1, 2, 3, 4, 5};
+String City[] = new String[]{"Pune", "Mumbai", "Mohali"};
+int CityId[] = new int[]{1, 2, 3};
 
-//        String Area[] = new String[]{"Hadaspar", "Worli", "Baner", "Phase5", "Sector 71"};
-//        int AreaID[] = new int[]{1, 2, 3, 4, 5};
-//        String City[] = new String[]{"Pune", "Mumbai", "Mohali"};
-//        int CityId[] = new int[]{1, 2, 3};
-//
-//        if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
-//            for (int i = 0; i < 5; i++) {
-//                VAreaMapper holder = new VAreaMapper();
-//                holder.setArea(Area[i]);
-//                holder.setAreaId(String.valueOf(AreaID[i]));
-//                if ((i == 0 || i == 2)) {
-//                    holder.setCity(City[0]);
-//                    holder.setCityId(String.valueOf(CityId[0]));
-//                } else if (i == 1) {
-//                    holder.setCity(City[1]);
-//                    holder.setCityId(String.valueOf(CityId[1]));
-//                } else {
-//                    holder.setCity(City[2]);
-//                    holder.setCityId(String.valueOf(CityId[2]));
-//                }
-//
-//                holder.setAccountId(Constants.ACCOUNT_ID);
-//                AreaCityTableManagement.insertAreaDetail(_dbHelper.getWritableDatabase(), holder);
-//            }
-//        _dbHelper.close();
-//        for (int i = 0; i < City.length; i++) {
-//            VAreaMapper holder = new VAreaMapper();
-//            holder.setCityId(String.valueOf(CityId[i]));
-//            holder.setCity(City[i]);
-//            holder.setAccountId(Constants.ACCOUNT_ID);
-//            AreaCityTableManagement.insertCityDetail(_dbHelper.getWritableDatabase(), holder);
-//        }
-//        _dbHelper.close();
+if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
+for (int i = 0; i < 5; i++) {
+VAreaMapper holder = new VAreaMapper();
+holder.setArea(Area[i]);
+holder.setAreaId(String.valueOf(AreaID[i]));
+if ((i == 0 || i == 2)) {
+holder.setCity(City[0]);
+holder.setCityId(String.valueOf(CityId[0]));
+} else if (i == 1) {
+holder.setCity(City[1]);
+holder.setCityId(String.valueOf(CityId[1]));
+} else {
+holder.setCity(City[2]);
+holder.setCityId(String.valueOf(CityId[2]));
+}
 
-
+holder.setAccountId(Constants.ACCOUNT_ID);
+AreaCityTableManagement.insertAreaDetail(_dbHelper.getWritableDatabase(), holder);
+}
+_dbHelper.close();
+for (int i = 0; i < City.length; i++) {
+VAreaMapper holder = new VAreaMapper();
+holder.setCityId(String.valueOf(CityId[i]));
+holder.setCity(City[i]);
+holder.setAccountId(Constants.ACCOUNT_ID);
+AreaCityTableManagement.insertCityDetail(_dbHelper.getWritableDatabase(), holder);
+}
+_dbHelper.close();
+*/
     }
 
-    private JSONArray jsonDataArray;
-
     @Override
-    public void onTaskCompleted(JSONArray result, String type, HashMap<String, String> requestType) {
+    public void onTaskCompleted(String type, HashMap<String, String> requestType) {
 
+        if (Constants.TIME_OUT) {
+            if (progressBar != null)
+                progressBar.hide();
+            else if (androidProgressBar != null) {
+                androidProgressBar.setMax(100);
+                androidProgressBar.setVisibility(View.GONE);
+            }
+            Constants.TIME_OUT = false;
 
-        if (ServerApis.STATUS == 1) {
-            if (type == ServerApis.SYNC) {
-                if (requestType.get("Customer_List").equals("0")) {
-                    CustomersTableMagagement.updateSyncedData(_dbHelper.getWritableDatabase());
-                } else if (requestType.get("Bill_List").equals("0")) {
-                    BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
+        }
+        if (type.equals(ServerApis.ACCOUNT_API)) {
+            if (Constants.API_RESPONCE != null) {
+                VAccount holder = new VAccount();
+                try {
+                    JSONObject result = Constants.API_RESPONCE;
+//                        holder.setFarmerCode(result.getString("FarmerCode"));
+//                        holder.setFirstName(result.getString("FirstName"));
+//                        holder.setLastName(result.getString("LastName"));
+//                        holder.setMobile(result.getString("Mobile"));
+//                        holder.setValidated(String.valueOf(result.getBoolean("Validated")));
+//                        holder.setDirty(String.valueOf(result.getInt("Dirty")));
+//                        holder.setDateAdded(result.getString("DateAdded"));
+//                        holder.setDateModified(result.getString("DateModified"));
+//                        holder.setAccountStartDate(result.getString("StartDate"));
+                    holder.setExpiryDate(result.getString("EndDate"));
+                    holder.setUsedSms(String.valueOf(result.getInt("UsedSms")));
+                    holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
+                    holder.setId(String.valueOf(result.getInt("Id")));
+
+                    Account.updateAllAccountDetails(_dbHelper.getWritableDatabase(), holder);
+                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+                        if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
+                            Toast.makeText(MainActivity.this, "Account is expired !", Toast.LENGTH_LONG).show();
+                        } else
+                            expirationDialog.dismiss();
+                    }
+                    progressBar.hide();
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
-        } else {
 
-
+        } else if (type == ServerApis.SYNC) {
+            if (requestType.get("Customer_List").equals("0")) {
+                CustomersTableMagagement.updateSyncedData(_dbHelper.getWritableDatabase());
+            } else if (requestType.get("Bill_List").equals("0")) {
+                BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
+            }
         }
         _dbHelper.close();
     }
@@ -458,114 +511,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         void onRefresh();
     }
 
-    public void SyncNow() {
-        HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SYNC, getAllDataToSync(), MainActivity.this, true, requestedList);
-    }
-
-    public static HashMap<String, String> requestedList = new HashMap<>();
-
-    private List<NameValuePair> getAllDataToSync() {
-        JSONArray jsonArray;
-        JSONObject jsonObject = new JSONObject();
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            ArrayList<ExtcalVCustomersList> custList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-            if (custList.size() == 0) {
-
-                requestedList.put("Customer_List", "1");
-
-            } else {
-                jsonArray = new JSONArray();
-                for (int i = 0; i < custList.size(); ++i) {
-                    JSONObject obj = new JSONObject();
-                    try {
-                        obj.put("FirstName", custList.get(i).getFirstName());
-                        obj.put("LastName", custList.get(i).getLastName());
-                        obj.put("Mobile", custList.get(i).getMobile());
-                        obj.put("Address1", custList.get(i).getAddress1());
-                        obj.put("Address2", custList.get(i).getAddress2());
-                        obj.put("Balance", custList.get(i).getBalance_amount());
-                        obj.put("DateAdded", custList.get(i).getDateAdded());
-                        obj.put("DateModified", custList.get(i).getDateModified());
-                        obj.put("AccountId", "5");
-                        obj.put("AreaId", "1");
-                        obj.put("Dirty", "0");
-
-                        jsonArray.put(obj);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                try {
-                    jsonObject.put("Customer_List", jsonArray);
-                    requestedList.put("Customer_List", "0");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            _dbHelper.close();
-        }
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
-            ArrayList<ExtcalVCustomersList> billList = BillTableManagement.getCustomersBill(_dbHelper.getReadableDatabase());
-            if (billList.size() == 0) {
-
-                requestedList.put("Customer_List", "1");
-
-            } else {
-                jsonArray = new JSONArray();
-                for (int i = 0; i < billList.size(); ++i) {
-                    JSONObject obj = new JSONObject();
-                    try {
-                        obj.put("CustomerId", billList.get(i).getCustomerId());
-                        obj.put("StartDate", billList.get(i).getStart_date());
-                        obj.put("EndDate", billList.get(i).getEnd_date());
-                        obj.put("Quantity", billList.get(i).getQuantity());
-                        obj.put("Balance", "0");
-                        obj.put("DateAdded", billList.get(i).getDateAdded());
-                        obj.put("DateModified", billList.get(i).getDateModified());
-                        obj.put("AccountId", "5");
-                        obj.put("AreaId", "1");
-                        obj.put("Dirty", "0");
-                        obj.put("Adjustment", billList.get(i).getAdjustment());
-                        obj.put("TOTAL_AMOUNT", billList.get(i).getBalance_amount());
-                        obj.put("TAX", billList.get(i).getTax());
-                        obj.put("IsCleared", billList.get(i).getIsCleared());
-                        obj.put("PaymentMade", billList.get(i).getPaymentMade());
-
-                        jsonArray.put(obj);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                try {
-                    jsonObject.put("Bill_List", jsonArray);
-                    requestedList.put("Bill_List", "0");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            _dbHelper.close();
-
-        }
-
-
-        List<NameValuePair> nameValuePair = new ArrayList<>();
-        if (jsonObject.length() > 0)
-            nameValuePair.add(new BasicNameValuePair("", jsonObject.toString()));
-
-
-        return nameValuePair;
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
-                && keyCode == KeyEvent.KEYCODE_BACK
+        if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
             onBackPressed();
             return true;
@@ -583,4 +532,221 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             }
     }
 
+    //Expiry dialog
+
+    ArrayList<SendMessage> list = new ArrayList<>();
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.sens_sms:
+                if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+                    list = CustomersTableMagagement.getAllCustomersBillingInfo(_dbHelper.getReadableDatabase());
+                }
+                if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
+                    if (list.size() > 0) {
+                        if (Account.getLeftsmsCount(_dbHelper.getReadableDatabase()) > list.size())
+                            new SendBillSMS().execute();
+                        else
+                            Toast.makeText(MainActivity.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
+                    } else
+                        Toast.makeText(MainActivity.this, "Please add customer !", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(MainActivity.this, "No network available. ", Toast.LENGTH_SHORT).show();
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    private class SendBillSMS extends AsyncTask<Void, String, String> {
+        AlertDialog dialog;
+        Handler progressHandler = new Handler();
+        int progress = 0;
+
+        String msg = "";
+        int finalI = 0;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            progressDialog = ProgressDialog.show(GlobalSetting.this, "Please wait", "Sending SMS...");
+            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+            dialog = dialogBuilder.create();
+            messageProgress(dialog);
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+
+            final ArrayList<SendMessage> finalList = list;
+
+            new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < finalList.size(); ++i) {
+                        String mesg = null;
+                        try {
+                            mesg = URLEncoder.encode("Dear " + finalList.get(i).getFristName() + ", " + "your milk bill is " + finalList.get(i).getBillAmount(), "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        SendSmsTouser(finalList.get(i).getMobileNo(), mesg);
+
+                        finalI = i + 1;
+                        progressHandler.post(new Runnable() {
+                            public void run() {
+                                progress += (100 / finalList.size());
+                                androidProgressBar.setProgress(progress);
+                                //Status update in textview
+
+                                if (finalI != finalList.size())
+                                    msg = "Sending message: " + finalI + "/" + finalList.size();
+                                else
+                                    msg = "Sent message: " + finalI + "/" + finalList.size();
+                                publishProgress(msg);
+
+                            }
+                        });
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }).start();
+
+            return msg;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            messageSent.setText(values[0]);
+            if (list.size() == finalI) {
+                Account.updateSMSCount(_dbHelper.getWritableDatabase(), list.size());
+                ok.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String aVoid) {
+            super.onPostExecute(aVoid);
+
+//            progressDialog.cancel();
+//            dialog.dismiss();
+        }
+    }
+
+    //Sens SMS to customers
+    private void SendSmsTouser(String mob, final String sms) {
+        if (mob.length() == 10) {
+            mob = "91" + mob;
+        }
+        String append = "&mobiles=" + mob + "&message=" + sms;
+        HttpAsycTask dataTask = new HttpAsycTask();
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append + ServerApis.SMS_API_POSTFIX, null, this, false, null);
+    }
+
+    private TextView messageSent;
+    private ProgressBar androidProgressBar;
+    private Button ok;
+
+    private void messageProgress(final AlertDialog dialog) {
+        final LayoutInflater inflater = (LayoutInflater)
+                MainActivity.this.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        View dialogView = inflater.inflate(R.layout.message_progress, null, false);
+        dialog.setView(dialogView);
+        dialog.setCancelable(false);
+        messageSent = (TextView) dialogView.findViewById(R.id.messageSent);
+        androidProgressBar = (ProgressBar) dialogView.findViewById(R.id.horizontal_progress_bar);
+        ok = (Button) dialogView.findViewById(R.id.ok);
+        ok.setVisibility(View.INVISIBLE);
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    AlertDialog expirationDialog;
+
+    public void expiryDialog() {
+
+
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        expirationDialog = dialogBuilder.create();
+//                    LayoutInflater inflater =  MainActivity.this(ge);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+//                    LayoutInflater inflater =  MainActivity.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.account_expire, null, false);
+        expirationDialog.setView(dialogView);
+        TextView title = (TextView) dialogView.findViewById(R.id.title);
+        title.setText("Account Expired");
+
+        expirationDialog.setCancelable(false);
+        Button cancelDialog = (Button) dialogView.findViewById(R.id.cancel_button);
+        Button continueButton = (Button) dialogView.findViewById(R.id.continue_button);
+        cancelDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expirationDialog.dismiss();
+                MainActivity.this.finish();
+            }
+        });
+        continueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ExpirationDateUpdate().execute();
+            }
+        });
+
+        expirationDialog.show();
+
+//            }
+
+
+    }
+
+    class ExpirationDateUpdate extends AsyncTask<Void, Void, Void> {
+
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            //mehod call to HttpAsyncTask class function with parametrs
+
+            //Creats a jason object for data
+
+//            asyncTask.runRequest(ServerApis.ACCOUNT_API, sendDataToServer(), FarmerSignup.this, true, requestedList);
+//            new ServerCommunication().SendHttpPost(ServerApis.ACCOUNT_API, jsonObject);
+            HttpAsycTask dataTask = new HttpAsycTask();
+            dataTask.runRequest(ServerApis.ACCOUNT_API, Account.getDetails(_dbHelper.getReadableDatabase()), MainActivity.this, true, null);
+
+
+            return null;
+        }
+
+        //sign up progress dialog
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressBar.show();
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+
+        }
+    }
 }

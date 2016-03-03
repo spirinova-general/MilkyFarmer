@@ -147,7 +147,6 @@ public class CustomersActivity extends AppCompatActivity {
                 builder.show();
             }
         });
-        exDb.close();
     }
 
     @Override

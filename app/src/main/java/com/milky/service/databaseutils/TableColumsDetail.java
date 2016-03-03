@@ -10,8 +10,9 @@ public class TableColumsDetail {
             + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.FARMER_CODE + " TEXT,"
             + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DEFAULT_RATE + " TEXT," + TableColumns.TAX + " TEXT,"
             + TableColumns.DATE_ADDED + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.FIRST_NAME + " TEXT,"
-            + TableColumns.LAST_NAME + " TEXT," + TableColumns.MOBILE + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
-            ")";
+            + TableColumns.LAST_NAME + " TEXT," + TableColumns.MOBILE + " TEXT," + TableColumns.SYNC_STATUS + " TEXT,"
+            + TableColumns.EXPIRY_DATE + " DATETIME," + TableColumns.TOTAL_SMS + " TEXT," + TableColumns.USED_SMS + " TEXT,"
+            + TableColumns.VALIDATED + " TEXT," + TableColumns.ACCOUNT_ID + " TEXT" +")";
 
 
     //AREA

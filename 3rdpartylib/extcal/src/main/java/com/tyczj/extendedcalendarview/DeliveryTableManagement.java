@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class DeliveryTableManagement {
     private static String TableNames = "delivery";
 
-    public static void insertCustomerDetail(SQLiteDatabase db, ExtcalVCustomersList holder, String qty,String accountId) {
+    public static void insertCustomerDetail(SQLiteDatabase db, ExtcalVCustomersList holder, String qty, String accountId, String date) {
 
         ContentValues values = new ContentValues();
         if (qty.equals(""))
@@ -22,7 +22,10 @@ public class DeliveryTableManagement {
             values.put(TableColumns.QUANTITY, qty);
         values.put(TableColumns.ACCOUNT_ID, accountId);
         values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
-        values.put(TableColumns.START_DATE, holder.getStart_date());
+        if (date.equals(""))
+            values.put(TableColumns.START_DATE, holder.getStart_date());
+        else
+            values.put(TableColumns.START_DATE, date);
         values.put(TableColumns.DELETED_ON, "1");
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
@@ -35,7 +38,7 @@ public class DeliveryTableManagement {
                 + deliveryDate + "'" + " AND "
                 + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
 
         cursor.close();
@@ -67,20 +70,23 @@ public class DeliveryTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantity;
     }
 
-    public static void updateCustomerDetail(SQLiteDatabase db, ExtcalVCustomersList holder, String qty) {
+    public static void updateCustomerDetail(SQLiteDatabase db, ExtcalVCustomersList holder, String qty, String date) {
         ContentValues values = new ContentValues();
+        String startdate = "";
         if (qty.equals(""))
             values.put(TableColumns.QUANTITY, holder.getQuantity());
         else
             values.put(TableColumns.QUANTITY, qty);
-        values.put(TableColumns.START_DATE, holder.getStart_date());
-
-        db.update(TableNames, values, TableColumns.START_DATE + " ='" + holder.getStart_date() + "'"
+        if (date.equals(""))
+            startdate = holder.getStart_date();
+        else
+            startdate = date;
+        values.put(TableColumns.START_DATE, startdate);
+        long i = db.update(TableNames, values, TableColumns.START_DATE + " ='" + startdate + "'"
                 + " AND " + TableColumns.CUSTOMER_ID +
                 " ='" + holder.getCustomerId() + "'", null);
     }
@@ -113,16 +119,16 @@ public class DeliveryTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantityList;
     }
 
-    public  static ArrayList<String> custIds = new ArrayList<>();
+    public static ArrayList<String> custIds = new ArrayList<>();
+
     public static double getQuantityOfDayByDate(SQLiteDatabase db, String day) {
         String selectquery = "";
 //        if (isDeletedCustomer(db, day))
-            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "' AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
+        selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "' AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
 //        else
 //            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
 //                    + " AND " + TableColumns.DELETED_ON + " >'" + day + "'";
@@ -139,8 +145,7 @@ public class DeliveryTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantity;
     }
 
@@ -163,8 +168,7 @@ public class DeliveryTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantityList;
     }
 
@@ -199,8 +203,7 @@ public class DeliveryTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantity;
     }
 

@@ -54,13 +54,12 @@ public class AreaCityTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return areaList;
     }
 
-    public static VAreaMapper getAreaById(SQLiteDatabase db, final String accountId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ID + " ='" + accountId + "'";
+    public static VAreaMapper getAreaById(SQLiteDatabase db, final String areaid) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ID + " ='" + areaid + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         VAreaMapper holder = null;
         if (cursor.moveToFirst()) {
@@ -80,8 +79,7 @@ public class AreaCityTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return holder;
     }
 
@@ -99,8 +97,7 @@ public class AreaCityTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return area;
     }
     public static String getLocalityById(SQLiteDatabase db, final String areaId) {
@@ -117,8 +114,7 @@ public class AreaCityTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return area;
     }
 
@@ -138,8 +134,7 @@ public class AreaCityTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return city;
     }
 
@@ -201,8 +196,7 @@ public class AreaCityTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return areaList;
     }
 
@@ -282,8 +276,7 @@ public class AreaCityTableManagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return areaList;
     }
 

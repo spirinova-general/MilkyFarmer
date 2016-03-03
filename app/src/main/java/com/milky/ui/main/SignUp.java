@@ -8,13 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DatabaseVersioControl;
@@ -25,8 +18,8 @@ import com.milky.utils.UserPrefrences;
 
 public class SignUp extends AppCompatActivity {
     private Button _signUp, _signIn;
-    LoginButton loginButton;
-    CallbackManager callbackManager;
+//    LoginButton loginButton;
+//    CallbackManager callbackManager;
     private DatabaseHelper _dbHelper;
 
     @Override
@@ -34,13 +27,13 @@ public class SignUp extends AppCompatActivity {
         super.onResume();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         // Logs 'install' and 'app activate' App Events.
-        AppEventsLogger.activateApp(getApplicationContext(), getResources().getString(R.string.facebook_app_id));
+//        AppEventsLogger.activateApp(getApplicationContext(), getResources().getString(R.string.facebook_app_id));
 
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        FacebookSdk.sdkInitialize(getApplicationContext());
+//        FacebookSdk.sdkInitialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         initResources();
@@ -114,25 +107,25 @@ public class SignUp extends AppCompatActivity {
                 }
             }
         });
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                // App code
-
-
-            }
-
-            @Override
-            public void onCancel() {
-                // App code
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                // App code
-                Toast.makeText(SignUp.this, "Some error occured, Please try again later!", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//                // App code
+//
+//
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                // App code
+//            }
+//
+//            @Override
+//            public void onError(FacebookException exception) {
+//                // App code
+//                Toast.makeText(SignUp.this, "Some error occured, Please try again later!", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
     }
 
@@ -141,16 +134,16 @@ public class SignUp extends AppCompatActivity {
         super.onPause();
 
         // Logs 'app deactivate' App Event.
-        AppEventsLogger.deactivateApp(this);
+//        AppEventsLogger.deactivateApp(this);
     }
 
     private void initResources() {
         _signIn = (Button) findViewById(R.id.signin);
         _signUp = (Button) findViewById(R.id.signup);
         preferences = getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
-        loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions("user_friends");
-        callbackManager = CallbackManager.Factory.create();
+//        loginButton = (LoginButton) findViewById(R.id.login_button);
+//        loginButton.setReadPermissions("user_friends");
+//        callbackManager = CallbackManager.Factory.create();
 
         edit = preferences.edit();
 
@@ -164,7 +157,7 @@ public class SignUp extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+//        callbackManager.onActivityResult(requestCode, resultCode, data);
         edit.putBoolean(UserPrefrences.VALID_USER, true);
         edit.apply();
         Intent i = new Intent(SignUp.this, FarmerSignup.class);

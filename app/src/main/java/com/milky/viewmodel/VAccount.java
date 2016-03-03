@@ -7,7 +7,7 @@ public class VAccount {
     public String FarmerCode;
     public String FirstName;
     public String LastName;
-    public boolean Validated;
+    public String Validated;
     public String DateAdded;
     public String DateModified;
     public String Rate;
@@ -15,6 +15,60 @@ public class VAccount {
     public String Mobile;
     public String Dirty;
     public String Sync;
+    public String totalSms;
+    public String usedSms;
+    public String accountStartDate;
+    public String expiryDate;
+    public String Id;
+    public String getValidated() {
+        return Validated;
+    }
+
+    public void setValidated(String validated) {
+        Validated = validated;
+    }
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
+    }
+
+    public String getTotalSms() {
+        return totalSms;
+    }
+
+    public void setTotalSms(String totalSms) {
+        this.totalSms = totalSms;
+    }
+
+    public String getUsedSms() {
+        return usedSms;
+    }
+
+    public void setUsedSms(String usedSms) {
+        this.usedSms = usedSms;
+    }
+
+    public String getAccountStartDate() {
+        return accountStartDate;
+    }
+
+    public void setAccountStartDate(String accountStartDate) {
+        this.accountStartDate = accountStartDate;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(String expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+
 
     public String getRate() {
         return Rate;
@@ -80,13 +134,7 @@ public class VAccount {
         Mobile = mobile;
     }
 
-    public boolean isValidated() {
-        return Validated;
-    }
 
-    public void setValidated(boolean validated) {
-        Validated = validated;
-    }
 
     public String getDateAdded() {
         return DateAdded;

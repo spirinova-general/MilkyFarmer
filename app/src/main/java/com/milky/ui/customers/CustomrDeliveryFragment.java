@@ -104,23 +104,22 @@ public class CustomrDeliveryFragment extends Fragment {
                     title.setText("Edit Quantity");
                     final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
                     quantity.setText(String.valueOf(totalData.get(day.getDay() - 1).getCalculatedQuqantity()));
-                    ((Button) view1.findViewById(R.id.save)).setText("Save");
-                    ((Button) view1.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
+                    ((Button) view1.findViewById(R.id.clear)).setText("Save");
+                    ((Button) view1.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (quantity.getText().toString().equals("")) {
+                            if (quantity.getText().toString().equals(""))
                                 quantity_layout.setError("Enter quantity!");
-                            } else {
+                            else {
                                 ExtcalVCustomersList holder = new ExtcalVCustomersList();
                                 holder.setQuantity(quantity.getText().toString());
                                 holder.setStart_date(selected_date);
                                 holder.setCustomerId(custId);
                                 if (DeliveryTableManagement.isHasData(_exDb.getReadableDatabase(),
-                                        custId, selected_date)) {
-
-                                    DeliveryTableManagement.updateCustomerDetail(_exDb.getWritableDatabase(), holder, "");
-                                } else
-                                    DeliveryTableManagement.insertCustomerDetail(_exDb.getWritableDatabase(), holder, "", Constants.ACCOUNT_ID);
+                                        custId, selected_date))
+                                    DeliveryTableManagement.updateCustomerDetail(_exDb.getWritableDatabase(), holder, "", selected_date);
+                                else
+                                    DeliveryTableManagement.insertCustomerDetail(_exDb.getWritableDatabase(), holder, "", Constants.ACCOUNT_ID,selected_date);
 
                                 DateQuantityModel holder1 = new DateQuantityModel();
                                 holder1.setDeliveryDate(selected_date);
@@ -128,7 +127,7 @@ public class CustomrDeliveryFragment extends Fragment {
                                 totalData.set(day.getDay() - 1, holder1);
                                 _mCalenderView.refresh();
                                 Constants.REFRESH_CALANDER = true;
-                                dialog.hide();
+                                dialog.dismiss();
                             }
 
                         }
@@ -136,7 +135,7 @@ public class CustomrDeliveryFragment extends Fragment {
                     ((Button) view1.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            dialog.hide();
+                            dialog.dismiss();
                         }
                     });
                     if (dialog != null)

@@ -200,7 +200,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
         switch (v.getId()) {
             case 1:
                 if (preferences.contains("init_year")) {
-                    if (preferences.getInt("init_year", 0) <= cal.get(Calendar.YEAR) && preferences.getInt("init_month", 0) < cal.get(Calendar.MONTH))
+                    if (preferences.getInt("init_year", 0) == cal.get(Calendar.YEAR) && preferences.getInt("init_month", 0) < cal.get(Calendar.MONTH))
                         previousMonth();
 
                 }

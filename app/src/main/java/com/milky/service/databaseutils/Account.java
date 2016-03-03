@@ -4,10 +4,13 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.milky.utils.Constants;
 import com.milky.viewmodel.VAccount;
-import com.milky.viewmodel.VAreaMapper;
 
-import java.util.ArrayList;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Calendar;
 
 /**
  * Created by Neha on 12/26/2015.
@@ -25,8 +28,33 @@ public class Account {
         values.put(TableColumns.TAX, holder.getTax());
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.DIRTY, "1");
+        values.put(TableColumns.EXPIRY_DATE, holder.getExpiryDate());
+        values.put(TableColumns.TOTAL_SMS, holder.getTotalSms());
+        values.put(TableColumns.USED_SMS, holder.getUsedSms());
+        values.put(TableColumns.ACCOUNT_ID, holder.getId());
+        values.put(TableColumns.VALIDATED, holder.getValidated());
 
-        db.insert(TableNames.TABLE_ACCOUNT, null, values);
+        long i = db.insert(TableNames.TABLE_ACCOUNT, null, values);
+    }
+
+    public static void updateAllAccountDetails(SQLiteDatabase db, VAccount holder) {
+        ContentValues values = new ContentValues();
+
+        values.put(TableColumns.SYNC_STATUS, "1");
+        values.put(TableColumns.DIRTY, "1");
+        values.put(TableColumns.EXPIRY_DATE, holder.getExpiryDate());
+        values.put(TableColumns.TOTAL_SMS, holder.getTotalSms());
+//        values.put(TableColumns.USED_SMS, holder.getUsedSms());
+        values.put(TableColumns.ACCOUNT_ID, holder.getId());
+
+        db.update(TableNames.TABLE_ACCOUNT, values, TableColumns.ACCOUNT_ID + " ='" + holder.getId() + "'", null);
+    }
+
+    public static void updateSMSCount(SQLiteDatabase db, int count) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.USED_SMS, String.valueOf(getUsedSMS(db)+count));
+//        values.put(TableColumns.TOTAL_SMS, String.valueOf(getLeftsmsCount(db) - count));
+        db.update(TableNames.TABLE_ACCOUNT, values, null, null);
     }
 
     public static String getDefaultRate(SQLiteDatabase db) {
@@ -43,9 +71,61 @@ public class Account {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return rate;
+    }
+
+    public static int getLeftsmsCount(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        int sms = 0;
+        Cursor cursor = db.rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.TOTAL_SMS)) != null)
+                    sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.TOTAL_SMS)))
+                            - getUsedSMS(db);
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+
+        return sms;
+    }
+    public static int getUsedSMS(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        int sms = 0;
+        Cursor cursor = db.rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.TOTAL_SMS)) != null)
+                    sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.USED_SMS)));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+
+        return sms;
+    }
+
+    public static String getExpirationDate(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        String date = "";
+        Cursor cursor = db.rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.EXPIRY_DATE)) != null)
+                    date = cursor.getString(cursor.getColumnIndex(TableColumns.EXPIRY_DATE));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+
+        return date;
     }
 
     public static void updateSyncedData(SQLiteDatabase db) {
@@ -60,17 +140,20 @@ public class Account {
     public static void updateAccountDetails(SQLiteDatabase db, VAccount holder) {
         ContentValues values = new ContentValues();
 
-        values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
-        values.put(TableColumns.DATE_ADDED, holder.getDateAdded());
+//        values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
+
         values.put(TableColumns.FIRST_NAME, holder.getFirstName());
         values.put(TableColumns.LAST_NAME, holder.getLastName());
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.TAX, holder.getTax());
+
+
         values.put(TableColumns.SYNC_STATUS, "0");
+
         values.put(TableColumns.DIRTY, "0");
 
-        db.update(TableNames.TABLE_ACCOUNT, values, null, null);
+        long i = db.update(TableNames.TABLE_ACCOUNT, values, null, null);
     }
 
     public static void updateMobileNumber(SQLiteDatabase db, String mobile) {
@@ -96,8 +179,7 @@ public class Account {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return rate;
     }
 
@@ -121,8 +203,7 @@ public class Account {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return holder;
     }
 
@@ -143,8 +224,7 @@ public class Account {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return holder;
     }
 
@@ -169,9 +249,84 @@ public class Account {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return holder;
     }
+
+    public static boolean isAccountExpired(SQLiteDatabase db) {
+        Calendar cal = Calendar.getInstance();
+        String day = Constants.api_format.format(cal.getTime());
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT + " WHERE "
+                + TableColumns.EXPIRY_DATE + " <'" + day + "'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        return result;
+    }
+
+    public static JSONObject getDetails(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        Cursor cursor = db.rawQuery(selectquery, null);
+        JSONObject jsonObject = new JSONObject();
+        if (cursor.moveToFirst()) {
+            do {
+                try {
+                    jsonObject.put("FarmerCode", cursor.getString(cursor.getColumnIndex(TableColumns.FARMER_CODE)));
+                    jsonObject.put("FirstName", cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
+                    jsonObject.put("LastName", cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
+                    jsonObject.put("Mobile", cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
+                    jsonObject.put("Validated", cursor.getString(cursor.getColumnIndex(TableColumns.VALIDATED)));
+                    jsonObject.put("Dirty", cursor.getString(cursor.getColumnIndex(TableColumns.DIRTY)));
+                    jsonObject.put("DateAdded", cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                    jsonObject.put("DateModified", cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+                    jsonObject.put("StartDate", cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                    jsonObject.put("EndDate", cursor.getString(cursor.getColumnIndex(TableColumns.EXPIRY_DATE)));
+                    jsonObject.put("UsedSms", cursor.getString(cursor.getColumnIndex(TableColumns.USED_SMS)));
+                    jsonObject.put("TotalSms", cursor.getString(cursor.getColumnIndex(TableColumns.TOTAL_SMS)));
+                    jsonObject.put("Id", cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+
+        return jsonObject;
+    }
+
+    public static int getAccountId(SQLiteDatabase db) {
+        String countQuery = "SELECT  * FROM " + TableNames.TABLE_ACCOUNT;
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int cnt = cursor.getCount();
+        cursor.close();
+        return cnt;
+    }
+
+
+    //to get account Expiry date
+//    public static String getEXpiryDate(SQLiteDatabase db) {
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+//        String expiryDate = null;
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//        if (cursor.moveToFirst()) {
+//            do {
+//                if (cursor.getString(cursor.getColumnIndex(TableColumns.EXPIRY_DATE)) != null)
+//                    expiryDate = cursor.getString(cursor.getColumnIndex(TableColumns.EXPIRY_DATE));
+//
+//            }
+//            while (cursor.moveToNext());
+//
+//        }
+//        cursor.close();
+//        if (db.isOpen())
+//            db.close();
+//        return expiryDate;
+//    }
 
 }

@@ -3,6 +3,7 @@ package com.milky.ui.customers;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -41,17 +42,17 @@ import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CustomersList extends AppCompatActivity {
     private ListView _mCustomers;
-    private int _mDay;
-    private String _mMonth;
     private Toolbar _mToolbar;
     public static GlobalDeliveryAdapter _mAdaapter;
     private DatabaseHelper _dbHelper;
-    private LinearLayout _bottomLayout;
     public static List<ExtcalVCustomersList> _mCustomersList, _mDeliveryList = new ArrayList<>();
     public static List<ExtcalVCustomersList> selectedCustomersId;
     public static String bulkQuantity = "";
@@ -68,11 +69,6 @@ public class CustomersList extends AppCompatActivity {
         exDb = new ExtcalDatabaseHelper(this);
         _mCustomers = (ListView) findViewById(R.id.customersList);
         selectedCustomersId = new ArrayList<>();
-
-        _bottomLayout = (LinearLayout) findViewById(R.id.bottom_Layout);
-        String month = new DateFormatSymbols().getMonths()[(Constants.SELECTED_DAY).getMonth()];
-        _mDay = Constants.SELECTED_DAY.getDay();
-        _mMonth = month;
         setActionBar();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
@@ -86,7 +82,6 @@ public class CustomersList extends AppCompatActivity {
         }
 
         _dbHelper.close();
-        exDb.close();
         _areaList.clear();
         _areacityList.clear();
 
@@ -128,20 +123,28 @@ public class CustomersList extends AppCompatActivity {
         LayoutInflater mInflater = LayoutInflater.from(this);
         View mCustomView = mInflater.inflate(R.layout.actionbar_layout, null);
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
+        Calendar cal = Calendar.getInstance();
+        try {
+            Date date = Constants.work_format.parse(Constants.DELIVERY_DATE);
+            cal.setTime(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
-        title.setText(Constants.DELIVERY_DATE);
+        title.setText(Constants.MONTHS[cal.get(Calendar.MONTH)] + "-" + cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.YEAR));
         ImageView deleteCustomer = (ImageView) mCustomView.findViewById(R.id.deleteCustomer);
         deleteCustomer.setVisibility(View.GONE);
         ((LinearLayout) mCustomView.findViewById(R.id.saveManu)).setVisibility(View.GONE);
         _mToolbar.setVisibility(View.VISIBLE);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setCustomView(mCustomView);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setCustomView(mCustomView);
+        }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -160,11 +163,10 @@ public class CustomersList extends AppCompatActivity {
                 for (ExtcalVCustomersList entry : _mDeliveryList) {
                     if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
                             entry.getCustomerId(), entry.getStart_date()))
-                        DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry, "");
+                        DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry, "", "");
                     else
-                        DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, "", Constants.ACCOUNT_ID);
+                        DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, "", Constants.ACCOUNT_ID, Constants.DELIVERY_DATE);
                 }
-            exDb.close();
             Constants.REFRESH_CALANDER = true;
             finish();
         }
@@ -172,10 +174,7 @@ public class CustomersList extends AppCompatActivity {
     }
 
     ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
-    View view1, searchView;
-    Spinner spinner;
-    int selectedPosition = 0;
-    public static String selectedArea = "";
+    View searchView;
     AreaCitySpinnerAdapter adp1;
 
     @Override
@@ -183,53 +182,9 @@ public class CustomersList extends AppCompatActivity {
 
         MenuInflater mi = getMenuInflater();
         mi.inflate(R.menu.customer_menu, menu);
-//        MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
         MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
-//        view1 = mSpinnerItem1.getActionView();
         searchView = mSpinnerItem2.getActionView();
 
-
-//        if (view1 instanceof Spinner) {
-//            spinner = (Spinner) view1;
-//            spinner.setAdapter(adp1);
-//            spinner.setSelection(selectedPosition);
-//            spinner.setGravity(Gravity.CENTER);
-//
-//            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//
-//                @Override
-//                public void onItemSelected(AdapterView<?> arg0, View arg1,
-//                                           int arg2, long arg3) {
-//
-//                    selectedPosition = arg2;
-//                    selectedAreaId = _areacityList.get(arg2).getAreaId();
-//                    selectedArea = _areacityList.get(arg2).getArea() + ", " + _areacityList.get(arg2).getCity();
-//
-//                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-//                        if (arg2 == 0) {
-//                            _mCustomersList = CustomerSettingTableManagement.customersForSelectedDates(_dbHelper.getReadableDatabase(), "");
-//                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
-//                            _mCustomers.setItemsCanFocus(true);
-//                            _mCustomers.setAdapter(_mAdaapter);
-//                        } else {
-//                            _mCustomersList = CustomerSettingTableManagement.customersForSelectedDates(_dbHelper.getReadableDatabase(), selectedAreaId);
-//                            _mAdaapter = new GlobalDeliveryAdapter(CustomersList.this, String.valueOf(Constants.SELECTED_DAY));
-//                            _mCustomers.setItemsCanFocus(true);
-//                            _mCustomers.setAdapter(_mAdaapter);
-//                        }
-//                    }
-//                    _dbHelper.close();
-//
-//                }
-//                @Override
-//                public void onNothingSelected(AdapterView<?> arg0) {
-//                    // TODO Auto-generated method stub
-//
-//
-//                }
-//            });
-//
-//        }
         if (searchView instanceof SearchView) {
             final SearchView actionSearchView = (SearchView) searchView;
             final AutoCompleteTextView editSearch;
@@ -248,11 +203,12 @@ public class CustomersList extends AppCompatActivity {
                     editSearch.setText(_areacityList.get(position).getCityArea());
                     Constants.selectedAreaId = _areacityList.get(position).getAreaId();
                     editSearch.setSelection(editSearch.getText().length());
-                    if (_mAdaapter != null)
+                    if (_mAdaapter != null) {
                         _mAdaapter.getFilter().filter(editSearch.getText().toString());
-                    _mAdaapter.clear();
-                    _mCustomers.setAdapter(_mAdaapter);
-                    _mAdaapter.notifyDataSetChanged();
+                        _mAdaapter.clear();
+                        _mCustomers.setAdapter(_mAdaapter);
+                        _mAdaapter.notifyDataSetChanged();
+                    }
                 }
             });
 
@@ -314,11 +270,11 @@ public class CustomersList extends AppCompatActivity {
         final EditText quantity = (EditText) view1.findViewById(R.id.milk_quantity);
         quantity.setHint("Quantity");
         final TextView title = (TextView) view1.findViewById(R.id.title);
-        title.setText("Bulk Quantity");
+        title.setText(String.format("%s", "Bulk Edit"));
         final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
 
-        ((Button) view1.findViewById(R.id.save)).setText("Save");
-        ((Button) view1.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
+        ((Button) view1.findViewById(R.id.clear)).setText("Save");
+        ((Button) view1.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (quantity.getText().toString().equals("")) {
@@ -327,14 +283,13 @@ public class CustomersList extends AppCompatActivity {
                     if (selectedCustomersId.size() > 0)
                         for (ExtcalVCustomersList entry : selectedCustomersId) {
                             if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
-                                    entry.getCustomerId(), entry.getStart_date()))
-                                DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry, quantity.getText().toString().trim());
+                                    entry.getCustomerId(), Constants.DELIVERY_DATE))
+                                DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry, quantity.getText().toString().trim(), Constants.DELIVERY_DATE);
                             else
-                                DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, quantity.getText().toString().trim(), Constants.ACCOUNT_ID);
+                                DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, quantity.getText().toString().trim(), Constants.ACCOUNT_ID, Constants.DELIVERY_DATE);
 
                         }
 
-                    exDb.close();
                     dialog.hide();
                     Constants.REFRESH_CALANDER = true;
                     finish();
@@ -350,7 +305,6 @@ public class CustomersList extends AppCompatActivity {
                 dialog.hide();
             }
         });
-        if (dialog != null)
             dialog.show();
 
 

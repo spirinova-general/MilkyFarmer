@@ -3,6 +3,7 @@ package com.milky.ui.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.support.design.widget.TextInputLayout;
@@ -11,14 +12,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,36 +35,42 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.ui.adapters.PlaceAdapter;
 import com.milky.utils.AppUtil;
+import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
+import com.milky.viewmodel.SendMessage;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import android.os.Handler;
+import java.util.HashMap;
 
 /**
  * Created by Neha on 11/19/2015.
  */
-public class GlobalSetting extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class GlobalSetting extends AppCompatActivity implements AdapterView.OnItemClickListener, OnTaskCompleteListner {
+
     private static final String LOG_TAG = "LOG";
     private Toolbar _mToolbar;
     private TextInputLayout rate_layout;
@@ -73,11 +79,13 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     private TextInputLayout localityInputLayout;
     private TextInputLayout lastname_layout;
     private TextInputLayout mobile_layout;
-    private EditText custCode, rate, tax, firstname, lastname, mobile;
+    private EditText custCode, rate, tax, firstname, lastname, mobile, expirationDate, msgCount;
     private LinearLayout _mBottomLayout;
     private DatabaseHelper _dbHelper;
     //    private AutoCompleteTextView AreaAutocomplete;
     private ArrayList<VAreaMapper> selectedareacityList = new ArrayList<>();
+    private ArrayList<SendMessage> messageData = new ArrayList<>();
+    public SendMessage sendMessage;
     private String[] autoCompleteData;
     private ImageView add;
     public static int Position = 0;
@@ -127,7 +135,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         lastname = (EditText) findViewById(R.id.last_name);
         mobile = (EditText) findViewById(R.id.mobile);
         changeNumber = (TextView) findViewById(R.id.change_number);
-
+        expirationDate = (EditText) findViewById(R.id.expirationDate);
+        msgCount = (EditText) findViewById(R.id.count);
         changeNumber.setVisibility(View.GONE);
         _cityArea = (AutoCompleteTextView) findViewById(R.id.autocomplete_city_area);
         _locality = (EditText) findViewById(R.id.locality);
@@ -153,6 +162,9 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         firstname.addTextChangedListener(new TextValidationMessage(firstname, name_layout, this, false));
         lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this, false));
         mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this, true));
+
+
+
 //        _cityArea.setOnTouchListener(new View.OnTouchListener() {
 //                                         @Override
 //                                         public boolean onTouch(View v, MotionEvent event) {
@@ -195,8 +207,18 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             tax.setText(holder.getTax());
             mobile.setText(holder.getMobile());
             custCode.setText(holder.getFarmerCode());
+            String expDate = Account.getExpirationDate(_dbHelper.getReadableDatabase());
+            Calendar cal = Calendar.getInstance();
+            try {
+                cal.setTime(Constants.api_format.parse(expDate));
+                expirationDate.setText(Constants.MONTHS[cal.get(Calendar.MONTH)] + "-" + cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.YEAR));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
+            msgCount.setText(String.valueOf(Account.getLeftsmsCount(_dbHelper.getReadableDatabase())));
         }
+
 
         custCode.setOnTouchListener(new View.OnTouchListener()
 
@@ -365,6 +387,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         LinearLayout saveManu = (LinearLayout) mCustomView.findViewById(R.id.saveManu);
 
         saveManu.setVisibility(View.VISIBLE);
+
         saveManu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -393,6 +416,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
                         Account.updateAccountDetails(_dbHelper.getWritableDatabase(), holder);
 
+
                     } else {
                         Account.insertAccountDetails(_dbHelper.getWritableDatabase(), holder);
 
@@ -411,13 +435,27 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
+    //inflate the global menu on option menu created
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.global_menu, menu);
+
+
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        switch (id) {
 
-        if (id == android.R.id.home) {
-            finish();
+            case android.R.id.home:
+                finish();
+                break;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -515,8 +553,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             });
 
             if (isNewAdded) {
-                if(!AreaCityTableManagement.hasAddress(_dbHelper.getReadableDatabase(),_locality.getText().toString().trim(),areaSelected.trim(),citySelected.trim()))
-                {
+                if (!AreaCityTableManagement.hasAddress(_dbHelper.getReadableDatabase(), _locality.getText().toString().trim(), areaSelected.trim(), citySelected.trim())) {
                     label.setTextColor(getResources().getColor(R.color.white));
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     layoutParams.leftMargin = 10;
@@ -546,9 +583,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     _locality.setText("");
                     google_autocomplete_layout.setError(null);
                     localityInputLayout.setError(null);
-                }
-                else
-                {
+                } else {
                     google_autocomplete_layout.setError("This Area is already Selected");
                     localityInputLayout.setError(null);
                     areaSelected = "";
@@ -697,7 +732,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     }
 
 
-
     PlaceAdapter adapter;
 
     private void parseAndBindDataToListview(String result) {
@@ -715,7 +749,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             e.toString();
         }
     }
-
 
 
     AlertDialog dialog;
@@ -769,6 +802,11 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         dialog.setView(wv);
 
         dialog.show();
+    }
+
+    @Override
+    public void onTaskCompleted(String type, HashMap<String, String> listType) {
+
     }
 
     public class JavaScriptInterface {
@@ -965,12 +1003,12 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
             for (int x = 0; x < list.size(); x++) {
 
-                    addLabel(list.get(x).getCityArea(), false);
+                addLabel(list.get(x).getCityArea(), false);
 
             }
         }
     }
-
 }
+
 
 

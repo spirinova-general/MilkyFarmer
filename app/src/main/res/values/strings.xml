@@ -28,6 +28,7 @@
     <string name="fill_valid_amount">Fill valid amount!</string>
     <string name="no_customer_added">No customer added yet !</string>
     <string name="title_activity_expiry">ExpiryActivity</string>
+    <string name="your_account_is_expired_please_conteact_the_adminstrator">Your account is expired.Please contact the administrator to activate</string>
 
 </resources>
 

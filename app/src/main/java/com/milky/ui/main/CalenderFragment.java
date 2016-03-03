@@ -50,13 +50,7 @@ public class CalenderFragment extends Fragment {
             _mCalenderView.setForCustomersDelivery(false);
 
             _mCalenderView.refresh();
-            if (AppUtil.totalData.size() > 0)
-                _mCalenderView.totalQuantityCalculated(AppUtil.totalData);
-            Constants.REFRESH_CALANDER = false;
-
         }
-
-
     }
 
     View viewLayout;
@@ -71,8 +65,7 @@ public class CalenderFragment extends Fragment {
         _mCalenderView.setForCustomersDelivery(false);
 
         _mCalenderView.refresh();
-        if (AppUtil.totalData.size() > 0)
-            _mCalenderView.totalQuantityCalculated(AppUtil.totalData);
+
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
@@ -81,7 +74,7 @@ public class CalenderFragment extends Fragment {
                         String.format("%02d", day.getDay());
                 //TODO ExtCal SETTINGS DB
                 if ((ExtcalCustomerSettingTableManagement.isHasDataForDay(new ExtcalDatabaseHelper(getActivity()).getReadableDatabase(), Constants.DELIVERY_DATE))
-                        && day.getDay()<=Calendar.getInstance().get(Calendar.DAY_OF_MONTH)  && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
+                        && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
                     Intent intent = new Intent(getActivity(), CustomersList.class);
                     startActivity(intent);
                 }
@@ -99,7 +92,7 @@ public class CalenderFragment extends Fragment {
             _editor.commit();
             _mCalenderView.setRegistrationDate(cl.get(Calendar.DAY_OF_MONTH));
             _mCalenderView.setRegistrationYear(cl.get(Calendar.YEAR));
-            _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH)) ;
+            _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
         }
         /*
         * Check if has customers added

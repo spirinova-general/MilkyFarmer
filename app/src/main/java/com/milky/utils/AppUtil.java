@@ -10,16 +10,27 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.serverapi.HttpAsycTask;
+import com.milky.service.serverapi.ServerApis;
 import com.milky.service.serverapi.SyncDataService;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.DeliveryTableManagement;
@@ -82,130 +93,8 @@ public class AppUtil extends Application {
         return _sharedPRefrences;
     }
 
-    public static ArrayList<DateQuantityModel> totalData = new ArrayList<>();
+
     public static double quantity = 0;
-    static Calendar cal = Calendar.getInstance();
-
-    private static BigDecimal previousQty = null;
-
-    public class GetQuantity extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            totalData.clear();
-            //TODO ExtCal SETTINGS DB
-//            ArrayList<String> dates = CustomerSettingTableManagement.getDates(getInstance().getDatabaseHandler().getReadableDatabase());
-            ArrayList<String> dates = ExtcalCustomerSettingTableManagement.getDates(new ExtcalDatabaseHelper(getInstance()).getReadableDatabase());
-
-            for (int j = 0; j < dates.size(); ++j) {
-                Calendar calendar = Calendar.getInstance();
-                Date date;
-                try {
-                    date = Constants.work_format.parse(dates.get(j));
-                    calendar.setTime(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                for (int i = 1; i <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-                    quantity = getDeliveryOfCustomer(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-                    DateQuantityModel holder = new DateQuantityModel();
-                    holder.setDeliveryDate(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-                    holder.setCalculatedQuqantity(round(quantity, 1));
-
-//                 if(previousQty==null)
-//                 {
-//                     previousQty = round(quantity, 1);
-//                 }
-//
-//                if (quantity == 0 && previousQty != null) {
-//                    holder.setCalculatedQuqantity(previousQty);
-//                    previousQty=null;
-//                }
-
-                    totalData.add(holder);
-
-                }
-            }
-            AppUtil.getInstance().getDatabaseHandler().close();
-
-            Constants.REFRESH_CALANDER = false;
-            return null;
-        }
-    }
-
-//    public static ArrayList<DateQuantityModel> getTotalQuantity() {
-//        totalData.clear();
-//        ArrayList<String> dates = CustomerSettingTableManagement.getDates(getInstance().getDatabaseHandler().getReadableDatabase());
-//        for (int j = 0; j < dates.size(); ++j) {
-//            Calendar calendar = Calendar.getInstance();
-//            Date date;
-//            try {
-//                date = Constants.work_format.parse(dates.get(j));
-//                calendar.setTime(date);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//
-//            for (int i = 1; i <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-//                quantity = getDeliveryOfCustomer(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-//                DateQuantityModel holder = new DateQuantityModel();
-//                holder.setDeliveryDate(calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-//                holder.setCalculatedQuqantity(round(quantity, 1));
-//
-////                 if(previousQty==null)
-////                 {
-////                     previousQty = round(quantity, 1);
-////                 }
-////
-////                if (quantity == 0 && previousQty != null) {
-////                    holder.setCalculatedQuqantity(previousQty);
-////                    previousQty=null;
-////                }
-//
-//                totalData.add(holder);
-//
-//            }
-//        }
-//        AppUtil.getInstance().getDatabaseHandler().close();
-//
-//        Constants.REFRESH_CALANDER = false;
-//        return totalData;
-//    }
-
-    public static BigDecimal round(double d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Double.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd;
-    }
-
-    public static double getDeliveryOfCustomer(String day) {
-        DeliveryTableManagement.custIds.clear();
-        double qty = 0;
-        double adjustedQty = 0;
-//        if (AppUtil.getInstance().getDatabaseHandler().isTableNotEmpty(TableNames.TABLE_DELIVERY))
-        if (DeliveryTableManagement.isDeletedCustomer(_exDb.getReadableDatabase(), day))
-            qty = DeliveryTableManagement.getQuantityOfDayByDate(_exDb.getReadableDatabase(), day);
-
-        if (_exDb.isTableNotEmpty("customers")) {
-            if (DeliveryTableManagement.custIds.size() > 0)
-                for (int i = 0; i < DeliveryTableManagement.custIds.size(); i++)
-                    //TODO ExtCal SETTINGS DB
-                    adjustedQty += ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
-                            ,DeliveryTableManagement. custIds.get(i));
-//            adjustedQty += CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
-//                    , custIds.get(i));
-//TODO ExtCal SETTINGS DB
-//            qty += CustomerSettingTableManagement.getAllCustomersByDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day) - adjustedQty;
-            qty += ExtcalCustomerSettingTableManagement.getAllCustomersByDay(_exDb.getReadableDatabase(), day) - adjustedQty;
-
-        }
-        return qty;
-    }
 
 
     public static void showNotification(Context context, String title, String content, Intent intent) {
@@ -324,4 +213,30 @@ public class AppUtil extends Application {
 
         return fullName;
     }
+
+    private boolean isConnected = false;
+
+    public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivity = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null) {
+                for (int i = 0; i < info.length; i++) {
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                        if (!isConnected) {
+
+                            isConnected = true;
+
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        isConnected = false;
+        return false;
+    }
+
+
 }

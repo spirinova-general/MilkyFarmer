@@ -47,9 +47,16 @@ public class TableColumns {
     public static final String LOCALITY ="locality" ;
 
 
-    public static String SYNC_STATUS = "sync_status";
-    public static String BILL_MADE = "bill_made";
-    public static String BALANCE_TYPE = "balance_type";
+    public static final String SYNC_STATUS = "sync_status";
+    public static final String BILL_MADE = "bill_made";
+    public static final String BALANCE_TYPE = "balance_type";
+    //New coloums
+
+    public static final String EXPIRY_DATE ="expir_date";
+    public static final String TOTAL_SMS="total_sms";
+    public static final String USED_SMS="used_sms";
+    public static final String VALIDATED="validated";
+
 
 }
 

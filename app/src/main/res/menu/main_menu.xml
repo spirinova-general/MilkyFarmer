@@ -63,6 +63,15 @@
         android:id="@+id/bulk_edit"
         android:orderInCategory="1"
         android:showAsAction="never"
-        android:title="Bulk Edit" />
+        android:title="Bulk Quantity" />
+
+    <item
+        android:id="@+id/sens_sms"
+        appcompat:showAsAction="never"
+        android:orderInCategory="1"
+
+        android:title="Send Bills" />
+
+
 </menu>
 

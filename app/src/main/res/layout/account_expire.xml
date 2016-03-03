@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android='http://schemas.android.com/apk/res/android'
+    android:layout_width='fill_parent'
+    android:layout_height='wrap_content'
+    android:background="@color/white"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation='vertical'
+    >
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Account Expired"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
+        android:padding="8dp"
+        android:gravity="center"/>
+ <TextView
+     android:padding="10dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/your_account_is_expired_please_conteact_the_adminstrator"
+     android:textColor="@color/colorPrimary"/>
+
+
+    <LinearLayout
+        android:layout_width='match_parent'
+        android:layout_height='wrap_content'
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:id='@+id/cancel_button'
+            android:layout_width='120dp'
+            android:layout_height='wrap_content'
+            android:background="@drawable/transparent_button_click"
+            android:text='Ok'
+            android:textColor="@color/white"
+            />
+
+        <Button
+
+            android:id='@+id/continue_button'
+            android:layout_width='120dp'
+            android:layout_height='wrap_content'
+            android:layout_alignParentTop='true'
+            android:layout_marginLeft='10dp'
+            android:layout_toRightOf='@+id/cancel_button'
+            android:background="@drawable/transparent_button_click"
+            android:text='Retry'
+            android:textColor="@color/white"
+            style="?android:attr/buttonStyleSmall"
+            />
+    </LinearLayout>
+
+</LinearLayout>

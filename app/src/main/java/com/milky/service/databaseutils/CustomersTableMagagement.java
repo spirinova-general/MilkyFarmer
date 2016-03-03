@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.utils.Constants;
+import com.milky.viewmodel.SendMessage;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
@@ -37,7 +38,8 @@ public class CustomersTableMagagement {
         values.put(TableColumns.DELETED_ON, "1");
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.SYNC_STATUS, "1");
-        long i =  db.insert(TableNames.TABLE_CUSTOMER, null, values);
+        long i = db.insert(TableNames.TABLE_CUSTOMER, null, values);
+
     }
 
     public static void updateBalance(SQLiteDatabase db, String balance, String custId, String balanceType) {
@@ -63,16 +65,33 @@ public class CustomersTableMagagement {
                     holder.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
 
             }
-
-
             while (cursor.moveToNext());
-
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return holder;
+    }
+
+    public static String getStartDatebyCustomerId(SQLiteDatabase db, String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        String startDate = "";
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
+                    startDate = cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+
+        return startDate;
     }
 
     public static ArrayList<ExtcalVCustomersList> getAllCustomers(SQLiteDatabase db) {
@@ -129,7 +148,7 @@ public class CustomersTableMagagement {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
         ArrayList<String> list = new ArrayList<>();
 
-         Cursor cursor = db.rawQuery(selectquery, null);
+        Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -140,8 +159,7 @@ public class CustomersTableMagagement {
             while (cursor.moveToNext());
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return list;
     }
 
@@ -160,8 +178,7 @@ public class CustomersTableMagagement {
             while (cursor.moveToNext());
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return id;
     }
 
@@ -180,8 +197,7 @@ public class CustomersTableMagagement {
             while (cursor.moveToNext());
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return list;
     }
 
@@ -233,12 +249,9 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return list;
     }
-
-
 
 
     public static String getFirstName(SQLiteDatabase db, final String custId) {
@@ -260,8 +273,7 @@ public class CustomersTableMagagement {
             while (cursor.moveToNext());
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return name;
     }
 
@@ -285,8 +297,7 @@ public class CustomersTableMagagement {
             while (cursor.moveToNext());
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return name;
     }
 
@@ -336,8 +347,7 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return holder;
     }
 
@@ -438,8 +448,7 @@ public class CustomersTableMagagement {
             while (cursor.moveToNext());
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return list;
     }
 
@@ -458,8 +467,7 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantityTotal;
 
     }
@@ -480,8 +488,7 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantityTotal;
 
     }
@@ -511,8 +518,7 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantityTotal;
 
     }
@@ -534,8 +540,7 @@ public class CustomersTableMagagement {
             while (cursor.moveToNext());
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return quantityList;
     }
 
@@ -556,8 +561,7 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return balance;
     }
 
@@ -570,20 +574,14 @@ public class CustomersTableMagagement {
         if (cursor.moveToFirst()) {
             do {
                 DateQuantityModel holder = new DateQuantityModel();
-
-
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)) != null)
                     balance = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE));
-
-
             }
             while (cursor.moveToNext());
 
-
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return balance;
     }
 
@@ -596,8 +594,6 @@ public class CustomersTableMagagement {
         if (cursor.moveToFirst()) {
             do {
                 DateQuantityModel holder = new DateQuantityModel();
-
-
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
                     holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
 
@@ -611,8 +607,7 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return list;
     }
 
@@ -631,9 +626,59 @@ public class CustomersTableMagagement {
 
         }
         cursor.close();
-        if (db.isOpen())
-            db.close();
+
         return list;
     }
 
+    public static String getCustomerMobileNo(SQLiteDatabase db, String id) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + id + "'";
+        String list = "";
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                list = cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE));
+            }
+            while (cursor.moveToNext());
+
+
+        }
+        cursor.close();
+
+        return list;
+    }
+
+    //To get the message data
+    public static ArrayList<SendMessage> getAllCustomersBillingInfo(SQLiteDatabase db) {
+
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate()
+                + "' AND (" + TableColumns.DELETED_ON + " ='0' OR " + TableColumns.DELETED_ON + " <'" + Constants.getCurrentDate() + "')";
+        ArrayList<SendMessage> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                SendMessage sm = new SendMessage();
+
+                sm.billAmount = BillTableManagement.getBill(db, cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)), Constants.getCurrentDate());
+                if (!sm.billAmount.equals("")) {
+                    sm.balance = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE));
+                    sm.fristName = cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME));
+                    sm.lastName = cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME));
+                    sm.customerId = cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID));
+                    sm.mobileNo = cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE));
+                    if (BillTableManagement.isClearedBill(db, sm.customerId, Constants.getCurrentDate()))
+                        list.add(sm);
+                }
+
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+//        if (db.isOpen())
+//            db.close();
+        return list;
+    }
 }

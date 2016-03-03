@@ -1,8 +1,11 @@
 package com.milky.ui.main;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +16,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.milky.R;
@@ -21,33 +26,42 @@ import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.serverapi.HttpAsycTask;
+import com.milky.service.serverapi.OnTaskCompleteListner;
+import com.milky.service.serverapi.ServerApis;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.milky.viewmodel.SendMessage;
 import com.milky.viewmodel.VBill;
 import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 /**
  * Created by Neha on 11/20/2015.
  */
-public class BillingEdit extends AppCompatActivity {
+public class BillingEdit extends AppCompatActivity implements OnTaskCompleteListner {
     private Intent intent;
     private Toolbar _mToolbar;
     private EditText milk_quantity;
     private EditText rate;
     private EditText balance_amount;
     private EditText tax, payment_made;
-    private Button save, clear_bill;
+    private Button save, clear_bill, send_bill;
     private TextView start_date, end_date, total_amount, clera_bill_text;
     private LinearLayout _payment;
     private TextInputLayout _amount_layout;
     private DatabaseHelper _dbHelper;
     private int balanceType = 0;
     private ExtcalDatabaseHelper _exDb;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -73,12 +87,22 @@ public class BillingEdit extends AppCompatActivity {
         if (intent.getStringExtra("balance_type").equals("1"))
             balanceType = 1;
         Calendar cal = Calendar.getInstance();
+        send_bill = (Button) findViewById(R.id.send_bill);
         try {
             cal.setTime(Constants._display_format.parse(intent.getStringExtra("end_date")));
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        send_bill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Account.getLeftsmsCount(_dbHelper.getReadableDatabase())>=1)
+                new SendBillSMS().execute();
+                else
+                    Toast.makeText(BillingEdit.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
 
+            }
+        });
         rate.setText(intent.getStringExtra("totalPrice"));
         start_date.setEnabled(false);
         end_date.setEnabled(false);
@@ -88,7 +112,7 @@ public class BillingEdit extends AppCompatActivity {
         clear_bill = (Button) findViewById(R.id.clear_bill);
         clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
         //TODo changed roll date
-                if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)){
+        if (cal.get(Calendar.DAY_OF_MONTH) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
 //        if ((cal.get(Calendar.DAY_OF_MONTH)) == 5) {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
@@ -106,6 +130,7 @@ public class BillingEdit extends AppCompatActivity {
         if (intent.getStringExtra("clear").equals("0")) {
             clear_bill.setVisibility(View.GONE);
             clera_bill_text.setVisibility(View.GONE);
+            send_bill.setVisibility(View.GONE);
             _payment.setVisibility(View.VISIBLE);
         } else
             _payment.setVisibility(View.GONE);
@@ -128,7 +153,7 @@ public class BillingEdit extends AppCompatActivity {
                 final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
                 payment.setHint("Enter payment (Rs)");
 
-                ((Button) view1.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
+                ((Button) view1.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
@@ -141,7 +166,7 @@ public class BillingEdit extends AppCompatActivity {
                             float bill_amount = Float.parseFloat(intent.getStringExtra("total"));
 
                             float bill = payment_made - bill_amount;
-                            if (bill_amount >=payment_made) {
+                            if (bill_amount >= payment_made) {
                                 holder.setBalance(String.valueOf(round(bill_amount - payment_made, 2)));
                                 holder.setBalanceType("0");
                             } else {
@@ -164,7 +189,7 @@ public class BillingEdit extends AppCompatActivity {
                             ExtcalCustomerSettingTableManagement.updateBalance(_exDb.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
 
                             BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"), holder);
-                            dialog.hide();
+                            dialog.dismiss();
                             BillingEdit.this.finish();
                         }
 
@@ -173,11 +198,11 @@ public class BillingEdit extends AppCompatActivity {
                 ((Button) view1.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dialog.hide();
+                        dialog.dismiss();
                     }
                 });
-                if(dialog != null)
-                dialog.show();
+                if (dialog != null)
+                    dialog.show();
 
             }
         });
@@ -204,6 +229,110 @@ public class BillingEdit extends AppCompatActivity {
         setActionBar();
         getview();
 
+    }
+
+    private class SendBillSMS extends AsyncTask<Void, String, String> {
+        AlertDialog dialog;
+        Handler progressHandler = new Handler();
+        int progress = 0;
+
+        String msg = "";
+        int finalI = 0;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            progressDialog = ProgressDialog.show(GlobalSetting.this, "Please wait", "Sending SMS...");
+            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(BillingEdit.this);
+            dialog = dialogBuilder.create();
+            messageProgress(dialog);
+        }
+
+        private TextView messageSent;
+        private ProgressBar androidProgressBar;
+        private Button ok;
+
+        private void messageProgress(final AlertDialog dialog) {
+            final LayoutInflater inflater = (LayoutInflater)
+                    BillingEdit.this.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+            View dialogView = inflater.inflate(R.layout.message_progress, null, false);
+            dialog.setView(dialogView);
+            dialog.setCancelable(false);
+            messageSent = (TextView) dialogView.findViewById(R.id.messageSent);
+            androidProgressBar = (ProgressBar) dialogView.findViewById(R.id.horizontal_progress_bar);
+            ok = (Button) dialogView.findViewById(R.id.ok);
+            ok.setVisibility(View.INVISIBLE);
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+
+            new Thread(new Runnable() {
+                public void run() {
+                    for (int i = 0; i < 1; ++i) {
+                        String mesg = null;
+                        try {
+                            mesg = URLEncoder.encode("Dear " + intent.getStringExtra("titleString") + ", " + "your milk bill is " + intent.getStringExtra("total"), "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), getIntent().getStringExtra("custId")), mesg);
+
+
+                        finalI = i + 1;
+                        progressHandler.post(new Runnable() {
+                            public void run() {
+                                progress += (100 / 1);
+                                androidProgressBar.setProgress(progress);
+                                //Status update in textview
+
+                                if (finalI != 1)
+                                    msg = "Sending message: " + finalI + "/" + 1;
+                                else
+                                    msg = "Sent message: " + finalI + "/" + 1;
+                                publishProgress(msg);
+
+                            }
+                        });
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }).start();
+
+            return msg;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            messageSent.setText(values[0]);
+
+
+            Account.updateSMSCount(_dbHelper.getWritableDatabase(), 1);
+            ok.setVisibility(View.VISIBLE);
+
+        }
+
+        @Override
+        protected void onPostExecute(String aVoid) {
+            super.onPostExecute(aVoid);
+
+//            progressDialog.cancel();
+//            dialog.dismiss();
+        }
     }
 
     public static BigDecimal round(double d, int decimalPlace) {
@@ -253,4 +382,20 @@ public class BillingEdit extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    String url = "";
+
+    private void SendSmsTouser(String mob, final String sms) {
+        if (mob.length() == 10) {
+            mob = "91" + mob;
+        }
+        String append = "&mobiles=" + mob + "&message=" + sms;
+        HttpAsycTask dataTask = new HttpAsycTask();
+        url = ServerApis.SMS_API_ROOT + append + ServerApis.SMS_API_POSTFIX;
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append + ServerApis.SMS_API_POSTFIX, null, this, false, null);
+    }
+
+    @Override
+    public void onTaskCompleted(String type, HashMap<String, String> listType) {
+
+    }
 }

@@ -134,7 +134,6 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
             }
         });
 
-        exDb.close();
         return convertView;
     }
 
