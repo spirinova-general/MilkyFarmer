@@ -48,16 +48,19 @@ import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.SendMessage;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
+import com.milky.viewmodel.VBill;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleteListner {
@@ -386,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 //        sync.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_image));
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
             if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
-//                expiryDialog();
+                expiryDialog();
             }
         }
         /**
@@ -534,15 +537,16 @@ _dbHelper.close();
 
     //Expiry dialog
 
-    ArrayList<SendMessage> list = new ArrayList<>();
+    ArrayList<VBill> list = new ArrayList<>();
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
         switch (id) {
             case R.id.sens_sms:
                 if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                    list = CustomersTableMagagement.getAllCustomersBillingInfo(_dbHelper.getReadableDatabase());
+                    list = BillTableManagement.getTotalBillList(_dbHelper.getReadableDatabase());
                 }
                 if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
                     if (list.size() > 0) {
@@ -581,20 +585,35 @@ _dbHelper.close();
 
         @Override
         protected String doInBackground(Void... params) {
-
-
-            final ArrayList<SendMessage> finalList = list;
+            final Calendar startDate = Calendar.getInstance();
+            final Calendar endDate = Calendar.getInstance();
+            final ArrayList<VBill> finalList = list;
 
             new Thread(new Runnable() {
                 public void run() {
                     for (int i = 0; i < finalList.size(); ++i) {
                         String mesg = null;
                         try {
-                            mesg = URLEncoder.encode("Dear " + finalList.get(i).getFristName() + ", " + "your milk bill is " + finalList.get(i).getBillAmount(), "UTF-8");
+
+                            try {
+                                Date date = Constants.work_format.parse(finalList.get(i).getStartDate());
+                                Date end = Constants.work_format.parse(finalList.get(i).getStartDate());
+                                startDate.setTime(date);
+                                endDate.setTime(end);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            mesg = URLEncoder.encode("Dear " + CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(),finalList.get(i).getCustomerId()) + ", " + "Your milk bill from " +Constants.MONTHS[startDate.get(Calendar.MONTH)]+" "
+                                    +String.format("%02d",startDate.get(Calendar.DAY_OF_MONTH))+" to "+
+                                    Constants.MONTHS[endDate.get(Calendar.MONTH)]+" "+String.format("%02d",endDate.get(Calendar.DAY_OF_MONTH))
+                                    +" is Rs. "+ finalList.get(i).getBillMade()
+                                    +". Total quantity "+finalList.get(i).getQuantity()+" litres. Rate is "+ finalList.get(i).getRate()+"/litre.", "UTF-8");
+
+//                            mesg = URLEncoder.encode("Dear " + finalList.get(i).getFristName() + ", " + "your milk bill is " + finalList.get(i).getBillAmount(), "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(finalList.get(i).getMobileNo(), mesg);
+                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(),finalList.get(i).getCustomerId()), mesg);
 
                         finalI = i + 1;
                         progressHandler.post(new Runnable() {
@@ -645,12 +664,10 @@ _dbHelper.close();
 
     //Sens SMS to customers
     private void SendSmsTouser(String mob, final String sms) {
-        if (mob.length() == 10) {
-            mob = "91" + mob;
-        }
-        String append = "&mobiles=" + mob + "&message=" + sms;
+
+        String append = "?mobile=" + mob + "&message=" + sms;
         HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append + ServerApis.SMS_API_POSTFIX, null, this, false, null);
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append , null, this, false, null);
     }
 
     private TextView messageSent;

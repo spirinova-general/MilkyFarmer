@@ -47,7 +47,6 @@ import com.milky.ui.adapters.PlaceAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
-import com.milky.viewmodel.SendMessage;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VAreaMapper;
 
@@ -84,8 +83,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     private DatabaseHelper _dbHelper;
     //    private AutoCompleteTextView AreaAutocomplete;
     private ArrayList<VAreaMapper> selectedareacityList = new ArrayList<>();
-    private ArrayList<SendMessage> messageData = new ArrayList<>();
-    public SendMessage sendMessage;
+
     private String[] autoCompleteData;
     private ImageView add;
     public static int Position = 0;

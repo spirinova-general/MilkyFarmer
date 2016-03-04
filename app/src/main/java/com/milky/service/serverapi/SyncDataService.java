@@ -92,7 +92,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                                 if (BillTableManagement.isHasBill(_dbHelper.getReadableDatabase(), currentDate) == null) {
                                     //Update billmade
                                     BillTableManagement.updateBillMade(_dbHelper.getWritableDatabase(), currentDate, BillTableManagement.
-                                            getBillMade(_dbHelper.getReadableDatabase(), list.get(i), currentDate));
+                                            getBillMade(_dbHelper.getReadableDatabase(), list.get(i), currentDate),list.get(i));
 
 
                                 }
@@ -115,14 +115,17 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 //                                        String.format("%02d", 29));
 
 //                                Insert new bill and setting for customer
-                                ExtcalCustomerSettingTableManagement.insertCustomersSetting(_exDb.getWritableDatabase(), custHolder);
-                                custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
-                                custHolder.setAdjustment("");
-                                custHolder.setPaymentMade("0");
-                                custHolder.setIsCleared("1");
-                                custHolder.setBalanceType("1");
-                                custHolder.setDateModified(custHolder.getStart_date());
-                                BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+                                if(!ExtcalCustomerSettingTableManagement.isHasDataForDaybyId(_exDb.getReadableDatabase(),custHolder.getStart_date(),custHolder.getCustomerId())) {
+                                    ExtcalCustomerSettingTableManagement.insertCustomersSetting(_exDb.getWritableDatabase(), custHolder);
+                                    custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+                                    custHolder.setAdjustment("");
+                                    custHolder.setPaymentMade("0");
+                                    custHolder.setIsCleared("1");
+                                    custHolder.setBalanceType("1");
+                                    custHolder.setOutstanding("1");
+                                    custHolder.setDateModified(custHolder.getStart_date());
+                                    BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+                                }
                             }
                             edit.putString(UserPrefrences.INSERT_BILL, "1");
                             edit.apply();

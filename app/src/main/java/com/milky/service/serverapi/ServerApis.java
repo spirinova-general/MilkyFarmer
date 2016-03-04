@@ -17,8 +17,9 @@ public class ServerApis {
     public static String AREA_API = "/getallareas";
 
     //    SMS apis
-    public static String SMS_API_ROOT = "http://login.wishbysms.com/api/sendhttp.php?authkey=82145AlwUkIYg9UKj551bafcf";
-    public static String SMS_API_POSTFIX = "&sender=KRUSHI&route=1&country=0";
+//    http://login.wishbysms.com/api/sendhttp.php?authkey=82145AlwUkIYg9UKj551bafcf
+    public static String SMS_API_ROOT = "http://milky.yaylo.com/api/syncobject/sendsms";
+//    public static String SMS_API_POSTFIX = "&sender=KRUSHI&route=1&country=0";
 
 
     //Sign up ,to get sign upe detail

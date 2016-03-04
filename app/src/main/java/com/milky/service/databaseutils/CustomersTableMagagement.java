@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.utils.Constants;
-import com.milky.viewmodel.SendMessage;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
@@ -363,7 +362,7 @@ public class CustomersTableMagagement {
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.QUANTITY, holder.getQuantity());
         values.put(TableColumns.ACCOUNT_ID, holder.getAccountId());
-        values.put(TableColumns.DATE_ADDED, holder.getDateAdded());
+//        values.put(TableColumns.DATE_ADDED, holder.getDateAdded());
         values.put(TableColumns.DATE_MODIFIED, holder.getDateAdded());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.DELETED_ON, "1");
@@ -650,35 +649,35 @@ public class CustomersTableMagagement {
     }
 
     //To get the message data
-    public static ArrayList<SendMessage> getAllCustomersBillingInfo(SQLiteDatabase db) {
-
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate()
-                + "' AND (" + TableColumns.DELETED_ON + " ='0' OR " + TableColumns.DELETED_ON + " <'" + Constants.getCurrentDate() + "')";
-        ArrayList<SendMessage> list = new ArrayList<>();
-
-        Cursor cursor = db.rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                SendMessage sm = new SendMessage();
-
-                sm.billAmount = BillTableManagement.getBill(db, cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)), Constants.getCurrentDate());
-                if (!sm.billAmount.equals("")) {
-                    sm.balance = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE));
-                    sm.fristName = cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME));
-                    sm.lastName = cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME));
-                    sm.customerId = cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID));
-                    sm.mobileNo = cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE));
-                    if (BillTableManagement.isClearedBill(db, sm.customerId, Constants.getCurrentDate()))
-                        list.add(sm);
-                }
-
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-//        if (db.isOpen())
-//            db.close();
-        return list;
-    }
+//    public static ArrayList<SendMessage> getAllCustomersBillingInfo(SQLiteDatabase db) {
+//
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate()
+//                + "' AND (" + TableColumns.DELETED_ON + " ='0' OR " + TableColumns.DELETED_ON + " <'" + Constants.getCurrentDate() + "')";
+//        ArrayList<SendMessage> list = new ArrayList<>();
+//
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//
+//        if (cursor.moveToFirst()) {
+//            do {
+//                SendMessage sm = new SendMessage();
+//
+//                sm.billAmount = BillTableManagement.getBill(db, cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)), Constants.getCurrentDate());
+//                if (!sm.billAmount.equals("")) {
+//                    sm.balance = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE));
+//                    sm.fristName = cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME));
+//                    sm.lastName = cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME));
+//                    sm.customerId = cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID));
+//                    sm.mobileNo = cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE));
+//                    if (BillTableManagement.isClearedBill(db, sm.customerId, Constants.getCurrentDate()))
+//                        list.add(sm);
+//                }
+//
+//            }
+//            while (cursor.moveToNext());
+//        }
+//        cursor.close();
+////        if (db.isOpen())
+////            db.close();
+//        return list;
+//    }
 }

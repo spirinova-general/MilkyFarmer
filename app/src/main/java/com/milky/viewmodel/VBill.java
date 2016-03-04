@@ -24,9 +24,17 @@ public class VBill {
     private String isOutstanding;
     private String firstname;
     private String lastName;
-
+    private String message;
     private String billMade;
     private String balanceType;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public String getBillMade() {
         return billMade;

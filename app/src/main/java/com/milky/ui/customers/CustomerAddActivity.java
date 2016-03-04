@@ -2,6 +2,7 @@ package com.milky.ui.customers;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -35,6 +36,7 @@ import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
+import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAreaMapper;
 import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
@@ -219,6 +221,16 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setPaymentMade("0");
                         holder.setIsCleared("1");
                         holder.setDateModified(holder.getStart_date());
+                        Calendar cal = Calendar.getInstance();
+                        if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+                            holder.setOutstanding("0");
+                            SharedPreferences preferences =AppUtil.getInstance().getPrefrences();
+                            SharedPreferences.Editor edit = preferences.edit();
+                            edit.putString(UserPrefrences.INSERT_BILL, "0");
+                            edit.apply();
+                        }
+                        else
+                        holder.setOutstanding("1");
                         BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
                         Constants.REFRESH_CALANDER = true;
                         CustomerAddActivity.this.finish();

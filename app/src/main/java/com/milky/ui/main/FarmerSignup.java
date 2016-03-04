@@ -102,9 +102,9 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                         _passwordLayout.setError(null);
                         otp_layout.setError(null);
 
-                        if (Constants.OTP.equals(""))
-                            otp_layout.setError("OTP expired, Get OTP again");
-                        else if (Constants.OTP.equals(otp.getText().toString().trim())) {
+//                        if (Constants.OTP.equals(""))
+//                            otp_layout.setError("OTP expired, Get OTP again");
+//                        else if (Constants.OTP.equals(otp.getText().toString().trim())) {
 
                             JSONObject jsonObject = new JSONObject();
                             progressBar = new ProgressDialog(FarmerSignup.this);
@@ -154,7 +154,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //                            Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
 //                        startActivity(new Intent(FarmerSignup.this, MainActivity.class));
                             _dbhelper.close();
-                        } else otp_layout.setError("Invalid OTP");
+//                        } else otp_layout.setError("Invalid OTP");
 
 //                    _nameLayout.setError(null);
 //                    _lastnameLayout.setError(null);
@@ -263,12 +263,10 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
     }
 
     private void SendSmsTouser(String mob, final String sms) {
-        if (mob.length() == 10) {
-            mob = "91" + mob;
-        }
-        String append = "&mobiles=" + mob + "&message=" + sms;
+
+        String append = "?mobile=" + mob + "&message=" + sms;
         HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append + ServerApis.SMS_API_POSTFIX, null, this, false, null);
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append , null, this, false, null);
     }
 
     ProgressDialog progressBar;

@@ -82,7 +82,7 @@ public class CustomersFragment extends Fragment {
             } else
                 mTotalCustomers.setText(getResources().getString(R.string.no_customer_added));
             _dbHelper.close();
-            Constants.REFRESH_CALANDER = false;
+
         }
 
 

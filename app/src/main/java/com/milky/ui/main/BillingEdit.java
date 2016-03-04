@@ -31,7 +31,6 @@ import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.SendMessage;
 import com.milky.viewmodel.VBill;
 import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
@@ -40,7 +39,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -190,6 +188,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
                             BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"), holder);
                             dialog.dismiss();
+                            Constants.REFRESH_CALANDER=true;
                             BillingEdit.this.finish();
                         }
 
@@ -280,7 +279,8 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                     for (int i = 0; i < 1; ++i) {
                         String mesg = null;
                         try {
-                            mesg = URLEncoder.encode("Dear " + intent.getStringExtra("titleString") + ", " + "your milk bill is " + intent.getStringExtra("total"), "UTF-8");
+                            mesg = URLEncoder.encode("Dear " + intent.getStringExtra("titleString") + ", " + "Your milk bill from" +start_date.getText().toString()+" to "+end_date.getText().toString()+" is Rs. "+ intent.getStringExtra("total")
+                                    +". Total quantity "+milk_quantity.getText().toString()+" litres. Rate is "+ rate.getText().toString()+"/litre.", "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
@@ -385,13 +385,11 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
     String url = "";
 
     private void SendSmsTouser(String mob, final String sms) {
-        if (mob.length() == 10) {
-            mob = "91" + mob;
-        }
-        String append = "&mobiles=" + mob + "&message=" + sms;
+
+        String append = "?mobile=" + mob + "&message=" + sms;
         HttpAsycTask dataTask = new HttpAsycTask();
-        url = ServerApis.SMS_API_ROOT + append + ServerApis.SMS_API_POSTFIX;
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append + ServerApis.SMS_API_POSTFIX, null, this, false, null);
+        url = ServerApis.SMS_API_ROOT + append ;
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
     }
 
     @Override
