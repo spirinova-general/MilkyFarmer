@@ -17,18 +17,18 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
     Context context;
     SQLiteDatabase db;
 
-    public ExtcalDatabaseHelper(final Context context) {
-        super(context, Environment.getExternalStorageDirectory()
-                + File.separator + "milky"
-                + File.separator + "Extcal", null, 1);
-    }
-
-//    public ExtcalDatabaseHelper(Context context) {
-//        super(context, "Extcal", null,
-//                1);
-//        this.context = context;
-//
+//    public ExtcalDatabaseHelper(final Context context) {
+//        super(context, Environment.getExternalStorageDirectory()
+//                + File.separator + "milky"
+//                + File.separator + "Extcal", null, 1);
 //    }
+
+    public ExtcalDatabaseHelper(Context context) {
+        super(context, "Extcal", null,
+                1);
+        this.context = context;
+
+    }
 
 
     @Override

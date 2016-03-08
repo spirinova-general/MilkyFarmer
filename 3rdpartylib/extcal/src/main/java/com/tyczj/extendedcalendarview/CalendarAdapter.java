@@ -30,6 +30,7 @@ public class CalendarAdapter extends BaseAdapter {
     Calendar cal, deletedCal;
     public String[] days;
     public static boolean isPost = false;
+    private double quantityOfDay=0;
 
     //	OnAddNewEventClick mAddEvent;
     SharedPreferences preferences;
@@ -109,13 +110,14 @@ public class CalendarAdapter extends BaseAdapter {
             FrameLayout today = (FrameLayout) v.findViewById(R.id.today_frame);
             Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
             Day d = dayList.get(position);
+            quantityOfDay = getQuantity(d);
 //today
             if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
-                if (getQuantity(d) == 0)
+                if (quantityOfDay == 0)
                     quantitiTV.setText("0.0L");
                 else
-                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                    quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
 
 
             } else if (d.getYear() <= cal.get(Calendar.YEAR) && d.getMonth() <= cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
@@ -123,18 +125,18 @@ public class CalendarAdapter extends BaseAdapter {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
                 }
-                if (getQuantity(d) == 0)
+                if (quantityOfDay == 0)
                     quantitiTV.setText("0.0L");
                 else
-                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                    quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
 
                 today.setVisibility(View.VISIBLE);
             } else if (d.getYear() >= cal.get(Calendar.YEAR) && d.getMonth() >= cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH)
                     ) {
-                if (getQuantity(d) == 0)
+                if (quantityOfDay == 0)
                     quantitiTV.setText("0.0L");
                 else
-                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+                    quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
 
                 today.setVisibility(View.GONE);
             }

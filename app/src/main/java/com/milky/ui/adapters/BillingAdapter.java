@@ -68,16 +68,15 @@ public class BillingAdapter extends BaseAdapter {
             final LayoutInflater mInflater = (LayoutInflater)
                     mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.bill_history_items, parent, false);
+
         }
-        Calendar c = Calendar.getInstance();
-        final String time = String.valueOf(String.valueOf(c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.DAY_OF_MONTH)) + "-" +
-                String.valueOf(c.get(Calendar.YEAR));
         holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
         holder.name = (TextView) convertView.findViewById(R.id.name);
         holder.custName = (TextView) convertView.findViewById(R.id.quantityText);
         holder.history = (TextView) convertView.findViewById(R.id.history);
+
         String nfNAme = CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), names.get(position));
         String lfNAme = CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), names.get(position));
         String a = Character.toString(nfNAme.charAt(0));
@@ -140,64 +139,6 @@ public class BillingAdapter extends BaseAdapter {
         TextView startDate, endDate, amount, name, custName, history;
     }
 
-    private DatabaseHelper databaseHelper = AppUtil.getInstance().getDatabaseHandler();
-
-    private String getBill(String currentDate, String custId, String deliveryDate, String endDate, String rate, String qty, String balance, String adjustment) {
-        Date todaydate = null, deliverydate = null, enddate = null, tempdate = null;
-        String billAmount = "0";
-        float previousBill = 0;
-        SimpleDateFormat sdf = Constants.work_format;
-        Float tax = (Float.parseFloat(rate) * Float.parseFloat(Account.getDefautTax(databaseHelper.getReadableDatabase()))) / 100;
-        try {
-            todaydate = sdf.parse(currentDate);
-            tempdate = sdf.parse(currentDate);
-            deliverydate = sdf.parse(deliveryDate);
-            if (!endDate.equals("0"))
-                enddate = sdf.parse(endDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if (deliverydate.compareTo(todaydate) == 0) {
-            previousBill = ((Float.parseFloat(rate) * Float.parseFloat(qty)) + tax) - (Float.parseFloat(balance) + Float.parseFloat(adjustment));
-            return String.valueOf(round(previousBill, 2));
-        } else if (deliverydate.before(todaydate)) {
-            if (!endDate.equals("0")) {
-                if (enddate.after(todaydate) && enddate.compareTo(todaydate) != 0) {
-                    for (int i = 0; i < (todaydate.compareTo(deliverydate)); i++) {
-                        previousBill = (Float.parseFloat(rate) * Float.parseFloat(qty)) + tax - (Float.parseFloat(balance) + Float.parseFloat(adjustment)) + previousBill;
-                        billAmount = String.valueOf(round(previousBill, 2));
-                    }
-                }
-            } else {
-                for (int i = 0; i < (todaydate.compareTo(deliverydate)); i++) {
-                    previousBill = (Float.parseFloat(rate) * Float.parseFloat(qty)) + tax - (Float.parseFloat(balance) + Float.parseFloat(adjustment)) + previousBill;
-                    billAmount = String.valueOf(round(previousBill, 2));
-                }
-            }
-        } else {
-            if ((tempdate.compareTo(todaydate) < 0)) {
-
-                for (int i = 0; i < (todaydate.compareTo(deliverydate)); i++) {
-                    previousBill = (Float.parseFloat(rate) * Float.parseFloat(qty)) + tax - (Float.parseFloat(balance) + Float.parseFloat(adjustment)) + previousBill;
-
-                    tempdate = addDays(tempdate, 1);
-                    billAmount = String.valueOf(round(previousBill, 2));
-                }
-            }
-            return String.valueOf(round(previousBill, 2));
-        }
-
-
-        return billAmount;
-    }
-
-    public Date addDays(Date date, int days) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.add(Calendar.DATE, days);
-        return cal.getTime();
-    }
 
     public static BigDecimal round(float d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Float.toString(d));

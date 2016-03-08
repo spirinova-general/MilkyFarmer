@@ -39,7 +39,6 @@ public class Account {
 
     public static void updateAllAccountDetails(SQLiteDatabase db, VAccount holder) {
         ContentValues values = new ContentValues();
-
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.EXPIRY_DATE, holder.getExpiryDate());

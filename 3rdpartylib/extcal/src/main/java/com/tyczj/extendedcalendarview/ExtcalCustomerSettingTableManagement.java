@@ -94,7 +94,7 @@ public class ExtcalCustomerSettingTableManagement {
         if (areaid.equals("")) {
 //            if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
             selectquery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.START_DATE
-                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >='" + date + "'"
+                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'"
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
 //            } else
 //                selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
@@ -103,7 +103,7 @@ public class ExtcalCustomerSettingTableManagement {
 // else if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
         else
             selectquery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.START_DATE
-                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >='" + date + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
+                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
 //        } else
 //            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
@@ -469,7 +469,7 @@ public class ExtcalCustomerSettingTableManagement {
 //                    + " >'" + day + "'" + " AND "
 //                    + TableColumns.CUSTOMER_ID + " ='" + id + "'";
         selectquery = "SELECT * FROM " + "customers" + " WHERE "
-                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
                 + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')" + " AND "
                 + TableColumns.CUSTOMER_ID + " ='" + id + "'";
         double qty = 0;
@@ -494,7 +494,7 @@ public class ExtcalCustomerSettingTableManagement {
         String selectquery = "";
 //        if (isDeletedCustomer(db, day)) {
         selectquery = "SELECT * FROM " + "customers" + " WHERE "
-                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
                 + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
 //        } else
 //            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "

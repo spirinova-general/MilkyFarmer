@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.milky.R;
+import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.ui.customers.CustomerTabFragment;
 import com.milky.utils.AppUtil;
@@ -134,6 +135,7 @@ public class CustomersActivity extends AppCompatActivity {
 
 
                         DeliveryTableManagement.updateDeletedCustomer(exDb.getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
+
                         finish();
                     }
                 });

@@ -1,6 +1,8 @@
 package com.milky.ui.main;
 
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,8 +20,6 @@ import com.milky.ui.adapters.BillingAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import java.util.ArrayList;
@@ -61,23 +61,55 @@ public class BillingFragment extends Fragment {
 
     }
 
-    private void populateBills() {
-        payment.clear();
-        custIdsList.clear();
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            list = CustomersTableMagagement.getAllCustomersIds(_dbHelper.getReadableDatabase());
-            for (int i = 0; i < list.size(); ++i) {
-                generateBill(list.get(i));
-            }
+    private ProgressDialog pd;
 
+    private class UpdataBills extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(getActivity());
+            pd.setTitle("Processing...");
+            pd.setMessage("Please wait.");
+            pd.setCancelable(false);
+            pd.setIndeterminate(true);
         }
-        if (payment.size() > 0) {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    payment.clear();
+                    custIdsList.clear();
+                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+                        list = CustomersTableMagagement.getAllCustomersIds(_dbHelper.getReadableDatabase());
+                        for (int i = 0; i < list.size(); ++i) {
+                            generateBill(list.get(i));
+                        }
+
+                    }
+
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (payment.size() > 0) {
 //            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-            _mListView.setAdapter(new BillingAdapter(payment, getActivity(), custIdsList));
+                _mListView.setAdapter(new BillingAdapter(payment, getActivity(), custIdsList));
+            }
+            final BillingAdapter adapter = ((BillingAdapter) _mListView.getAdapter());
+            if (adapter != null)
+                adapter.notifyDataSetChanged();
+            pd.dismiss();
         }
-        final BillingAdapter adapter = ((BillingAdapter) _mListView.getAdapter());
-        if (adapter != null)
-            adapter.notifyDataSetChanged();
+    }
+
+    private void populateBills() {
+        new UpdataBills().execute();
     }
 
     private void initResources(View v) {
@@ -206,6 +238,7 @@ public class BillingFragment extends Fragment {
 //        _hasFutureBill = false;
 //    }
 
+
     private void generateBill(String custId) {
         ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase(), custId);
         if (bills.size() > 0)
@@ -219,18 +252,17 @@ public class BillingFragment extends Fragment {
         }
         String startDate = BillTableManagement.getStartDatebyCustomerId(_dbHelper.getReadableDatabase(), custId);
 
-        if(!"".equals(startDate)) {
+        if (!"".equals(startDate)) {
             VBill holder = BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase(), custId, startDate);
-            if(holder !=null) {
+            if (holder != null) {
                 payment.add(holder);
                 custIdsList.add(custId);
                 BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), holder.getBillMade(), custId);
             }
-            }
+        }
 
 
     }
-
 
 
 }

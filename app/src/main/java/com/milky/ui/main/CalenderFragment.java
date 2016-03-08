@@ -1,8 +1,10 @@
 package com.milky.ui.main;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -42,14 +44,43 @@ public class CalenderFragment extends Fragment {
 
     }
 
+    private ProgressDialog pd;
+
+    private class UpdataCalander extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(getActivity());
+            pd.setTitle("Processing...");
+            pd.setMessage("Please wait.");
+            pd.setCancelable(false);
+            pd.setIndeterminate(true);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    _mCalenderView.setForCustomersDelivery(false);
+                    _mCalenderView.refresh();
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            pd.dismiss();
+        }
+    }
 
     @Override
     public void onResume() {
         super.onResume();
         if (Constants.REFRESH_CALANDER) {
-            _mCalenderView.setForCustomersDelivery(false);
-
-            _mCalenderView.refresh();
+            new UpdataCalander().execute();
         }
     }
 

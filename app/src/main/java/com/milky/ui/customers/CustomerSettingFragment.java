@@ -48,7 +48,6 @@ public class CustomerSettingFragment extends Fragment {
     private EditText _mFirstName, _mLastName, _mAddress1, _mBalance, _mQuantuty, _mMobile, _mRate;
     private InputMethodManager inputMethodManager;
     private Button _mSave, _mCancel;
-    //    private FloatingActionButton _mEdit;
     private int dataCount = 0;
     private TextInputLayout _phone_textinput_layout;
     private AutoCompleteTextView _autocomplete_city_area;
@@ -65,13 +64,10 @@ public class CustomerSettingFragment extends Fragment {
     private Calendar c;
     private TextView pick_date;
     private String custId = "";
-    //   private FormEditText et_phone;
     private ExtcalDatabaseHelper extDb;
     private boolean updatedQtyRate = false;
-
     public CustomerSettingFragment() {
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -79,24 +75,17 @@ public class CustomerSettingFragment extends Fragment {
         inputMethodManager =
                 (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-
-        initResources(view);
-        /*
-        * initialize all resources
+  /** initialize all resources
         * */
 
-
-       /*
-        * Set text field listeners*/
+        initResources(view);
+       /*  * Set text field listeners*/
         _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, getActivity(), false));
         _mFirstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, getActivity(), false));
         _mLastName.addTextChangedListener(new TextValidationMessage(_mAddress1, last_name_layout, getActivity(), false));
 
-//        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, getActivity(), false));
         _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, getActivity(), false));
         _mMobile.addTextChangedListener(new TextValidationMessage(_mMobile, _phone_textinput_layout, getActivity(), true));
-//        _mAddress2.addTextChangedListener(new TextValidationMessage(_mMobile, street_layout, getActivity(), false));
-//        _mRate.addTextChangedListener(new TextValidationMessage(_mMobile, rate_layout, getActivity(), false));
 
         _mQuantuty.addTextChangedListener(new TextWatcher() {
             @Override
@@ -440,34 +429,21 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setEnd_date(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
                             String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
-
-//                    if (CustomerSettingTableManagement.isHasStartDate(_dbHelper.getReadableDatabase(),
-//                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
-//                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
-//TODO ExtCal SETTINGS DB
                     if (ExtcalCustomerSettingTableManagement.isHasStartDate(extDb.getReadableDatabase(),
                             getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
-//                        CustomerSettingTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                         ExtcalCustomerSettingTableManagement.updateData(extDb.getWritableDatabase(), holder);
-
-
                     } else {
                         if (updatedQtyRate) {
                             String enddate = ExtcalCustomerSettingTableManagement.getOldEndDate(extDb.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
                             ExtcalCustomerSettingTableManagement.updateEndDate(extDb.getWritableDatabase(), holder, enddate, formattedDate);
-//                            BillTableManagement.updateEndDate(_dbHelper.getWritableDatabase(), holder, enddate, formattedDate);
                             holder.setStart_date(formattedDate);
                             ExtcalCustomerSettingTableManagement.insertCustomersSetting(extDb.getWritableDatabase(), holder);
-//                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
                         } else {
                             ExtcalCustomerSettingTableManagement.updateAllData(extDb.getWritableDatabase(), holder);
-
                         }
-
                     }
                     BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
-//                    EnableEditableFields.setIsEnabled(false);
                     Constants.REFRESH_CALANDER = true;
                     getActivity().finish();
 
@@ -475,8 +451,6 @@ public class CustomerSettingFragment extends Fragment {
                     Toast.makeText(getActivity(), getResources().getString(R.string.fill_require_fields), Toast.LENGTH_SHORT).show();
 
                 }
-
-
             }
         });
 

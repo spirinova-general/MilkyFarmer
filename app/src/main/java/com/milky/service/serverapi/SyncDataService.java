@@ -8,14 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
@@ -36,12 +29,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -51,6 +40,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     public Handler handler = null;
     public static Runnable runnable = null;
     public ExtcalDatabaseHelper _exDb;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -60,7 +50,6 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     @Override
     public void onCreate() {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-
         handler = new Handler();
         _exDb = new ExtcalDatabaseHelper(this);
 
@@ -70,52 +59,31 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
             public void run() {
                 //TODo changed roll date
-                ////////////////////////////////////
-                  if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
+                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
 ////                 if ((c.get(Calendar.DAY_OF_MONTH)) == 5)
                 {
-
-
-////                    updateDataForNewMonth();
-
                     String currentDate = Constants.getCurrentDate();
-        /*Bill is to be outstanding*/
-
+                    /*Bill is to be outstanding*/
                     // update outstanding bills
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
                         BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), currentDate);
-                        if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
-
+                        if(preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
                             ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
                             for (int i = 0; i < list.size(); ++i) {
-
                                 if (BillTableManagement.isHasBill(_dbHelper.getReadableDatabase(), currentDate) == null) {
                                     //Update billmade
                                     BillTableManagement.updateBillMade(_dbHelper.getWritableDatabase(), currentDate, BillTableManagement.
-                                            getBillMade(_dbHelper.getReadableDatabase(), list.get(i), currentDate),list.get(i));
-
-
+                                            getBillMade(_dbHelper.getReadableDatabase(), list.get(i), currentDate), list.get(i));
                                 }
-
-
                                 ExtcalVCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
                                 Calendar nextMonth = Calendar.getInstance();
                                 nextMonth.add(Calendar.MONTH, 1);
                                 Calendar cal = Calendar.getInstance();
                                 custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
                                         "01");
-
                                 custHolder.setEnd_date("2250" + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 13) + "-" +
                                         String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-
-//                                custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-//                                        "06");
-//
-//                                custHolder.setEnd_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" +
-//                                        String.format("%02d", 29));
-
-//                                Insert new bill and setting for customer
-                                if(!ExtcalCustomerSettingTableManagement.isHasDataForDaybyId(_exDb.getReadableDatabase(),custHolder.getStart_date(),custHolder.getCustomerId())) {
+                                if (!ExtcalCustomerSettingTableManagement.isHasDataForDayById(_exDb.getReadableDatabase(), custHolder.getStart_date(), custHolder.getCustomerId())) {
                                     ExtcalCustomerSettingTableManagement.insertCustomersSetting(_exDb.getWritableDatabase(), custHolder);
                                     custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
                                     custHolder.setAdjustment("");
@@ -129,20 +97,16 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                             }
                             edit.putString(UserPrefrences.INSERT_BILL, "1");
                             edit.apply();
-
                         }
-//                        Toast.makeText(SyncDataService.this, "Bill inserted", Toast.LENGTH_SHORT).show();
                     } else {
                         edit.putString(UserPrefrences.INSERT_BILL, "0");
                         edit.apply();
-//                    Toast.makeText(SyncDataService.this, "Bill not inserted", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     edit.putString(UserPrefrences.INSERT_BILL, "0");
                     edit.apply();
-//                    Toast.makeText(SyncDataService.this, "Bill not inserted", Toast.LENGTH_SHORT).show();
                 }
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
                     SyncNow();
                 handler.postDelayed(runnable, 50000);
@@ -155,23 +119,19 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Let it continue running until it is stopped.
-
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
     }
 
     public void SyncNow() {
-
         HttpAsycTask dataTask = new HttpAsycTask();
 //        dataTask.runRequest( ServerApis.API_ROOT+ServerApis.SYNC, getAllDataToSync(), this, true, requestedList);
         dataTask.runRequest(ServerApis.ACCOUNT_API, Account.getDetails(_dbHelper.getReadableDatabase()), this, true, null);
     }
-
     public static HashMap<String, String> requestedList = new HashMap<>();
 
     private List<NameValuePair> getAllDataToSync() {
@@ -395,14 +355,10 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     }
 
     Calendar c = Calendar.getInstance();
-
     private void updateDataForNewMonth() {
-
-
         DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
         if (db.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
             ArrayList<ExtcalVCustomersList> list = CustomersTableMagagement.getAllCustomers(db.getReadableDatabase());
-
             for (int i = 0; i < list.size(); ++i) {
                 // update customers setting
                 VBill holder = new VBill();

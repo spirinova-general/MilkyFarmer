@@ -8,14 +8,15 @@ import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.DateQuantityModel;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Neha on 11/30/2015.
  */
 public class CustomersTableMagagement {
-
-
     public static void insertCustomerDetail(SQLiteDatabase db, ExtcalVCustomersList holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.FIRST_NAME, holder.getFirstName());
@@ -377,9 +378,9 @@ public class CustomersTableMagagement {
         db.update(TableNames.TABLE_CUSTOMER, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'", null);
     }
 
-    public static boolean isDeletedCustomer(SQLiteDatabase db) {
+    public static boolean isDeletedCustomer(SQLiteDatabase db, String custId) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='"
-                + "1'";
+                + "1' AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -399,6 +400,33 @@ public class CustomersTableMagagement {
         return result;
     }
 
+
+    public static String getCustomerDeletionDate(SQLiteDatabase db, String custId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+        String date = "";
+        Cursor cursor = db.rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ExtcalVCustomersList holder = new ExtcalVCustomersList();
+                Calendar cal = Calendar.getInstance();
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
+                    date = cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON));
+                try {
+                    Date d = Constants.work_format.parse(date);
+                    cal.setTime(d);
+                    date = String.valueOf(cal.get(Calendar.YEAR)+"-"+ String.format("%02d",cal.get(Calendar.MONTH))
+                    +"-"+String.valueOf(cal.get(Calendar.DAY_OF_MONTH)-1));
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return date;
+    }
 
     public static ArrayList<ExtcalVCustomersList> getAllCustomersToSync(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.SYNC_STATUS + " ='" + "0'";

@@ -48,7 +48,7 @@ public class AreaCityTableManagement {
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)) != null)
 //                    holder.setCityId(cursor.getString(cursor.getColumnIndex(TableColumns.CITY_ID)));
 
-                areaList.add(holder);
+                    areaList.add(holder);
             }
             while (cursor.moveToNext());
 
@@ -64,7 +64,7 @@ public class AreaCityTableManagement {
         VAreaMapper holder = null;
         if (cursor.moveToFirst()) {
             do {
-                 holder = new VAreaMapper();
+                holder = new VAreaMapper();
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_NAME)) != null)
                     holder.setArea(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_NAME)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.CITY_NAME)) != null)
@@ -100,6 +100,7 @@ public class AreaCityTableManagement {
 
         return area;
     }
+
     public static String getLocalityById(SQLiteDatabase db, final String areaId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ID + " ='" + areaId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
@@ -172,7 +173,7 @@ public class AreaCityTableManagement {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA;
         Cursor cursor = db.rawQuery(selectquery, null);
         ArrayList<VAreaMapper> areaList = new ArrayList<>();
-        String address ="";
+        String address = "";
 
         if (cursor.moveToFirst()) {
             do {
@@ -180,16 +181,14 @@ public class AreaCityTableManagement {
                 VAreaMapper holder = new VAreaMapper();
                 holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.ID)));
 
-                if(cursor.getString(cursor.getColumnIndex(TableColumns.LOCALITY)).equals(""))
-                {
-                    address = cursor.getString(cursor.getColumnIndex(TableColumns.AREA_NAME))+", "
-                            +cursor.getString(cursor.getColumnIndex(TableColumns.CITY_NAME));
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.LOCALITY)).equals("")) {
+                    address = cursor.getString(cursor.getColumnIndex(TableColumns.AREA_NAME)) + ", "
+                            + cursor.getString(cursor.getColumnIndex(TableColumns.CITY_NAME));
 
-                }
-                else
-                    address = cursor.getString(cursor.getColumnIndex(TableColumns.LOCALITY))+", "+cursor.getString(cursor.getColumnIndex(TableColumns.AREA_NAME))+", "
-                            +cursor.getString(cursor.getColumnIndex(TableColumns.CITY_NAME));
-            holder.setCityArea(address);
+                } else
+                    address = cursor.getString(cursor.getColumnIndex(TableColumns.LOCALITY)) + ", " + cursor.getString(cursor.getColumnIndex(TableColumns.AREA_NAME)) + ", "
+                            + cursor.getString(cursor.getColumnIndex(TableColumns.CITY_NAME));
+                holder.setCityArea(address);
                 areaList.add(holder);
             }
             while (cursor.moveToNext());
@@ -199,7 +198,6 @@ public class AreaCityTableManagement {
 
         return areaList;
     }
-
 
 
     public static boolean hasArea(SQLiteDatabase db, String area) {
@@ -235,18 +233,19 @@ public class AreaCityTableManagement {
         return result;
 
     }
-    public static boolean hasAddress(SQLiteDatabase db, String locality,String area,String city) {
-        String selectQuery="";
-        if(locality.equals(""))
-            selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE "+TableColumns.LOCALITY+" ='' AND (("+TableColumns.CITY_NAME+" ='"+city+"' COLLATE NOCASE"
-                    + " AND "+TableColumns.AREA_NAME+" ='"+area+"' COLLATE NOCASE )OR ("
-               +TableColumns.CITY_NAME+" ='"+area+"' COLLATE NOCASE"
-                + " AND "+TableColumns.AREA_NAME+" ='"+city+"' COLLATE NOCASE))";
+
+    public static boolean hasAddress(SQLiteDatabase db, String locality, String area, String city) {
+        String selectQuery = "";
+        if (locality.equals(""))
+            selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.LOCALITY + " ='' AND ((" + TableColumns.CITY_NAME + " ='" + city + "' COLLATE NOCASE"
+                    + " AND " + TableColumns.AREA_NAME + " ='" + area + "' COLLATE NOCASE )OR ("
+                    + TableColumns.CITY_NAME + " ='" + area + "' COLLATE NOCASE"
+                    + " AND " + TableColumns.AREA_NAME + " ='" + city + "' COLLATE NOCASE))";
 
         else
-            selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE "+TableColumns.LOCALITY+" ='"+locality+"' COLLATE NOCASE"
-                    +" AND (("+TableColumns.CITY_NAME+" ='"+city+"' COLLATE NOCASE"+ " AND "+TableColumns.AREA_NAME+" ='"+area+"' COLLATE NOCASE)"
-                    +" OR (" +TableColumns.CITY_NAME+" ='"+area+"' COLLATE NOCASE"+ " AND "+TableColumns.AREA_NAME+" ='"+city+"' COLLATE NOCASE))";
+            selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.LOCALITY + " ='" + locality + "' COLLATE NOCASE"
+                    + " AND ((" + TableColumns.CITY_NAME + " ='" + city + "' COLLATE NOCASE" + " AND " + TableColumns.AREA_NAME + " ='" + area + "' COLLATE NOCASE)"
+                    + " OR (" + TableColumns.CITY_NAME + " ='" + area + "' COLLATE NOCASE" + " AND " + TableColumns.AREA_NAME + " ='" + city + "' COLLATE NOCASE))";
 
 //        selectQuery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE "+TableColumns.LOCALITY+" ='"+locality+"' COLLATE NOCASE"
 //                +" AND (("+TableColumns.CITY_NAME+" ='"+city+"' COLLATE NOCASE"+ " AND "+TableColumns.AREA_NAME+" ='"+area+"' COLLATE NOCASE)"
@@ -258,12 +257,14 @@ public class AreaCityTableManagement {
         return result;
 
     }
+
     public static boolean deleteArea(SQLiteDatabase db, String areaId) {
         Boolean result = db.delete(TableNames.TABLE_AREA, TableColumns.ID + " ='" + areaId + "'", null) > 0;
-        return  result;
+        return result;
     }
+
     public static ArrayList<String> getArea(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA ;
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA;
         Cursor cursor = db.rawQuery(selectquery, null);
         ArrayList<String> areaList = new ArrayList<>();
         if (cursor.moveToFirst()) {

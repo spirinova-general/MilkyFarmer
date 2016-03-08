@@ -1,6 +1,8 @@
 package com.milky.ui.main;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -38,6 +40,7 @@ public class CustomersFragment extends Fragment {
     private DatabaseHelper _dbHelper;
     public static ListView recList;
 
+    private ProgressDialog pd;
 
     @Override
     public void onResume() {
@@ -48,24 +51,35 @@ public class CustomersFragment extends Fragment {
                 ((MainActivity) getActivity()).setFragmentRefreshListener(new MainActivity.FragmentRefreshListener() {
                     @Override
                     public void onRefresh() {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pd = new ProgressDialog(getActivity());
+                                pd.setTitle("Processing...");
+                                pd.setMessage("Please wait.");
+                                pd.setCancelable(false);
+                                pd.setIndeterminate(true);
+                                if (Constants.selectedAreaId.equals("")) {
+                                    _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+                                    if (_mCustomersList.size() == 1)
+                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
+                                    else
+                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
+                                    _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+                                    recList.setAdapter(_mAdapter);
+                                } else {
+                                    _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+                                    if (_mCustomersList.size() == 1)
+                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
+                                    else
+                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
+                                    _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+                                    recList.setAdapter(_mAdapter);
+                                }
+                                pd.dismiss();
+                            }
+                        });
 
-                        if (Constants.selectedAreaId.equals("")) {
-                            _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-                            if (_mCustomersList.size() == 1)
-                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
-                            else
-                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
-                            _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-                            recList.setAdapter(_mAdapter);
-                        } else {
-                            _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
-                            if (_mCustomersList.size() == 1)
-                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
-                            else
-                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
-                            _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-                            recList.setAdapter(_mAdapter);
-                        }
 
                     }
                 });
@@ -77,6 +91,7 @@ public class CustomersFragment extends Fragment {
                     mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers ");
                 _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
                 recList.setAdapter(_mAdapter);
+
 
 
             } else
