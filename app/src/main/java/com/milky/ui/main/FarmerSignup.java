@@ -106,46 +106,46 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //                            otp_layout.setError("OTP expired, Get OTP again");
 //                        else if (Constants.OTP.equals(otp.getText().toString().trim())) {
 
-                            JSONObject jsonObject = new JSONObject();
-                            progressBar = new ProgressDialog(FarmerSignup.this);
-                            progressBar.setCancelable(true);
-                            progressBar.setMessage("Signing Up ...");
-                            //progress dialog type
-                            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                            progressBar.setProgress(0);
-                            progressBar.setMax(100);
-                            progressBar.show();
+                        JSONObject jsonObject = new JSONObject();
+                        progressBar = new ProgressDialog(FarmerSignup.this);
+                        progressBar.setCancelable(true);
+                        progressBar.setMessage("Signing Up ...");
+                        //progress dialog type
+                        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progressBar.setProgress(0);
+                        progressBar.setMax(100);
+                        progressBar.show();
 
-                            Calendar cal = Calendar.getInstance();
-                            //formating the current date and time
-                            String startDate = Constants.api_format.format(cal.getTime());
-                            //To get the maximum date of month
-                            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
-                            Date date = cal.getTime();
-                            String endDate = Constants.api_format.format(date);
-                            try {
-                                //inserting the data to json object
-                                jsonObject.put("FarmerCode", Constants.generateOTP());
-                                jsonObject.put("FirstName", _firstName.getText().toString());
-                                jsonObject.put("LastName", _lastName.getText().toString());
-                                jsonObject.put("Mobile", _mobile.getText().toString());
-                                jsonObject.put("Validated", "true");
-                                jsonObject.put("Dirty", "0");
-                                jsonObject.put("DateAdded", startDate);
-                                jsonObject.put("DateModified", startDate);
-                                jsonObject.put("StartDate", startDate);
-                                jsonObject.put("EndDate", endDate);
-                                jsonObject.put("UsedSms", "0");
-                                jsonObject.put("TotalSms", "10");
-                                //getting the row count from account table
-                                jsonObject.put("Id", Account.getAccountId(_dbhelper.getReadableDatabase()) + 1);
+                        Calendar cal = Calendar.getInstance();
+                        //formating the current date and time
+                        String startDate = Constants.api_format.format(cal.getTime());
+                        //To get the maximum date of month
+                        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+                        Date date = cal.getTime();
+                        String endDate = Constants.api_format.format(date);
+                        try {
+                            //inserting the data to json object
+                            jsonObject.put("FarmerCode", Constants.generateOTP());
+                            jsonObject.put("FirstName", _firstName.getText().toString());
+                            jsonObject.put("LastName", _lastName.getText().toString());
+                            jsonObject.put("Mobile", _mobile.getText().toString());
+                            jsonObject.put("Validated", "true");
+                            jsonObject.put("Dirty", "0");
+                            jsonObject.put("DateAdded", startDate);
+                            jsonObject.put("DateModified", startDate);
+                            jsonObject.put("StartDate", startDate);
+                            jsonObject.put("EndDate", endDate);
+                            jsonObject.put("UsedSms", "0");
+                            jsonObject.put("TotalSms", "10");
+                            //getting the row count from account table
+                            jsonObject.put("Id", Account.getAccountId(_dbhelper.getReadableDatabase()) + 1);
 
 
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            HttpAsycTask dataTask = new HttpAsycTask();
-                            dataTask.runRequest(ServerApis.ACCOUNT_API, jsonObject, FarmerSignup.this, true, null);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        HttpAsycTask dataTask = new HttpAsycTask();
+                        dataTask.runRequest(ServerApis.ACCOUNT_API, jsonObject, FarmerSignup.this, true, null);
 
 //                        if (_dbhelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
 //                            Account.updateAccountDetails(_dbhelper.getWritableDatabase(), holder);
@@ -153,7 +153,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //
 //                            Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
 //                        startActivity(new Intent(FarmerSignup.this, MainActivity.class));
-                            _dbhelper.close();
+                        _dbhelper.close();
 //                        } else otp_layout.setError("Invalid OTP");
 
 //                    _nameLayout.setError(null);
@@ -266,7 +266,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
         String append = "?mobile=" + mob + "&message=" + sms;
         HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append , null, this, false, null);
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
     }
 
     ProgressDialog progressBar;
@@ -279,7 +279,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //            if(progressBar !=null)
 //            progressBar.dismiss();
 
-            VAccount holder=new VAccount();
+            VAccount holder = new VAccount();
             try {
                 JSONObject result = Constants.API_RESPONCE;
                 holder.setFarmerCode(result.getString("FarmerCode"));
@@ -296,34 +296,35 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
                 holder.setId(String.valueOf(result.getInt("Id")));
                 holder.setRate("0");
+                Calendar cal = Calendar.getInstance();
+                holder.setRollDate(String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH)+1) +
+                        "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)));
                 holder.setTax("0");
-                            edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
-                            edit.putString(UserPrefrences.INSERT_BILL, "0");
-                            edit.commit();
-                if(progressBar!=null)
+                edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
+                edit.putString(UserPrefrences.INSERT_BILL, "0");
+                edit.commit();
+                if (progressBar != null)
                     progressBar.dismiss();
-                    Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
+                Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
                 startActivity(new Intent(FarmerSignup.this, MainActivity.class));
                 this.finish();
-
 
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-        }
-        else {
+        } else {
 
-                if (otpButton.getText().toString().equals("Get OTP"))
-                    otpButton.setText("Resend OTP");
-                else {
-                    otp_layout.setError(null);
+            if (otpButton.getText().toString().equals("Get OTP"))
+                otpButton.setText("Resend OTP");
+            else {
+                otp_layout.setError(null);
 
 //                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.VISIBLE);
-                    AppUtil.getInstance().cancelTimer(FarmerSignup.this);
-                    AppUtil.getInstance().startTimer();
-                }
+                AppUtil.getInstance().cancelTimer(FarmerSignup.this);
+                AppUtil.getInstance().startTimer();
+            }
 
         }
     }

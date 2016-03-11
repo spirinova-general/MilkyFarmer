@@ -29,11 +29,12 @@ public class Constants {
     public static SimpleDateFormat work_format = new SimpleDateFormat("yyyy-MM-dd");
     public static SimpleDateFormat _display_format = new SimpleDateFormat("dd-MMM-yyyy");
     public static SimpleDateFormat api_format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    public static SimpleDateFormat api_format_other = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     public static boolean validArea = false;
     public static String OTP = "";
     public static String selectedAreaId = "";
     public static String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-    public static boolean REFRESH_CALANDER = false;
+    public static boolean REFRESH_CALANDER = false,REFRESH_CUSTOMERS=false,REFRESH_BILL=false,REFRESH=false;
     public static boolean REFRESH_DELIVRY_CALANDER = false;
     public static JSONObject API_RESPONCE = null;
     public static Boolean TIME_OUT = false;

@@ -29,6 +29,7 @@
     <string name="no_customer_added">No customer added yet !</string>
     <string name="title_activity_expiry">ExpiryActivity</string>
     <string name="your_account_is_expired_please_conteact_the_adminstrator">Your account is expired.Please contact the administrator to activate</string>
+    <string name="bill_genration_date">Bill Generation Date</string>
 
 </resources>
 

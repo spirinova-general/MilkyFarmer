@@ -33,6 +33,7 @@ import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
+import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
@@ -189,7 +190,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         hol.setStart_date(pickedDate);
                         hol.setEnd_date("2250" + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
-                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH)+5));
+                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
                         hol.setCustomerId(String.valueOf(System.currentTimeMillis()));
 
                         ExtcalDatabaseHelper db = new ExtcalDatabaseHelper(CustomerAddActivity.this);
@@ -224,15 +225,16 @@ public class CustomerAddActivity extends AppCompatActivity {
                         Calendar cal = Calendar.getInstance();
                         if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
                             holder.setOutstanding("0");
-                            SharedPreferences preferences =AppUtil.getInstance().getPrefrences();
+                            SharedPreferences preferences = AppUtil.getInstance().getPrefrences();
                             SharedPreferences.Editor edit = preferences.edit();
                             edit.putString(UserPrefrences.INSERT_BILL, "0");
                             edit.apply();
-                        }
-                        else
-                        holder.setOutstanding("1");
+                        } else
+                            holder.setOutstanding("1");
                         BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
-                        Constants.REFRESH_CALANDER = true;
+//                        Constants.REFRESH_CUSTOMERS = true;
+//                        Constants.REFRESH_BILL=true;
+//                        Constants.REFRESH_CALANDER=true;
                         CustomerAddActivity.this.finish();
                     }
                 } catch (NullPointerException npe) {
@@ -450,14 +452,6 @@ public class CustomerAddActivity extends AppCompatActivity {
         _mSave.setText("Add");
 //        ((FloatingActionButton) findViewById(R.id.editFab)).setVisibility(View.GONE);
 
-        final Snackbar snackbar = Snackbar
-                .make(_mCoordinatorLayout, "Please fill required fields!", Snackbar.LENGTH_LONG)
-                .setAction("OK", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                    }
-                });
 
     }
 

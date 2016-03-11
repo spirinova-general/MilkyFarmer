@@ -103,38 +103,21 @@ public class CustomersTableMagagement {
         if (cursor.moveToFirst()) {
             do {
                 ExtcalVCustomersList holder = new ExtcalVCustomersList();
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
                     holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
                     holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
                     holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
                     holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
                     holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
                     holder.setBalance_amount(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)) != null)
                     holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)) != null)
                     holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
                     holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)) != null)
                     holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)) != null)
                     holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
                     holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)) != null)
                     holder.setQuantityModifiedDate(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_QUANTITY_MODIFIED)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
                     holder.setIs_deleted(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
                     holder.setStart_date(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)) != null)
                     holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
                 list.add(holder);
             }
@@ -413,11 +396,12 @@ public class CustomersTableMagagement {
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
                     date = cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON));
                 try {
-                    Date d = Constants.work_format.parse(date);
-                    cal.setTime(d);
-                    date = String.valueOf(cal.get(Calendar.YEAR)+"-"+ String.format("%02d",cal.get(Calendar.MONTH))
-                    +"-"+String.valueOf(cal.get(Calendar.DAY_OF_MONTH)-1));
-
+                    if (!date.equals("1")) {
+                        Date d = Constants.work_format.parse(date);
+                        cal.setTime(d);
+                        date = String.valueOf(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH))
+                                + "-" + String.valueOf(cal.get(Calendar.DAY_OF_MONTH) - 1));
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

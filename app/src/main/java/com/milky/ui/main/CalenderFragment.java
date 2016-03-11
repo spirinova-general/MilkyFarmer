@@ -43,18 +43,19 @@ public class CalenderFragment extends Fragment {
         return view;
 
     }
-
+public void onTabChange()
+{
+//    if (Constants.REFRESH) {
+    new UpdataCalander().execute();
+//}
+}
     private ProgressDialog pd;
 
     private class UpdataCalander extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pd = new ProgressDialog(getActivity());
-            pd.setTitle("Processing...");
-            pd.setMessage("Please wait.");
-            pd.setCancelable(false);
-            pd.setIndeterminate(true);
+
         }
 
         @Override
@@ -72,7 +73,6 @@ public class CalenderFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            pd.dismiss();
         }
     }
 
@@ -81,7 +81,9 @@ public class CalenderFragment extends Fragment {
         super.onResume();
         if (Constants.REFRESH_CALANDER) {
             new UpdataCalander().execute();
+            Constants.REFRESH_CALANDER=false;
         }
+
     }
 
     View viewLayout;
@@ -95,7 +97,6 @@ public class CalenderFragment extends Fragment {
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
         _mCalenderView.setForCustomersDelivery(false);
 
-        _mCalenderView.refresh();
 
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
@@ -124,6 +125,7 @@ public class CalenderFragment extends Fragment {
             _mCalenderView.setRegistrationDate(cl.get(Calendar.DAY_OF_MONTH));
             _mCalenderView.setRegistrationYear(cl.get(Calendar.YEAR));
             _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
+
         }
         /*
         * Check if has customers added

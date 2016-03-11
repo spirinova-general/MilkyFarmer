@@ -26,6 +26,7 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,76 +34,150 @@ import java.util.List;
  */
 public class CustomersFragment extends Fragment {
 
-    private List<ExtcalVCustomersList> _mCustomersList;
+    private List<ExtcalVCustomersList> _mCustomersList = new ArrayList<>();
     public static MainCustomersListAdapter _mAdapter;
     private FloatingActionButton mFab;
     public static TextView mTotalCustomers;
     private DatabaseHelper _dbHelper;
     public static ListView recList;
 
-    private ProgressDialog pd;
+    public void onTabChange(){
 
-    @Override
+                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+                        if (Constants.selectedAreaId.equals("")) {
+                            if(_mCustomersList.size()>0 && _mAdapter!=null)
+                            {
+                                _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+                                _mAdapter.notifyDataSetChanged();
+                            }else {
+                                _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+                                if (_mCustomersList.size() == 1)
+                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
+                                else
+                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
+                                _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+                                recList.setAdapter(_mAdapter);
+                            }
+                        } else {
+                            if(_mCustomersList.size()>0 && _mAdapter!=null)
+                            {
+                                _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(),Constants.selectedAreaId);
+                                _mAdapter.notifyDataSetChanged();
+                            }
+                            else {
+                                _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+                                if (_mCustomersList.size() == 1)
+                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
+                                else
+                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
+                                _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+                                recList.setAdapter(_mAdapter);
+                            }
+                        }
+//                    ((MainActivity) getActivity()).setFragmentRefreshListener(new MainActivity.FragmentRefreshListener() {
+//                        @Override
+//                        public void onRefresh() {
+//                            getActivity().runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    pd = new ProgressDialog(getActivity());
+//                                    pd.setTitle("Processing...");
+//                                    pd.setMessage("Please wait.");
+//                                    pd.setCancelable(false);
+//                                    pd.setIndeterminate(true);
+//
+//                                    pd.dismiss();
+//                                }
+//                            });
+//
+//
+//                        }
+//                    });
+
+//                _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+//                if (_mCustomersList.size() == 1)
+//                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
+//                else
+//                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers ");
+//                _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+//                recList.setAdapter(_mAdapter);
+
+
+
+                    } else
+                        mTotalCustomers.setText(getResources().getString(R.string.no_customer_added));
+                    _dbHelper.close();
+
+                }
+
+
+
+
     public void onResume() {
         super.onResume();
-        if (Constants.REFRESH_CALANDER) {
+//        if (Constants.REFRESH_CALANDER) {
             if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-
-                ((MainActivity) getActivity()).setFragmentRefreshListener(new MainActivity.FragmentRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                pd = new ProgressDialog(getActivity());
-                                pd.setTitle("Processing...");
-                                pd.setMessage("Please wait.");
-                                pd.setCancelable(false);
-                                pd.setIndeterminate(true);
-                                if (Constants.selectedAreaId.equals("")) {
-                                    _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-                                    if (_mCustomersList.size() == 1)
-                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
-                                    else
-                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
-                                    _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-                                    recList.setAdapter(_mAdapter);
-                                } else {
-                                    _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
-                                    if (_mCustomersList.size() == 1)
-                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
-                                    else
-                                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
-                                    _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-                                    recList.setAdapter(_mAdapter);
-                                }
-                                pd.dismiss();
-                            }
-                        });
-
-
-                    }
-                });
-
-                _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-                if (_mCustomersList.size() == 1)
-                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
-                else
-                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers ");
-                _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-                recList.setAdapter(_mAdapter);
-
-
+                if (Constants.selectedAreaId.equals("")) {
+                    _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+                    if (_mCustomersList.size() == 1)
+                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
+                    else
+                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
+                    _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+                    recList.setAdapter(_mAdapter);
+                } else {
+                    _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+                    if (_mCustomersList.size() == 1)
+                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
+                    else
+                        mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
+                    _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+                    recList.setAdapter(_mAdapter);
+                }
+//                ((MainActivity) getActivity()).setFragmentRefreshListener(new MainActivity.FragmentRefreshListener() {
+//                    @Override
+//                    public void onRefresh() {
+////                        getActivity().runOnUiThread(new Runnable() {
+////                            @Override
+////                            public void run() {
+////
+////
+////                            }
+////                        });
+//                        if (Constants.selectedAreaId.equals("")) {
+//                            _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+//                            if (_mCustomersList.size() == 1)
+//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
+//                            else
+//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
+//                            _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+//                            recList.setAdapter(_mAdapter);
+//                        } else {
+//                            _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+//                            if (_mCustomersList.size() == 1)
+//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
+//                            else
+//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
+//                            _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
+//                            recList.setAdapter(_mAdapter);
+//                        }
+//
+//
+//                    }
+//                });
 
             } else
                 mTotalCustomers.setText(getResources().getString(R.string.no_customer_added));
             _dbHelper.close();
 
-        }
+//        }
 
 
 
     }
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

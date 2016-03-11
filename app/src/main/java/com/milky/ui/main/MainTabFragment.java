@@ -21,7 +21,6 @@ import com.milky.R;
  * Created by Neha on 11/17/2015.
  */
 public class MainTabFragment extends Fragment {
-
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
     public static int int_items = 3;
@@ -57,17 +56,35 @@ public class MainTabFragment extends Fragment {
                 tabLayout.setupWithViewPager(viewPager);
             }
         });
+
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 MainActivity.POSITION = viewPager.getCurrentItem();
                 getActivity().supportInvalidateOptionsMenu();
+//                switch (MainActivity.POSITION)
+//                {
+//                    case 0:
+//                        calenderFragment.onTabChange();
+//                        break;
+//
+//                    case 1:
+//                        customersFragment.onTabChange();
+//                        break;
+//
+//                    case 2:
+//                        billingFragment.onTabChange();
+//                        break;
+//                }
             }
         });
         return x;
 
     }
 
+    public static CalenderFragment calenderFragment;
+    public static CustomersFragment customersFragment;
+    public static BillingFragment billingFragment;
 
     class MyAdapter extends FragmentPagerAdapter {
 
@@ -83,11 +100,14 @@ public class MainTabFragment extends Fragment {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new CalenderFragment();
+                    calenderFragment = new CalenderFragment();
+                    return calenderFragment;
                 case 1:
-                    return new CustomersFragment();
+                    customersFragment = new CustomersFragment();
+                    return customersFragment;
                 case 2:
-                    return new BillingFragment();
+                    billingFragment = new BillingFragment();
+                    return billingFragment;
             }
             return null;
         }

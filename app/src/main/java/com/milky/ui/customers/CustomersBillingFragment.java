@@ -10,30 +10,19 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.milky.service.databaseutils.Account;
+import com.milky.R;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.ui.adapters.CustomersListAdapter;
 import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
-import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import com.milky.R;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Neha on 11/20/2015.
@@ -110,7 +99,6 @@ private void generateBill(String custId) {
         if(holder !=null) {
             payment.add(holder);
             names.add(custId);
-            BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), holder.getBillMade(), custId);
         }
     }
 

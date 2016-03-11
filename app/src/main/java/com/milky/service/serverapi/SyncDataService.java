@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
@@ -29,8 +30,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,41 +53,57 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
     @Override
     public void onCreate() {
-        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+        _dbHelper = new DatabaseHelper(this);
         handler = new Handler();
         _exDb = new ExtcalDatabaseHelper(this);
 
         runnable = new Runnable() {
-            SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+            SharedPreferences preferences = getApplicationContext().getSharedPreferences("com.milky_prefrences", MODE_PRIVATE);
             SharedPreferences.Editor edit = preferences.edit();
 
             public void run() {
                 //TODo changed roll date
-                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
+                // Get roll date from db.
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat work_format = new SimpleDateFormat("yyyy-MM-dd");
+                work_format.format(calendar.getTime());
+                String currentDate = calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" +
+                        String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
+                try {
+                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+                        Date date = work_format.parse(Account.getRollDate(_dbHelper.getReadableDatabase()));
+                        calendar.setTime(date);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+//                if ((c.get(Calendar.DAY_OF_MONTH)) == c.getActualMaximum(Calendar.DAY_OF_MONTH))
+                if (c.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && c.get(Calendar.MONTH) == calendar.get(Calendar.MONTH))
 ////                 if ((c.get(Calendar.DAY_OF_MONTH)) == 5)
                 {
-                    String currentDate = Constants.getCurrentDate();
+//                    Toast.makeText(SyncDataService.this,"roll date..",Toast.LENGTH_SHORT).show();
+
                     /*Bill is to be outstanding*/
                     // update outstanding bills
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+//                        Toast.makeText(SyncDataService.this,"roll date update..",Toast.LENGTH_SHORT).show();
+
                         BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), currentDate);
-                        if(preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
+                        if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
                             ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
                             for (int i = 0; i < list.size(); ++i) {
-                                if (BillTableManagement.isHasBill(_dbHelper.getReadableDatabase(), currentDate) == null) {
-                                    //Update billmade
-                                    BillTableManagement.updateBillMade(_dbHelper.getWritableDatabase(), currentDate, BillTableManagement.
-                                            getBillMade(_dbHelper.getReadableDatabase(), list.get(i), currentDate), list.get(i));
-                                }
                                 ExtcalVCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
                                 Calendar nextMonth = Calendar.getInstance();
                                 nextMonth.add(Calendar.MONTH, 1);
                                 Calendar cal = Calendar.getInstance();
+//                                Update end date ..
+                                ExtcalCustomerSettingTableManagement.updateEndDate(_exDb.getWritableDatabase(), currentDate,custHolder.getCustomerId());
                                 custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
                                         "01");
                                 custHolder.setEnd_date("2250" + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 13) + "-" +
                                         String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-                                if (!ExtcalCustomerSettingTableManagement.isHasDataForDayById(_exDb.getReadableDatabase(), custHolder.getStart_date(), custHolder.getCustomerId())) {
+                                if (!ExtcalCustomerSettingTableManagement.isHasDataForDayById(_exDb.getReadableDatabase(),custHolder.getCustomerId(), custHolder.getStart_date())) {
                                     ExtcalCustomerSettingTableManagement.insertCustomersSetting(_exDb.getWritableDatabase(), custHolder);
                                     custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
                                     custHolder.setAdjustment("");
@@ -93,7 +113,11 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                                     custHolder.setOutstanding("1");
                                     custHolder.setDateModified(custHolder.getStart_date());
                                     BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+//                                    Toast.makeText(SyncDataService.this,"inserted bill..",Toast.LENGTH_SHORT).show();
+
                                 }
+                                Account.updateRollDate(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+                                        String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH)));
                             }
                             edit.putString(UserPrefrences.INSERT_BILL, "1");
                             edit.apply();
@@ -132,6 +156,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 //        dataTask.runRequest( ServerApis.API_ROOT+ServerApis.SYNC, getAllDataToSync(), this, true, requestedList);
         dataTask.runRequest(ServerApis.ACCOUNT_API, Account.getDetails(_dbHelper.getReadableDatabase()), this, true, null);
     }
+
     public static HashMap<String, String> requestedList = new HashMap<>();
 
     private List<NameValuePair> getAllDataToSync() {
@@ -355,6 +380,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     }
 
     Calendar c = Calendar.getInstance();
+
     private void updateDataForNewMonth() {
         DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
         if (db.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {

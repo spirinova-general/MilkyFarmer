@@ -37,15 +37,28 @@ public class BillingFragment extends Fragment {
     private boolean _hasFutureBill = false;
     private boolean hasPreviousBills = false;
     private ExtcalDatabaseHelper _exDb;
-
+    public static String addedCustomerId ="";
     @Override
     public void onResume() {
         super.onResume();
-        if (Constants.REFRESH_CALANDER) {
-            populateBills();
-            Constants.REFRESH_CALANDER = false;
+//        if(Constants.REFRESH_BILL) {
+//            if (custIdsList.size() > 0 && adapter != null) {
+//                adapter.notifyDataSetChanged();
+//            } else
+                populateBills();
+//        }
+//        else
+//            Constants.REFRESH_BILL=false;
+    }
 
+    public void onTabChange() {
+        if(custIdsList.size()>0 && adapter!=null)
+        {
+            adapter.notifyDataSetChanged();
         }
+        else
+        populateBills();
+
     }
 
     @Override
@@ -61,17 +74,12 @@ public class BillingFragment extends Fragment {
 
     }
 
-    private ProgressDialog pd;
-
+    private BillingAdapter adapter;
     private class UpdataBills extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pd = new ProgressDialog(getActivity());
-            pd.setTitle("Processing...");
-            pd.setMessage("Please wait.");
-            pd.setCancelable(false);
-            pd.setIndeterminate(true);
+
         }
 
         @Override
@@ -88,7 +96,11 @@ public class BillingFragment extends Fragment {
                         }
 
                     }
-
+                    if (payment.size() > 0) {
+//            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
+                        adapter =new BillingAdapter(payment, getActivity(), custIdsList);
+                        _mListView.setAdapter(adapter);
+                    }
                 }
             });
             return null;
@@ -97,14 +109,8 @@ public class BillingFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (payment.size() > 0) {
-//            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-                _mListView.setAdapter(new BillingAdapter(payment, getActivity(), custIdsList));
-            }
-            final BillingAdapter adapter = ((BillingAdapter) _mListView.getAdapter());
-            if (adapter != null)
-                adapter.notifyDataSetChanged();
-            pd.dismiss();
+
+
         }
     }
 
@@ -117,7 +123,7 @@ public class BillingFragment extends Fragment {
         _exDb = new ExtcalDatabaseHelper(getActivity());
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         TextView _mTotalBills = (TextView) v.findViewById(R.id.total_pending_bills);
-        populateBills();
+
         if (hasPreviousBills)
             ((TextView) v.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         _dbHelper.close();
@@ -249,20 +255,15 @@ public class BillingFragment extends Fragment {
 //            String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
             custIdsList.add(custId);
 
+
         }
         String startDate = BillTableManagement.getStartDatebyCustomerId(_dbHelper.getReadableDatabase(), custId);
-
         if (!"".equals(startDate)) {
             VBill holder = BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase(), custId, startDate);
             if (holder != null) {
                 payment.add(holder);
                 custIdsList.add(custId);
-                BillTableManagement.updateTotalQuantity(_dbHelper.getWritableDatabase(), holder.getQuantity(), holder.getBillMade(), custId);
             }
         }
-
-
     }
-
-
 }

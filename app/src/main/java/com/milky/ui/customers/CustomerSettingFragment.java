@@ -66,8 +66,10 @@ public class CustomerSettingFragment extends Fragment {
     private String custId = "";
     private ExtcalDatabaseHelper extDb;
     private boolean updatedQtyRate = false;
+
     public CustomerSettingFragment() {
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -75,8 +77,8 @@ public class CustomerSettingFragment extends Fragment {
         inputMethodManager =
                 (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-  /** initialize all resources
-        * */
+        /** initialize all resources
+         * */
 
         initResources(view);
        /*  * Set text field listeners*/
@@ -422,8 +424,7 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
                     holder.setStart_date(getActivity().getIntent().getStringExtra("start_delivery_date"));
                     Calendar c = Calendar.getInstance();
-                    SimpleDateFormat df = Constants.work_format;
-                    String formattedDate = df.format(c.getTime());
+                    String formattedDate = Constants.work_format.format(c.getTime());
                     holder.setBalanceType("1");
                     holder.setDateModified(formattedDate);
                     holder.setEnd_date(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
@@ -435,7 +436,7 @@ public class CustomerSettingFragment extends Fragment {
                     } else {
                         if (updatedQtyRate) {
                             String enddate = ExtcalCustomerSettingTableManagement.getOldEndDate(extDb.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
-                            ExtcalCustomerSettingTableManagement.updateEndDate(extDb.getWritableDatabase(), holder, enddate, formattedDate);
+                            ExtcalCustomerSettingTableManagement.updateEndDateByArea(extDb.getWritableDatabase(), holder, enddate, formattedDate);
                             holder.setStart_date(formattedDate);
                             ExtcalCustomerSettingTableManagement.insertCustomersSetting(extDb.getWritableDatabase(), holder);
                         } else {
@@ -445,6 +446,8 @@ public class CustomerSettingFragment extends Fragment {
                     BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
+                    Constants.REFRESH_CUSTOMERS=true;
+                    Constants.REFRESH_BILL=true;
                     getActivity().finish();
 
                 } else {

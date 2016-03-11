@@ -15,6 +15,7 @@ public class TableColumns {
     public static final String CUSTOMER_ID = "customer_id";
     public static final String START_DATE = "start_date";
     public static final String AREA_NAME = "area_name";
+    public static final String ROLL_DATE = "roll_date";
     public static final String END_DATE = "end_date";
 
     public static final String QUANTITY = "quantity";

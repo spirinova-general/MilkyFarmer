@@ -6,13 +6,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.DatabaseVersioControl;
-import com.milky.service.databaseutils.TableColumns;
-import com.milky.service.databaseutils.TableNames;
 import com.milky.utils.AppUtil;
 import com.milky.utils.UserPrefrences;
 
@@ -37,13 +34,13 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         initResources();
-        if (preferences.contains(UserPrefrences.PRE_VERSION)) {
-            if (preferences.getInt(UserPrefrences.PRE_VERSION, 0) < DatabaseVersioControl.DATABASE_VERSION) {
-                edit.clear();
-            }
-        }
-        edit.putInt(UserPrefrences.PRE_VERSION, DatabaseVersioControl.DATABASE_VERSION);
-        edit.commit();
+//        if (preferences.contains(UserPrefrences.PRE_VERSION)) {
+//            if (preferences.getInt(UserPrefrences.PRE_VERSION, 0) < DatabaseVersioControl.DATABASE_VERSION) {
+//                edit.clear();
+//            }
+//        }
+//        edit.putInt(UserPrefrences.PRE_VERSION, DatabaseVersioControl.DATABASE_VERSION);
+//        edit.commit();
         if (preferences.contains(UserPrefrences.MOBILE_NUMBER)) {
             if (preferences.getString(UserPrefrences.MOBILE_NUMBER, "").length() > 0) {
                 Intent i = new Intent(SignUp.this, MainActivity.class);
@@ -94,6 +91,8 @@ public class SignUp extends AppCompatActivity {
 //                } else
 //                    Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
 //                Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
+
+                //comment to bye pass the farmer signup
                 if (preferences.contains(UserPrefrences.MOBILE_NUMBER)) {
                     if (preferences.getString(UserPrefrences.MOBILE_NUMBER, "").length() > 0) {
                         Intent i = new Intent(SignUp.this, MainActivity.class);
@@ -105,6 +104,10 @@ public class SignUp extends AppCompatActivity {
                     startActivity(i);
                     finish();
                 }
+                        //comment to bye pass the farmer signup end comment
+
+
+
             }
         });
 //        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -164,3 +167,4 @@ public class SignUp extends AppCompatActivity {
         startActivity(i);
     }
 }
+

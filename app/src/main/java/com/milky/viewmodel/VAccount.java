@@ -20,6 +20,16 @@ public class VAccount {
     public String accountStartDate;
     public String expiryDate;
     public String Id;
+    public String rollDate;
+
+    public String getRollDate() {
+        return rollDate;
+    }
+
+    public void setRollDate(String rollDate) {
+        this.rollDate = rollDate;
+    }
+
     public String getValidated() {
         return Validated;
     }
@@ -67,7 +77,6 @@ public class VAccount {
     public void setExpiryDate(String expiryDate) {
         this.expiryDate = expiryDate;
     }
-
 
 
     public String getRate() {
@@ -133,7 +142,6 @@ public class VAccount {
     public void setMobile(String mobile) {
         Mobile = mobile;
     }
-
 
 
     public String getDateAdded() {

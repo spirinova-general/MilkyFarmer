@@ -69,8 +69,8 @@
         android:id="@+id/sens_sms"
         appcompat:showAsAction="never"
         android:orderInCategory="1"
-
         android:title="Send Bills" />
+
 
 
 </menu>

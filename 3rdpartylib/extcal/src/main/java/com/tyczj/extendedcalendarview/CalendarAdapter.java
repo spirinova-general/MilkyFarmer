@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.text.format.Time;
 import android.view.LayoutInflater;
@@ -80,6 +81,7 @@ public class CalendarAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+//        new updateCalendar().execute();
         View v = convertView;
         LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (position >= 0 && position < 7) {
@@ -110,9 +112,10 @@ public class CalendarAdapter extends BaseAdapter {
             FrameLayout today = (FrameLayout) v.findViewById(R.id.today_frame);
             Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
             Day d = dayList.get(position);
+            selectedday = d;
             quantityOfDay = getQuantity(d);
 //today
-            if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
+                if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
                 if (quantityOfDay == 0)
                     quantitiTV.setText("0.0L");
@@ -140,32 +143,6 @@ public class CalendarAdapter extends BaseAdapter {
 
                 today.setVisibility(View.GONE);
             }
-
-
-// else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
-//                    && d.getDay() >= registrationDate) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//                    today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
-//                }
-//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-//
-//                today.setVisibility(View.VISIBLE);
-//            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && (d.getDay() == 1 || d.getDay() < cal.get(Calendar.DAY_OF_MONTH))
-//                    && d.getDay() < registrationDate) {
-//                today.setVisibility(View.GONE);
-//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-//            } else if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() < cal.get(Calendar.MONTH)) {
-//                today.setVisibility(View.GONE);
-//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-//            } else if ((d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() > cal.get(Calendar.MONTH)) ||d.getYear() > cal.get(Calendar.YEAR)) {
-//                quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//                    today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
-//                }
-//            } else if (d.getYear() < cal.get(Calendar.YEAR)) {
-//                quantitiTV.setText("");
-//                today.setVisibility(View.GONE);
-//            }
             else {
                 if (getQuantity(d) == 0)
                     quantitiTV.setText("0L");
@@ -812,11 +789,20 @@ public class CalendarAdapter extends BaseAdapter {
 //    }
 
     private static String custId = "";
-
+private Day selectedday;
     public static void setcustId(String id) {
         custId = id;
     }
+private class  updateCalendar extends AsyncTask<Void,Void,Void>
+{
 
+
+    @Override
+    protected Void doInBackground(Void... params) {
+        quantityOfDay =getQuantity(selectedday);
+        return null;
+    }
+}
     private double getQuantity(Day day) {
         double qty = 0, adjustedQty = 0;
         DeliveryTableManagement.custIds.clear();

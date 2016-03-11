@@ -37,11 +37,13 @@ public class BillingAdapter extends BaseAdapter {
     private Context mContext;
     private boolean _mIsCustomer = false;
     private ArrayList<String> names = new ArrayList<>();
+    private DatabaseHelper _dbhelper;
 
     public BillingAdapter(final List<VBill> dataList, final Context con, ArrayList<String> name) {
         this.mContext = con;
         this.totalBill = dataList;
         this.names = name;
+        this._dbhelper=_dbhelper;
     }
 
     @Override
@@ -84,7 +86,13 @@ public class BillingAdapter extends BaseAdapter {
         holder.custName.setText(nfNAme + " " + lfNAme);
 
         holder.name.setText(a + b);
-        if (("0").equals(totalBill.get(position).isOutstanding())) {
+
+
+
+
+
+        if ("0".equals(totalBill.get(position).isOutstanding())) {
+
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("Outstanding");
         }

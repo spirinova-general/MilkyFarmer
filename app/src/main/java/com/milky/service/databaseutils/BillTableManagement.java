@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.math.BigDecimal;
@@ -77,9 +75,11 @@ public class BillTableManagement {
     public static void updateOutstandingBills(SQLiteDatabase db, String date) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.IS_OUTSTANDING, "0");
+        values.put(TableColumns.IS_CLEARED, "1");
         values.put(TableColumns.END_DATE, date);
-        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.END_DATE + " >='" + date + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + date + "'", null);
+        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.START_DATE + " <='" + date + "'", null);
+//        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.END_DATE + " >='" + date + "'"
+//                + " AND " + TableColumns.START_DATE + " <='" + date + "'", null);
     }
 
     public static void updateBillMade(SQLiteDatabase db, String date, String bill, String custId) {
@@ -409,21 +409,18 @@ public class BillTableManagement {
                 + " AND " + TableColumns.IS_OUTSTANDING + " ='1'", null);
     }
 
-    public static void updateTotalQuantity(SQLiteDatabase db, String quantity, String payment, String custId) {
+    public static void updateOutstandingBills(SQLiteDatabase db, String quantity, String payment, String custId) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.QUANTITY, quantity);
         values.put(TableColumns.BILL_MADE, payment);
-        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.IS_OUTSTANDING
-                + " ='1' AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.END_DATE + " >'" + Constants.getCurrentDate() + "'", null);
+        if (Constants.getCurrentDate().equals(Account.getRollDate(db))) {
+            values.put(TableColumns.END_DATE, Constants.getCurrentDate());
+            values.put(TableColumns.IS_OUTSTANDING, "0");
+        }
+        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND "
+                + TableColumns.IS_OUTSTANDING + " ='1'  AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.END_DATE + " >'" + Constants.getCurrentDate() + "'", null);
     }
 
-    public static void updateOutstandingBill(SQLiteDatabase db, String custId, String day) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.IS_OUTSTANDING, "0");
-        db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'" +
-                " AND " + TableColumns.END_DATE + " ='" + day + "'" + " AND "
-                + TableColumns.IS_OUTSTANDING + " ='1'", null);
-    }
 
     public static ArrayList<VBill> getHistoryBills(SQLiteDatabase db, String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE "
@@ -481,6 +478,7 @@ public class BillTableManagement {
         return list;
     }
 
+
     public static ArrayList<VBill> getOutstandingsBill(SQLiteDatabase db, String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.IS_CLEARED + " ='" + "1'"
                 + " AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" + " AND " + TableColumns.IS_OUTSTANDING + " ='" + "0'" + " AND "
@@ -498,10 +496,8 @@ public class BillTableManagement {
                     holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
                     holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)) != null)
                     holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)) != null)
                     holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
@@ -523,11 +519,10 @@ public class BillTableManagement {
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)) != null)
                     holder.setBalanceType(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)) != null)
-                    holder.setBalanceType(cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)));
-
-//                }
+                    holder.setBillMade(cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
                     holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -545,6 +540,7 @@ public class BillTableManagement {
                 + deliveryStartDate + "' AND " + TableColumns.IS_OUTSTANDING + " ='1'";
         VBill holder = null;
 
+
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
@@ -557,27 +553,12 @@ public class BillTableManagement {
                     holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
                     holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-//                if (cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)) != null) {
-//                    String s = cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE));
-//                    Calendar c = Calendar.getInstance();
-//
-//                    try {
-//
-//                        c.setTime(Constants.work_format.parse(s));
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
-//
-////                    holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-//                    holder.setEndDate(c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)));
-//
-//
-//                }
-                String deletionDate =CustomersTableMagagement.getCustomerDeletionDate(db,custId);
-               if("1".equals(deletionDate))
-                holder.setEndDate(Constants.getCurrentDate());
+
+                String deletionDate = CustomersTableMagagement.getCustomerDeletionDate(db, custId);
+                if ("1".equals(deletionDate))
+                    holder.setEndDate(Constants.getCurrentDate());
                 else
-                 holder.setEndDate(deletionDate);
+                    holder.setEndDate(deletionDate);
                 Calendar cal = Calendar.getInstance();
                 Calendar currentDate = Calendar.getInstance();
                 double totalQty = 0;
@@ -625,6 +606,7 @@ public class BillTableManagement {
 
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
                     holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+                updateOutstandingBills(db, holder.getQuantity(), holder.getBillMade(), custId);
 
             }
             while (cursor.moveToNext());

@@ -5,16 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-import android.util.Log;
 
-import java.io.File;
+import java.util.Calendar;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
     Context context;
     SQLiteDatabase db;
-
 //    public DatabaseHelper(final Context context) {
 //        super(context, Environment.getExternalStorageDirectory()
 //                + File.separator + "milky"
@@ -25,7 +21,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DatabaseVersioControl.DATABASE_NAME, null,
                 DatabaseVersioControl.DATABASE_VERSION);
         this.context = context;
-
     }
 
 
@@ -40,6 +35,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //        db.execSQL(TableColumsDetail.DELIVERY);
         db.execSQL(TableColumsDetail.CUSTOMERS_BILL);
         db.execSQL(TableColumsDetail.AREA_ACCOUNT_MAPPING);
+        Calendar cal = Calendar.getInstance();
+        String date = String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) +
+                "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        final String ADD_ROLL_DATE_COLUMN = "ALTER TABLE "
+                + TableNames.TABLE_ACCOUNT + " ADD COLUMN " + TableColumns.ROLL_DATE + " TEXT NOT NULL DEFAULT '" + date + "'";
+        if(!Account.columnRollDateExists(db))
+            db.execSQL(ADD_ROLL_DATE_COLUMN);
+
     }
 
     @Override
@@ -54,17 +57,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 TableNames.TABLE_CUSTOMER_BILL
 
         };
-        for (String tableName : tables) {
-            db.execSQL(String.format("DROP TABLE IF EXISTS %s", tableName));
+//        for (String tableName : tables) {
+//            db.execSQL(String.format("DROP TABLE IF EXISTS %s", tableName));
+//        }
+
+        Calendar cal = Calendar.getInstance();
+        String date = String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) +
+                "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        final String ADD_ROLL_DATE_COLUMN = "ALTER TABLE "
+                + TableNames.TABLE_ACCOUNT + " ADD COLUMN " + TableColumns.ROLL_DATE + " TEXT NOT NULL DEFAULT '" + date + "'";
+        if (newVersion > oldVersion && !Account.columnRollDateExists(db)) {
+            db.execSQL(ADD_ROLL_DATE_COLUMN);
         }
+
+
 //        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES,Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = preferences.edit();
 //        editor.clear();
 //        editor.commit();
 
-        onCreate(db);
+//        onCreate(db);
     }
-
 
     public boolean isTableNotEmpty(String table) {
         SQLiteDatabase db = this.getReadableDatabase();

@@ -12,8 +12,9 @@ public class TableColumsDetail {
             + TableColumns.DATE_ADDED + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.FIRST_NAME + " TEXT,"
             + TableColumns.LAST_NAME + " TEXT," + TableColumns.MOBILE + " TEXT," + TableColumns.SYNC_STATUS + " TEXT,"
             + TableColumns.EXPIRY_DATE + " DATETIME," + TableColumns.TOTAL_SMS + " TEXT," + TableColumns.USED_SMS + " TEXT,"
-            + TableColumns.VALIDATED + " TEXT," + TableColumns.ACCOUNT_ID + " TEXT" +")";
+            + TableColumns.VALIDATED + " TEXT,"+ TableColumns.ACCOUNT_ID + " TEXT" + ")";
 
+//
 
     //AREA
     public static final String AREA = "CREATE TABLE " + TableNames.TABLE_AREA + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"

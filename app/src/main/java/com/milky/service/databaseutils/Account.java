@@ -33,6 +33,7 @@ public class Account {
         values.put(TableColumns.USED_SMS, holder.getUsedSms());
         values.put(TableColumns.ACCOUNT_ID, holder.getId());
         values.put(TableColumns.VALIDATED, holder.getValidated());
+        values.put(TableColumns.ROLL_DATE, holder.getRollDate());
 
         long i = db.insert(TableNames.TABLE_ACCOUNT, null, values);
     }
@@ -51,9 +52,18 @@ public class Account {
 
     public static void updateSMSCount(SQLiteDatabase db, int count) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.USED_SMS, String.valueOf(getUsedSMS(db)+count));
+        values.put(TableColumns.USED_SMS, String.valueOf(getUsedSMS(db) + count));
 //        values.put(TableColumns.TOTAL_SMS, String.valueOf(getLeftsmsCount(db) - count));
         db.update(TableNames.TABLE_ACCOUNT, values, null, null);
+    }
+    public static boolean columnRollDateExists(SQLiteDatabase db) {
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getColumnIndex(TableColumns.ROLL_DATE)  > 0;
+
+        cursor.close();
+        return result;
     }
 
     public static String getDefaultRate(SQLiteDatabase db) {
@@ -64,6 +74,23 @@ public class Account {
             do {
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
                     rate = cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+
+        return rate;
+    }
+    public static String getRollDate(SQLiteDatabase db) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        String rate = null;
+        Cursor cursor = db.rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE)) != null)
+                    rate = cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE));
 
             }
             while (cursor.moveToNext());
@@ -92,6 +119,7 @@ public class Account {
 
         return sms;
     }
+
     public static int getUsedSMS(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
         int sms = 0;
@@ -135,6 +163,12 @@ public class Account {
         db.update(TableNames.TABLE_ACCOUNT, values, TableColumns.SYNC_STATUS + " ='" + "0" + "'"
                 + " AND " + TableColumns.DIRTY + " ='" + "0" + "'", null);
     }
+    public static void updateRollDate(SQLiteDatabase db,String date) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.ROLL_DATE,date );
+
+        db.update(TableNames.TABLE_ACCOUNT, values,null,null);
+    }
 
     public static void updateAccountDetails(SQLiteDatabase db, VAccount holder) {
         ContentValues values = new ContentValues();
@@ -146,7 +180,7 @@ public class Account {
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.TAX, holder.getTax());
-
+        values.put(TableColumns.ROLL_DATE,holder.getRollDate());
 
         values.put(TableColumns.SYNC_STATUS, "0");
 

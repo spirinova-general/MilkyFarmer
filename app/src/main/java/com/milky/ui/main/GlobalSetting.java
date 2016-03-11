@@ -1,5 +1,7 @@
 package com.milky.ui.main;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -63,6 +66,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -91,10 +95,16 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
     private Vibrator myVib;
     private String mob = "";
-    private TextView changeNumber;
+    private TextView changeNumber, _billGenerationDateView;
     private EditText _locality;
     private AutoCompleteTextView _cityArea;
     private ScrollView ScrollView01;
+    private Button _billGenerationDate;
+    private int _mday;
+    private int _mmonth;
+    private int _mYear;
+    static final int DATE_DIALOG_ID = 999;
+
 
     @Override
     protected void onResume() {
@@ -117,11 +127,74 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         * disable keyboard*/
 //        disableKeyBoard();
 
+        //On click listerner for bill Generation Date button
+        _billGenerationDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar cal = Calendar.getInstance();
+                _mYear = cal.get(Calendar.YEAR);
+                _mmonth = cal.get(Calendar.MONTH);
+                _mday = cal.get(Calendar.DAY_OF_MONTH) + 1;
 
+
+                showDialog(DATE_DIALOG_ID);
+            }
+        });
     }
 
 
+    @Override
+    protected Dialog onCreateDialog(int id) {
+
+        switch (id) {
+            case DATE_DIALOG_ID:
+                // set date picker as current date
+                DatePickerDialog _date = new DatePickerDialog(this, datePickerListener, _mYear, _mmonth,
+                        _mday) {
+                    @Override
+                    public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        if (year < _mYear)
+                            view.updateDate(_mYear, _mmonth, _mday);
+
+                        if (monthOfYear < _mmonth && year == _mYear)
+                            view.updateDate(_mYear, _mmonth, _mday);
+
+                        if (dayOfMonth < _mday && year == _mYear && monthOfYear == _mmonth)
+                            view.updateDate(_mYear, _mmonth, _mday);
+
+
+                    }
+                };
+                return _date;
+        }
+        return null;
+    }
+
+    private String rollDate = "";
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+            _mYear = selectedYear;
+            _mmonth = selectedMonth;
+            _mday = selectedDay;
+
+            _billGenerationDateView.setText(new StringBuilder()
+                    .append(Constants.MONTHS[_mmonth]).append("-")
+                    .append(String.format("%02d", _mday)).append("-")
+                    .append(_mYear).append(" "));
+            rollDate = String.valueOf(_mYear) +
+                    "-" + String.format("%02d", _mmonth + 1) + "-" + String.format("%02d", _mday);
+
+        }
+    };
+
+    private Calendar cal = Calendar.getInstance();
+
     private void initResources() {
+        _billGenerationDateView = (TextView) findViewById(R.id.bill_generation_view);
+        _billGenerationDate = (Button) findViewById(R.id.bill_generation_date);
         ScrollView01 = (ScrollView) findViewById(R.id.scrollView);
         rate_layout = (TextInputLayout) findViewById(R.id.rate_layout);
         google_autocomplete_layout = (TextInputLayout) findViewById(R.id.google_autocomplete_layout);
@@ -152,6 +225,16 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
         /*Get DBhelper*/
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+        rollDate = Account.getRollDate(_dbHelper.getReadableDatabase());
+        try {
+            Date date = Constants.work_format.parse(rollDate);
+            cal.setTime(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        _billGenerationDateView.setText(Constants.MONTHS[cal.get(Calendar.MONTH)] + "-"
+                + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(cal.get(Calendar.YEAR)));
+
          /*
         * Set text field listeners*/
 //        custCode.addTextChangedListener(new TextValidationMessage(custCode_layout, this, false));
@@ -161,39 +244,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this, false));
         mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this, true));
 
-
-
-//        _cityArea.setOnTouchListener(new View.OnTouchListener() {
-//                                         @Override
-//                                         public boolean onTouch(View v, MotionEvent event) {
-//                                             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-//                                                 _cityArea.clearFocus();
-//                                                 if (Constants.isConnectingToInternet(GlobalSetting.this)) {
-//                                                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                                                     imm.hideSoftInputFromWindow(_cityArea.getWindowToken(), 0);
-//
-//                                                     google_autocomplete_layout.setHint("Search area and city");
-//                                                     openWebView();
-//                                                 } else {
-//                                                     _cityArea.requestFocus();
-//                                                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                                                     imm.showSoftInput(_cityArea, InputMethodManager.SHOW_IMPLICIT);
-//                                                     google_autocomplete_layout.setHint("Add area and city");
-//                                                 }
-//                                             }
-//
-//
-//                                             return true;
-//                                         }
-//
-//                                     }
-//
-//        );
-         /* Let fields be enabled if edit button has been clicked only.
-        * */
-
-//        rate.setOnTouchListener(new EnableEditableFields(rate, this, inputMethodManager));
-//        tax.setOnTouchListener(new EnableEditableFields(tax, this, inputMethodManager));
         /*Set default cust code*/
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
 
@@ -208,7 +258,11 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             String expDate = Account.getExpirationDate(_dbHelper.getReadableDatabase());
             Calendar cal = Calendar.getInstance();
             try {
-                cal.setTime(Constants.api_format.parse(expDate));
+//                String format[] = expDate.split("\\.");
+//                if(format.length==1 || format[1].length()==11)
+//                cal.setTime(Constants.api_format_other.parse(expDate));
+//                else
+                cal.setTime(Constants.work_format.parse(expDate));
                 expirationDate.setText(Constants.MONTHS[cal.get(Calendar.MONTH)] + "-" + cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.YEAR));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -216,8 +270,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
             msgCount.setText(String.valueOf(Account.getLeftsmsCount(_dbHelper.getReadableDatabase())));
         }
-
-
         custCode.setOnTouchListener(new View.OnTouchListener()
 
                                     {
@@ -281,41 +333,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                                         }
 
         );
-//        _areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
-//        _dbHelper.close();
-//        autoCompleteData = new String[_areaList.size()];
-//        for (
-//                int i = 0;
-//                i < _areaList.size(); i++)
-//
-//        {
-//            VAreaMapper areacity = new VAreaMapper();
-//            areacity.setArea(_areaList.get(i).getArea());
-//            areacity.setAreaId(_areaList.get(i).getAreaId());
-//            areacity.setCityId(_areaList.get(i).getCityId());
-//            areacity.setCity(AreaMapTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), _areaList.get(i).getCityId()));
-//            areacity.setCityArea(areacity.getArea() + areacity.getCity());
-//            _areacityList.add(areacity);
-//        }
-//
-//        _dbHelper.close();
-//        AreaAutocomplete.setFocusable(false);
-//        AreaAutocomplete.setFocusableInTouchMode(false);
-//        AreaAutocomplete.setThreshold(1);
-//        adapter1 = new AreaCityAdapter(this, 0, R.id.te1, _areacityList);
-//        AreaAutocomplete.setAdapter(adapter1);
-//        AreaAutocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Position = position;
-//                AreaAutocomplete.setText(_areacityList.get(position).getArea() + ", " + _areacityList.get(position).getCity());
-//                selectedAreaId = _areacityList.get(position).getAreaId();
-//                selectedCityId = _areacityList.get(position).getCityId();
-//                selectedareacityList.add(_areacityList.get(position));
-//
-//                AreaAutocomplete.setSelection(AreaAutocomplete.getText().length());
-//            }
-//        });
+
 
         add.setOnClickListener(new View.OnClickListener()
 
@@ -399,7 +417,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                 } else if (tax.getText().toString().trim().equals("")) {
                     tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
                 } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA)) {
-                    localityInputLayout.setError("Please add atleast one area !");
+                    google_autocomplete_layout.setError("Please add atleast one area !");
                 } else {
                     Calendar cl = Calendar.getInstance();
                     String date = String.valueOf(cl.get(Calendar.MONTH))
@@ -411,20 +429,13 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     holder.setMobile(mobile.getText().toString());
                     holder.setFirstName(firstname.getText().toString());
                     holder.setLastName(lastname.getText().toString());
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
-                        Account.updateAccountDetails(_dbHelper.getWritableDatabase(), holder);
-
-
-                    } else {
-                        Account.insertAccountDetails(_dbHelper.getWritableDatabase(), holder);
-
-                    }
+                    holder.setRollDate(rollDate);
+                    Account.updateAccountDetails(_dbHelper.getWritableDatabase(), holder);
                     _dbHelper.close();
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
 
                     GlobalSetting.this.finish();
                 }
-
 
             }
         });
@@ -437,10 +448,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-
         inflater.inflate(R.menu.global_menu, menu);
-
-
         return true;
     }
 
@@ -453,57 +461,19 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                 finish();
                 break;
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
 
     public void onClick(View v) {
         switch (v.getId()) {
-//            case R.id.editFab:
-//                /* on click Edit button*/
-//                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-//                rate.requestFocus();
-//                inputMethodManager.showSoftInput(rate, InputMethodManager.SHOW_IMPLICIT);
-//                _mBottomLayout.setVisibility(View.VISIBLE);
-////                _editFab.setVisibility(View.GONE);
-//                rate.setSelection(rate.getText().length());
-//                isEditModeEnabled = true;
-//                AreaAutocomplete.setFocusable(true);
-//                add.setEnabled(true);
-//                AreaAutocomplete.setFocusableInTouchMode(true);
-//                EnableEditableFields.setIsEnabled(true);
-//                break;
             case R.id.save:
-
-
                 break;
             case R.id.cancel:
-//                EnableEditableFields.setIsEnabled(false);
-//                isEditModeEnabled = false;
-//        _editFab.setVisibility(View.VISIBLE);
-//                _mBottomLayout.setVisibility(View.GONE);
-//                AreaAutocomplete.setFocusable(false);
-//                AreaAutocomplete.setFocusableInTouchMode(false);
-//                disableKeyBoard();
-//                add.setEnabled(false);
-                //Clear focus from first field
-//                custCode.clearFocus();
-//                tax.clearFocus();
-//                rate.clearFocus();
                 break;
         }
 
     }
-
-//    private void disableKeyBoard() {
-//        //Block default keyboard
-//        new EnableEditableFields(custCode, this, inputMethodManager).blockDefaultKeys();
-//        new EnableEditableFields(rate, this, inputMethodManager).blockDefaultKeys();
-//        new EnableEditableFields(tax, this, inputMethodManager).blockDefaultKeys();
-//
-//    }
 
     private int selectedposition = 0;
     int a = 0;
@@ -521,8 +491,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             label.setText(cityarea);
             final ImageView remove = new ImageView(this);
             myVib.vibrate(50);
-
-
             remove.setId(selectedposition);
             selectedposition++;
             // remove.setBackgroundColor(getResources().getColor(R.color.black));
@@ -537,11 +505,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                             Toast.makeText(GlobalSetting.this, "Area removed!", Toast.LENGTH_SHORT).show();
                             ((ViewGroup) label.getParent()).removeView(label);
                             ((ViewGroup) remove.getParent()).removeView(remove);
-//                        try {
-//                            selectedareacityList.remove(a);
-//                        } catch (ArrayIndexOutOfBoundsException exp) {
-//
-//                        }
                         }
                     } else
                         Toast.makeText(GlobalSetting.this, "Area is associated with customer !", Toast.LENGTH_SHORT).show();
@@ -1006,6 +969,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             }
         }
     }
+
+
 }
 
 

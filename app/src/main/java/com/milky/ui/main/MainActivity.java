@@ -70,6 +70,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     protected ArrayList<VAreaMapper> selectedareacityList;
     public static DrawerLayout mDrawerLayout;
     public static NavigationView mNavigationView;
+    private int myear;
+    private int mmonth;
+    private int mday;
+    static final int DATE_DIALOG_ID = 999;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
       * init resources
       * */
         initResources();
-
+        Constants.REFRESH_CALANDER=true;
         /*
         * Set up ACTIONBAR
         * */
@@ -113,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 //                        finish();
 //
 //                        break;
+                    case R.id.nav_about:
+                        startActivity(new Intent(MainActivity.this, About.class));
+                        break;
                 }
                 mDrawerLayout.closeDrawers();
 
@@ -356,12 +364,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.sens_sms).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
+
                 break;
             case 2:
                 menu.findItem(R.id.action_search).setVisible(false);
                 menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.sens_sms).setVisible(true);
                 menu.findItem(R.id.save).setVisible(false);
+
                 break;
         }
         return true;
@@ -389,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 //        sync.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_image));
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
             if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
-                expiryDialog();
+//                expiryDialog();
             }
         }
         /**
@@ -561,10 +571,12 @@ _dbHelper.close();
 
                 break;
 
+
         }
         return super.onOptionsItemSelected(item);
 
     }
+
 
     private class SendBillSMS extends AsyncTask<Void, String, String> {
         AlertDialog dialog;
@@ -603,17 +615,17 @@ _dbHelper.close();
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
-                            mesg = URLEncoder.encode("Dear " + CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(),finalList.get(i).getCustomerId()) + ", " + "Your milk bill from " +Constants.MONTHS[startDate.get(Calendar.MONTH)]+" "
-                                    +String.format("%02d",startDate.get(Calendar.DAY_OF_MONTH))+" to "+
-                                    Constants.MONTHS[endDate.get(Calendar.MONTH)]+" "+String.format("%02d",endDate.get(Calendar.DAY_OF_MONTH))
-                                    +" is Rs. "+ finalList.get(i).getBillMade()
-                                    +". Total quantity "+finalList.get(i).getQuantity()+" litres. Rate is "+ finalList.get(i).getRate()+"/litre.", "UTF-8");
+                            mesg = URLEncoder.encode("Dear " + CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), finalList.get(i).getCustomerId()) + ", " + "Your milk bill from " + Constants.MONTHS[startDate.get(Calendar.MONTH)] + " "
+                                    + String.format("%02d", startDate.get(Calendar.DAY_OF_MONTH)) + " to " +
+                                    Constants.MONTHS[endDate.get(Calendar.MONTH)] + " " + String.format("%02d", endDate.get(Calendar.DAY_OF_MONTH))
+                                    + " is Rs. " + finalList.get(i).getBillMade()
+                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + finalList.get(i).getRate() + "/litre.", "UTF-8");
 
 //                            mesg = URLEncoder.encode("Dear " + finalList.get(i).getFristName() + ", " + "your milk bill is " + finalList.get(i).getBillAmount(), "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(),finalList.get(i).getCustomerId()), mesg);
+                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), finalList.get(i).getCustomerId()), mesg);
 
                         finalI = i + 1;
                         progressHandler.post(new Runnable() {
@@ -667,7 +679,7 @@ _dbHelper.close();
 
         String append = "?mobile=" + mob + "&message=" + sms;
         HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append , null, this, false, null);
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
     }
 
     private TextView messageSent;
