@@ -16,10 +16,10 @@ public class TableColumns {
     public static final String START_DATE = "start_date";
     public static final String AREA_NAME = "area_name";
     public static final String END_DATE = "end_date";
-
+    public static final String CUST_INDEX="index_cust";
     public static final String QUANTITY = "quantity";
     public static final String ADJUSTMENTS = "adjustments";
-
+    public static final String DELV_INDEX="delv_cust";
     public static final String BALANCE = "balance";
     public static final String TAX = "tax";
     public static final String IS_CLEARED = "is_cleared";

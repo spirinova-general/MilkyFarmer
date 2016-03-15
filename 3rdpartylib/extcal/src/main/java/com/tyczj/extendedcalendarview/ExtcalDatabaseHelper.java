@@ -25,7 +25,7 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
 
     public ExtcalDatabaseHelper(Context context) {
         super(context, "Extcal", null,
-                1);
+                2);
         this.context = context;
 
     }
@@ -46,6 +46,11 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
                 + TableColumns.CUSTOMER_ID + " TEXT," + TableColumns.START_DATE + " DATETIME," + TableColumns.DELETED_ON + " TEXT," + TableColumns.DIRTY + " TEXT," + TableColumns.SYNC_STATUS + " TEXT" +
                 ")";
         db.execSQL(DELIVERY);
+        String custIndex = "CREATE UNIQUE INDEX " + TableColumns.CUST_INDEX + " ON " + "customers" + " (" +TableColumns.CUSTOMER_ID+", "+TableColumns.ID+ " )";
+        db.execSQL(custIndex);
+        //        Adding custId Index..
+        String deliveryIndex = "CREATE UNIQUE INDEX " + TableColumns.DELV_INDEX + " ON " + "delivery" + " (" +TableColumns.CUSTOMER_ID+", "+TableColumns.ID+ " )";
+        db.execSQL(deliveryIndex);
 
     }
 
@@ -55,15 +60,21 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
                 "customers", "delivery"
 
         };
-        for (String tableName : tables) {
-            db.execSQL(String.format("DROP TABLE IF EXISTS %s", tableName));
-        }
+//        for (String tableName : tables) {
+//            db.execSQL(String.format("DROP TABLE IF EXISTS %s", tableName));
+//        }
+        String custIndex = "CREATE UNIQUE INDEX " + TableColumns.CUST_INDEX + " ON " + "customers" + " (" +TableColumns.CUSTOMER_ID+", "+TableColumns.ID+ " )";
+        db.execSQL(custIndex);
+        //        Adding custId Index..
+        String deliveryIndex = "CREATE UNIQUE INDEX " + TableColumns.DELV_INDEX + " ON " + "delivery" + " (" +TableColumns.CUSTOMER_ID+", "+TableColumns.ID+ " )";
+        db.execSQL(deliveryIndex);
+
 //        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES,Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = preferences.edit();
 //        editor.clear();
 //        editor.commit();
 
-        onCreate(db);
+//        onCreate(db);
     }
 
 

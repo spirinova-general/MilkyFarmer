@@ -34,7 +34,6 @@ public class CustomersBillingFragment extends Fragment {
     private FloatingActionButton _mAddBillFab;
     private DatabaseHelper _dbHelper;
     private String custId = "";
-    private ArrayList<String> names = new ArrayList<>();
     private boolean hasPreviousBills = false;
     private TextView preivousBills;
     private boolean _hasFutureBill = false;
@@ -48,11 +47,10 @@ public class CustomersBillingFragment extends Fragment {
         db = new ExtcalDatabaseHelper(getActivity());
         custId = getActivity().getIntent().getStringExtra("cust_id");
         payment.clear();
-        names.clear();
         generateBill(custId);
         if (payment.size() > 0) {
 //            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-            _mListView.setAdapter(new BillingAdapter(payment, getActivity(), names));
+            _mListView.setAdapter(new BillingAdapter(payment, getActivity()));
         }
         if (hasPreviousBills)
             ((TextView) view.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
@@ -78,29 +76,13 @@ public class CustomersBillingFragment extends Fragment {
 
     }
 
-    ArrayList<VBill> payment = new ArrayList<>();
+    public static ArrayList<VBill> payment = new ArrayList<>();
     //Calculating total qty
 
 private void generateBill(String custId) {
-     ArrayList<VBill> bills = BillTableManagement.getHistoryBills(_dbHelper.getReadableDatabase(), custId);
-    if (bills.size() > 0)
-        hasPreviousBills = true;
-    for (int x = 0; x < bills.size(); x++) {
-        payment.add(bills.get(x));
-//            String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-//            String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-        names.add(custId);
 
-    }
-    String startDate = BillTableManagement.getStartDatebyCustomerId(_dbHelper.getReadableDatabase(), custId);
-
-    if(!"".equals(startDate)) {
-        VBill holder = BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase(), custId, startDate);
-        if(holder !=null) {
-            payment.add(holder);
-            names.add(custId);
-        }
-    }
+    BillTableManagement.getHistoryBills(_dbHelper.getReadableDatabase(), custId);
+    BillTableManagement.getTotalBillById(_dbHelper.getReadableDatabase(),custId);
 
 
 }

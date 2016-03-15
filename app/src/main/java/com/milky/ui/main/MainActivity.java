@@ -70,12 +70,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     protected ArrayList<VAreaMapper> selectedareacityList;
     public static DrawerLayout mDrawerLayout;
     public static NavigationView mNavigationView;
-    private int myear;
-    private int mmonth;
-    private int mday;
-    static final int DATE_DIALOG_ID = 999;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
       * */
         initResources();
         Constants.REFRESH_CALANDER=true;
+        Constants.REFRESH_CUSTOMERS=true;
+        Constants.REFRESH_BILL=true;
         /*
         * Set up ACTIONBAR
         * */

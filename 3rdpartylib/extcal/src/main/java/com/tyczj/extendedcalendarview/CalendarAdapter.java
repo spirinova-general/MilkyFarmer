@@ -31,7 +31,7 @@ public class CalendarAdapter extends BaseAdapter {
     Calendar cal, deletedCal;
     public String[] days;
     public static boolean isPost = false;
-    private double quantityOfDay=0;
+    private double quantityOfDay = 0;
 
     //	OnAddNewEventClick mAddEvent;
     SharedPreferences preferences;
@@ -113,44 +113,33 @@ public class CalendarAdapter extends BaseAdapter {
             Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
             Day d = dayList.get(position);
             selectedday = d;
-            quantityOfDay = getQuantity(d);
-//today
-                if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
+            if (db.isTableNotEmpty("customers"))
+                quantityOfDay = getQuantity(d);
+            //today
+            if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
-                if (quantityOfDay == 0)
-                    quantitiTV.setText("0.0L");
-                else
-                    quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
-
 
             } else if (d.getYear() <= cal.get(Calendar.YEAR) && d.getMonth() <= cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
                     ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
                 }
-                if (quantityOfDay == 0)
-                    quantitiTV.setText("0.0L");
-                else
-                    quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
-
                 today.setVisibility(View.VISIBLE);
             } else if (d.getYear() >= cal.get(Calendar.YEAR) && d.getMonth() >= cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH)
                     ) {
-                if (quantityOfDay == 0)
-                    quantitiTV.setText("0.0L");
-                else
-                    quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
-
                 today.setVisibility(View.GONE);
             }
-            else {
-                if (getQuantity(d) == 0)
-                    quantitiTV.setText("0L");
-                else
-                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-                today.setVisibility(View.GONE);
-            }
-
+//            else {
+//                if (getQuantity(d) == 0)
+//                    quantitiTV.setText("0L");
+//                else
+//                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
+//                today.setVisibility(View.GONE);
+//            }
+            if (quantityOfDay == 0)
+                quantitiTV.setText("0.0L");
+            else
+                quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
             RelativeLayout rl = (RelativeLayout) v.findViewById(R.id.rl);
             ImageView iv = (ImageView) v.findViewById(R.id.imageView1);
             ImageView blue = (ImageView) v.findViewById(R.id.imageView2);
@@ -729,7 +718,7 @@ public class CalendarAdapter extends BaseAdapter {
 //
 
 
-///*//Check if deleted customer
+    ///*//Check if deleted customer
 //        if(totaldata.getIsDeletedCustomer().equals("1"))
 //        {
 //
@@ -789,71 +778,40 @@ public class CalendarAdapter extends BaseAdapter {
 //    }
 
     private static String custId = "";
-private Day selectedday;
+    private Day selectedday;
+
     public static void setcustId(String id) {
         custId = id;
     }
-private class  updateCalendar extends AsyncTask<Void,Void,Void>
-{
+
+    private class updateCalendar extends AsyncTask<Void, Void, Void> {
 
 
-    @Override
-    protected Void doInBackground(Void... params) {
-        quantityOfDay =getQuantity(selectedday);
-        return null;
+        @Override
+        protected Void doInBackground(Void... params) {
+            quantityOfDay = getQuantity(selectedday);
+            return null;
+        }
     }
-}
+
+    public static String delvCustId = "";
     private double getQuantity(Day day) {
-        double qty = 0, adjustedQty = 0;
-        DeliveryTableManagement.custIds.clear();
+        double qty = 0;
         String date = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay());
         if (!isForCustomers) {
-            if (DeliveryTableManagement.isDeletedCustomer(db.getReadableDatabase(), date))
-                qty = DeliveryTableManagement.getQuantityOfDayByDate(db.getReadableDatabase(), date);
-
-            if (db.isTableNotEmpty("customers")) {
-                if (DeliveryTableManagement.custIds != null) {
-                    if (DeliveryTableManagement.custIds.size() > 0)
-                        for (int i = 0; i < DeliveryTableManagement.custIds.size(); i++)
-                            //TODO ExtCal SETTINGS DB
-                            adjustedQty += ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
-                                    , DeliveryTableManagement.custIds.get(i));
-                    //            adjustedQty += CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
-                    //                    , custIds.get(i));
-                    //TODO ExtCal SETTINGS DB
-                    //            qty += CustomerSettingTableManagement.getAllCustomersByDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day) - adjustedQty;
-                    qty += ExtcalCustomerSettingTableManagement.getAllCustomersByDay(db.getReadableDatabase(), date) - adjustedQty;
-                }
-
-            }
-
-//            bigDecimal = BigDecimal.valueOf(ExtcalCustomerSettingTableManagement.getAllCustomersByDay(db.getReadableDatabase(), String.valueOf(day.getYear()) + "-"
-//                    + String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay())));
-        } else {
             if (db.isTableNotEmpty("delivery")) {
-                if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, custId) == 0) {
-                    if (db.isTableNotEmpty("customers")) {
-                    //TODO ExtCal SETTINGS DB
-                    //                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
-                    //                            , custId);
-                        qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
-                                , custId);
-
-                    }
-                } else
-                    qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, custId);
+                qty += DeliveryTableManagement.getQuantityOfDayByDate(db.getReadableDatabase(), date);
+            }
+                qty += ExtcalCustomerSettingTableManagement.getAllCustomersById(db.getReadableDatabase(), date, delvCustId);
 
 
-            } else if (db.isTableNotEmpty("customers")) {
+        } else {
+            if (db.isTableNotEmpty("delivery"))
+                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, custId);
 
-//            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
-//                    , custId);
-                //TODO ExtCal SETTINGS DB
+            if (qty == 0)
                 qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
                         , custId);
-
-            }
-
 
         }
         return qty;

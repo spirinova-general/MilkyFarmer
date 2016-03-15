@@ -38,10 +38,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Calendar cal = Calendar.getInstance();
         String date = String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) +
                 "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+
         final String ADD_ROLL_DATE_COLUMN = "ALTER TABLE "
                 + TableNames.TABLE_ACCOUNT + " ADD COLUMN " + TableColumns.ROLL_DATE + " TEXT NOT NULL DEFAULT '" + date + "'";
         if(!Account.columnRollDateExists(db))
             db.execSQL(ADD_ROLL_DATE_COLUMN);
+
+        String areaIndex = "CREATE UNIQUE INDEX " +TableColumns.AREA_INDEX + " ON " + TableNames.TABLE_CUSTOMER + " (" +TableColumns.AREA_ID+ ", "+ TableColumns.CUSTOMER_ID+", "+ TableColumns.ID+ " )";
+        db.execSQL(areaIndex);
+        String custIndex = "CREATE UNIQUE INDEX " +TableColumns.CUSTID_INDEX + " ON " + TableNames.TABLE_CUSTOMER_BILL + " (" + TableColumns.CUSTOMER_ID+", "+ TableColumns.ID+ " )";
+        db.execSQL(custIndex);
 
     }
 
@@ -69,7 +75,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (newVersion > oldVersion && !Account.columnRollDateExists(db)) {
             db.execSQL(ADD_ROLL_DATE_COLUMN);
         }
-
+//        Adding indexes..
+        String areaIndex = "CREATE UNIQUE INDEX " +TableColumns.AREA_INDEX + " ON " + TableNames.TABLE_CUSTOMER + " (" +TableColumns.AREA_ID+ ", "+ TableColumns.CUSTOMER_ID+", "+ TableColumns.ID+ " )";
+        db.execSQL(areaIndex);
+        String custIndex = "CREATE UNIQUE INDEX " +TableColumns.CUSTID_INDEX + " ON " + TableNames.TABLE_CUSTOMER_BILL + " (" + TableColumns.CUSTOMER_ID+", "+ TableColumns.ID+ " )";
+        db.execSQL(custIndex);
 
 //        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES,Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = preferences.edit();
@@ -78,7 +88,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 //        onCreate(db);
     }
+    public static boolean columnIndexExists(SQLiteDatabase db,String table, String index,String indexObj) {
+        String selectQuery = "SELECT * FROM sys.indexes WHERE name ='"+index+"' AND object_id ="+ indexObj+"('"+table+"')";
 
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount()  > 0;
+
+        cursor.close();
+        return result;
+    }
     public boolean isTableNotEmpty(String table) {
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + table;

@@ -137,6 +137,7 @@ public class DeliveryTableManagement {
         if (cursor.moveToFirst()) {
             do {
                 custIds.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                CalendarAdapter.delvCustId = cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID));
                 quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
 
             }
@@ -184,13 +185,8 @@ public class DeliveryTableManagement {
     }
 
     public static double getQuantityOfDayByDateForCustomer(SQLiteDatabase db, String day, String CustId) {
-        String selectquery = "";
-        if (isDeletedCustomer(db, day))
-            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
-                    + " AND " + TableColumns.CUSTOMER_ID + " ='" + CustId + "'";
-        else
-            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
-                    + " AND " + TableColumns.DELETED_ON + " >'" + day + "'" + " AND " + TableColumns.CUSTOMER_ID + " ='" + CustId + "'";
+        String selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
+                    + " AND (" + TableColumns.DELETED_ON+" ='1' OR "+TableColumns.DELETED_ON + " >'" + day + "' )" + " AND " + TableColumns.CUSTOMER_ID + " ='" + CustId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         double quantity = 0;
         if (cursor.moveToFirst()) {

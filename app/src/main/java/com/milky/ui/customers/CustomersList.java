@@ -292,6 +292,7 @@ public class CustomersList extends AppCompatActivity {
 
                     dialog.hide();
                     Constants.REFRESH_CALANDER = true;
+                    Constants.REFRESH_BILL = true;
                     finish();
                 }
 

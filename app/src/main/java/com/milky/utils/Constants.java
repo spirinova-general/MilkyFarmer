@@ -66,23 +66,16 @@ public class Constants {
         double qty = 0;
         ExtcalDatabaseHelper _exDb = new ExtcalDatabaseHelper(AppUtil.getInstance());
         if (_exDb.isTableNotEmpty("delivery")) {
-            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId) == 0) {
-                if (_exDb.isTableNotEmpty("customers")) {
-//TODO ExtCal SETTINGS DB
-//                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
-//                            , custId);
+           qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
+            if(qty==0 &&_exDb.isTableNotEmpty("customers")) {
+
                     qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                             , custId);
 
                 }
-            } else
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
 
 
         } else if (_exDb.isTableNotEmpty("customers")) {
-//TODO ExtCal SETTINGS DB
-//            qty = CustomerSettingTableManagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), day
-//                    , custId);
             qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                     , custId);
         }

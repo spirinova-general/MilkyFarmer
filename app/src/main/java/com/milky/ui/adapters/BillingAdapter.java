@@ -36,14 +36,11 @@ public class BillingAdapter extends BaseAdapter {
     private List<VBill> totalBill;
     private Context mContext;
     private boolean _mIsCustomer = false;
-    private ArrayList<String> names = new ArrayList<>();
     private DatabaseHelper _dbhelper;
 
-    public BillingAdapter(final List<VBill> dataList, final Context con, ArrayList<String> name) {
+    public BillingAdapter(final List<VBill> dataList, final Context con) {
         this.mContext = con;
         this.totalBill = dataList;
-        this.names = name;
-        this._dbhelper=_dbhelper;
     }
 
     @Override
@@ -72,6 +69,7 @@ public class BillingAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.bill_history_items, parent, false);
 
         }
+        final VBill data = totalBill.get(position);
         holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
@@ -79,8 +77,8 @@ public class BillingAdapter extends BaseAdapter {
         holder.custName = (TextView) convertView.findViewById(R.id.quantityText);
         holder.history = (TextView) convertView.findViewById(R.id.history);
 
-        String nfNAme = CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), names.get(position));
-        String lfNAme = CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), names.get(position));
+        String nfNAme = CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), data.getCustomerId());
+        String lfNAme = CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),  data.getCustomerId());
         String a = Character.toString(nfNAme.charAt(0));
         String b = Character.toString(lfNAme.charAt(0));
         holder.custName.setText(nfNAme + " " + lfNAme);
@@ -91,12 +89,12 @@ public class BillingAdapter extends BaseAdapter {
 
 
 
-        if ("0".equals(totalBill.get(position).isOutstanding())) {
+        if ("0".equals(data.isOutstanding())) {
 
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("Outstanding");
         }
-        if ("0".equals(totalBill.get(position).getIsCleared())) {
+        if ("0".equals(data.getIsCleared())) {
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("History");
         }
@@ -104,8 +102,8 @@ public class BillingAdapter extends BaseAdapter {
         final Calendar showDatePattern = Calendar.getInstance();
         final Calendar shownEndDate = Calendar.getInstance();
         try {
-            showDatePattern.setTime(Constants.work_format.parse(totalBill.get(position).getStartDate()));
-            shownEndDate.setTime(Constants.work_format.parse(totalBill.get(position).getEndDate()));
+            showDatePattern.setTime(Constants.work_format.parse(data.getStartDate()));
+            shownEndDate.setTime(Constants.work_format.parse(data.getEndDate()));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -114,7 +112,7 @@ public class BillingAdapter extends BaseAdapter {
                 Constants.MONTHS[showDatePattern.get(Calendar.MONTH)] + "-" + showDatePattern.get(Calendar.YEAR));
         holder.endDate.setText(shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +
                 Constants.MONTHS[shownEndDate.get(Calendar.MONTH)] + "-" + shownEndDate.get(Calendar.YEAR));
-        holder.amount.setText(totalBill.get(position).getBillMade());
+        holder.amount.setText(data.getBillMade());
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,18 +121,18 @@ public class BillingAdapter extends BaseAdapter {
                         Constants.MONTHS[showDatePattern.get(Calendar.MONTH)] + "-" + showDatePattern.get(Calendar.YEAR))
                         .putExtra("end_date", shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +
                                 Constants.MONTHS[shownEndDate.get(Calendar.MONTH)] + "-" + shownEndDate.get(Calendar.YEAR))
-                        .putExtra("quantity", totalBill.get(position).getQuantity())
+                        .putExtra("quantity", data.getQuantity())
                         .putExtra("amount", "0")
-                        .putExtra("balance", totalBill.get(position).getBalance())
+                        .putExtra("balance", data.getBalance())
                         .putExtra("titleString", holder.custName.getText())
-                        .putExtra("totalPrice", totalBill.get(position).getRate())
-                        .putExtra("custId", totalBill.get(position).getCustomerId())
-                        .putExtra("clear", totalBill.get(position).getIsCleared())
-                        .putExtra("total", totalBill.get(position).getBillMade())
-                        .putExtra("balance_type", totalBill.get(position).getBalanceType())
-                        .putExtra("payment_made", totalBill.get(position).getPaymentMode())
-                        .putExtra("start_date_work_format", totalBill.get(position).getStartDate())
-                        .putExtra("end_date_work_format", totalBill.get(position).getEndDate());
+                        .putExtra("totalPrice", data.getRate())
+                        .putExtra("custId", data.getCustomerId())
+                        .putExtra("clear", data.getIsCleared())
+                        .putExtra("total",data.getBillMade())
+                        .putExtra("balance_type", data.getBalanceType())
+                        .putExtra("payment_made", data.getPaymentMode())
+                        .putExtra("start_date_work_format", data.getStartDate())
+                        .putExtra("end_date_work_format", data.getEndDate());
                 mContext.startActivity(intent);
 
             }
@@ -148,9 +146,4 @@ public class BillingAdapter extends BaseAdapter {
     }
 
 
-    public static BigDecimal round(float d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Float.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd;
-    }
 }

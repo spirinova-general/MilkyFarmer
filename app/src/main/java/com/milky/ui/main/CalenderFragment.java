@@ -35,21 +35,16 @@ public class CalenderFragment extends Fragment {
     private SharedPreferences _prefrences;
     private SharedPreferences.Editor _editor;
     private DatabaseHelper _dbHelper;
-
+    View view=null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.calender_layout, container, false);
-        initResources(view);
+        if(view==null) {
+            view = inflater.inflate(R.layout.calender_layout, container, false);
+            initResources(view);
+        }
         return view;
 
     }
-public void onTabChange()
-{
-//    if (Constants.REFRESH) {
-    new UpdataCalander().execute();
-//}
-}
-    private ProgressDialog pd;
 
     private class UpdataCalander extends AsyncTask<Void, Void, Void> {
         @Override
@@ -73,6 +68,7 @@ public void onTabChange()
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            Constants.REFRESH_CALANDER = false;
         }
     }
 
@@ -81,7 +77,7 @@ public void onTabChange()
         super.onResume();
         if (Constants.REFRESH_CALANDER) {
             new UpdataCalander().execute();
-            Constants.REFRESH_CALANDER=false;
+
         }
 
     }
@@ -127,14 +123,7 @@ public void onTabChange()
             _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
 
         }
-        /*
-        * Check if has customers added
-        * */
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            _mCalenderView.setQuantity(String.valueOf(CustomersTableMagagement.getTotalMilkQuantyty(_dbHelper.getReadableDatabase())));
 
-        } else
-            _mCalenderView.setQuantity("0");
         _dbHelper.close();
 
     }

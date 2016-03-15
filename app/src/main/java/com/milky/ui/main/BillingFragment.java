@@ -21,6 +21,7 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
+import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import java.util.ArrayList;
 
@@ -32,49 +33,43 @@ public class BillingFragment extends Fragment {
 
     public static ListView _mListView;
     private DatabaseHelper _dbHelper;
-    private ArrayList<String> custIdsList = new ArrayList();
-    private ArrayList<String> list;
-    private boolean _hasFutureBill = false;
+    private ArrayList<ExtcalVCustomersList> list;
     private boolean hasPreviousBills = false;
     private ExtcalDatabaseHelper _exDb;
-    public static String addedCustomerId ="";
+    public static String addedCustomerId = "";
+
     @Override
     public void onResume() {
         super.onResume();
-//        if(Constants.REFRESH_BILL) {
-//            if (custIdsList.size() > 0 && adapter != null) {
-//                adapter.notifyDataSetChanged();
-//            } else
-                populateBills();
-//        }
-//        else
-//            Constants.REFRESH_BILL=false;
-    }
-
-    public void onTabChange() {
-        if(custIdsList.size()>0 && adapter!=null)
-        {
-            adapter.notifyDataSetChanged();
+        if(Constants.REFRESH_BILL) {
+            new UpdataBills().execute();
         }
         else
-        populateBills();
+        if (payment.size() > 0) {
+            adapter = new BillingAdapter(payment, getActivity());
+            _mListView.setAdapter(adapter);
 
+        }
+        Constants.REFRESH_BILL=false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
     }
-
+    private  View view = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_customers_list, container, false);
-        initResources(view);
+        if(view ==null) {
+            view = inflater.inflate(R.layout.activity_customers_list, container, false);
+            initResources(view);
+        }
         return view;
 
     }
 
     private BillingAdapter adapter;
+
     private class UpdataBills extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -88,18 +83,14 @@ public class BillingFragment extends Fragment {
                 @Override
                 public void run() {
                     payment.clear();
-                    custIdsList.clear();
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                        list = CustomersTableMagagement.getAllCustomersIds(_dbHelper.getReadableDatabase());
-                        for (int i = 0; i < list.size(); ++i) {
-                            generateBill(list.get(i));
-                        }
-
+                        BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase());
+                        BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase());
                     }
                     if (payment.size() > 0) {
-//            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-                        adapter =new BillingAdapter(payment, getActivity(), custIdsList);
+                        adapter = new BillingAdapter(payment, getActivity());
                         _mListView.setAdapter(adapter);
+
                     }
                 }
             });
@@ -112,10 +103,6 @@ public class BillingFragment extends Fragment {
 
 
         }
-    }
-
-    private void populateBills() {
-        new UpdataBills().execute();
     }
 
     private void initResources(View v) {
@@ -133,7 +120,7 @@ public class BillingFragment extends Fragment {
 
     }
 
-    ArrayList<VBill> payment = new ArrayList<>();
+    public static ArrayList<VBill> payment = new ArrayList<>();
     //Calculating total qty
     double payMade = 0;
 
@@ -245,25 +232,12 @@ public class BillingFragment extends Fragment {
 //    }
 
 
-    private void generateBill(String custId) {
-        ArrayList<VBill> bills = BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase(), custId);
-        if (bills.size() > 0)
-            hasPreviousBills = true;
-        for (int x = 0; x < bills.size(); x++) {
-            payment.add(bills.get(x));
-//            String a = Character.toString(CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-//            String b = Character.toString(CustomersTableMagagement.getLastName(_dbHelper.getReadableDatabase(), custId).charAt(0));
-            custIdsList.add(custId);
-
-
-        }
-        String startDate = BillTableManagement.getStartDatebyCustomerId(_dbHelper.getReadableDatabase(), custId);
-        if (!"".equals(startDate)) {
-            VBill holder = BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase(), custId, startDate);
-            if (holder != null) {
-                payment.add(holder);
-                custIdsList.add(custId);
-            }
-        }
-    }
+//    private void generateBill() {
+//
+//            VBill holder = BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase());
+//            if (holder != null) {
+//                payment.add(holder);
+//
+//        }
+//    }
 }

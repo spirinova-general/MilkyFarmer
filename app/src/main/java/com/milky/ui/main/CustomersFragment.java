@@ -41,81 +41,9 @@ public class CustomersFragment extends Fragment {
     private DatabaseHelper _dbHelper;
     public static ListView recList;
 
-    public void onTabChange(){
-
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                        if (Constants.selectedAreaId.equals("")) {
-                            if(_mCustomersList.size()>0 && _mAdapter!=null)
-                            {
-                                _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-                                _mAdapter.notifyDataSetChanged();
-                            }else {
-                                _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-                                if (_mCustomersList.size() == 1)
-                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
-                                else
-                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
-                                _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-                                recList.setAdapter(_mAdapter);
-                            }
-                        } else {
-                            if(_mCustomersList.size()>0 && _mAdapter!=null)
-                            {
-                                _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(),Constants.selectedAreaId);
-                                _mAdapter.notifyDataSetChanged();
-                            }
-                            else {
-                                _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
-                                if (_mCustomersList.size() == 1)
-                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
-                                else
-                                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
-                                _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-                                recList.setAdapter(_mAdapter);
-                            }
-                        }
-//                    ((MainActivity) getActivity()).setFragmentRefreshListener(new MainActivity.FragmentRefreshListener() {
-//                        @Override
-//                        public void onRefresh() {
-//                            getActivity().runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    pd = new ProgressDialog(getActivity());
-//                                    pd.setTitle("Processing...");
-//                                    pd.setMessage("Please wait.");
-//                                    pd.setCancelable(false);
-//                                    pd.setIndeterminate(true);
-//
-//                                    pd.dismiss();
-//                                }
-//                            });
-//
-//
-//                        }
-//                    });
-
-//                _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-//                if (_mCustomersList.size() == 1)
-//                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
-//                else
-//                    mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers ");
-//                _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-//                recList.setAdapter(_mAdapter);
-
-
-
-                    } else
-                        mTotalCustomers.setText(getResources().getString(R.string.no_customer_added));
-                    _dbHelper.close();
-
-                }
-
-
-
-
     public void onResume() {
         super.onResume();
-//        if (Constants.REFRESH_CALANDER) {
+        if (Constants.REFRESH_CUSTOMERS) {
             if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
                 if (Constants.selectedAreaId.equals("")) {
                     _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
@@ -134,56 +62,25 @@ public class CustomersFragment extends Fragment {
                     _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
                     recList.setAdapter(_mAdapter);
                 }
-//                ((MainActivity) getActivity()).setFragmentRefreshListener(new MainActivity.FragmentRefreshListener() {
-//                    @Override
-//                    public void onRefresh() {
-////                        getActivity().runOnUiThread(new Runnable() {
-////                            @Override
-////                            public void run() {
-////
-////
-////                            }
-////                        });
-//                        if (Constants.selectedAreaId.equals("")) {
-//                            _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
-//                            if (_mCustomersList.size() == 1)
-//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
-//                            else
-//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers");
-//                            _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-//                            recList.setAdapter(_mAdapter);
-//                        } else {
-//                            _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
-//                            if (_mCustomersList.size() == 1)
-//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
-//                            else
-//                                mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customers in " + MainActivity.selectedArea);
-//                            _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
-//                            recList.setAdapter(_mAdapter);
-//                        }
-//
-//
-//                    }
-//                });
+
 
             } else
                 mTotalCustomers.setText(getResources().getString(R.string.no_customer_added));
             _dbHelper.close();
-
-//        }
+            Constants.REFRESH_CUSTOMERS=false;
+        }
 
 
 
     }
 
-
-
-
+private View view=null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.customers_fragment_layout, null);
-        initResources(view);
-        Constants.REFRESH_CALANDER = true;
+        if(view ==null) {
+            view = inflater.inflate(R.layout.customers_fragment_layout, null);
+            initResources(view);
+        }
         return view;
     }
 

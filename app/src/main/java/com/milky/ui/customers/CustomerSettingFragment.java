@@ -435,19 +435,22 @@ public class CustomerSettingFragment extends Fragment {
                         ExtcalCustomerSettingTableManagement.updateData(extDb.getWritableDatabase(), holder);
                     } else {
                         if (updatedQtyRate) {
+                            Constants.REFRESH_CALANDER = true;
+                            Constants.REFRESH_CUSTOMERS = true;
+                            Constants.REFRESH_BILL = true;
                             String enddate = ExtcalCustomerSettingTableManagement.getOldEndDate(extDb.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
                             ExtcalCustomerSettingTableManagement.updateEndDateByArea(extDb.getWritableDatabase(), holder, enddate, formattedDate);
                             holder.setStart_date(formattedDate);
                             ExtcalCustomerSettingTableManagement.insertCustomersSetting(extDb.getWritableDatabase(), holder);
                         } else {
+                            Constants.REFRESH_CUSTOMERS = true;
+                            Constants.REFRESH_BILL = true;
                             ExtcalCustomerSettingTableManagement.updateAllData(extDb.getWritableDatabase(), holder);
                         }
                     }
                     BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
-                    Constants.REFRESH_CALANDER = true;
-                    Constants.REFRESH_CUSTOMERS=true;
-                    Constants.REFRESH_BILL=true;
+
                     getActivity().finish();
 
                 } else {

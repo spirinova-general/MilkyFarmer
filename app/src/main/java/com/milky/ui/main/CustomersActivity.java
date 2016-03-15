@@ -38,8 +38,6 @@ public class CustomersActivity extends AppCompatActivity {
     private FragmentTransaction mFragmentTransaction;
     private Toolbar _mToolbar;
     public static int POSITION = 0;
-
-    private boolean _mIsToAddCustomer = false;
     private FloatingActionButton fabDelete;
     public static Intent _mIntent;
     public static String titleString = "";
@@ -112,7 +110,6 @@ public class CustomersActivity extends AppCompatActivity {
     private void initResources() {
         _mIntent = this.getIntent();
         exDb = new ExtcalDatabaseHelper(this);
-        _mIsToAddCustomer = _mIntent.getBooleanExtra("istoAddCustomer", false);
         fabDelete = (FloatingActionButton) findViewById(R.id.fabDelete);
         fabDelete.setOnClickListener(new View.OnClickListener() {
             @Override

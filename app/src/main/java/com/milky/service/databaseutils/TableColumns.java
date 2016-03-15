@@ -57,7 +57,7 @@ public class TableColumns {
     public static final String TOTAL_SMS="total_sms";
     public static final String USED_SMS="used_sms";
     public static final String VALIDATED="validated";
-
-
+    public static final String AREA_INDEX="index_area";
+    public static final String CUSTID_INDEX="index_id";
 }
 
