@@ -3,6 +3,7 @@ package com.tyczj.extendedcalendarview;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.SyncStateContract;
 
 
 import java.util.ArrayList;
@@ -123,21 +124,17 @@ public class DeliveryTableManagement {
         return quantityList;
     }
 
-    public static ArrayList<String> custIds = new ArrayList<>();
+    public static ArrayList<String> custIds;
 
     public static double getQuantityOfDayByDate(SQLiteDatabase db, String day) {
         String selectquery = "";
-//        if (isDeletedCustomer(db, day))
         selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "' AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
-//        else
-//            selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
-//                    + " AND " + TableColumns.DELETED_ON + " >'" + day + "'";
+        custIds = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectquery, null);
         double quantity = 0;
         if (cursor.moveToFirst()) {
             do {
                 custIds.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                CalendarAdapter.delvCustId = cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID));
                 quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
 
             }
@@ -183,17 +180,19 @@ public class DeliveryTableManagement {
         cursor.close();
         return result;
     }
-
+    public static boolean isFromDelivery=false;
     public static double getQuantityOfDayByDateForCustomer(SQLiteDatabase db, String day, String CustId) {
         String selectquery = "SELECT * FROM " + TableNames + " WHERE " + TableColumns.START_DATE + " ='" + day + "'"
                     + " AND (" + TableColumns.DELETED_ON+" ='1' OR "+TableColumns.DELETED_ON + " >'" + day + "' )" + " AND " + TableColumns.CUSTOMER_ID + " ='" + CustId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
-        double quantity = 0;
+        double quantity =0;
+
+        custIds = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 custIds.add(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
                 quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
-
+                isFromDelivery=true;
             }
             while (cursor.moveToNext());
 

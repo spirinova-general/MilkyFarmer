@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -32,12 +33,12 @@ public class CalendarAdapter extends BaseAdapter {
     public String[] days;
     public static boolean isPost = false;
     private double quantityOfDay = 0;
-
+    private int index=0;
     //	OnAddNewEventClick mAddEvent;
     SharedPreferences preferences;
     ExtcalDatabaseHelper db;
     ArrayList<Day> dayList = new ArrayList<Day>();
-
+    boolean isFirtsIndex=false;
     public CalendarAdapter(Context context, Calendar cal) {
         this.cal = cal;
         this.context = context;
@@ -87,7 +88,7 @@ public class CalendarAdapter extends BaseAdapter {
         if (position >= 0 && position < 7) {
             v = vi.inflate(R.layout.day_of_week, null);
             TextView day = (TextView) v.findViewById(R.id.textView1);
-
+            isFirtsIndex = false;
             if (position == 0) {
                 day.setText(R.string.sunday);
             } else if (position == 1) {
@@ -103,7 +104,7 @@ public class CalendarAdapter extends BaseAdapter {
             } else if (position == 6) {
                 day.setText(R.string.saturday);
             }
-
+            index=position;
         } else {
 
             v = vi.inflate(R.layout.day_view, null);
@@ -113,8 +114,9 @@ public class CalendarAdapter extends BaseAdapter {
             Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
             Day d = dayList.get(position);
             selectedday = d;
-            if (db.isTableNotEmpty("customers"))
-                quantityOfDay = getQuantity(d);
+            String date = d.getYear() + "-" + String.format("%02d", d.getMonth() + 1) + "-" + String.format("%02d", d.getDay());
+//            if (db.isTableNotEmpty("customers"))
+//                quantityOfDay = getQuantity(date);
             //today
             if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
@@ -136,10 +138,23 @@ public class CalendarAdapter extends BaseAdapter {
 //                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
 //                today.setVisibility(View.GONE);
 //            }
-            if (quantityOfDay == 0)
-                quantitiTV.setText("0.0L");
-            else
-                quantitiTV.setText(String.valueOf(quantityOfDay) + "L");
+            if (date.equals("0-01-00")) {
+            }
+            else {
+                if(!isFirtsIndex)
+                {
+                    index=position;
+                }
+                isFirtsIndex=true;
+                try {
+                    quantitiTV.setText(String.valueOf(totalData.get(position - index)) + "L");
+
+                }
+                catch (IndexOutOfBoundsException iob)
+                {
+
+                }
+                }
             RelativeLayout rl = (RelativeLayout) v.findViewById(R.id.rl);
             ImageView iv = (ImageView) v.findViewById(R.id.imageView1);
             ImageView blue = (ImageView) v.findViewById(R.id.imageView2);
@@ -286,7 +301,8 @@ public class CalendarAdapter extends BaseAdapter {
 
     //    static float totalQuantity;
     static boolean isForCustomers = false;
-    static ArrayList<DateQuantityModel> quantityByDateList, totalData;
+    static ArrayList<DateQuantityModel> quantityByDateList;
+    static  List<Double>totalData;
 
 //    public static void totalData(final float totalList) {
 //        totalQuantity = totalList;
@@ -296,7 +312,7 @@ public class CalendarAdapter extends BaseAdapter {
         quantityByDateList = totalList;
     }
 
-    public static void totalDataList(final ArrayList<DateQuantityModel> totalList) {
+    public static void totalDataList(final List<Double> totalList) {
         totalData = totalList;
     }
 
@@ -784,38 +800,28 @@ public class CalendarAdapter extends BaseAdapter {
         custId = id;
     }
 
-    private class updateCalendar extends AsyncTask<Void, Void, Void> {
 
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            quantityOfDay = getQuantity(selectedday);
-            return null;
-        }
-    }
-
-    public static String delvCustId = "";
-    private double getQuantity(Day day) {
-        double qty = 0;
-        String date = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" + String.format("%02d", day.getDay());
-        if (!isForCustomers) {
-            if (db.isTableNotEmpty("delivery")) {
-                qty += DeliveryTableManagement.getQuantityOfDayByDate(db.getReadableDatabase(), date);
-            }
-                qty += ExtcalCustomerSettingTableManagement.getAllCustomersById(db.getReadableDatabase(), date, delvCustId);
-
-
-        } else {
-            if (db.isTableNotEmpty("delivery"))
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, custId);
-
-            if (qty == 0)
-                qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
-                        , custId);
-
-        }
-        return qty;
-    }
+//    private double getQuantity(String  date) {
+//        String delvCustId = "";
+//        double qty = 0;
+//        if (!isForCustomers) {
+//            if (db.isTableNotEmpty("delivery")) {
+//                qty += DeliveryTableManagement.getQuantityOfDayByDate(db.getReadableDatabase(), date);
+//            }
+//                qty += ExtcalCustomerSettingTableManagement.getAllCustomersById(db.getReadableDatabase(), date);
+//
+//
+//        } else {
+//            if (db.isTableNotEmpty("delivery"))
+//                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, custId);
+//
+//            if (qty == 0)
+//                qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
+//                        , custId);
+//
+//        }
+//        return qty;
+//    }
 
 
 }

@@ -30,14 +30,12 @@ public class ExtcalCustomerSettingTableManagement {
         values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
         values.put(TableColumns.DELETED_ON, "1");
         values.put(TableColumns.AREA_ID, holder.getAreaId());
-        long i = db.insert("customers", null, values);
-
+        db.insert("customers", null, values);
     }
 
     public static ArrayList<ExtcalVCustomersList> getAllCustomersBySelectedDate(SQLiteDatabase db, String areaid, String date) {
         String selectquery = "";
         if (areaid.equals("")) {
-
             selectquery = "SELECT * FROM " + "customers" + " WHERE " + TableColumns.START_DATE
                     + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'" + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
         } else
@@ -46,7 +44,6 @@ public class ExtcalCustomerSettingTableManagement {
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + date + "')";
 
         ArrayList<ExtcalVCustomersList> list = new ArrayList<>();
-
         Cursor cursor = db.rawQuery(selectquery, null);
 
         if (cursor.moveToFirst()) {
@@ -488,7 +485,7 @@ public class ExtcalCustomerSettingTableManagement {
     }
 
 
-    public static double getAllCustomersByDay(SQLiteDatabase db, String day,String id) {
+    public static double getAllCustomersByDay(SQLiteDatabase db, String day) {
         String selectquery = "";
 //        if (isDeletedCustomer(db, day)) {
 
@@ -518,19 +515,11 @@ public class ExtcalCustomerSettingTableManagement {
         return qty;
     }
 
-    public static double getAllCustomersById(SQLiteDatabase db, String day, String id) {
-        String selectquery = "";
-        if(id.equals(""))
-            selectquery = "SELECT * FROM " + "customers" + " WHERE "
+    public static double getAllCustomersById(SQLiteDatabase db, String day) {
+        String selectquery = "SELECT * FROM " + "customers" + " WHERE "
                     + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
 
                     + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
-            else
-        selectquery = "SELECT * FROM " + "customers" + " WHERE "
-                + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
-                + " AND " + TableColumns.CUSTOMER_ID + " !='" + id + "'"
-                + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
-
         double qty = 0;
 
         Cursor cursor = db.rawQuery(selectquery, null);
@@ -649,7 +638,7 @@ public class ExtcalCustomerSettingTableManagement {
 //            e.printStackTrace();
 //        }
         db.update("customers", values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
-                + " AND " + TableColumns.START_DATE + " ='" + holder.getDateAdded() + "'", null);
+                + " AND " + TableColumns.START_DATE + " ='" + holder.getDateModified() + "'", null);
     }
 
     public static void updateAllData(SQLiteDatabase db, ExtcalVCustomersList holder) {
@@ -670,7 +659,24 @@ public class ExtcalCustomerSettingTableManagement {
         db.update("customers", values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
                 + " AND " + TableColumns.START_DATE + " ='" + holder.getStart_date() + "'", null);
     }
+    public static void updateRate(SQLiteDatabase db, ExtcalVCustomersList holder) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.ACCOUNT_ID, holder.getAccountId());
+        values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
+        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+        values.put(TableColumns.DEFAULT_QUANTITY, holder.getQuantity());
+        values.put(TableColumns.START_DATE, holder.getStart_date());
+        values.put(TableColumns.BALANCE, holder.getBalance_amount());
+        values.put(TableColumns.END_DATE, holder.getEnd_date());
+        values.put(TableColumns.ADJUSTMENTS, "0");
+        values.put(TableColumns.DIRTY, "1");
+        values.put(TableColumns.SYNC_STATUS, "0");
+        values.put(TableColumns.DELETED_ON, "1");
+        values.put(TableColumns.AREA_ID, holder.getAreaId());
 
+        db.update("customers", values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
+                + " AND " + TableColumns.START_DATE + " <='" + getCurrentDate() + "' AND "+TableColumns.END_DATE+" >='"+getCurrentDate()+"'", null);
+    }
     public static String getCurrentDate() {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");

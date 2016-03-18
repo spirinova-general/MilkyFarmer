@@ -27,6 +27,24 @@ public class VBill {
     private String message;
     private String billMade;
     private String balanceType;
+    private String rollDate;
+    private String deletedOn;
+
+    public String getDeletedOn() {
+        return deletedOn;
+    }
+
+    public void setDeletedOn(String deletedOn) {
+        this.deletedOn = deletedOn;
+    }
+
+    public String getRollDate() {
+        return rollDate;
+    }
+
+    public void setRollDate(String rollDate) {
+        this.rollDate = rollDate;
+    }
 
     public String getMessage() {
         return message;

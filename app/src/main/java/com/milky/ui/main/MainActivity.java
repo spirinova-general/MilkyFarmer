@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleteListner {
 
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     protected ArrayList<VAreaMapper> selectedareacityList;
     public static DrawerLayout mDrawerLayout;
     public static NavigationView mNavigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,9 +80,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
       * init resources
       * */
         initResources();
-        Constants.REFRESH_CALANDER=true;
-        Constants.REFRESH_CUSTOMERS=true;
-        Constants.REFRESH_BILL=true;
+        Constants.REFRESH_CALANDER = true;
+        Constants.REFRESH_CUSTOMERS = true;
+        Constants.REFRESH_BILL = true;
+
         /*
         * Set up ACTIONBAR
         * */
@@ -104,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                     case R.id.nav_settings:
                         Intent i = new Intent(MainActivity.this, GlobalSetting.class);
                         startActivity(i);
-
                         break;
 //                    case R.id.nav_sign_out:
 //                        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);

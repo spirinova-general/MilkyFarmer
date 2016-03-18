@@ -392,20 +392,18 @@ public class CustomersTableMagagement {
 
         if (cursor.moveToFirst()) {
             do {
-                ExtcalVCustomersList holder = new ExtcalVCustomersList();
                 Calendar cal = Calendar.getInstance();
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)) != null)
                     date = cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON));
-                try {
-                    if (!date.equals("1")) {
-                        Date d = Constants.work_format.parse(date);
-                        cal.setTime(d);
-                        date = String.valueOf(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH))
-                                + "-" + String.valueOf(cal.get(Calendar.DAY_OF_MONTH) - 1));
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    if (!date.equals("1")) {
+//                        Date d = Constants.work_format.parse(date);
+//                        cal.setTime(d);
+//                        date = String.valueOf(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH))
+//                                + "-" + String.valueOf(cal.get(Calendar.DAY_OF_MONTH) - 1));
+//                    }
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
             }
             while (cursor.moveToNext());
         }

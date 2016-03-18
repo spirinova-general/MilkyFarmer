@@ -43,6 +43,7 @@ public class CustomersActivity extends AppCompatActivity {
     public static String titleString = "";
     private ExtcalDatabaseHelper exDb;
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -118,26 +119,23 @@ public class CustomersActivity extends AppCompatActivity {
                 builder.setTitle("Delete Customer ?");
                 builder.setMessage("Want to delete " + getIntent().getStringExtra("fname") + " " + getIntent().getStringExtra("lname")
                         + "?");
-
-
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         CustomersTableMagagement.updatedeletedCustomerDetail(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-                        //TODO ExtCal SETTINGS DB
-//                        CustomerSettingTableManagement.updateDeletetdCustomer(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
                         ExtcalCustomerSettingTableManagement.updateDeletetdCustomer(exDb.getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-
-
                         DeliveryTableManagement.updateDeletedCustomer(exDb.getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
-
+                        BillTableManagement.updateDeletedOn(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"));
+                        POSITION=0;
+                        Constants.REFRESH_BILL=true;
+                        Constants.REFRESH_CALANDER=true;
+                        Constants.REFRESH_CUSTOMERS=true;
                         finish();
                     }
                 });
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -150,7 +148,7 @@ public class CustomersActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        int page = POSITION;
+       int page = POSITION;
         switch (page) {
             case 0:
                 saveManu.setVisibility(View.VISIBLE);
@@ -176,9 +174,17 @@ public class CustomersActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
+            POSITION=0;
             finish();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        POSITION=0;
+        finish();
     }
 }

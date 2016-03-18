@@ -41,10 +41,32 @@ public class BillTableManagement {
         values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.IS_OUTSTANDING, holder.getOutstanding());
         values.put(TableColumns.DIRTY, "1");
-
+        values.put(TableColumns.ROLL_DATE, holder.getRollDate());
+        values.put(TableColumns.DELETED_ON, "1");
         long i = db.insert(TableNames.TABLE_CUSTOMER_BILL, null, values);
     }
 
+    public static boolean columnRollDateExists(SQLiteDatabase db) {
+
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL;
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getColumnIndex(TableColumns.ROLL_DATE) > 0;
+
+        cursor.close();
+        return result;
+    }
+
+    public static boolean columnRollDateExistsDeletedOn(SQLiteDatabase db) {
+
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL;
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Boolean result = cursor.getColumnIndex(TableColumns.DELETED_ON) > 0;
+
+        cursor.close();
+        return result;
+    }
 //    public static void updateBillData(SQLiteDatabase db, VBill holder) {
 //        ContentValues values = new ContentValues();
 //        values.put(TableColumns.PAYMENT_MADE, holder.getPaymentMode());
@@ -81,9 +103,17 @@ public class BillTableManagement {
         values.put(TableColumns.IS_OUTSTANDING, "0");
         values.put(TableColumns.IS_CLEARED, "1");
         values.put(TableColumns.END_DATE, date);
+        values.put(TableColumns.ROLL_DATE, Account.getRollDate(db));
         long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.START_DATE + " <='" + date + "'", null);
-//        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.END_DATE + " >='" + date + "'"
-//                + " AND " + TableColumns.START_DATE + " <='" + date + "'", null);
+
+    }
+
+    public static void updateRollDate(SQLiteDatabase db) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.ROLL_DATE, Account.getRollDate(db));
+        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "' AND " +
+                TableColumns.IS_OUTSTANDING + " ='1'", null);
+
     }
 
     public static void updateBillMade(SQLiteDatabase db, String date, String bill, String custId) {
@@ -93,9 +123,27 @@ public class BillTableManagement {
                 + " AND " + TableColumns.START_DATE + " <='" + date + "'", null);
     }
 
-    public static void updateEndDate(SQLiteDatabase db, String date, String custId) {
+    public static void updateDeletedOn(SQLiteDatabase db, String custId) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.END_DATE, date);
+
+
+        values.put(TableColumns.DELETED_ON, Constants.getCurrentDate());
+        Calendar deletedCal = Calendar.getInstance();
+        Calendar startCal = Calendar.getInstance();
+        try {
+            Date start = Constants.work_format.parse(CustomersTableMagagement.getStartDatebyCustomerId(db, custId));
+            Date date = Constants.work_format.parse(Constants.getCurrentDate());
+            deletedCal.setTime(date);
+            startCal.setTime(start);
+            if (startCal.get(Calendar.YEAR) == deletedCal.get(Calendar.YEAR) && startCal.get(Calendar.MONTH) <= deletedCal.get(Calendar.MONTH)
+                    && startCal.get(Calendar.DAY_OF_MONTH) == deletedCal.get(Calendar.DAY_OF_MONTH)) {
+                values.put(TableColumns.END_DATE, String.valueOf(deletedCal.get(Calendar.YEAR)) + "-" + String.format("%02d", deletedCal.get(Calendar.MONTH))
+                        + "-" + String.format("%02d", deletedCal.get(Calendar.DAY_OF_MONTH) - 1));
+            }
+
+        } catch (ParseException pexp) {
+
+        }
         long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custId + "'"
                 , null);
     }
@@ -109,9 +157,8 @@ public class BillTableManagement {
         values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
         values.put(TableColumns.BILL_MADE, holder.getBillMade());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
-
-        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "' AND " + TableColumns.END_DATE + " >='" + date + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + date + "' AND " + TableColumns.IS_CLEARED + " ='1'", null);
+        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "'"
+                + " AND " + TableColumns.START_DATE + " ='" + holder.getStartDate() + "' AND " + TableColumns.IS_CLEARED + " ='1' AND " + TableColumns.IS_OUTSTANDING + " ='0'", null);
     }
 
     public static void updateCurrentDateData(SQLiteDatabase db, ExtcalVCustomersList holder) {
@@ -420,40 +467,23 @@ public class BillTableManagement {
         if (cursor.moveToFirst()) {
             do {
                 VBill holder = new VBill();
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)) != null)
-                    holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)) != null)
-                    holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)) != null)
-                    holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)) != null)
-                    holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)) != null)
-                    holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)) != null)
-                    holder.setBalance(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)) != null)
-                    holder.setAdjustment(cursor.getString(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.TAX)) != null)
-                    holder.setTax(cursor.getString(cursor.getColumnIndex(TableColumns.TAX)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.IS_CLEARED)) != null)
-                    holder.setIsCleared(cursor.getString(cursor.getColumnIndex(TableColumns.IS_CLEARED)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)) != null)
-                    holder.setPaymentMode(cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
-                    holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)) != null)
-                    holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)) != null)
-                    holder.setIsOutstanding(cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)) != null)
-                    holder.setBalanceType(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)) != null)
-                    holder.setBillMade(cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)));
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
-                    holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+                holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
+                holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+                holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+                holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
+                holder.setQuantity(cursor.getString(cursor.getColumnIndex(TableColumns.QUANTITY)));
+                holder.setBalance(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
+                holder.setAdjustment(cursor.getString(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)));
+                holder.setTax(cursor.getString(cursor.getColumnIndex(TableColumns.TAX)));
+                holder.setIsCleared(cursor.getString(cursor.getColumnIndex(TableColumns.IS_CLEARED)));
+                holder.setPaymentMode(cursor.getString(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)));
+                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+                holder.setIsOutstanding(cursor.getString(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)));
+                holder.setBalanceType(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
+                holder.setBillMade(cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)));
+                holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE)));
                 CustomersBillingFragment.payment.add(holder);
             }
             while (cursor.moveToNext());
@@ -491,6 +521,7 @@ public class BillTableManagement {
                 holder.setBalanceType(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
                 holder.setBillMade(cursor.getString(cursor.getColumnIndex(TableColumns.BILL_MADE)));
                 holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE)));
                 BillingFragment.payment.add(holder);
             }
             while (cursor.moveToNext());
@@ -557,7 +588,7 @@ public class BillTableManagement {
                             - Float.parseFloat(holder.getBalance());
 
 
-                holder.setBillMade(String.valueOf(round(payMade, 2)));
+                holder.setBillMade(String.valueOf(Constants.round(payMade, 2)));
 
                 holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
 //                updateOutstandingBills(db, holder.getQuantity(), holder.getBillMade(), holder.getCustomerId());
@@ -577,24 +608,16 @@ public class BillTableManagement {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.IS_CLEARED + " ='" + "1'"
                 + " AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.END_DATE + " >='"
                 + Constants.getCurrentDate() + "' AND " + TableColumns.IS_OUTSTANDING + " ='1'";
+
         ArrayList<VBill> list = new ArrayList<>();
-
-
         Cursor cursor = db.rawQuery(selectquery, null);
-
         if (cursor.moveToFirst()) {
-
             do {
                 VBill holder = new VBill();
                 holder.setAccountId(cursor.getString(cursor.getColumnIndex(TableColumns.ACCOUNT_ID)));
                 holder.setCustomerId(cursor.getString(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
                 holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-
-                String deletionDate = CustomersTableMagagement.getCustomerDeletionDate(db, holder.getCustomerId());
-                if ("1".equals(deletionDate))
-                    holder.setEndDate(Constants.getCurrentDate());
-                else
-                    holder.setEndDate(deletionDate);
+                holder.setDeletedOn(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)));
                 Calendar cal = Calendar.getInstance();
                 Calendar currentDate = Calendar.getInstance();
                 double totalQty = 0;
@@ -604,10 +627,29 @@ public class BillTableManagement {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                for (int i = cal.get(Calendar.DAY_OF_MONTH); i <= currentDate.get(Calendar.DAY_OF_MONTH); ++i) {
-//                    totalQty += getQuatity(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-                    totalQty += Constants.getQtyOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i), holder.getCustomerId());
+                if ("1".equals(holder.getDeletedOn())) {
+                    holder.setEndDate(Constants.getCurrentDate());
+                    for (int i = cal.get(Calendar.DAY_OF_MONTH); i <= currentDate.get(Calendar.DAY_OF_MONTH); ++i)
+                        totalQty += Constants.getQtyOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i), holder.getCustomerId());
+
+                } else {
+                    Calendar deletedCal = Calendar.getInstance();
+                    try {
+                        Date date = Constants.work_format.parse(holder.getDeletedOn());
+                        deletedCal.setTime(date);
+                        holder.setEndDate(String.valueOf(deletedCal.get(Calendar.YEAR)) + "-" + String.format("%02d", deletedCal.get(Calendar.MONTH))
+                                + "-" + String.format("%02d", deletedCal.get(Calendar.DAY_OF_MONTH) - 1));
+                        for (int i = cal.get(Calendar.DAY_OF_MONTH); i <= deletedCal.get(Calendar.DAY_OF_MONTH) - 1; ++i)
+                            totalQty += Constants.getQtyOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i), holder.getCustomerId());
+
+
+                    } catch (ParseException pexp) {
+
+                    }
+
+
                 }
+
 
                 holder.setQuantity(String.valueOf(totalQty));
                 holder.setBalance(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
@@ -628,9 +670,10 @@ public class BillTableManagement {
                             - Float.parseFloat(holder.getBalance());
 
 
-                holder.setBillMade(String.valueOf(round(payMade, 2)));
+                holder.setBillMade(String.valueOf(Constants.round(payMade, 2)));
 
                 holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE)));
                 updateOutstandingBills(db, holder.getQuantity(), holder.getBillMade(), holder.getCustomerId());
 //                BillingFragment.custIdsList.add(holder.getCustomerId());
                 BillingFragment.payment.add(holder);
@@ -722,7 +765,7 @@ public class BillTableManagement {
                             - Float.parseFloat(holder.getBalance());
 
 
-                holder.setBillMade(String.valueOf(round(payMade, 2)));
+                holder.setBillMade(String.valueOf(Constants.round(payMade, 2)));
 
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)) != null)
                     holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
@@ -774,7 +817,7 @@ public class BillTableManagement {
                             - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
 
 
-                billmade = String.valueOf(round(payMade, 2));
+                billmade = String.valueOf(Constants.round(payMade, 2));
 
 
             }
@@ -823,7 +866,7 @@ public class BillTableManagement {
                             - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
 
 
-                billmade = String.valueOf(round(payMade, 2));
+                billmade = String.valueOf(Constants.round(payMade, 2));
 
 
             }
@@ -858,11 +901,6 @@ public class BillTableManagement {
         return startDate;
     }
 
-    public static BigDecimal round(double d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Double.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd;
-    }
 
     public static void insertNewBills(SQLiteDatabase db, VBill holder) {
         ContentValues values = new ContentValues();

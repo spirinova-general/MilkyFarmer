@@ -35,10 +35,11 @@ public class CalenderFragment extends Fragment {
     private SharedPreferences _prefrences;
     private SharedPreferences.Editor _editor;
     private DatabaseHelper _dbHelper;
-    View view=null;
+    View view = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(view==null) {
+        if (view == null) {
             view = inflater.inflate(R.layout.calender_layout, container, false);
             initResources(view);
         }
@@ -76,24 +77,32 @@ public class CalenderFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (Constants.REFRESH_CALANDER) {
+            Calendar cal = Calendar.getInstance();
+            _mCalenderView.calculateDeliveryTotal(cal.getActualMaximum(Calendar.DAY_OF_MONTH),cal.get(Calendar.MONTH),cal.get(Calendar.YEAR));
+            _mCalenderView.updateQuantityList(_mCalenderView.totalDeliveryData);
             new UpdataCalander().execute();
 
         }
 
     }
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
 
+        }
+    }
     View viewLayout;
 
     private void initResources(View view) {
         viewLayout = view;
-
         _prefrences = AppUtil.getInstance().getPrefrences();
         _editor = _prefrences.edit();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
         _mCalenderView.setForCustomersDelivery(false);
 
-
+        _mCalenderView.databaseHelper(new ExtcalDatabaseHelper(getActivity()));
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {

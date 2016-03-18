@@ -88,17 +88,19 @@ public class CustomerAddActivity extends AppCompatActivity {
         setCurrentDateOnView();
         addListenerOnButton();
 
-      /*
+      /* final boolean phone,final boolean rate,final boolean quantity,final boolean balance
         * Set text field listeners*/
-        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, this, false));
-        _firstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, this, false));
-        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, this, false));
-        _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, this, false));
-        _mPhone.addTextChangedListener(new TextValidationMessage(_mPhone, _phone_textinput_layout, this, true));
+        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, this, false,false,false,false,false));
+        _firstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, this,  false,false,false,false,false));
+        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, this, false,false,true,false,false));
+        _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, this, false, false, false, true, false));
+        _mPhone.addTextChangedListener(new TextValidationMessage(_mPhone, _phone_textinput_layout, this, true, false, false, false, false));
 //        _address2.addTextChangedListener(new TextValidationMessage(_mPhone, street_layout, this, false));
-        _lastName.addTextChangedListener(new TextValidationMessage(_mPhone, last_name_layout, this, false));
-        _cityAreaAutocomplete.addTextChangedListener(new TextValidationMessage(_mPhone, autocomplete_layout, this, false));
-        _rate.addTextChangedListener(new TextValidationMessage(_mPhone, rate_layout, this, false));
+        _lastName.addTextChangedListener(new TextValidationMessage(_mPhone, last_name_layout, this, false, false, false, false, false));
+        _cityAreaAutocomplete.addTextChangedListener(new TextValidationMessage(_mPhone, autocomplete_layout, this, false, false, false, false, false));
+        _rate.addTextChangedListener(new TextValidationMessage(_mPhone, rate_layout, this, false, true, false, false, false));
+
+
 
     }
 
@@ -136,11 +138,21 @@ public class CustomerAddActivity extends AppCompatActivity {
                         last_name_layout.setError("Enter name!");
                     else if (_rate.getText().toString().equals(""))
                         rate_layout.setError("Enter amount!");
-                    else if (Float.parseFloat(_rate.getText().toString().trim()) <= 0)
+                    else if(_rate.getText().toString().equals(".")){
+                        rate_layout.setError(getResources().getString(R.string.enter_valid_rate));
+                    }
+                    else if (Float.parseFloat(_rate.getText().toString().trim()) <= 0){
                         rate_layout.setError("Enter valid amount!");
-
-                    else if (_mBalance.getText().toString().equals(""))
+                    }
+                    else if (_mBalance.getText().toString().equals("")) {
                         balance_layout.setError("Enter balance amount");
+                    }
+                    else if(_mBalance.getText().toString().equals(".")){
+                        balance_layout.setError(getResources().getString(R.string.enter_valid_balance));
+                    }
+                    else if(_mQuantuty.getText().toString().equals(".")){
+                        milk_quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
+                    }
                     else if (_mAddress1.getText().toString().equals(""))
                         flat_number_layout.setError("Enter flat number!");
 //                    else if (_address2.getText().toString().equals(""))
@@ -154,6 +166,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         milk_quantity_layout.setError("Enter milk quantity!");
                     else if (Float.parseFloat(_mQuantuty.getText().toString().trim()) <= 0)
                         milk_quantity_layout.setError("Enter valid quantity!");
+
                     else if ((!_firstName.getText().toString().equals("")
                             && !_lastName.getText().toString().equals("") &&
                             !_mBalance.getText().toString().equals("") &&
@@ -179,12 +192,12 @@ public class CustomerAddActivity extends AppCompatActivity {
                         hol.setFirstName(_firstName.getText().toString());
                         hol.setLastName(_lastName.getText().toString());
                         hol.setAddress1(_mAddress1.getText().toString());
-                        hol.setBalance_amount(_mBalance.getText().toString());
+                        hol.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
                         hol.setAreaId(selectedAreaId);
                         hol.setMobile(_mPhone.getText().toString());
-                        hol.setQuantity(_mQuantuty.getText().toString());
+                        hol.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
                         hol.setAccountId(Constants.ACCOUNT_ID);
-                        hol.setRate(_rate.getText().toString());
+                        hol.setRate(String.valueOf(Constants.round(Double.parseDouble(_rate.getText().toString()), 1)));
                         hol.setBalanceType("1");
                         hol.setDateAdded(formattedDate);
                         hol.setStart_date(pickedDate);
@@ -198,16 +211,16 @@ public class CustomerAddActivity extends AppCompatActivity {
 
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
-                        holder.setBalance_amount(_mBalance.getText().toString());
+                        holder.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
                         holder.setAddress1(_mAddress1.getText().toString());
 //                        holder.setAddress2(_address2.getText().toString());
 //                        holder.setCityId(selectedCityId);
                         autocomplete_layout.setError(null);
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
-                        holder.setQuantity(_mQuantuty.getText().toString());
+                        holder.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
                         holder.setAccountId(Constants.ACCOUNT_ID);
-                        holder.setRate(_rate.getText().toString());
+                        holder.setRate(String.valueOf(Constants.round(Double.parseDouble(_rate.getText().toString()), 1)));
                         holder.setBalanceType("1");
                         holder.setDateAdded(formattedDate);
                         holder.setStart_date(pickedDate);
@@ -222,6 +235,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setPaymentMade("0");
                         holder.setIsCleared("1");
                         holder.setDateModified(holder.getStart_date());
+                        holder.setRollDate(Account.getRollDate(_dbHelper.getReadableDatabase()));
                         Calendar cal = Calendar.getInstance();
                         if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
                             holder.setOutstanding("0");
@@ -471,6 +485,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 
 
     }
+
 
 
 }

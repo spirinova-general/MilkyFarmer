@@ -42,6 +42,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
+import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -238,11 +239,12 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
          /*
         * Set text field listeners*/
 //        custCode.addTextChangedListener(new TextValidationMessage(custCode_layout, this, false));
-        rate.addTextChangedListener(new TextValidationMessage(rate, rate_layout, this, false));
-        tax.addTextChangedListener(new TextValidationMessage(rate, tax_layouts, this, false));
-        firstname.addTextChangedListener(new TextValidationMessage(firstname, name_layout, this, false));
-        lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this, false));
-        mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this, true));
+        rate.addTextChangedListener(new TextValidationMessage(rate, rate_layout, this,  false,true,false,false,false));
+        tax.addTextChangedListener(new TextValidationMessage(rate, tax_layouts, this,  false,false,false,false,true));
+        firstname.addTextChangedListener(new TextValidationMessage(firstname, name_layout, this,  false,false,false,false,false));
+        lastname.addTextChangedListener(new TextValidationMessage(lastname, lastname_layout, this,  false,false,false,false,false));
+        mobile.addTextChangedListener(new TextValidationMessage(mobile, mobile_layout, this,  true,false,false,false,false));
+
 
         /*Set default cust code*/
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
@@ -287,7 +289,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                 toString();
 
         changeNumber.setOnClickListener(new View.OnClickListener()
-
                                         {
                                             @Override
                                             public void onClick(View v) {
@@ -412,25 +413,35 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             {
                 if (rate.getText().toString().trim().equals("")) {
                     rate_layout.setError(getResources().getString(R.string.field_cant_empty));
-                } else if (Float.parseFloat(rate.getText().toString().trim()) <= 0) {
-                    rate_layout.setError(getResources().getString(R.string.fill_valid_amount));
-                } else if (tax.getText().toString().trim().equals("")) {
+//                } else if (Float.parseFloat(rate.getText().toString().trim()) <= 0) {
+//                    rate_layout.setError(getResources().getString(R.string.fill_valid_amount));
+                }
+                 else if(rate.getText().toString().equals(".")){
+                    rate_layout.setError(getResources().getString(R.string.enter_valid_rate));
+                }
+                else if (tax.getText().toString().trim().equals("")) {
                     tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
-                } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA)) {
+
+                }else if(tax.getText().toString().equals(".")){
+                    tax_layouts.setError(getResources().getString(R.string.enter_valid_tax));
+                }
+                else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA)) {
                     google_autocomplete_layout.setError("Please add atleast one area !");
                 } else {
                     Calendar cl = Calendar.getInstance();
                     String date = String.valueOf(cl.get(Calendar.MONTH))
                             + "-" + String.valueOf(cl.get(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(cl.get(Calendar.YEAR));
                     VAccount holder = new VAccount();
-                    holder.setTax(tax.getText().toString().trim());
-                    holder.setRate(rate.getText().toString().trim());
+                    holder.setTax(String.valueOf(Constants.round(Double.parseDouble(tax.getText().toString().trim()), 1)));
+                    holder.setRate(String.valueOf(Constants.round(Double.parseDouble(rate.getText().toString().trim()), 1)));
                     holder.setDateModified(date);
                     holder.setMobile(mobile.getText().toString());
                     holder.setFirstName(firstname.getText().toString());
                     holder.setLastName(lastname.getText().toString());
                     holder.setRollDate(rollDate);
                     Account.updateAccountDetails(_dbHelper.getWritableDatabase(), holder);
+                    if(_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL))
+                        BillTableManagement.updateRollDate(_dbHelper.getWritableDatabase());
                     _dbHelper.close();
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
 

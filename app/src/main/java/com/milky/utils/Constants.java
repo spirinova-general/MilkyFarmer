@@ -11,6 +11,7 @@ import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,6 +41,7 @@ public class Constants {
     public static Boolean TIME_OUT = false;
     static Calendar cal = Calendar.getInstance();
 
+
     public static String getCurrentDate() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         df.format(cal.getTime());
@@ -62,24 +64,21 @@ public class Constants {
 
         return result;
     }
+
     public static double getQtyOfCustomer(String day, String custId) {
         double qty = 0;
         ExtcalDatabaseHelper _exDb = new ExtcalDatabaseHelper(AppUtil.getInstance());
         if (_exDb.isTableNotEmpty("delivery")) {
-           qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
-            if(qty==0 &&_exDb.isTableNotEmpty("customers")) {
-
+                   qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
+            if(!DeliveryTableManagement.isFromDelivery && _exDb.isTableNotEmpty("customers")) {
                     qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                             , custId);
-
                 }
-
-
         } else if (_exDb.isTableNotEmpty("customers")) {
             qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
                     , custId);
         }
-
+        DeliveryTableManagement.isFromDelivery=false;
 
         return qty;
     }
@@ -96,4 +95,38 @@ public class Constants {
         }
         return false;
     }
+    public static BigDecimal round(double d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Double.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd;
+    }
+
+//    public static double getTotalDeliveriesForMonth(String date) {
+//        double qty = 0,adjustQty=0;
+//        ExtcalDatabaseHelper _exDb = new ExtcalDatabaseHelper(AppUtil.getInstance());
+//        if (_exDb.isTableNotEmpty("delivery")) {
+//            qty += DeliveryTableManagement.getQuantityOfDayByDate(_exDb.getReadableDatabase(), date);
+//        }
+//        if(_exDb.isTableNotEmpty("customers"))
+//            if(DeliveryTableManagement.custIds.size()>0)
+//        for(int i=0; i<DeliveryTableManagement.custIds.size();++i)
+//        adjustQty += ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), date,DeliveryTableManagement.custIds.get(i));
+//        qty += ExtcalCustomerSettingTableManagement.getAllCustomersById(_exDb.getReadableDatabase(), date)-adjustQty;
+//
+//
+//        return qty;
+//    }
+//
+//
+//public static void calculateDeliveryTotal()
+//{
+//    List<Double> data = new ArrayList<>();
+//    for(int i=1; i<=cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i)
+//    {
+//        data.add(Constants.getTotalDeliveriesForMonth(String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) +
+//                "-" + String.format("%02d", i)));
+//    }
+//    totalDeliveryData=data;
+//}
+
 }

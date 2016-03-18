@@ -41,6 +41,8 @@ public class Account {
     public static void updateAllAccountDetails(SQLiteDatabase db, VAccount holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.SYNC_STATUS, "1");
+
+
         values.put(TableColumns.DIRTY, "1");
         values.put(TableColumns.EXPIRY_DATE, holder.getExpiryDate());
         values.put(TableColumns.TOTAL_SMS, holder.getTotalSms());
@@ -56,11 +58,13 @@ public class Account {
 //        values.put(TableColumns.TOTAL_SMS, String.valueOf(getLeftsmsCount(db) - count));
         db.update(TableNames.TABLE_ACCOUNT, values, null, null);
     }
+
     public static boolean columnRollDateExists(SQLiteDatabase db) {
+
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
 
         Cursor cursor = db.rawQuery(selectQuery, null);
-        Boolean result = cursor.getColumnIndex(TableColumns.ROLL_DATE)  > 0;
+        Boolean result = cursor.getColumnIndex(TableColumns.ROLL_DATE) > 0;
 
         cursor.close();
         return result;
@@ -83,6 +87,7 @@ public class Account {
 
         return rate;
     }
+
     public static String getRollDate(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
         String rate = null;
@@ -163,11 +168,22 @@ public class Account {
         db.update(TableNames.TABLE_ACCOUNT, values, TableColumns.SYNC_STATUS + " ='" + "0" + "'"
                 + " AND " + TableColumns.DIRTY + " ='" + "0" + "'", null);
     }
-    public static void updateRollDate(SQLiteDatabase db,String date) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.ROLL_DATE,date );
 
-        db.update(TableNames.TABLE_ACCOUNT, values,null,null);
+    public static void updateRollDate(SQLiteDatabase db, String date) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.ROLL_DATE, date);
+
+        db.update(TableNames.TABLE_ACCOUNT, values, null, null);
+    }
+
+    public static String staticCall() {
+        return "sucess static";
+
+    }
+
+    public  String nonstaticCall() {
+        return "sucess nonstatic";
+
     }
 
     public static void updateAccountDetails(SQLiteDatabase db, VAccount holder) {
@@ -180,7 +196,7 @@ public class Account {
         values.put(TableColumns.MOBILE, holder.getMobile());
         values.put(TableColumns.DEFAULT_RATE, holder.getRate());
         values.put(TableColumns.TAX, holder.getTax());
-        values.put(TableColumns.ROLL_DATE,holder.getRollDate());
+        values.put(TableColumns.ROLL_DATE, holder.getRollDate());
 
         values.put(TableColumns.SYNC_STATUS, "0");
 
@@ -332,6 +348,7 @@ public class Account {
 
         return jsonObject;
     }
+
 
     public static int getAccountId(SQLiteDatabase db) {
         String countQuery = "SELECT  * FROM " + TableNames.TABLE_ACCOUNT;

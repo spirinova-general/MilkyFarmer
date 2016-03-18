@@ -20,7 +20,7 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
 //    public ExtcalDatabaseHelper(final Context context) {
 //        super(context, Environment.getExternalStorageDirectory()
 //                + File.separator + "milky"
-//                + File.separator + "Extcal", null, 1);
+//                + File.separator + "Extcal.db", null, 1);
 //    }
 
     public ExtcalDatabaseHelper(Context context) {
@@ -56,28 +56,12 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String[] tables = {
-                "customers", "delivery"
-
-        };
-//        for (String tableName : tables) {
-//            db.execSQL(String.format("DROP TABLE IF EXISTS %s", tableName));
-//        }
         String custIndex = "CREATE UNIQUE INDEX " + TableColumns.CUST_INDEX + " ON " + "customers" + " (" +TableColumns.CUSTOMER_ID+", "+TableColumns.ID+ " )";
         db.execSQL(custIndex);
         //        Adding custId Index..
         String deliveryIndex = "CREATE UNIQUE INDEX " + TableColumns.DELV_INDEX + " ON " + "delivery" + " (" +TableColumns.CUSTOMER_ID+", "+TableColumns.ID+ " )";
         db.execSQL(deliveryIndex);
-
-//        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES,Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.clear();
-//        editor.commit();
-
-//        onCreate(db);
     }
-
-
     public boolean isTableNotEmpty(String table) {
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + table;
@@ -89,13 +73,4 @@ public class ExtcalDatabaseHelper extends SQLiteOpenHelper {
 
         return result;
     }
-
-    public static void updateSyncInfo(SQLiteDatabase db, String tableName) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.DIRTY, "1");
-
-        db.update(tableName, values, TableColumns.DIRTY + " ='0'"
-                , null);
-    }
-
 }

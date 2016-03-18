@@ -36,7 +36,6 @@ import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -60,15 +59,11 @@ public class CustomerSettingFragment extends Fragment {
     private String previousSelectedArea = "";
     private String[] mData;
     private ArrayList<VAreaMapper> areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
-    private String formattedDate;
     private Calendar c;
     private TextView pick_date;
     private String custId = "";
     private ExtcalDatabaseHelper extDb;
-    private boolean updatedQtyRate = false;
-
-    public CustomerSettingFragment() {
-    }
+    private boolean updatedQty = false, updateRate = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,12 +77,13 @@ public class CustomerSettingFragment extends Fragment {
 
         initResources(view);
        /*  * Set text field listeners*/
-        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, getActivity(), false));
-        _mFirstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, getActivity(), false));
-        _mLastName.addTextChangedListener(new TextValidationMessage(_mAddress1, last_name_layout, getActivity(), false));
+        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, getActivity(), false, false, false, false, false));
+        _mFirstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, getActivity(), false, false, false, false, false));
+        _mLastName.addTextChangedListener(new TextValidationMessage(_mAddress1, last_name_layout, getActivity(), false, false, false, false, false));
 
-        _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, getActivity(), false));
-        _mMobile.addTextChangedListener(new TextValidationMessage(_mMobile, _phone_textinput_layout, getActivity(), true));
+        _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, getActivity(), false, false, false, true, false));
+
+        _mMobile.addTextChangedListener(new TextValidationMessage(_mMobile, _phone_textinput_layout, getActivity(), true, false, false, false, false));
 
         _mQuantuty.addTextChangedListener(new TextWatcher() {
             @Override
@@ -98,28 +94,32 @@ public class CustomerSettingFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) {
-
-                    milk_quantity_layout.setError(null);
-                    updatedQtyRate = true;
+                    if (s.toString().equals("."))
+                        milk_quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
+                    else
+                        milk_quantity_layout.setError(null);
+                    updatedQty = true;
 
 
                 } else {
                     milk_quantity_layout.setError(getResources().getString(R.string.field_cant_empty));
-                    updatedQtyRate = false;
+                    updatedQty = false;
                 }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
-
-                    milk_quantity_layout.setError(null);
-                    updatedQtyRate = true;
+                    if (s.toString().equals("."))
+                        milk_quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
+                    else
+                        milk_quantity_layout.setError(null);
+                    updatedQty = true;
 
 
                 } else {
                     milk_quantity_layout.setError(getResources().getString(R.string.field_cant_empty));
-                    updatedQtyRate = false;
+                    updatedQty = false;
                 }
             }
         });
@@ -132,14 +132,16 @@ public class CustomerSettingFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) {
-
-                    rate_layout.setError(null);
-                    updatedQtyRate = true;
+                    if (s.toString().equals("."))
+                        rate_layout.setError(getResources().getString(R.string.enter_valid_rate));
+                    else
+                        rate_layout.setError(null);
+                    updateRate = true;
 
 
                 } else {
                     rate_layout.setError(getResources().getString(R.string.field_cant_empty));
-                    updatedQtyRate = false;
+                    updateRate = false;
                 }
             }
 
@@ -147,16 +149,20 @@ public class CustomerSettingFragment extends Fragment {
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
 
-                    rate_layout.setError(null);
-                    updatedQtyRate = true;
+                    if (s.toString().equals("."))
+                        rate_layout.setError(getResources().getString(R.string.enter_valid_rate));
+                    else
+                        rate_layout.setError(null);
+                    updateRate = true;
 
 
                 } else {
                     rate_layout.setError(getResources().getString(R.string.field_cant_empty));
-                    updatedQtyRate = false;
+                    updateRate = false;
                 }
             }
         });
+
         /* ---------------------------------------------------*/
 
 
@@ -385,8 +391,14 @@ public class CustomerSettingFragment extends Fragment {
                     last_name_layout.setError("Enter name!");
                 else if (_mRate.getText().toString().equals(""))
                     rate_layout.setError("Enter amount!");
+                else if (_mRate.getText().toString().equals("."))
+                    rate_layout.setError(getResources().getString(R.string.enter_valid_rate));
                 else if (_mBalance.getText().toString().equals(""))
                     balance_layout.setError("Enter balance amount");
+                else if (_mQuantuty.getText().toString().equals("."))
+                    milk_quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
+                else if (_mBalance.getText().toString().equals("."))
+                    balance_layout.setError(getResources().getString(R.string.enter_valid_balance));
                 else if (_mAddress1.getText().toString().equals(""))
                     flat_number_layout.setError("Enter flat number!");
 
@@ -399,6 +411,7 @@ public class CustomerSettingFragment extends Fragment {
                     _phone_textinput_layout.setError("Enter mobile number!");
                 else if (_mQuantuty.getText().toString().equals(""))
                     milk_quantity_layout.setError("Enter milk quantity!");
+
                 else if (!_mFirstName.getText().toString().equals("")
                         && !_mLastName.getText().toString().equals("") &&
                         !_mBalance.getText().toString().equals("") &&
@@ -411,46 +424,50 @@ public class CustomerSettingFragment extends Fragment {
                     ExtcalVCustomersList holder = new ExtcalVCustomersList();
                     holder.setFirstName(_mFirstName.getText().toString());
                     holder.setLastName(_mLastName.getText().toString());
-                    holder.setBalance_amount(_mBalance.getText().toString());
+                    holder.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
                     holder.setAddress1(_mAddress1.getText().toString());
 //                    holder.setAddress2(_mAddress2.getText().toString());
 
                     holder.setAreaId(selectedAreaId);
                     holder.setMobile(_mMobile.getText().toString());
-                    holder.setQuantity(_mQuantuty.getText().toString());
+                    holder.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
                     holder.setCustomerId(getActivity().getIntent().getStringExtra("cust_id"));
                     holder.setAccountId(Constants.ACCOUNT_ID);
-                    holder.setRate(_mRate.getText().toString());
+                    holder.setRate(String.valueOf(Constants.round(Double.parseDouble(_mRate.getText().toString()), 1)));
                     holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
                     holder.setStart_date(getActivity().getIntent().getStringExtra("start_delivery_date"));
-                    Calendar c = Calendar.getInstance();
-                    String formattedDate = Constants.work_format.format(c.getTime());
+                    String currentDate = Constants.getCurrentDate();
                     holder.setBalanceType("1");
-                    holder.setDateModified(formattedDate);
+                    holder.setDateModified(currentDate);
+                    Calendar c = Calendar.getInstance();
                     holder.setEnd_date(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
                             String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
                     CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
                     if (ExtcalCustomerSettingTableManagement.isHasStartDate(extDb.getReadableDatabase(),
-                            getActivity().getIntent().getStringExtra("cust_id"), formattedDate)) {
+                            getActivity().getIntent().getStringExtra("cust_id"), currentDate))
                         ExtcalCustomerSettingTableManagement.updateData(extDb.getWritableDatabase(), holder);
-                    } else {
-                        if (updatedQtyRate) {
-                            Constants.REFRESH_CALANDER = true;
-                            Constants.REFRESH_CUSTOMERS = true;
-                            Constants.REFRESH_BILL = true;
-                            String enddate = ExtcalCustomerSettingTableManagement.getOldEndDate(extDb.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), formattedDate);
-                            ExtcalCustomerSettingTableManagement.updateEndDateByArea(extDb.getWritableDatabase(), holder, enddate, formattedDate);
-                            holder.setStart_date(formattedDate);
+                    else {
+                        if (updatedQty) {
+                            String enddate = ExtcalCustomerSettingTableManagement.getOldEndDate(extDb.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"), currentDate);
+                            ExtcalCustomerSettingTableManagement.updateEndDateByArea(extDb.getWritableDatabase(), holder, enddate, currentDate);
+                            holder.setStart_date(currentDate);
                             ExtcalCustomerSettingTableManagement.insertCustomersSetting(extDb.getWritableDatabase(), holder);
-                        } else {
-                            Constants.REFRESH_CUSTOMERS = true;
-                            Constants.REFRESH_BILL = true;
+                        } else if (updateRate)
+
+                            ExtcalCustomerSettingTableManagement.updateRate(extDb.getWritableDatabase(), holder);
+
+
+                        else
+
                             ExtcalCustomerSettingTableManagement.updateAllData(extDb.getWritableDatabase(), holder);
-                        }
+
+
                     }
                     BillTableManagement.updateData(_dbHelper.getWritableDatabase(), holder);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
-
+                    Constants.REFRESH_CALANDER = true;
+                    Constants.REFRESH_CUSTOMERS = true;
+                    Constants.REFRESH_BILL = true;
                     getActivity().finish();
 
                 } else {

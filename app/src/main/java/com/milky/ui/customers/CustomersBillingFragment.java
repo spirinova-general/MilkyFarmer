@@ -42,26 +42,20 @@ public class CustomersBillingFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.customer_billing_list, container, false);
+        if(view == null)
+        view = inflater.inflate(R.layout.customer_billing_list, container, false);
         initResources(view);
         db = new ExtcalDatabaseHelper(getActivity());
-        custId = getActivity().getIntent().getStringExtra("cust_id");
-        payment.clear();
-        generateBill(custId);
-        if (payment.size() > 0) {
-//            _mCustomersList = CustomerSettingTableManagement.getAllCustomersByCustomerId(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("cust_id"));
-            _mListView.setAdapter(new BillingAdapter(payment, getActivity()));
-        }
-        if (hasPreviousBills)
+
+        if (payment.size()>0)
             ((TextView) view.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
-        _dbHelper.close();
         return view;
     }
-
+private View view=null;
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersListView);
         _mAddBillFab = (FloatingActionButton) v.findViewById(R.id.addBillFab);
-        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+
         preivousBills = (TextView) v.findViewById(R.id.preivousBills);
         preivousBills.setVisibility(View.VISIBLE);
         _mAddBillFab.setOnClickListener(new View.OnClickListener() {
@@ -79,12 +73,29 @@ public class CustomersBillingFragment extends Fragment {
     public static ArrayList<VBill> payment = new ArrayList<>();
     //Calculating total qty
 
-private void generateBill(String custId) {
+    private void generateBill() {
+        custId = getActivity().getIntent().getStringExtra("cust_id");
+        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+        BillTableManagement.getHistoryBills(_dbHelper.getReadableDatabase(), custId);
+        BillTableManagement.getTotalBillById(_dbHelper.getReadableDatabase(), custId);
+    }
 
-    BillTableManagement.getHistoryBills(_dbHelper.getReadableDatabase(), custId);
-    BillTableManagement.getTotalBillById(_dbHelper.getReadableDatabase(),custId);
-
-
-}
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+            if(view == null)
+                view = inflater.inflate(R.layout.customer_billing_list,null , false);
+            _mListView = (ListView) view.findViewById(R.id.customersListView);
+            payment.clear();
+            generateBill();
+            if (payment.size() > 0) {
+                _mListView.setAdapter(new BillingAdapter(payment, getActivity()));
+            }
+            _dbHelper.close();
+        } else {
+        }
+    }
 
 }

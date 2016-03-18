@@ -30,6 +30,11 @@
     <string name="title_activity_expiry">ExpiryActivity</string>
     <string name="your_account_is_expired_please_conteact_the_adminstrator">Your account is expired.Please contact the administrator to activate</string>
     <string name="bill_genration_date">Bill Generation Date</string>
+    <string name="enter_valid_quantity">Enter valid quantity</string>
+    <string name="enter_valid_rate">Enter valid rate</string>
+    <string name="enter_valid_balance">Enter valid balance</string>
+    <string name="enter_valid_tax">Enter valid tax</string>
+
 
 </resources>
 

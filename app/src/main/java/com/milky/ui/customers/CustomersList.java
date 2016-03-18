@@ -22,7 +22,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +40,6 @@ import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
 import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
-import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -168,6 +166,7 @@ public class CustomersList extends AppCompatActivity {
                         DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, "", Constants.ACCOUNT_ID, Constants.DELIVERY_DATE);
                 }
             Constants.REFRESH_CALANDER = true;
+            Constants.REFRESH_BILL = true;
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -279,6 +278,9 @@ public class CustomersList extends AppCompatActivity {
             public void onClick(View v) {
                 if (quantity.getText().toString().equals("")) {
                     quantity_layout.setError("Enter quantity!");
+                }
+                 if(quantity.getText().toString().equals(".")){
+                    quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
                 } else {
                     if (selectedCustomersId.size() > 0)
                         for (ExtcalVCustomersList entry : selectedCustomersId) {

@@ -102,9 +102,9 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                         _passwordLayout.setError(null);
                         otp_layout.setError(null);
 
-//                        if (Constants.OTP.equals(""))
-//                            otp_layout.setError("OTP expired, Get OTP again");
-//                        else if (Constants.OTP.equals(otp.getText().toString().trim())) {
+                        if (Constants.OTP.equals(""))
+                            otp_layout.setError("OTP expired, Get OTP again");
+                        else if (Constants.OTP.equals(otp.getText().toString().trim())) {
 
                         JSONObject jsonObject = new JSONObject();
                         progressBar = new ProgressDialog(FarmerSignup.this);
@@ -154,7 +154,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //                            Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
 //                        startActivity(new Intent(FarmerSignup.this, MainActivity.class));
                         _dbhelper.close();
-//                        } else otp_layout.setError("Invalid OTP");
+                        } else otp_layout.setError("Invalid OTP");
 
 //                    _nameLayout.setError(null);
 //                    _lastnameLayout.setError(null);
@@ -225,10 +225,10 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
         _mobileLayout = (TextInputLayout) findViewById(R.id.mobile_layout);
         _passwordLayout = (TextInputLayout) findViewById(R.id.password_layout);
         /*Validation for text input*/
-        _firstName.addTextChangedListener(new TextValidationMessage(_firstName, _nameLayout, this, false));
-        _lastName.addTextChangedListener(new TextValidationMessage(_lastName, _lastnameLayout, this, false));
-        _mobile.addTextChangedListener(new TextValidationMessage(_mobile, _mobileLayout, this, true));
-        _password.addTextChangedListener(new TextValidationMessage(_password, _passwordLayout, this, false));
+        _firstName.addTextChangedListener(new TextValidationMessage(_firstName, _nameLayout, this,  false,false,false,false,false));
+        _lastName.addTextChangedListener(new TextValidationMessage(_lastName, _lastnameLayout, this,  false,false,false,false,false));
+        _mobile.addTextChangedListener(new TextValidationMessage(_mobile, _mobileLayout, this,  true,false,false,false,false));
+        _password.addTextChangedListener(new TextValidationMessage(_password, _passwordLayout, this,  false,false,false,false,false));
         otp_layout = (TextInputLayout) findViewById(R.id.otp_layout);
         otp = (EditText) findViewById(R.id.otp);
         otpButton = (Button) findViewById(R.id.otpButton);

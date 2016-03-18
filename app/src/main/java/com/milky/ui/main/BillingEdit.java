@@ -113,13 +113,14 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         //TODo changed roll date
         Calendar calendar = Calendar.getInstance();
         try {
-            Date date = Constants.work_format.parse(Account.getRollDate(_dbHelper.getReadableDatabase()));
+            Date date = Constants.work_format.parse(intent.getStringExtra("roll_date"));
             calendar.setTime(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        if (cal.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && cal.get(Calendar.MONTH)==calendar.get(Calendar.MONTH)) {
+        if (cal.get(Calendar.DAY_OF_MONTH) >= calendar.get(Calendar.DAY_OF_MONTH) && cal.get(Calendar.MONTH)>=calendar.get(Calendar.MONTH)
+                && cal.get(Calendar.YEAR) >= calendar.get(Calendar.YEAR) && intent.getStringExtra("clear").equals("1")) {
 //        if ((cal.get(Calendar.DAY_OF_MONTH)) == 5) {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);

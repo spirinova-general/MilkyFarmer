@@ -70,7 +70,7 @@ public class BillingAdapter extends BaseAdapter {
 
         }
         final VBill data = totalBill.get(position);
-        holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
+         holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
         holder.name = (TextView) convertView.findViewById(R.id.name);
@@ -78,7 +78,7 @@ public class BillingAdapter extends BaseAdapter {
         holder.history = (TextView) convertView.findViewById(R.id.history);
 
         String nfNAme = CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), data.getCustomerId());
-        String lfNAme = CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),  data.getCustomerId());
+        String lfNAme = CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), data.getCustomerId());
         String a = Character.toString(nfNAme.charAt(0));
         String b = Character.toString(lfNAme.charAt(0));
         holder.custName.setText(nfNAme + " " + lfNAme);
@@ -86,15 +86,11 @@ public class BillingAdapter extends BaseAdapter {
         holder.name.setText(a + b);
 
 
-
-
-
-        if ("0".equals(data.isOutstanding())) {
-
+        if ("1".equals(data.getIsCleared()) && "0".equals(data.isOutstanding())) {
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("Outstanding");
         }
-        if ("0".equals(data.getIsCleared())) {
+        if ("0".equals(data.getIsCleared()) && "0".equals(data.isOutstanding())) {
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("History");
         }
@@ -128,11 +124,13 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("totalPrice", data.getRate())
                         .putExtra("custId", data.getCustomerId())
                         .putExtra("clear", data.getIsCleared())
-                        .putExtra("total",data.getBillMade())
+                        .putExtra("total", data.getBillMade())
                         .putExtra("balance_type", data.getBalanceType())
                         .putExtra("payment_made", data.getPaymentMode())
                         .putExtra("start_date_work_format", data.getStartDate())
-                        .putExtra("end_date_work_format", data.getEndDate());
+                        .putExtra("end_date_work_format", data.getEndDate())
+                        .putExtra("roll_date", data.getRollDate())
+                        .putExtra("is_outstanding", data.getIsOutstanding());
                 mContext.startActivity(intent);
 
             }

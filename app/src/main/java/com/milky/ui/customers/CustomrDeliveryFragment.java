@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by Neha on 11/19/2015.
@@ -76,8 +77,11 @@ public class CustomrDeliveryFragment extends Fragment {
     private AlertDialog dialog;
 
     private void initResources() {
-        getTotalQuantity();
+        Calendar cal = Calendar.getInstance();
+        _mCalenderView.calculateDeliveryTotal(cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
+        _mCalenderView.updateQuantityList(_mCalenderView.totalDeliveryData);
         AppUtil.getInstance().getDatabaseHandler().close();
+        totalData= ExtendedCalendarView.totalDeliveryData;
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, final int i, long l, final Day day) {
@@ -103,7 +107,7 @@ public class CustomrDeliveryFragment extends Fragment {
                     final TextView title = (TextView) view1.findViewById(R.id.title);
                     title.setText("Edit Quantity");
                     final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
-                    quantity.setText(String.valueOf(totalData.get(day.getDay() - 1).getCalculatedQuqantity()));
+                    quantity.setText(String.valueOf(totalData.get(day.getDay() - 1)));
                     ((Button) view1.findViewById(R.id.clear)).setText("Save");
                     ((Button) view1.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -121,10 +125,7 @@ public class CustomrDeliveryFragment extends Fragment {
                                 else
                                     DeliveryTableManagement.insertCustomerDetail(_exDb.getWritableDatabase(), holder, "", Constants.ACCOUNT_ID,selected_date);
 
-                                DateQuantityModel holder1 = new DateQuantityModel();
-                                holder1.setDeliveryDate(selected_date);
-                                holder1.setCalculatedQuqantity(round(Double.parseDouble(quantity.getText().toString()), 1));
-                                totalData.set(day.getDay() - 1, holder1);
+                                totalData.set(day.getDay() - 1, Double.parseDouble(quantity.getText().toString()));
                                 _mCalenderView.refresh();
                                 Constants.REFRESH_CALANDER = true;
                                 dialog.dismiss();
@@ -145,82 +146,25 @@ public class CustomrDeliveryFragment extends Fragment {
         });
     }
 
-    protected void onCreateDialog(String stringData) {
 
 
-        // custom dialog
-        final Dialog dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.clear_bill_popup);
-        dialog.setTitle("Clear Bill");
-
-        // set the custom dialog components
-        final EditText billamount = (EditText) dialog.findViewById(R.id.bill_amount);
-        bill_amount_layout = (TextInputLayout) dialog.findViewById(R.id.bill_amount_layout);
-        billamount.setText(stringData);
-        Button ok = (Button) dialog.findViewById(R.id.ok);
-        Button cancel = (Button) dialog.findViewById(R.id.cancel);
-        billamount.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable.length() > 0) {
-                    dataCount++;
-                    bill_amount_layout.setError(null);
-                } else {
-                    bill_amount_layout.setError("This cannot be empty");
-                }
-            }
-        });
-
-        // if button is clicked, close the custom dialog
-        ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                _mCalenderView.setQuantity(billamount.getText().toString());
-                dialog.dismiss();
-            }
-        });
-        // if button is clicked, close the custom dialog
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-
-
-    }
-
-    public static ArrayList<DateQuantityModel> totalData = new ArrayList<>();
+    public static List<Double> totalData ;
     public static double quantity = 0;
     static Calendar cal = Calendar.getInstance();
-    public static ArrayList<String> custIds = new ArrayList<>();
 
-
-    public ArrayList<DateQuantityModel> getTotalQuantity() {
-        totalData.clear();
-        for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-            quantity = getDeliveryOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-            DateQuantityModel holder = new DateQuantityModel();
-            holder.setDeliveryDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-            holder.setCalculatedQuqantity(round(quantity, 1));
-            totalData.add(holder);
-        }
-
-
-        return totalData;
-    }
+//    public ArrayList<DateQuantityModel> getTotalQuantity() {
+//        totalData.clear();
+//        for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
+//            quantity = getDeliveryOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+//            DateQuantityModel holder = new DateQuantityModel();
+//            holder.setDeliveryDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
+//            holder.setCalculatedQuqantity(round(quantity, 1));
+//            totalData.add(holder);
+//        }
+//
+//
+//        return totalData;
+//    }
 
     public static BigDecimal round(double d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Double.toString(d));
@@ -230,36 +174,36 @@ public class CustomrDeliveryFragment extends Fragment {
 
     private String d = "";
 
-    public double getDeliveryOfCustomer(String day) {
-        double qty = 0;
-        double adjustedQty = 0;
-        if (_exDb.isTableNotEmpty("delivery")) {
-            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId) == 0) {
-                if (_exDb.isTableNotEmpty("customers")) {
-                    //TODO ExtCal SETTINGS DB
-                    //                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
-                    //                            , custId);
-                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
-                            , custId);
-
-                }
-            } else
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
-
-
-        } else if (_exDb.isTableNotEmpty("customers")) {
-
-//            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+//    public double getDeliveryOfCustomer(String day) {
+//        double qty = 0;
+//        double adjustedQty = 0;
+//        if (_exDb.isTableNotEmpty("delivery")) {
+//            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId) == 0) {
+//                if (_exDb.isTableNotEmpty("customers")) {
+//                    //TODO ExtCal SETTINGS DB
+//                    //                    qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+//                    //                            , custId);
+//                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
+//                            , custId);
+//
+//                }
+//            } else
+//                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
+//
+//
+//        } else if (_exDb.isTableNotEmpty("customers")) {
+//
+////            qty = CustomerSettingTableManagement.getAllCustomersByCustId(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), day
+////                    , custId);
+//            //TODO ExtCal SETTINGS DB
+//            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
 //                    , custId);
-            //TODO ExtCal SETTINGS DB
-            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
-                    , custId);
-
-        }
-
-
-        return qty;
-    }
+//
+//        }
+//
+//
+//        return qty;
+//    }
 
     @Override
     public void onDestroy() {

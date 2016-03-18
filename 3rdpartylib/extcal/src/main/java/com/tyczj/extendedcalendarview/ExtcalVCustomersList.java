@@ -6,7 +6,7 @@ package com.tyczj.extendedcalendarview;
 public class ExtcalVCustomersList {
     private String firstName;
     private String lastName;
-
+    private String rollDate;
     private String quantity;
     private String area;
     private String balance_amount;
@@ -32,6 +32,14 @@ public class ExtcalVCustomersList {
     private String billMade;
     private String balanceType;
     private String locality;
+
+    public String getRollDate() {
+        return rollDate;
+    }
+
+    public void setRollDate(String rollDate) {
+        this.rollDate = rollDate;
+    }
 
     public String getLocality() {
         return locality;
