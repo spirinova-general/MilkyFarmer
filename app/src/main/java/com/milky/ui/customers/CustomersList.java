@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.milky.R;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
@@ -35,10 +36,7 @@ import com.milky.ui.adapters.GlobalDeliveryAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -51,10 +49,9 @@ public class CustomersList extends AppCompatActivity {
     private Toolbar _mToolbar;
     public static GlobalDeliveryAdapter _mAdaapter;
     private DatabaseHelper _dbHelper;
-    public static List<ExtcalVCustomersList> _mCustomersList, _mDeliveryList = new ArrayList<>();
-    public static List<ExtcalVCustomersList> selectedCustomersId;
+    public static List<VCustomers> _mCustomersList, _mDeliveryList = new ArrayList<>();
+    public static List<VCustomers> selectedCustomersId;
     public static String bulkQuantity = "";
-    private ExtcalDatabaseHelper exDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +61,6 @@ public class CustomersList extends AppCompatActivity {
     }
 
     private void initResources() {
-        exDb = new ExtcalDatabaseHelper(this);
         _mCustomers = (ListView) findViewById(R.id.customersList);
         selectedCustomersId = new ArrayList<>();
         setActionBar();
@@ -72,7 +68,7 @@ public class CustomersList extends AppCompatActivity {
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
             //TODO ExtCal SETTINGS DB
 //            _mCustomersList = CustomerSettingTableManagement.customersForSelectedDates(_dbHelper.getReadableDatabase(), "");
-            _mCustomersList = ExtcalCustomerSettingTableManagement.customersForSelectedDates(exDb.getReadableDatabase(), "", Constants.DELIVERY_DATE);
+//            _mCustomersList = ExtcalCustomerSettingTableManagement.customersForSelectedDates(exDb.getReadableDatabase(), "", Constants.DELIVERY_DATE);
             _mAdaapter = new GlobalDeliveryAdapter(this, 0, 0, String.valueOf(Constants.SELECTED_DAY), _mCustomersList);
             selectedCustomersId = _mCustomersList;
             _mCustomers.setItemsCanFocus(true);
@@ -158,12 +154,12 @@ public class CustomersList extends AppCompatActivity {
 
         if (id == R.id.save) {
             if (_mDeliveryList.size() > 0)
-                for (ExtcalVCustomersList entry : _mDeliveryList) {
-                    if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
-                            entry.getCustomerId(), entry.getStart_date()))
-                        DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry, "", "");
-                    else
-                        DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, "", Constants.ACCOUNT_ID, Constants.DELIVERY_DATE);
+                for (VCustomers entry : _mDeliveryList) {
+//                    if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
+//                            entry.getCustomerId(), entry.getStart_date()))
+//                        DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry);
+//                    else
+//                        DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, Constants.ACCOUNT_ID);
                 }
             Constants.REFRESH_CALANDER = true;
             Constants.REFRESH_BILL = true;
@@ -225,7 +221,7 @@ public class CustomersList extends AppCompatActivity {
                     _mCustomers.setAdapter(_mAdaapter);
                     _mAdaapter.notifyDataSetChanged();
                     if (s.length() == 0) {
-                        Constants.selectedAreaId = "";
+                        Constants.selectedAreaId = 0;
                     }
 
                 }
@@ -283,12 +279,14 @@ public class CustomersList extends AppCompatActivity {
                     quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
                 } else {
                     if (selectedCustomersId.size() > 0)
-                        for (ExtcalVCustomersList entry : selectedCustomersId) {
-                            if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
-                                    entry.getCustomerId(), Constants.DELIVERY_DATE))
-                                DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry, quantity.getText().toString().trim(), Constants.DELIVERY_DATE);
-                            else
-                                DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, quantity.getText().toString().trim(), Constants.ACCOUNT_ID, Constants.DELIVERY_DATE);
+                        for (VCustomers entry : selectedCustomersId) {
+                            entry.setQuantity(quantity.getText().toString().trim());
+                            entry.setStart_date(Constants.DELIVERY_DATE);
+//                            if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
+//                                    entry.getCustomerId(), Constants.DELIVERY_DATE))
+//                                DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry);
+//                            else
+//                                DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, Constants.ACCOUNT_ID);
 
                         }
 

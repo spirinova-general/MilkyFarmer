@@ -12,40 +12,20 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Environment;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.TableNames;
-import com.milky.service.serverapi.HttpAsycTask;
-import com.milky.service.serverapi.ServerApis;
 import com.milky.service.serverapi.SyncDataService;
-import com.tyczj.extendedcalendarview.DateQuantityModel;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
 
 /**
@@ -60,7 +40,6 @@ public class AppUtil extends Application {
     private static AppUtil _instance;
     private DatabaseHelper _dbHandler;
     private SharedPreferences _sharedPRefrences;
-    private static ExtcalDatabaseHelper _exDb;
 
     @Override
     public void onCreate() {
@@ -73,7 +52,6 @@ public class AppUtil extends Application {
             }
         });
         _instance = this;
-        _exDb = new ExtcalDatabaseHelper(_instance);
         _dbHandler = new DatabaseHelper(getApplicationContext());
         _sharedPRefrences = getApplicationContext().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
         startService(new Intent(getBaseContext(), SyncDataService.class));

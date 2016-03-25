@@ -4,48 +4,40 @@ package com.milky.viewmodel;
  * Created by Neha on 11/30/2015.
  */
 public class VGlobalSettings {
-    private String id;
-    private String accountId;
-    private String dateModified;
-    private String defaultRate;
-    private String tax;
+    private String Id;
+    private double DefaultRate;
+    private double Tax;
+    private String RollDate;
+
+    public String getRollDate() {
+        return RollDate;
+    }
+
+    public void setRollDate(String rollDate) {
+        RollDate = rollDate;
+    }
+
     public String getId() {
-        return id;
+        return Id;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.Id = id;
     }
 
-    public String getAccountId() {
-        return accountId;
+    public double getDefaultRate() {
+        return DefaultRate;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
+    public void setDefaultRate(double defaultRate) {
+        this.DefaultRate = defaultRate;
     }
 
-    public String getDateModified() {
-        return dateModified;
+    public double getTax() {
+        return Tax;
     }
 
-    public void setDateModified(String dateModified) {
-        this.dateModified = dateModified;
-    }
-
-    public String getDefaultRate() {
-        return defaultRate;
-    }
-
-    public void setDefaultRate(String defaultRate) {
-        this.defaultRate = defaultRate;
-    }
-
-    public String getTax() {
-        return tax;
-    }
-
-    public void setTax(String tax) {
-        this.tax = tax;
+    public void setTax(double tax) {
+        this.Tax = tax;
     }
 }

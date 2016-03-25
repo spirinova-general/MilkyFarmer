@@ -23,7 +23,6 @@ public class DialogScreen {
 
     protected void onCreateDialog(String stringData) {
 
-
         // custom dialog
         final Dialog dialog = new Dialog(_mContext);
         dialog.setContentView(R.layout.clear_bill_popup);

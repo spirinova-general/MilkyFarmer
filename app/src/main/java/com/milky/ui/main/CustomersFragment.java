@@ -1,8 +1,6 @@
 package com.milky.ui.main;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -19,12 +17,13 @@ import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.MainCustomersListAdapter;
 import com.milky.ui.customers.CustomerAddActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +32,7 @@ import java.util.List;
  * Created by Neha on 11/17/2015.
  */
 public class CustomersFragment extends Fragment {
-
-    private List<ExtcalVCustomersList> _mCustomersList = new ArrayList<>();
+    private List<VCustomers> _mCustomersList = new ArrayList<>();
     public static MainCustomersListAdapter _mAdapter;
     private FloatingActionButton mFab;
     public static TextView mTotalCustomers;
@@ -96,7 +94,7 @@ private View view=null;
             @Override
             public void onClick(View v) {
                 //check if global setting has been set
-                if ("0".equals(Account.getDefaultRate(_dbHelper.getReadableDatabase()))) {
+                if ("0".equals(GlobalSettingsService.getDefaultRate(_dbHelper.getReadableDatabase()))) {
                     MainActivity.mDrawerLayout.openDrawer(MainActivity.mNavigationView);
                     Toast.makeText(getActivity(), getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
                 } else {

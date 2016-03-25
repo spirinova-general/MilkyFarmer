@@ -235,10 +235,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     private void rebuildCalendar() {
         if (month != null) {
             month.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " + cal.get(Calendar.YEAR));
-
-                calculateDeliveryTotal(cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
-                updateQuantityList(totalDeliveryData);
-
+//            calculateDeliveryTotal(cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
             refreshCalendar();
         }
     }
@@ -348,10 +345,6 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
 //        calendar.setAdapter(mAdapter);
 //    }
 
-    public void quantityByDate(final ArrayList<DateQuantityModel> totalList) {
-        CalendarAdapter.quantityByDate(totalList);
-    }
-
 
     public void updateQuantityList(final List<Double> totalList) {
         CalendarAdapter.totalDataList(totalList);
@@ -375,74 +368,73 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
 
     public void setCustomerId(final String id) {
         CalendarAdapter.setcustId(id);
-        selectedCustomer = id;
     }
 
-    public static ExtcalDatabaseHelper databaseHelper;
-
-    public void databaseHelper(ExtcalDatabaseHelper db) {
-        databaseHelper = db;
-    }
-
-    public double getTotalDeliveriesForMonth(String date) {
-        double qty = 0, adjustQty = 0;
-        ExtcalDatabaseHelper _exDb = databaseHelper;
-        if (_exDb.isTableNotEmpty("delivery")) {
-            qty += DeliveryTableManagement.getQuantityOfDayByDate(_exDb.getReadableDatabase(), date);
-        }
-        if (_exDb.isTableNotEmpty("customers"))
-            if (DeliveryTableManagement.custIds!=null &&  DeliveryTableManagement.custIds.size() > 0)
-                for (int i = 0; i < DeliveryTableManagement.custIds.size(); ++i)
-                    adjustQty += ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), date, DeliveryTableManagement.custIds.get(i));
-        qty += ExtcalCustomerSettingTableManagement.getAllCustomersById(_exDb.getReadableDatabase(), date) - adjustQty;
-
-
-        return qty;
-    }
-
-    public static List<Double> totalDeliveryData;
-
-    public void calculateDeliveryTotal(int maxDay, int month, int year) {
-        List<Double> data = new ArrayList<>();
-        for (int i = 1; i <= maxDay; ++i) {
-            if(!isForCustomers) {
-                data.add(getTotalDeliveriesForMonth(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i)));
-            }
-            else
-            {
-                data.add(calculateDeliveryForCustomers(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i)));
-            }
-        }
-        totalDeliveryData = data;
-    }
-    public  static String selectedCustomer="";
-    private double calculateDeliveryForCustomers(String date)
-    {
-        double qty = 0, adjustQty = 0;
-        ExtcalDatabaseHelper db = databaseHelper;
-        if (db.isTableNotEmpty("delivery")) {
-            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, selectedCustomer) == 0) {
-                if (db.isTableNotEmpty("customers")) {
-                    //TODO ExtCal SETTINGS DB
-
-                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
-                            , selectedCustomer);
-
-                }
-            } else
-                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, selectedCustomer);
-
-
-        } else if (db.isTableNotEmpty("customers")) {
-
-
-            //TODO ExtCal SETTINGS DB
-            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
-                    , selectedCustomer);
-
-        }
-        return qty;
-    }
+//    public static ExtcalDatabaseHelper databaseHelper;
+//
+//    public void databaseHelper(ExtcalDatabaseHelper db) {
+//        databaseHelper = db;
+//    }
+//
+//    public double getTotalDeliveriesForMonth(String date) {
+//        double qty = 0, adjustQty = 0;
+//        ExtcalDatabaseHelper _exDb = databaseHelper;
+//        if (_exDb.isTableNotEmpty("delivery")) {
+//            qty += DeliveryTableManagement.getQuantityOfDayByDate(_exDb.getReadableDatabase(), date);
+//        }
+//        if (_exDb.isTableNotEmpty("customers"))
+//            if (DeliveryTableManagement.custIds!=null &&  DeliveryTableManagement.custIds.size() > 0)
+//                for (int i = 0; i < DeliveryTableManagement.custIds.size(); ++i)
+//                    adjustQty += ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), date, DeliveryTableManagement.custIds.get(i));
+//        qty += ExtcalCustomerSettingTableManagement.getAllCustomersById(_exDb.getReadableDatabase(), date) - adjustQty;
+//
+//
+//        return qty;
+//    }
+//
+//    public static List<Double> totalDeliveryData;
+//
+//    public void calculateDeliveryTotal(int maxDay, int month, int year) {
+//        List<Double> data = new ArrayList<>();
+//        for (int i = 1; i <= maxDay; ++i) {
+//            if(!isForCustomers) {
+//                data.add(getTotalDeliveriesForMonth(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
+//                        "-" + String.format("%02d", i)));
+//            }
+//            else
+//            {
+//                data.add(calculateDeliveryForCustomers(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
+//                        "-" + String.format("%02d", i)));
+//            }
+//        }
+//        totalDeliveryData = data;
+//    }
+//    public  static String selectedCustomer="";
+//    private double calculateDeliveryForCustomers(String date)
+//    {
+//        double qty = 0, adjustQty = 0;
+//        ExtcalDatabaseHelper db = databaseHelper;
+//        if (db.isTableNotEmpty("delivery")) {
+//            if (DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, selectedCustomer) == 0) {
+//                if (db.isTableNotEmpty("customers")) {
+//                    //TODO ExtCal SETTINGS DB
+//
+//                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
+//                            , selectedCustomer);
+//
+//                }
+//            } else
+//                qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(db.getReadableDatabase(), date, selectedCustomer);
+//
+//
+//        } else if (db.isTableNotEmpty("customers")) {
+//
+//
+//            //TODO ExtCal SETTINGS DB
+//            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(db.getReadableDatabase(), date
+//                    , selectedCustomer);
+//
+//        }
+//        return qty;
+//    }
 }

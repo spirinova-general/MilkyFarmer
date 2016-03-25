@@ -1,7 +1,6 @@
 package com.milky.ui.main;
 
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,15 +12,13 @@ import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 import java.util.ArrayList;
 
@@ -32,9 +29,8 @@ import java.util.ArrayList;
 public class BillingFragment extends Fragment {
     public static ListView _mListView;
     private DatabaseHelper _dbHelper;
-    private ArrayList<ExtcalVCustomersList> list;
+    private ArrayList<VCustomers> list;
     private boolean hasPreviousBills = false;
-    private ExtcalDatabaseHelper _exDb;
 
     @Override
     public void onResume() {
@@ -96,7 +92,6 @@ public class BillingFragment extends Fragment {
 
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersList);
-        _exDb = new ExtcalDatabaseHelper(getActivity());
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         TextView _mTotalBills = (TextView) v.findViewById(R.id.total_pending_bills);
 

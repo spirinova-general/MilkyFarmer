@@ -11,13 +11,14 @@ import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.AreaCityTableManagement;
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VAreaMapper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -27,12 +28,12 @@ import java.util.List;
 /**
  * Created by Neha on 11/18/2015.
  */
-public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList> {
-    private List<ExtcalVCustomersList> mCustomersList, tempItems, suggestions;
+public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
+    private List<VCustomers> mCustomersList, tempItems, suggestions;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
 
-    public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<ExtcalVCustomersList> listData) {
+    public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<VCustomers> listData) {
         super(act, resource, textViewResourceId, listData);
         this.mCustomersList = listData;
         this.mActivity = act;
@@ -67,7 +68,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList>
         holder._nameView = (TextView) convertView.findViewById(R.id.nameView);
 
 
-        final ExtcalVCustomersList customer = mCustomersList.get(position);
+        final VCustomers customer = mCustomersList.get(position);
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
@@ -91,7 +92,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList>
             public void onClick(View v) {
                 Calendar c = Calendar.getInstance();
                 try {
-                    c.setTime(Constants.work_format.parse(customer.getStart_date()));
+                    c.setTime(Constants.work_format.parse(CustomerSettingTableManagement.getStartDeliveryDate(_dbhelper.getReadableDatabase(),customer.getCustomerId())));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -103,7 +104,6 @@ public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList>
                         .putExtra("areaId", customer.getAreaId())
                         .putExtra("address1", customer.getAddress1())
                         .putExtra("istoAddCustomer", false)
-
                         .putExtra("mobile", customer.getMobile())
                         .putExtra("defaultrate", customer.getRate())
                         .putExtra("address2", customer.getAddress2())
@@ -130,7 +130,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList>
     Filter nameFilter = new Filter() {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
-            String str = ((ExtcalVCustomersList) resultValue).getFirstName();
+            String str = ((VCustomers) resultValue).getFirstName();
             notifyDataSetChanged();
             return str;
         }
@@ -139,7 +139,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList>
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
                 suggestions.clear();
-                for (ExtcalVCustomersList Area : tempItems) {
+                for (VCustomers Area : tempItems) {
                     if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase()) ||
                             Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
                         suggestions.add(Area);
@@ -157,10 +157,10 @@ public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList>
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            List<ExtcalVCustomersList> filterList = (ArrayList<ExtcalVCustomersList>) results.values;
+            List<VCustomers> filterList = (ArrayList<VCustomers>) results.values;
             if (results != null && results.count > 0) {
                 clear();
-                for (ExtcalVCustomersList Area : filterList) {
+                for (VCustomers Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }
@@ -178,7 +178,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<ExtcalVCustomersList>
                 VAreaMapper holder = AreaCityTableManagement.getAreaById(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
 
                 filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
-                for (ExtcalVCustomersList Area : filterList) {
+                for (VCustomers Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }

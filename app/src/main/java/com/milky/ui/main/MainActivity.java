@@ -40,6 +40,7 @@ import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
@@ -157,43 +158,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         MenuInflater mi = getMenuInflater();
         mi.inflate(R.menu.main_menu, menu);
         this.menu = menu;
-//        final MenuItem mSpinnerItem1 = menu.findItem(R.id.areaSpinner);
         final MenuItem mSpinnerItem2 = menu.findItem(R.id.action_search);
-
-//        view1 = mSpinnerItem1.getActionView();
         searchView = mSpinnerItem2.getActionView();
-//        if (view1 instanceof Spinner) {
-//            spinner = (Spinner) view1;
-//            spinner.setAdapter(adp1);
-//            spinner.setSelection(selectedPosition);
-//            spinner.setGravity(Gravity.CENTER);
-//
-//            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//
-//                @Override
-//                public void onItemSelected(AdapterView<?> arg0, View arg1,
-//                                           int arg2, long arg3) {
-//
-//                    selectedPosition = arg2;
-//                    selectedAreaId = _areacityList.get(arg2).getAreaId();
-//                    selectedArea = _areacityList.get(arg2).getArea() + ", " + _areacityList.get(arg2).getCity();
-//                    if (getFragmentRefreshListener() != null) {
-//                        getFragmentRefreshListener().onRefresh();
-//                    }
-//
-//                }
-//
-//                @Override
-//                public void onNothingSelected(AdapterView<?> arg0) {
-//                    // TODO Auto-generated method stub
-//
-//
-//                }
-//            });
-//
-//        }
         MenuItemCompat.expandActionView(mSpinnerItem2);
-
 
         if (searchView instanceof SearchView) {
             final SearchView actionSearchView = (SearchView) searchView;
@@ -207,8 +174,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 @Override
                 public void onClick(View v) {
                     expended = true;
-//                    mSpinnerItem1.setVisible(false);
-
                 }
             });
             editSearch.setThreshold(1);
@@ -220,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     editSearch.setText(_areacityList.get(position).getCityArea());
                     Constants.selectedAreaId = _areacityList.get(position).getAreaId();
-//                    Constants.selectedCityId = _areacityList.get(position).getCityId();
                     selectedareacityList.add(_areacityList.get(position));
                     editSearch.setSelection(editSearch.getText().length());
                     if (CustomersFragment._mAdapter != null)
@@ -231,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             editSearch.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
                 }
 
                 @Override
@@ -239,15 +202,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                     if (CustomersFragment._mAdapter != null)
                         CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
                     if (s.length() == 0) {
-                        Constants.selectedAreaId = "";
-//                        Constants.selectedCityId = "";
+                        Constants.selectedAreaId = 0;
                     }
-
                 }
-
                 @Override
                 public void afterTextChanged(Editable s) {
-
                 }
             });
             actionSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -299,34 +258,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             _areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areas.get(i)));
         }
         _dbHelper.close();
-//        VAreaMapper areacity = new VAreaMapper();
-////        areacity.setArea("");
-////        areacity.setAreaId("");
-////        areacity.setCity("");
-////        areacity.setCityArea("All");
-////        _areacityList.add(areacity);
-//        for (int i = 0; i < _areaList.size(); i++) {
-//            areacity = new VAreaMapper();
-//            areacity.setArea(_areaList.get(i).getArea());
-//            areacity.setAreaId(_areaList.get(i).getAreaId());
-//            areacity.setLocality(_areaList.get(i).getLocality());
-//            areacity.setCity(_areaList.get(i).getCity());
-//            if(areacity.getLocality().equals(""))
-//                areacity.setCityArea(areacity.getArea() + ", " + areacity.getCity());
-//            else
-//                areacity.setCityArea(_areaList.get(i).getLocality()+", " + areacity.getArea() + ", " + areacity.getCity());
-//
-//            _areacityList.add(areacity);
-//
-//
-//        }
-//        _dbHelper.close();
+
         _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
-//        AppUtil.getTotalQuantity();
-
-    }
+      }
 
 
     private void supportActionBar() {
@@ -411,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
 
         //check if global setting has been set
-        if ("0".equals(Account.getDefaultRate(_dbHelper.getReadableDatabase()))) {
+        if ("0".equals(GlobalSettingsService.getDefaultRate(_dbHelper.getReadableDatabase()))) {
             mDrawerLayout.openDrawer(mNavigationView);
             Toast.makeText(MainActivity.this, getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
             _dbHelper.close();
@@ -469,8 +405,8 @@ _dbHelper.close();
         if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
                 VAccount holder = new VAccount();
-                try {
-                    JSONObject result = Constants.API_RESPONCE;
+//                try {
+//                    JSONObject result = Constants.API_RESPONCE;
 //                        holder.setFarmerCode(result.getString("FarmerCode"));
 //                        holder.setFirstName(result.getString("FirstName"));
 //                        holder.setLastName(result.getString("LastName"));
@@ -480,22 +416,22 @@ _dbHelper.close();
 //                        holder.setDateAdded(result.getString("DateAdded"));
 //                        holder.setDateModified(result.getString("DateModified"));
 //                        holder.setAccountStartDate(result.getString("StartDate"));
-                    holder.setExpiryDate(result.getString("EndDate"));
-                    holder.setUsedSms(String.valueOf(result.getInt("UsedSms")));
-                    holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
-                    holder.setId(String.valueOf(result.getInt("Id")));
+//                    holder.setExpiryDate(result.getString("EndDate"));
+//                    holder.setUsedSms(String.valueOf(result.getInt("UsedSms")));
+//                    holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
+//                    holder.setId(String.valueOf(result.getInt("Id")));
 
-                    Account.updateAllAccountDetails(_dbHelper.getWritableDatabase(), holder);
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
-                        if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
-                            Toast.makeText(MainActivity.this, "Account is expired !", Toast.LENGTH_LONG).show();
-                        } else
-                            expirationDialog.dismiss();
-                    }
-                    progressBar.hide();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                    Account.updateAllAccountDetails(_dbHelper.getWritableDatabase(), holder);
+//                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+//                        if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
+//                            Toast.makeText(MainActivity.this, "Account is expired !", Toast.LENGTH_LONG).show();
+//                        } else
+//                            expirationDialog.dismiss();
+//                    }
+//                    progressBar.hide();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
             }
 
         } else if (type == ServerApis.SYNC) {
@@ -616,8 +552,8 @@ _dbHelper.close();
                             mesg = URLEncoder.encode("Dear " + CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), finalList.get(i).getCustomerId()) + ", " + "Your milk bill from " + Constants.MONTHS[startDate.get(Calendar.MONTH)] + " "
                                     + String.format("%02d", startDate.get(Calendar.DAY_OF_MONTH)) + " to " +
                                     Constants.MONTHS[endDate.get(Calendar.MONTH)] + " " + String.format("%02d", endDate.get(Calendar.DAY_OF_MONTH))
-                                    + " is Rs. " + finalList.get(i).getBillMade()
-                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + finalList.get(i).getRate() + "/litre.", "UTF-8");
+                                    + " is Rs. " + finalList.get(i).getTotalAmount()
+                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + finalList.get(i).get() + "/litre.", "UTF-8");
 
 //                            mesg = URLEncoder.encode("Dear " + finalList.get(i).getFristName() + ", " + "your milk bill is " + finalList.get(i).getBillAmount(), "UTF-8");
                         } catch (UnsupportedEncodingException e) {

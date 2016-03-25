@@ -26,14 +26,13 @@ import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -59,7 +58,6 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
     private TextInputLayout _amount_layout;
     private DatabaseHelper _dbHelper;
     private int balanceType = 0;
-    private ExtcalDatabaseHelper _exDb;
 
     @Override
     protected void onResume() {
@@ -69,7 +67,6 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
     private void getview() {
         milk_quantity = (EditText) findViewById(R.id.milk_quantity);
-        _exDb = new ExtcalDatabaseHelper(this);
         rate = (EditText) findViewById(R.id.rate);
         balance_amount = (EditText) findViewById(R.id.balance_amount);
         tax = (EditText) findViewById(R.id.tax);
@@ -176,33 +173,31 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
                             float bill = payment_made - bill_amount;
                             if (bill_amount >= payment_made) {
-                                holder.setBalance(String.valueOf(round(bill_amount - payment_made, 2)));
-                                holder.setBalanceType("0");
+                                holder.setBalance(bill_amount - payment_made);
+                                holder.setBalanceType(0);
                             } else {
-                                holder.setBalance(String.valueOf(round(bill, 2)));
-                                holder.setBalanceType("1");
+                                holder.setBalance(bill);
+                                holder.setBalanceType(1);
                             }
-                            holder.setPaymentMode(String.valueOf(round(payment_made, 2)));
+                            holder.setPaymentMade(payment_made);
 
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
-                            holder.setBillMade(String.valueOf(round(bill_amount, 2)));
-                            holder.setRate(intent.getStringExtra("totalPrice"));
+                            holder.setTotalAmount(bill_amount);
+//                            holder.setRate(intent.getStringExtra("totalPrice"));
 //                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
                             Calendar c = Calendar.getInstance();
                             String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
 
-                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType());
+                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getIntExtra("custId",0), holder.getBalanceType());
 //                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
                             //TODO ExtCal SETTINGS DB
-                            ExtcalCustomerSettingTableManagement.updateBalance(_exDb.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
-
+//                            ExtcalCustomerSettingTableManagement.updateBalance(_exDb.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
                             BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"), holder);
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER=true;
                             BillingEdit.this.finish();
                         }
-
                     }
                 });
                 ((Button) view1.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
@@ -227,7 +222,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         total_amount.setText(intent.getStringExtra("total"));
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
-        tax.setText(Account.getDefautTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase()));
+        tax.setText(GlobalSettingsService.getDefautTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase()));
         AppUtil.getInstance().getDatabaseHandler().close();
     }
 

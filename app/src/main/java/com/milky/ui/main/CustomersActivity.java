@@ -23,9 +23,6 @@ import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.ui.customers.CustomerTabFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -41,8 +38,6 @@ public class CustomersActivity extends AppCompatActivity {
     private FloatingActionButton fabDelete;
     public static Intent _mIntent;
     public static String titleString = "";
-    private ExtcalDatabaseHelper exDb;
-
 
     @Override
     protected void onResume() {
@@ -110,7 +105,6 @@ public class CustomersActivity extends AppCompatActivity {
 
     private void initResources() {
         _mIntent = this.getIntent();
-        exDb = new ExtcalDatabaseHelper(this);
         fabDelete = (FloatingActionButton) findViewById(R.id.fabDelete);
         fabDelete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,8 +119,8 @@ public class CustomersActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         CustomersTableMagagement.updatedeletedCustomerDetail(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-                        ExtcalCustomerSettingTableManagement.updateDeletetdCustomer(exDb.getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-                        DeliveryTableManagement.updateDeletedCustomer(exDb.getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
+//                        ExtcalCustomerSettingTableManagement.updateDeletetdCustomer(exDb.getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
+//                        DeliveryTableManagement.updateDeletedCustomer(exDb.getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
                         BillTableManagement.updateDeletedOn(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"));
                         POSITION=0;
                         Constants.REFRESH_BILL=true;

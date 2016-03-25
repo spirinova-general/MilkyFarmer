@@ -18,17 +18,17 @@ import java.util.List;
 
 import com.milky.R;
 import com.milky.utils.DialogScreen;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 /**
  * Created by Neha on 11/17/2015.
  */
 public class CustomersListAdapter extends BaseAdapter {
-    private List<ExtcalVCustomersList> mCustomersData;
+    private List<VCustomers> mCustomersData;
     private Context mContext;
     private boolean _mIsCustomer = false;
 
-    public CustomersListAdapter(final List<ExtcalVCustomersList> dataList, final Context con, final boolean isCustomer) {
+    public CustomersListAdapter(final List<VCustomers> dataList, final Context con, final boolean isCustomer) {
         this.mContext = con;
         this.mCustomersData = dataList;
         this._mIsCustomer = isCustomer;

@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -28,10 +30,12 @@ import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAccount;
+import com.milky.viewmodel.VGlobalSettings;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Calendar;
@@ -51,7 +55,10 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin_layout);
         preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
-
+        File f = new File(Environment.getExternalStorageDirectory() + File.separator + "milky");
+        if (!f.isDirectory()) {
+            f.mkdirs();
+        }
         initResources();
         setActionBar();
     }
@@ -106,46 +113,46 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                             otp_layout.setError("OTP expired, Get OTP again");
                         else if (Constants.OTP.equals(otp.getText().toString().trim())) {
 
-                        JSONObject jsonObject = new JSONObject();
-                        progressBar = new ProgressDialog(FarmerSignup.this);
-                        progressBar.setCancelable(true);
-                        progressBar.setMessage("Signing Up ...");
-                        //progress dialog type
-                        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                        progressBar.setProgress(0);
-                        progressBar.setMax(100);
-                        progressBar.show();
+                            JSONObject jsonObject = new JSONObject();
+                            progressBar = new ProgressDialog(FarmerSignup.this);
+                            progressBar.setCancelable(true);
+                            progressBar.setMessage("Signing Up ...");
+                            //progress dialog type
+                            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                            progressBar.setProgress(0);
+                            progressBar.setMax(100);
+                            progressBar.show();
 
-                        Calendar cal = Calendar.getInstance();
-                        //formating the current date and time
-                        String startDate = Constants.api_format.format(cal.getTime());
-                        //To get the maximum date of month
-                        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
-                        Date date = cal.getTime();
-                        String endDate = Constants.api_format.format(date);
-                        try {
-                            //inserting the data to json object
-                            jsonObject.put("FarmerCode", Constants.generateOTP());
-                            jsonObject.put("FirstName", _firstName.getText().toString());
-                            jsonObject.put("LastName", _lastName.getText().toString());
-                            jsonObject.put("Mobile", _mobile.getText().toString());
-                            jsonObject.put("Validated", "true");
-                            jsonObject.put("Dirty", "0");
-                            jsonObject.put("DateAdded", startDate);
-                            jsonObject.put("DateModified", startDate);
-                            jsonObject.put("StartDate", startDate);
-                            jsonObject.put("EndDate", endDate);
-                            jsonObject.put("UsedSms", "0");
-                            jsonObject.put("TotalSms", "10");
-                            //getting the row count from account table
-                            jsonObject.put("Id", Account.getAccountId(_dbhelper.getReadableDatabase()) + 1);
+                            Calendar cal = Calendar.getInstance();
+                            //formating the current date and time
+                            String startDate = Constants.api_format.format(cal.getTime());
+                            //To get the maximum date of month
+                            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+                            Date date = cal.getTime();
+                            String endDate = Constants.api_format.format(date);
+                            try {
+                                //inserting the data to json object
+                                jsonObject.put("FarmerCode", Constants.generateOTP());
+                                jsonObject.put("FirstName", _firstName.getText().toString());
+                                jsonObject.put("LastName", _lastName.getText().toString());
+                                jsonObject.put("Mobile", _mobile.getText().toString());
+                                jsonObject.put("Validated", "true");
+                                jsonObject.put("Dirty", "0");
+                                jsonObject.put("DateAdded", startDate);
+                                jsonObject.put("DateModified", startDate);
+                                jsonObject.put("StartDate", startDate);
+                                jsonObject.put("EndDate", endDate);
+                                jsonObject.put("UsedSms", "0");
+                                jsonObject.put("TotalSms", "10");
+                                //getting the row count from account table
+                                jsonObject.put("Id", Account.getAccountId(_dbhelper.getReadableDatabase()) + 1);
 
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        HttpAsycTask dataTask = new HttpAsycTask();
-                        dataTask.runRequest(ServerApis.ACCOUNT_API, jsonObject, FarmerSignup.this, true, null);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            HttpAsycTask dataTask = new HttpAsycTask();
+                            dataTask.runRequest(ServerApis.ACCOUNT_API, jsonObject, FarmerSignup.this, true, null);
 
 //                        if (_dbhelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
 //                            Account.updateAccountDetails(_dbhelper.getWritableDatabase(), holder);
@@ -153,9 +160,8 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //
 //                            Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
 //                        startActivity(new Intent(FarmerSignup.this, MainActivity.class));
-                        _dbhelper.close();
+                            _dbhelper.close();
                         } else otp_layout.setError("Invalid OTP");
-
 //                    _nameLayout.setError(null);
 //                    _lastnameLayout.setError(null);
 //                    _mobileLayout.setError(null);
@@ -190,8 +196,6 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //                    } else {
 //                        otp_layout.setError("Invalid OTP");
 //                    }
-
-
                     }
                 } else
                     Toast.makeText(FarmerSignup.this, "Network is not available. ", Toast.LENGTH_SHORT).show();
@@ -225,10 +229,10 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
         _mobileLayout = (TextInputLayout) findViewById(R.id.mobile_layout);
         _passwordLayout = (TextInputLayout) findViewById(R.id.password_layout);
         /*Validation for text input*/
-        _firstName.addTextChangedListener(new TextValidationMessage(_firstName, _nameLayout, this,  false,false,false,false,false));
-        _lastName.addTextChangedListener(new TextValidationMessage(_lastName, _lastnameLayout, this,  false,false,false,false,false));
-        _mobile.addTextChangedListener(new TextValidationMessage(_mobile, _mobileLayout, this,  true,false,false,false,false));
-        _password.addTextChangedListener(new TextValidationMessage(_password, _passwordLayout, this,  false,false,false,false,false));
+        _firstName.addTextChangedListener(new TextValidationMessage(_firstName, _nameLayout, this, false, false, false, false, false));
+        _lastName.addTextChangedListener(new TextValidationMessage(_lastName, _lastnameLayout, this, false, false, false, false, false));
+        _mobile.addTextChangedListener(new TextValidationMessage(_mobile, _mobileLayout, this, true, false, false, false, false));
+        _password.addTextChangedListener(new TextValidationMessage(_password, _passwordLayout, this, false, false, false, false, false));
         otp_layout = (TextInputLayout) findViewById(R.id.otp_layout);
         otp = (EditText) findViewById(R.id.otp);
         otpButton = (Button) findViewById(R.id.otpButton);
@@ -286,26 +290,32 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 holder.setFirstName(result.getString("FirstName"));
                 holder.setLastName(result.getString("LastName"));
                 holder.setMobile(result.getString("Mobile"));
-                holder.setValidated(String.valueOf(result.getBoolean("Validated")));
-                holder.setDirty(String.valueOf(result.getInt("Dirty")));
+                if (result.getBoolean("Validated"))
+                    holder.setValidated(0);
+                else
+                    holder.setValidated(1);
                 holder.setDateAdded(result.getString("DateAdded"));
                 holder.setDateModified(result.getString("DateModified"));
-                holder.setAccountStartDate(result.getString("StartDate"));
-                holder.setExpiryDate(result.getString("EndDate"));
-                holder.setUsedSms(String.valueOf(result.getInt("UsedSms")));
-                holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
-                holder.setId(String.valueOf(result.getInt("Id")));
-                holder.setRate("0");
-                Calendar cal = Calendar.getInstance();
-                holder.setRollDate(String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH)+1) +
-                        "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)));
-                holder.setTax("0");
+//                holder.setAccountStartDate(result.getString("StartDate"));
+                holder.setEndDate(result.getString("EndDate"));
+                holder.setUsedSms(result.getInt("UsedSms"));
+                holder.setTotalSms(result.getInt("TotalSms"));
+                holder.setServerAccountId(result.getInt("Id"));
+
+
                 edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
                 edit.putString(UserPrefrences.INSERT_BILL, "0");
                 edit.commit();
                 if (progressBar != null)
                     progressBar.dismiss();
                 Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
+                VGlobalSettings settinsHolder = new VGlobalSettings();
+                Calendar cal = Calendar.getInstance();
+                settinsHolder.setRollDate(String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) +
+                        "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)));
+                settinsHolder.setTax(0);
+                settinsHolder.setDefaultRate(0);
+                GlobalSettingsService.insertGlobalSettingsData(_dbhelper.getWritableDatabase(), settinsHolder);
                 startActivity(new Intent(FarmerSignup.this, MainActivity.class));
                 this.finish();
 

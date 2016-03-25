@@ -14,8 +14,8 @@
         android:theme="@style/AppTheme" >
         
         <provider
-            android:name="com.tyczj.extendedcalendarview.CalendarProvider"
-            android:authorities="com.tyczj.extendedcalendarview.calendarprovider" />
+            android:name="VCustomersCalendarProvider"
+            android:authorities="VCustomerscalendarprovider" />
     </application>
 
 </manifest>

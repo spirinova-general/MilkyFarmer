@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,19 +28,18 @@ import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.adapters.AreaCityAdapter;
-import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAreaMapper;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -65,7 +63,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private AutoCompleteTextView _cityAreaAutocomplete;
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
-    private String selectedAreaId = "";
+    private int selectedAreaId =0;
     private ArrayList<VAreaMapper> _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
@@ -158,7 +156,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 //                    else if (_address2.getText().toString().equals(""))
 //                        street_layout.setError("Enter street !");
 
-                    else if (selectedAreaId.equals(""))
+                    else if (selectedAreaId==0)
                         autocomplete_layout.setError("Select valid area");
                     else if (_mPhone.getText().toString().equals(""))
                         _phone_textinput_layout.setError("Enter mobile number!");
@@ -171,7 +169,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                             && !_lastName.getText().toString().equals("") &&
                             !_mBalance.getText().toString().equals("") &&
                             !_mAddress1.getText().toString().equals("")
-                            && !selectedAreaId.equals("")
+                            && selectedAreaId!=0
                             && !_mPhone.getText().toString().equals("") &&
                             !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
                     )) {
@@ -187,32 +185,28 @@ public class CustomerAddActivity extends AppCompatActivity {
                         }
 
 
-                        ExtcalVCustomersList holder = new ExtcalVCustomersList();
-                        ExtcalVCustomersList hol = new ExtcalVCustomersList();
-                        hol.setFirstName(_firstName.getText().toString());
-                        hol.setLastName(_lastName.getText().toString());
-                        hol.setAddress1(_mAddress1.getText().toString());
-                        hol.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
-                        hol.setAreaId(selectedAreaId);
-                        hol.setMobile(_mPhone.getText().toString());
-                        hol.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
-                        hol.setAccountId(Constants.ACCOUNT_ID);
-                        hol.setRate(String.valueOf(Constants.round(Double.parseDouble(_rate.getText().toString()), 1)));
-                        hol.setBalanceType("1");
-                        hol.setDateAdded(formattedDate);
-                        hol.setStart_date(pickedDate);
-                        hol.setEnd_date("2250" + "-" +
+                        VCustomers holder = new VCustomers();
+                        holder.setFirstName(_firstName.getText().toString());
+                        holder.setLastName(_lastName.getText().toString());
+                        holder.setAddress1(_mAddress1.getText().toString());
+                        holder.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
+                        holder.setAreaId(selectedAreaId);
+                        holder.setMobile(_mPhone.getText().toString());
+                        holder.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
+                        holder.setAccountId(Constants.ACCOUNT_ID);
+                        holder.setRate(String.valueOf(Constants.round(Double.parseDouble(_rate.getText().toString()), 1)));
+                        holder.setBalanceType("1");
+                        holder.setDateAdded(formattedDate);
+                        holder.setStart_date(pickedDate);
+                        holder.setEnd_date("2250" + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-                        hol.setCustomerId(String.valueOf(System.currentTimeMillis()));
-
-                        ExtcalDatabaseHelper db = new ExtcalDatabaseHelper(CustomerAddActivity.this);
-                        ExtcalCustomerSettingTableManagement.insertCustomersSetting(db.getWritableDatabase(), hol);
+                        holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
 
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
                         holder.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
-                        holder.setAddress1(_mAddress1.getText().toString());
+                        holder.setTotal(0.0);
 //                        holder.setAddress2(_address2.getText().toString());
 //                        holder.setCityId(selectedCityId);
                         autocomplete_layout.setError(null);
@@ -224,18 +218,16 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setBalanceType("1");
                         holder.setDateAdded(formattedDate);
                         holder.setStart_date(pickedDate);
-                        holder.setEnd_date(hol.getEnd_date());
-                        holder.setCustomerId(hol.getCustomerId());
-
+                        holder.setEnd_date(holder.getEnd_date());
+                        holder.setCustomerId(holder.getCustomerId());
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
-//                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
-
-                        holder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
+                        holder.setTax(GlobalSettingsService.getDefautTax(_dbHelper.getReadableDatabase()));
                         holder.setAdjustment("");
                         holder.setPaymentMade("0");
                         holder.setIsCleared("1");
                         holder.setDateModified(holder.getStart_date());
-                        holder.setRollDate(Account.getRollDate(_dbHelper.getReadableDatabase()));
+                        holder.setRollDate(GlobalSettingsService.getRollDate(_dbHelper.getReadableDatabase()));
                         Calendar cal = Calendar.getInstance();
                         if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
                             holder.setOutstanding("0");
@@ -395,7 +387,7 @@ public class CustomerAddActivity extends AppCompatActivity {
         /*Set defaul rate
         * */
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-            _rate.setText(Account.getDefaultRate(_dbHelper.getReadableDatabase()));
+            _rate.setText(GlobalSettingsService.getDefaultRate(_dbHelper.getReadableDatabase()));
 
         _phone_textinput_layout = (TextInputLayout) findViewById(R.id.phone_textinput_layout);
         rate_layout = (TextInputLayout) findViewById(R.id.rate_layout);
@@ -450,7 +442,7 @@ public class CustomerAddActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
-                    selectedAreaId = "";
+                    selectedAreaId = 0;
 //                    selectedCityId = "";
 
                 }
@@ -483,9 +475,9 @@ public class CustomerAddActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+    }
+
 
     }
 
 
-
-}

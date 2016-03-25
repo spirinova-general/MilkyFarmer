@@ -6,36 +6,37 @@ import java.math.BigDecimal;
  * Created by Neha on 11/30/2015.
  */
 public class VBill {
-    private String id;
-    private String accountId;
-    private String customerId;
+    //    private String id;
+//    private String accountId;
+    private int customerId;
     private String startDate;
     private String endDate;
-    private String quantity;
-    private String balance;
-    private String adjustment;
-    private String tax;
-    private String rate;
-    private String isCleared;
-    private String paymentMode;
+    private double quantity;
+    private double balance;
+    private double adjustment;
+    private double tax;
+    //    private String rate;
+    private int isCleared;
+    private double paymentMade;
     private String dateAdded;
     private String dateModified;
-    private double totalPrice;
-    private String isOutstanding;
-    private String firstname;
-    private String lastName;
-    private String message;
-    private String billMade;
-    private String balanceType;
+    private double totalAmount;
+    private int isOutstanding;
+    //    private String firstname;
+//    private String lastName;
+//    private String message;
+//    private String billMade;
+    private int balanceType;
     private String rollDate;
-    private String deletedOn;
+    //    private String deletedOn;
+    private int dirty;
 
-    public String getDeletedOn() {
-        return deletedOn;
+    public int getDirty() {
+        return dirty;
     }
 
-    public void setDeletedOn(String deletedOn) {
-        this.deletedOn = deletedOn;
+    public void setDirty(int dirty) {
+        this.dirty = dirty;
     }
 
     public String getRollDate() {
@@ -46,95 +47,39 @@ public class VBill {
         this.rollDate = rollDate;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getBillMade() {
-        return billMade;
-    }
-
-    public void setBillMade(String billMade) {
-        this.billMade = billMade;
-    }
-
-    public String getBalanceType() {
+    public int getBalanceType() {
         return balanceType;
     }
 
-    public void setBalanceType(String balanceType) {
+    public void setBalanceType(int balanceType) {
         this.balanceType = balanceType;
     }
 
-    public String getIsOutstanding() {
+    public int getIsOutstanding() {
         return isOutstanding;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public double getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public String isOutstanding() {
+    public int isOutstanding() {
         return isOutstanding;
     }
 
-    public void setIsOutstanding(String isOutstanding) {
+    public void setIsOutstanding(int isOutstanding) {
         this.isOutstanding = isOutstanding;
     }
 
-    public String getRate() {
-        return rate;
-    }
-
-    public void setRate(String rate) {
-        this.rate = rate;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getCustomerId() {
+    public int getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(String customerId) {
+    public void setCustomerId(int customerId) {
         this.customerId = customerId;
     }
 
@@ -154,52 +99,52 @@ public class VBill {
         this.endDate = endDate;
     }
 
-    public String getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 
-    public String getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(String balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
-    public String getAdjustment() {
+    public double getAdjustment() {
         return adjustment;
     }
 
-    public void setAdjustment(String adjustment) {
+    public void setAdjustment(double adjustment) {
         this.adjustment = adjustment;
     }
 
-    public String getTax() {
+    public double getTax() {
         return tax;
     }
 
-    public void setTax(String tax) {
+    public void setTax(double tax) {
         this.tax = tax;
     }
 
-    public String getIsCleared() {
+    public int getIsCleared() {
         return isCleared;
     }
 
-    public void setIsCleared(String isCleared) {
+    public void setIsCleared(int isCleared) {
         this.isCleared = isCleared;
     }
 
-    public String getPaymentMode() {
-        return paymentMode;
+    public double getPaymentMade() {
+        return paymentMade;
     }
 
-    public void setPaymentMode(String paymentMode) {
-        this.paymentMode = paymentMode;
+    public void setPaymentMade(double paymentMade) {
+        this.paymentMade = paymentMade;
     }
 
     public String getDateAdded() {

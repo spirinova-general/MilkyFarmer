@@ -14,29 +14,27 @@ import java.util.ArrayList;
 public class AreaCityTableManagement {
     public static long insertAreaDetail(SQLiteDatabase db, VAreaMapper holder) {
         ContentValues values = new ContentValues();
-//        values.put(TableColumns.ACCOUNT_ID, holder.getAccountId());
+//        values.put(TableColumns.SERVER_ACCOUNT_ID, holder.getAccountId());
 //        values.put(TableColumns.AREA_NAME, holder.getArea());
 //        values.put(TableColumns.AREA_ID, holder.getAreaId());
 //        values.put(TableColumns.CITY_ID, holder.getCityId());
-//        values.put(TableColumns.SYNC_STATUS,"0");
+        values.put(TableColumns.DIRTY,"1");
         values.put(TableColumns.AREA_NAME, holder.getArea());
         values.put(TableColumns.CITY_NAME, holder.getCity());
         values.put(TableColumns.LOCALITY, holder.getLocality());
 //        values.put(TableColumns.CITY_ID, holder.getCityId());
-        values.put(TableColumns.SYNC_STATUS, "0");
         return db.insert(TableNames.TABLE_AREA, null, values);
     }
 
     public static void insertCityDetail(SQLiteDatabase db, VAreaMapper holder) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.ACCOUNT_ID, holder.getAccountId());
 //        values.put(TableColumns.CITY_ID, holder.getCityId());
         values.put(TableColumns.CITY_NAME, holder.getCity());
         db.insert(TableNames.TABLE_CITY, null, values);
     }
 
     public static ArrayList<VAreaMapper> getCityById(SQLiteDatabase db, final String accountId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ACCOUNT_ID + " ='" + accountId + "'";
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.SERVER_ACCOUNT_ID + " ='" + accountId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         ArrayList<VAreaMapper> areaList = new ArrayList<>();
         if (cursor.moveToFirst()) {
@@ -72,7 +70,7 @@ public class AreaCityTableManagement {
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.LOCALITY)) != null)
                     holder.setLocality(cursor.getString(cursor.getColumnIndex(TableColumns.LOCALITY)));
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ID)) != null)
-                    holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.ID)));
+                    holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
 
             }
             while (cursor.moveToNext());
@@ -179,7 +177,7 @@ public class AreaCityTableManagement {
             do {
 
                 VAreaMapper holder = new VAreaMapper();
-                holder.setAreaId(cursor.getString(cursor.getColumnIndex(TableColumns.ID)));
+                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
 
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.LOCALITY)).equals("")) {
                     address = cursor.getString(cursor.getColumnIndex(TableColumns.AREA_NAME)) + ", "
@@ -258,7 +256,7 @@ public class AreaCityTableManagement {
 
     }
 
-    public static boolean deleteArea(SQLiteDatabase db, String areaId) {
+    public static boolean deleteArea(SQLiteDatabase db, int areaId) {
         Boolean result = db.delete(TableNames.TABLE_AREA, TableColumns.ID + " ='" + areaId + "'", null) > 0;
         return result;
     }

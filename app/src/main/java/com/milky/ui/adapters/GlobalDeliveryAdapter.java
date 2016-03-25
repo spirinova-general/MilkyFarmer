@@ -16,14 +16,10 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.TableNames;
 import com.milky.ui.customers.CustomersList;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +27,16 @@ import java.util.List;
 /**
  * Created by Neha on 11/17/2015.
  */
-public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
+public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
     private Context mContext;
     private String date;
-    private List<ExtcalVCustomersList> filteredList, tempItems, suggestions;
-    private ExtcalVCustomersList filetrHolder;
+    private List<VCustomers> filteredList, tempItems, suggestions;
+    private VCustomers filetrHolder;
     private DatabaseHelper _dbHelper;
-    private ExtcalDatabaseHelper exDb;
 
-    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate, final List<ExtcalVCustomersList> _mCustomersList) {
+    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate, final List<VCustomers> _mCustomersList) {
         super(con, resource, textViewResourceId, _mCustomersList);
         this.mContext = con;
-        exDb = new ExtcalDatabaseHelper(con);
         this.date = quantityEditDate;
         this.filteredList = _mCustomersList;
         tempItems = new ArrayList<>(filteredList); // this makes the difference.
@@ -80,17 +74,17 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
             holder = (ViewHolder) convertView.getTag();
         }
 //        DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
-        if (exDb.isTableNotEmpty("delivery")) {
-            if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(), filteredList
-                    .get(position).getCustomerId(), Constants.DELIVERY_DATE)) {
-                holder._quantity.setText(DeliveryTableManagement.getQuantityBySelectedDay(exDb.getReadableDatabase(), filteredList
-                        .get(position).getCustomerId(), Constants.DELIVERY_DATE));
-            } else {
-                holder._quantity.setText(filteredList.get(position).getQuantity());
-            }
-        } else {
-            holder._quantity.setText(filteredList.get(position).getQuantity());
-        }
+//        if (exDb.isTableNotEmpty("delivery")) {
+//            if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(), filteredList
+//                    .get(position).getCustomerId(), Constants.DELIVERY_DATE)) {
+//                holder._quantity.setText(DeliveryTableManagement.getQuantityBySelectedDay(exDb.getReadableDatabase(), filteredList
+//                        .get(position).getCustomerId(), Constants.DELIVERY_DATE));
+//            } else {
+//                holder._quantity.setText(filteredList.get(position).getQuantity());
+//            }
+//        } else {
+//            holder._quantity.setText(filteredList.get(position).getQuantity());
+//        }
         holder._quantity.setTag(position);
         holder._quantity.setId(position);
         String a = Character.toString(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
@@ -117,12 +111,12 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 final int position2 = finalHolder._quantity.getId();
                 if (s.toString().length() > 0) {
-                    ExtcalVCustomersList holder = new ExtcalVCustomersList();
+                    VCustomers holder = new VCustomers();
                     holder.setQuantity(s.toString());
-                    holder.setCustomerId(CustomersList._mCustomersList.get(position2).getCustomerId());
-                    holder.setStart_date(Constants.DELIVERY_DATE);
-                    holder.setAreaId(CustomersList._mCustomersList.get(position2).getAreaId());
-                    CustomersList._mDeliveryList.add(holder);
+//                    holder.setCustomerId(CustomersList._mCustomersList.get(position2).getCustomerId());
+//                    holder.setStart_date(Constants.DELIVERY_DATE);
+//                    holder.setAreaId(CustomersList._mCustomersList.get(position2).getAreaId());
+//                    CustomersList._mDeliveryList.add(holder);
                     finalHolder._quantity_input_layout.setError(null);
                 } else {
                     finalHolder._quantity_input_layout.setError(mContext.getString(R.string.field_cant_empty));
@@ -217,7 +211,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
         nameFilter = new Filter() {
             @Override
             public CharSequence convertResultToString(Object resultValue) {
-                String str = ((ExtcalVCustomersList) resultValue).getFirstName();
+                String str = ((VCustomers) resultValue).getFirstName();
                 notifyDataSetChanged();
                 return str;
             }
@@ -226,7 +220,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
             protected FilterResults performFiltering(CharSequence constraint) {
                 if (constraint != null) {
                     suggestions.clear();
-                    for (ExtcalVCustomersList Area : tempItems) {
+                    for (VCustomers Area : tempItems) {
                         if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase().trim()) ||
                                 Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase().trim()))) {
                             suggestions.add(Area);
@@ -245,11 +239,11 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                List<ExtcalVCustomersList> filterList;
-                filterList = (ArrayList<ExtcalVCustomersList>) results.values;
+                List<VCustomers> filterList;
+                filterList = (ArrayList<VCustomers>) results.values;
                 if (results != null && results.count > 0) {
                     clear();
-                    for (ExtcalVCustomersList Area : filterList) {
+                    for (VCustomers Area : filterList) {
                         add(Area);
                         notifyDataSetChanged();
                     }
@@ -260,12 +254,12 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<ExtcalVCustomersList> {
                 if (!Constants.selectedAreaId.equals("")) {
                     clear();
 
-                    filterList = ExtcalCustomerSettingTableManagement.getAllCustomersBySelectedDate(exDb.getReadableDatabase(), Constants.selectedAreaId,Constants.DELIVERY_DATE);
+//                    filterList = ExtcalCustomerSettingTableManagement.getAllCustomersBySelectedDate(exDb.getReadableDatabase(), Constants.selectedAreaId,Constants.DELIVERY_DATE);
                     CustomersList.selectedCustomersId = new ArrayList<>();
-                    for (ExtcalVCustomersList Area : filterList) {
+                    for (VCustomers Area : filterList) {
                         add(Area);
                         notifyDataSetChanged();
-                        CustomersList.selectedCustomersId.add(Area);
+//                        CustomersList.selectedCustomersId.add(Area);
                     }
                 }
                 CustomersList._mAdaapter.notifyDataSetChanged();

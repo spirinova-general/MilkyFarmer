@@ -5,9 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.tyczj.extendedcalendarview.Day;
-import com.tyczj.extendedcalendarview.DeliveryTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
 
 import org.json.JSONObject;
 
@@ -33,7 +30,7 @@ public class Constants {
     public static SimpleDateFormat api_format_other = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     public static boolean validArea = false;
     public static String OTP = "";
-    public static String selectedAreaId = "";
+    public static int selectedAreaId = 0;
     public static String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     public static boolean REFRESH_CALANDER = false,REFRESH_CUSTOMERS=false,REFRESH_BILL=false,REFRESH=false;
     public static boolean REFRESH_DELIVRY_CALANDER = false;
@@ -54,9 +51,7 @@ public class Constants {
         for (int i = 0; i < 10; i++) {
             numbers.add(i);
         }
-
         Collections.shuffle(numbers);
-
         String result = "";
         for (int i = 0; i < 4; i++) {
             result += numbers.get(i).toString();
@@ -65,23 +60,24 @@ public class Constants {
         return result;
     }
 
-    public static double getQtyOfCustomer(String day, String custId) {
-        double qty = 0;
-        ExtcalDatabaseHelper _exDb = new ExtcalDatabaseHelper(AppUtil.getInstance());
-        if (_exDb.isTableNotEmpty("delivery")) {
-                   qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
-            if(!DeliveryTableManagement.isFromDelivery && _exDb.isTableNotEmpty("customers")) {
-                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
-                            , custId);
-                }
-        } else if (_exDb.isTableNotEmpty("customers")) {
-            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
-                    , custId);
-        }
-        DeliveryTableManagement.isFromDelivery=false;
+//    public static double getQtyOfCustomer(String day, String custId) {
+//        double qty = 0;
+//        ExtcalDatabaseHelper _exDb = new ExtcalDatabaseHelper(AppUtil.getInstance());
+//        if (_exDb.isTableNotEmpty("delivery")) {
+//                   qty = DeliveryTableManagement.getQuantityOfDayByDateForCustomer(_exDb.getReadableDatabase(), day, custId);
+//            if(!DeliveryTableManagement.isFromDelivery && _exDb.isTableNotEmpty("customers")) {
+//                    qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
+//                            , custId);
+//                }
+//        } else if (_exDb.isTableNotEmpty("customers")) {
+//            qty = ExtcalCustomerSettingTableManagement.getAllCustomersByCustId(_exDb.getReadableDatabase(), day
+//                    , custId);
+//        }
+//        DeliveryTableManagement.isFromDelivery=false;
+//
+//        return qty;
+//    }
 
-        return qty;
-    }
     public static boolean isConnectingToInternet(Context _context) {
         ConnectivityManager connectivity = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {

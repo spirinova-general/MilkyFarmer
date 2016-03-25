@@ -18,8 +18,7 @@ import com.milky.ui.adapters.CustomersListAdapter;
 import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
 import com.milky.viewmodel.VBill;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
+import com.milky.viewmodel.VCustomers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.List;
  */
 public class CustomersBillingFragment extends Fragment {
     private CustomersListAdapter _mAdapter;
-    private List<ExtcalVCustomersList> _mCustomersList;
+    private List<VCustomers> _mCustomersList;
     public static ListView _mListView;
     private FloatingActionButton _mAddBillFab;
     private DatabaseHelper _dbHelper;
@@ -38,20 +37,19 @@ public class CustomersBillingFragment extends Fragment {
     private TextView preivousBills;
     private boolean _hasFutureBill = false;
 
-    private ExtcalDatabaseHelper db;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(view == null)
-        view = inflater.inflate(R.layout.customer_billing_list, container, false);
+        if (view == null)
+            view = inflater.inflate(R.layout.customer_billing_list, container, false);
         initResources(view);
-        db = new ExtcalDatabaseHelper(getActivity());
 
-        if (payment.size()>0)
+        if (payment.size() > 0)
             ((TextView) view.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         return view;
     }
-private View view=null;
+
+    private View view = null;
+
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersListView);
         _mAddBillFab = (FloatingActionButton) v.findViewById(R.id.addBillFab);
@@ -85,8 +83,8 @@ private View view=null;
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
-            if(view == null)
-                view = inflater.inflate(R.layout.customer_billing_list,null , false);
+            if (view == null)
+                view = inflater.inflate(R.layout.customer_billing_list, null, false);
             _mListView = (ListView) view.findViewById(R.id.customersListView);
             payment.clear();
             generateBill();

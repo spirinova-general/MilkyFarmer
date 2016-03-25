@@ -4,13 +4,20 @@ package com.milky.viewmodel;
  * Created by Neha on 12/2/2015.
  */
 public class VAreaMapper {
-    private String id;
     private String area;
-    private String areaId;
+    private int areaId;
     private String city;
-    private String accountId;
     private String cityArea;
     private String locality;
+    private int dirty;
+
+    public int getDirty() {
+        return dirty;
+    }
+
+    public void setDirty(int dirty) {
+        this.dirty = dirty;
+    }
 
     public String getLocality() {
         return locality;
@@ -28,14 +35,6 @@ public class VAreaMapper {
         this.cityArea = cityArea;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getArea() {
         return area;
     }
@@ -44,11 +43,11 @@ public class VAreaMapper {
         this.area = area;
     }
 
-    public String getAreaId() {
+    public int getAreaId() {
         return areaId;
     }
 
-    public void setAreaId(String areaId) {
+    public void setAreaId(int areaId) {
         this.areaId = areaId;
     }
 
@@ -58,15 +57,5 @@ public class VAreaMapper {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
     }
 }

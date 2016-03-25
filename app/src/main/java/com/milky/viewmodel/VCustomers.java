@@ -1,9 +1,9 @@
-package com.tyczj.extendedcalendarview;
+package com.milky.viewmodel;
 
 /**
  * Created by Neha on 11/17/2015.
  */
-public class ExtcalVCustomersList {
+public class VCustomers {
     private String firstName;
     private String lastName;
     private String rollDate;
@@ -18,7 +18,7 @@ public class ExtcalVCustomersList {
     private String address1;
     private String address2;
     private String customerId;
-    private String areaId;
+    private int areaId;
     private String accountId;
     private String rate;
     private String tax;
@@ -29,7 +29,7 @@ public class ExtcalVCustomersList {
     private String paymentMade;
     private String dirty;
     private String outstanding;
-    private String billMade;
+    private Double total;
     private String balanceType;
     private String locality;
 
@@ -49,12 +49,12 @@ public class ExtcalVCustomersList {
         this.locality = locality;
     }
 
-    public String getBillMade() {
-        return billMade;
+    public Double getTotal() {
+        return total;
     }
 
-    public void setBillMade(String billMade) {
-        this.billMade = billMade;
+    public void setTotal(Double total) {
+        this.total = total;
     }
 
     public String getBalanceType() {
@@ -148,7 +148,6 @@ public class ExtcalVCustomersList {
     public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
-
 
 
     public String getMobile() {
@@ -279,11 +278,11 @@ public class ExtcalVCustomersList {
         this.dateModified = dateModified;
     }
 
-    public String getAreaId() {
+    public int getAreaId() {
         return areaId;
     }
 
-    public void setAreaId(String areaId) {
+    public void setAreaId(int areaId) {
         this.areaId = areaId;
     }
 

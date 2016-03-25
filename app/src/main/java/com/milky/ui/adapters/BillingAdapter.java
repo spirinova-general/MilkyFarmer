@@ -10,21 +10,15 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.viewmodel.VBill;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,7 +26,7 @@ import java.util.List;
  */
 public class BillingAdapter extends BaseAdapter {
 
-    private List<ExtcalVCustomersList> mCustomersData;
+//    private List<VCustomers> mCustomersData;
     private List<VBill> totalBill;
     private Context mContext;
     private boolean _mIsCustomer = false;
@@ -45,9 +39,10 @@ public class BillingAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (mCustomersData == null)
-            return totalBill.size();
-        return mCustomersData.size();
+//        if (mCustomersData == null)
+//            return totalBill.size();
+//        return mCustomersData.size();
+        return 0;
     }
 
     @Override
@@ -108,7 +103,7 @@ public class BillingAdapter extends BaseAdapter {
                 Constants.MONTHS[showDatePattern.get(Calendar.MONTH)] + "-" + showDatePattern.get(Calendar.YEAR));
         holder.endDate.setText(shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +
                 Constants.MONTHS[shownEndDate.get(Calendar.MONTH)] + "-" + shownEndDate.get(Calendar.YEAR));
-        holder.amount.setText(data.getBillMade());
+        holder.amount.setText(String.valueOf(data.getTotalAmount()));
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,12 +116,13 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("amount", "0")
                         .putExtra("balance", data.getBalance())
                         .putExtra("titleString", holder.custName.getText())
-                        .putExtra("totalPrice", data.getRate())
+//                        TODO COMMENTED
+//                        .putExtra("totalPrice", data.getRate())
                         .putExtra("custId", data.getCustomerId())
                         .putExtra("clear", data.getIsCleared())
-                        .putExtra("total", data.getBillMade())
+                        .putExtra("total", data.getTotalAmount())
                         .putExtra("balance_type", data.getBalanceType())
-                        .putExtra("payment_made", data.getPaymentMode())
+                        .putExtra("payment_made", data.getPaymentMade())
                         .putExtra("start_date_work_format", data.getStartDate())
                         .putExtra("end_date_work_format", data.getEndDate())
                         .putExtra("roll_date", data.getRollDate())

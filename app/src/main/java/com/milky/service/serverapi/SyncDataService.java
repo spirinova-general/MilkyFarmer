@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
@@ -20,9 +19,6 @@ import com.milky.utils.Constants;
 import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAccount;
 import com.milky.viewmodel.VBill;
-import com.tyczj.extendedcalendarview.ExtcalCustomerSettingTableManagement;
-import com.tyczj.extendedcalendarview.ExtcalDatabaseHelper;
-import com.tyczj.extendedcalendarview.ExtcalVCustomersList;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -43,7 +39,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     public Context context = this;
     public Handler handler = null;
     public static Runnable runnable = null;
-    public ExtcalDatabaseHelper _exDb;
+//    public ExtcalDatabaseHelper _exDb;
 
     @Nullable
     @Override
@@ -55,92 +51,87 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     public void onCreate() {
         _dbHelper = new DatabaseHelper(this);
         handler = new Handler();
-        _exDb = new ExtcalDatabaseHelper(this);
+//        _exDb = new ExtcalDatabaseHelper(this);
         runnable = new Runnable() {
             SharedPreferences preferences = getApplicationContext().getSharedPreferences("com.milky_prefrences", MODE_PRIVATE);
             SharedPreferences.Editor edit = preferences.edit();
              public void run() {
                 //TODo changed roll date
                 // Get roll date from db.
-//                Toast.makeText(SyncDataService.this, "service running", Toast.LENGTH_SHORT).show();
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat work_format = new SimpleDateFormat("yyyy-MM-dd");
                 work_format.format(calendar.getTime());
                 String currentDate = calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" +
                         String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
-                try {
-                    if (_dbHelper.isTableNotEmpty("account")) {
-                        Date date = work_format.parse(Account.getRollDate(_dbHelper.getReadableDatabase()));
-                        calendar.setTime(date);
-//                        Toast.makeText(SyncDataService.this, "clendar..", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    if (_dbHelper.isTableNotEmpty("account")) {
+//                        Date date = work_format.parse(Account.getRollDate(_dbHelper.getReadableDatabase()));
+//                        calendar.setTime(date);
+//                    }
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
                 Calendar c = Calendar.getInstance();
-                if (c.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && c.get(Calendar.MONTH) == calendar.get(Calendar.MONTH))
-////                 if ((c.get(Calendar.DAY_OF_MONTH)) == 5)
-                {
-//                    Toast.makeText(SyncDataService.this, "Roll date", Toast.LENGTH_SHORT).show();
-                    /*Bill is to be outstanding*/
-                    // update outstanding bills
-                    if (_dbHelper.isTableNotEmpty("customer")) {
-                        BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), currentDate);
-//                        Toast.makeText(SyncDataService.this, "Update outstanding bills", Toast.LENGTH_SHORT).show();
-
-                        if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
-                            ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
-                            for (int i = 0; i < list.size(); ++i) {
-                                ExtcalVCustomersList custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
-                                Calendar nextMonth = Calendar.getInstance();
-                                nextMonth.add(Calendar.MONTH, 1);
-                                Calendar cal = Calendar.getInstance();
-//                                Update end date ..
-                                ExtcalCustomerSettingTableManagement.updateEndDate(_exDb.getWritableDatabase(), currentDate, custHolder.getCustomerId());
-//                                custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
-//                                        "01");
-                                if (cal.getActualMaximum(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH))
-                                    custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
-                                            "01");
-                                else
-                                    custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH)) + "-" +
-                                            String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
-                                custHolder.setEnd_date("2250" + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 13) + "-" +
-                                        String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-
-                                Account.updateRollDate(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
-                                        String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH)));
-//                                Toast.makeText(SyncDataService.this, "update Roll date", Toast.LENGTH_SHORT).show();
-
-                                if (!ExtcalCustomerSettingTableManagement.isHasDataForDayById(_exDb.getReadableDatabase(), custHolder.getCustomerId(), custHolder.getStart_date())) {
-                                    ExtcalCustomerSettingTableManagement.insertCustomersSetting(_exDb.getWritableDatabase(), custHolder);
-                                    custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
-                                    custHolder.setAdjustment("");
-                                    custHolder.setPaymentMade("0");
-                                    custHolder.setIsCleared("1");
-                                    custHolder.setBalanceType("1");
-                                    custHolder.setOutstanding("1");
-                                    custHolder.setDateModified(custHolder.getStart_date());
-                                    custHolder.setRollDate(Account.getRollDate(_dbHelper.getReadableDatabase()));
-                                    BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
-//                                    Toast.makeText(SyncDataService.this, "inserted bill new", Toast.LENGTH_SHORT).show();
-
-                                }
-                            }
-                            edit.putString(UserPrefrences.INSERT_BILL, "1");
-                            edit.apply();
-                        }
-                    } else {
-                        edit.putString(UserPrefrences.INSERT_BILL, "0");
-                        edit.apply();
-                    }
-                } else {
-                    edit.putString(UserPrefrences.INSERT_BILL, "0");
-                    edit.apply();
-                }
+//                if (c.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && c.get(Calendar.MONTH) == calendar.get(Calendar.MONTH))
+//                {
+//                    /*Bill is to be outstanding*/
+//                    // update outstanding bills
+//                    if (_dbHelper.isTableNotEmpty("customer")) {
+//                        BillTableManagement.getAndUpdateTotalBill(_dbHelper.getReadableDatabase());
+//                        BillTableManagement.updateOutstandingBills(_dbHelper.getWritableDatabase(), currentDate);
+//
+//                        if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
+//                            ArrayList<String> list = CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase());
+//                            for (int i = 0; i < list.size(); ++i) {
+//                                VCustomers custHolder = CustomersTableMagagement.getAllCustomersByCustId(_dbHelper.getReadableDatabase(), list.get(i));
+//                                Calendar nextMonth = Calendar.getInstance();
+//                                nextMonth.add(Calendar.MONTH, 1);
+//                                Calendar cal = Calendar.getInstance();
+////                                Update end date ..
+//                                ExtcalCustomerSettingTableManagement.updateEndDate(_exDb.getWritableDatabase(), currentDate, custHolder.getCustomerId());
+////                                custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+////                                        "01");
+//                                if (cal.getActualMaximum(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH))
+//                                    custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+//                                            "01");
+//                                else
+//                                    custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH)) + "-" +
+//                                            String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
+//                                custHolder.setEnd_date("2250" + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 13) + "-" +
+//                                        String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+//
+//                                Account.updateRollDate(_dbHelper.getWritableDatabase(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+//                                        String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH)));
+//
+//                                 if(!ExtcalCustomerSettingTableManagement.isHasDataForDayById(_exDb.getReadableDatabase(), custHolder.getCustomerId(), custHolder.getStart_date())) {
+//                                    ExtcalCustomerSettingTableManagement.insertCustomersSetting(_exDb.getWritableDatabase(), custHolder);
+//                                    custHolder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+//                                    custHolder.setAdjustment("");
+//                                    custHolder.setPaymentMade("0");
+//                                    custHolder.setIsCleared("1");
+//                                    custHolder.setBalanceType("1");
+//                                    custHolder.setOutstanding("1");
+//                                    custHolder.setDateModified(custHolder.getStart_date());
+//                                    custHolder.setRollDate(Account.getRollDate(_dbHelper.getReadableDatabase()));
+//                                    BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), custHolder);
+////                                    Toast.makeText(SyncDataService.this, "inserted bill new", Toast.LENGTH_SHORT).show();
+//
+//                                }
+//                            }
+//                            edit.putString(UserPrefrences.INSERT_BILL, "1");
+//                            edit.apply();
+//                        }
+//                    } else {
+//                        edit.putString(UserPrefrences.INSERT_BILL, "0");
+//                        edit.apply();
+//                    }
+//                } else {
+//                    edit.putString(UserPrefrences.INSERT_BILL, "0");
+//                    edit.apply();
+//                }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-                    SyncNow();
+//                if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
+//                    SyncNow();
                 handler.postDelayed(runnable, 50000);
             }
         };
@@ -161,7 +152,6 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
     public void SyncNow() {
         HttpAsycTask dataTask = new HttpAsycTask();
-//        dataTask.runRequest( ServerApis.API_ROOT+ServerApis.SYNC, getAllDataToSync(), this, true, requestedList);
         dataTask.runRequest(ServerApis.ACCOUNT_API, Account.getDetails(_dbHelper.getReadableDatabase()), this, true, null);
     }
 
@@ -207,107 +197,27 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
         }
 
 
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            ArrayList<ExtcalVCustomersList> custList = CustomersTableMagagement.getAllCustomersToSync(_dbHelper.getReadableDatabase());
-            if (custList.size() == 0) {
-
-                requestedList.put("Customer_List", "1");
-
-            } else {
-                jsonArray = new JSONArray();
-                for (int i = 0; i < custList.size(); ++i) {
-                    JSONObject obj = new JSONObject();
-                    try {
-                        obj.put("FirstName", custList.get(i).getFirstName());
-                        obj.put("LastName", custList.get(i).getLastName());
-                        obj.put("Mobile", custList.get(i).getMobile());
-                        obj.put("Address1", custList.get(i).getAddress1());
-                        obj.put("Address2", custList.get(i).getAddress2());
-                        obj.put("Balance", custList.get(i).getBalance_amount());
-                        obj.put("DateAdded", custList.get(i).getDateAdded());
-                        obj.put("DateModified", custList.get(i).getDateModified());
-                        obj.put("AccountId", "5");
-                        obj.put("AreaId", "1");
-                        obj.put("Dirty", "0");
-
-                        jsonArray.put(obj);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                try {
-                    jsonObject.put("Customer_List", jsonArray);
-                    requestedList.put("Customer_List", "0");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-        }
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
-            ArrayList<ExtcalVCustomersList> billList = BillTableManagement.getCustomersBillToSync(_dbHelper.getReadableDatabase());
-            if (billList.size() == 0) {
-
-                requestedList.put("Customer_List", "1");
-
-            } else {
-                jsonArray = new JSONArray();
-                for (int i = 0; i < billList.size(); ++i) {
-                    JSONObject obj = new JSONObject();
-                    try {
-                        obj.put("CustomerId", billList.get(i).getCustomerId());
-                        obj.put("StartDate", billList.get(i).getStart_date());
-                        obj.put("EndDate", billList.get(i).getEnd_date());
-                        obj.put("Quantity", billList.get(i).getQuantity());
-                        obj.put("Balance", "0");
-                        obj.put("DateAdded", billList.get(i).getDateAdded());
-                        obj.put("DateModified", billList.get(i).getDateModified());
-                        obj.put("AccountId", "5");
-                        obj.put("AreaId", "1");
-                        obj.put("Dirty", "0");
-                        obj.put("Adjustment", billList.get(i).getAdjustment());
-                        obj.put("TOTAL_AMOUNT", billList.get(i).getBalance_amount());
-                        obj.put("TAX", billList.get(i).getTax());
-                        obj.put("IsCleared", billList.get(i).getIsCleared());
-                        obj.put("PaymentMade", billList.get(i).getPaymentMade());
-
-                        jsonArray.put(obj);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                try {
-                    jsonObject.put("Bill_List", jsonArray);
-                    requestedList.put("Bill_List", "0");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-        }
-
-//        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
-//            ArrayList<VCustomersList> custList = CustomerSettingTableManagement.getAllCustomersByCustomerIdToSync(_dbHelper.getReadableDatabase());
-//            if (custList == null) {
+//        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+//            ArrayList<VCustomers> custList = CustomersTableMagagement.getAllCustomersToSync(_dbHelper.getReadableDatabase());
+//            if (custList.size() == 0) {
 //
-//                requestedList.put("CustomerSetting_List", "1");
+//                requestedList.put("Customer_List", "1");
 //
 //            } else {
 //                jsonArray = new JSONArray();
 //                for (int i = 0; i < custList.size(); ++i) {
 //                    JSONObject obj = new JSONObject();
 //                    try {
-//                        obj.put("AccountId", custList.get(i).getAccountId());
-//                        obj.put("CustomerId", custList.get(i).getCustomerId());
-//                        obj.put("Rate", custList.get(i).getRate());
-//                        obj.put("DefaultQuantity", custList.get(i).getQuantity());
+//                        obj.put("FirstName", custList.get(i).getFirstName());
+//                        obj.put("LastName", custList.get(i).getLastName());
+//                        obj.put("Mobile", custList.get(i).getMobile());
+//                        obj.put("Address1", custList.get(i).getAddress1());
+//                        obj.put("Address2", custList.get(i).getAddress2());
+//                        obj.put("Balance", custList.get(i).getBalance_amount());
+//                        obj.put("DateAdded", custList.get(i).getDateAdded());
 //                        obj.put("DateModified", custList.get(i).getDateModified());
+//                        obj.put("AccountId", "5");
+//                        obj.put("AreaId", "1");
 //                        obj.put("Dirty", "0");
 //
 //                        jsonArray.put(obj);
@@ -315,11 +225,55 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 //                    } catch (JSONException e) {
 //                        e.printStackTrace();
 //                    }
-//                }
 //
+//                }
 //                try {
-//                    jsonObject.put("CustomerSetting_List", jsonArray);
-//                    requestedList.put("CustomerSetting_List", "0");
+//                    jsonObject.put("Customer_List", jsonArray);
+//                    requestedList.put("Customer_List", "0");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//
+//        }
+//        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
+//            ArrayList<VCustomers> billList = BillTableManagement.getCustomersBillToSync(_dbHelper.getReadableDatabase());
+//            if (billList.size() == 0) {
+//
+//                requestedList.put("Customer_List", "1");
+//
+//            } else {
+//                jsonArray = new JSONArray();
+//                for (int i = 0; i < billList.size(); ++i) {
+//                    JSONObject obj = new JSONObject();
+//                    try {
+//                        obj.put("CustomerId", billList.get(i).getCustomerId());
+//                        obj.put("StartDate", billList.get(i).getStart_date());
+//                        obj.put("EndDate", billList.get(i).getEnd_date());
+//                        obj.put("Quantity", billList.get(i).getQuantity());
+//                        obj.put("Balance", "0");
+//                        obj.put("DateAdded", billList.get(i).getDateAdded());
+//                        obj.put("DateModified", billList.get(i).getDateModified());
+//                        obj.put("AccountId", "5");
+//                        obj.put("AreaId", "1");
+//                        obj.put("Dirty", "0");
+//                        obj.put("Adjustment", billList.get(i).getAdjustment());
+//                        obj.put("TOTAL_AMOUNT", billList.get(i).getBalance_amount());
+//                        obj.put("TAX", billList.get(i).getTax());
+//                        obj.put("IsCleared", billList.get(i).getIsCleared());
+//                        obj.put("PaymentMade", billList.get(i).getPaymentMade());
+//
+//                        jsonArray.put(obj);
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//                try {
+//                    jsonObject.put("Bill_List", jsonArray);
+//                    requestedList.put("Bill_List", "0");
 //                } catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
@@ -342,34 +296,25 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
         if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
                 VAccount holder = new VAccount();
-                try {
-                    JSONObject result = Constants.API_RESPONCE;
-//                    holder.setFarmerCode(result.getString("FarmerCode"));
-//                    holder.setFirstName(result.getString("FirstName"));
-//                    holder.setLastName(result.getString("LastName"));
-//                    holder.setMobile(result.getString("Mobile"));
-//                    holder.setValidated(String.valueOf(result.getBoolean("Validated")));
-//                    holder.setDirty(String.valueOf(result.getInt("Dirty")));
-//                    holder.setDateAdded(result.getString("DateAdded"));
-//                    holder.setDateModified(result.getString("DateModified"));
-//                    holder.setAccountStartDate(result.getString("StartDate"));
-                    holder.setExpiryDate(result.getString("EndDate"));
-                    holder.setUsedSms(String.valueOf(result.getInt("UsedSms")));
-                    holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
-                    holder.setId(String.valueOf(result.getInt("Id")));
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
-                        holder.setRate(Account.getDefaultRate(_dbHelper.getReadableDatabase()));
-                        holder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
-                    } else {
-                        holder.setRate("0");
-                        holder.setTax("0");
-                    }
-                    Account.updateAllAccountDetails(_dbHelper.getWritableDatabase(), holder);
+//                try {
+//                    JSONObject result = Constants.API_RESPONCE;
+//                    holder.setExpiryDate(result.getString("EndDate"));
+//                    holder.setUsedSms(String.valueOf(result.getInt("UsedSms")));
+//                    holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
+//                    holder.setId(String.valueOf(result.getInt("Id")));
+//                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+//                        holder.setRate(Account.getDefaultRate(_dbHelper.getReadableDatabase()));
+//                        holder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
+//                    } else {
+//                        holder.setRate("0");
+//                        holder.setTax("0");
+//                    }
+//                    Account.updateAllAccountDetails(_dbHelper.getWritableDatabase(), holder);
 
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
             }
 
         } else if (type.equals(ServerApis.SYNC)) {
@@ -392,33 +337,32 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
         Calendar c = Calendar.getInstance();
         DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
         if (db.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            ArrayList<ExtcalVCustomersList> list = CustomersTableMagagement.getAllCustomers(db.getReadableDatabase());
-            for (int i = 0; i < list.size(); ++i) {
-                // update customers setting
-                VBill holder = new VBill();
-                holder.setEndDate(String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
-                        + String.format("%02d", 32) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
-                holder.setStartDate(String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
-                        + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
-                holder.setRate(list.get(i).getRate());
-                holder.setAccountId(list.get(i).getAccountId());
-                holder.setAdjustment("0");
-                holder.setBalance("0");
-                holder.setCustomerId(list.get(i).getCustomerId());
-                holder.setDateAdded(list.get(i).getDateAdded());
-                holder.setDateModified(list.get(i).getDateModified());
-                holder.setQuantity(list.get(i).getQuantity());
-                holder.setTax(list.get(i).getTax());
-                holder.setIsCleared("1");
+//            ArrayList<VCustomers> list = CustomersTableMagagement.getAllCustomers(db.getReadableDatabase());
+//            for (int i = 0; i < list.size(); ++i) {
+//                // update customers setting
+//                VBill holder = new VBill();
+//                holder.setEndDate(String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
+//                        + String.format("%02d", 32) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+//                holder.setStartDate(String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
+//                        + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR)));
+//                holder.setRate(list.get(i).getRate());
+//                holder.setAccountId(list.get(i).getAccountId());
+//                holder.setAdjustment("0");
+//                holder.setBalance("0");
+//                holder.setCustomerId(list.get(i).getCustomerId());
+//                holder.setDateAdded(list.get(i).getDateAdded());
+//                holder.setDateModified(list.get(i).getDateModified());
+//                holder.setQuantity(list.get(i).getQuantity());
+//                holder.setTax(list.get(i).getTax());
+//                holder.setIsCleared("1");
 //                if (!CustomerSettingTableManagement.isHasDataForDayById(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
 //                        + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR))))
 //                    CustomerSettingTableManagement.insertNewCustomersSetting(db.getWritableDatabase(), holder);
-                if (!BillTableManagement.isHasDataForDay(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
-                        + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR))))
-                    BillTableManagement.insertNewBills(db.getWritableDatabase(), holder);
-            }
+//                if (!BillTableManagement.isHasDataForDay(db.getReadableDatabase(), list.get(i).getCustomerId(), String.format("%02d", c.get(Calendar.MONTH) + 2) + "-"
+//                        + String.format("%02d", 1) + "-" + String.format("%02d", c.get(Calendar.YEAR))))
+//                    BillTableManagement.insertNewBills(db.getWritableDatabase(), holder);
+//            }
         }
     }
-
 
 }

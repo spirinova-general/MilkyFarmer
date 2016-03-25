@@ -8,7 +8,7 @@ public class TableColumns {
     public static final String FARMER_CODE = "farmer_code";
     public static final String DATE_MODIFIED = "date_modified";
     public static final String DATE_ADDED = "date_added";
-    public static final String ACCOUNT_ID = "account_id";
+    public static final String SERVER_ACCOUNT_ID = "account_id";
     public static final String AREA_ID = "area_id";
     public static final String NAME = "name";
     public static final String CITY_ID = "city_id";
@@ -17,7 +17,7 @@ public class TableColumns {
     public static final String AREA_NAME = "area_name";
     public static final String ROLL_DATE = "roll_date";
     public static final String END_DATE = "end_date";
-
+    public static final String ISDELETED ="id_deleted";
     public static final String QUANTITY = "quantity";
     public static final String ADJUSTMENTS = "adjustments";
 
@@ -49,15 +49,17 @@ public class TableColumns {
 
 
     public static final String SYNC_STATUS = "sync_status";
-    public static final String BILL_MADE = "bill_made";
     public static final String BALANCE_TYPE = "balance_type";
     //New coloums
 
-    public static final String EXPIRY_DATE ="expir_date";
     public static final String TOTAL_SMS="total_sms";
     public static final String USED_SMS="used_sms";
     public static final String VALIDATED="validated";
     public static final String AREA_INDEX="index_area";
     public static final String CUSTID_INDEX="index_id";
+    public static final String DELEVERY_DATE = "delivery_date";
+    public static final String CUSTOMER_SETTING_INDEX="index_customer_setting";
+    public static final String DELIVERY_INDEX="index_delivery_customer";
+    public static final String BILL_INDEX="index_bill_customer";
 }
 
