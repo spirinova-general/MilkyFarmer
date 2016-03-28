@@ -32,7 +32,7 @@ public class CustomersBillingFragment extends Fragment {
     public static ListView _mListView;
     private FloatingActionButton _mAddBillFab;
     private DatabaseHelper _dbHelper;
-    private String custId = "";
+    private int custId = 0;
     private boolean hasPreviousBills = false;
     private TextView preivousBills;
     private boolean _hasFutureBill = false;
@@ -72,7 +72,7 @@ public class CustomersBillingFragment extends Fragment {
     //Calculating total qty
 
     private void generateBill() {
-        custId = getActivity().getIntent().getStringExtra("cust_id");
+        custId = getActivity().getIntent().getIntExtra("cust_id",0);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         BillTableManagement.getHistoryBills(_dbHelper.getReadableDatabase(), custId);
         BillTableManagement.getTotalBillById(_dbHelper.getReadableDatabase(), custId);

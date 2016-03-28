@@ -15,7 +15,7 @@ public class VBill {
     private double balance;
     private double adjustment;
     private double tax;
-    //    private String rate;
+    private double rate;
     private int isCleared;
     private double paymentMade;
     private String dateAdded;
@@ -30,6 +30,14 @@ public class VBill {
     private String rollDate;
     //    private String deletedOn;
     private int dirty;
+
+    public double getRate() {
+        return rate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
 
     public int getDirty() {
         return dirty;

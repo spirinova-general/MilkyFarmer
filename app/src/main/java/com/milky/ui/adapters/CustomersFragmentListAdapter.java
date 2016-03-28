@@ -143,22 +143,22 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(mActivity, com.milky.ui.main.CustomersActivity.class)
-                    .putExtra("fname", mCustomersList.get(getPosition()).getFirstName())
-                    .putExtra("lname", mCustomersList.get(getPosition()).getLastName())
-                    .putExtra("quantity", mCustomersList.get(getPosition()).get_mQuantity())
-                    .putExtra("areaId", mCustomersList.get(getPosition()).getAreaId())
-                    .putExtra("address1", mCustomersList.get(getPosition()).getAddress1())
-                    .putExtra("istoAddCustomer", false)
-                    .putExtra("mobile", mCustomersList.get(getPosition()).getMobile())
-                    .putExtra("defaultrate", mCustomersList.get(getPosition()).getRate())
-                    .putExtra("address2", mCustomersList.get(getPosition()).getAddress2())
-                    .putExtra("added_date", mCustomersList.get(getPosition()).getDateAdded())
-                    .putExtra("balance", mCustomersList.get(getPosition()).getBalance_amount())
-                    .putExtra("cust_id", mCustomersList.get(getPosition()).getCustomerId())
-                    .putExtra("delivery_date", mCustomersList.get(getPosition()).getStart_date());
-
-            mActivity.startActivity(intent);
+//            Intent intent = new Intent(mActivity, com.milky.ui.main.CustomersActivity.class)
+//                    .putExtra("fname", mCustomersList.get(getPosition()).getFirstName())
+//                    .putExtra("lname", mCustomersList.get(getPosition()).getLastName())
+//                    .putExtra("quantity", mCustomersList.get(getPosition()).get_mQuantity())
+//                    .putExtra("areaId", mCustomersList.get(getPosition()).getAreaId())
+//                    .putExtra("address1", mCustomersList.get(getPosition()).getAddress1())
+//                    .putExtra("istoAddCustomer", false)
+//                    .putExtra("mobile", mCustomersList.get(getPosition()).getMobile())
+//                    .putExtra("defaultrate", mCustomersList.get(getPosition()).getRate())
+//                    .putExtra("address2", mCustomersList.get(getPosition()).getAddress2())
+//                    .putExtra("added_date", mCustomersList.get(getPosition()).getDateAdded())
+//                    .putExtra("balance", mCustomersList.get(getPosition()).getBalance_amount())
+//                    .putExtra("cust_id", mCustomersList.get(getPosition()).getCustomerId())
+//                    .putExtra("delivery_date", mCustomersList.get(getPosition()).getStart_date());
+//
+//            mActivity.startActivity(intent);
 
         }
     }

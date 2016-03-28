@@ -217,26 +217,26 @@ public class CustomerSettingFragment extends Fragment {
 //        _mAddress2.setText(getActivity().getIntent().getStringExtra("address2"));
         _mAddress1.setText(getActivity().getIntent().getStringExtra("address1"));
         _mRate.setText(getActivity().getIntent().getStringExtra("defaultrate"));
-        if (!AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")).equals(""))
-            _autocomplete_city_area.setText(AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId"))
+        if (!AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)).equals(""))
+            _autocomplete_city_area.setText(AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0))
                     + ", " +
-                    AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")) +
-                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")));
+                    AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)) +
+                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)));
         else
-            _autocomplete_city_area.setText(AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")) +
-                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getStringExtra("areaId")));
+            _autocomplete_city_area.setText(AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)) +
+                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)));
 
         previousSelectedArea = _autocomplete_city_area.getText().toString();
         _mFirstName.setSelection(getActivity().getIntent().getStringExtra("fname").length());
         _mLastName.setSelection(getActivity().getIntent().getStringExtra("lname").length());
-        _mRate.setSelection(getActivity().getIntent().getStringExtra("defaultrate").length());
+        _mRate.setSelection(String.valueOf(getActivity().getIntent().getDoubleExtra("defaultrate", 0)).length());
         _mMobile.setSelection(getActivity().getIntent().getStringExtra("mobile").length());
 
-        _mBalance.setSelection(getActivity().getIntent().getStringExtra("balance").length());
+        _mBalance.setSelection(String.valueOf(getActivity().getIntent().getDoubleExtra("balance", 0)).length());
         _mAddress1.setSelection(getActivity().getIntent().getStringExtra("address1").length());
 //        _mAddress2.setSelection(getActivity().getIntent().getStringExtra("address2").length());
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
-        _mQuantuty.setSelection(getActivity().getIntent().getStringExtra("quantity").length());
+        _mQuantuty.setSelection(String.valueOf(getActivity().getIntent().getDoubleExtra("quantity",0)).length());
         custId = getActivity().getIntent().getStringExtra("cust_id");
 
         //        areaList = AreaMapTableManagement.getAreaById(_dbHelper.getReadableDatabase(), Constants.ACCOUNT_ID);
@@ -421,25 +421,24 @@ public class CustomerSettingFragment extends Fragment {
                     VCustomers holder = new VCustomers();
                     holder.setFirstName(_mFirstName.getText().toString());
                     holder.setLastName(_mLastName.getText().toString());
-                    holder.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
+                    holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
                     holder.setAddress1(_mAddress1.getText().toString());
 //                    holder.setAddress2(_mAddress2.getText().toString());
 
                     holder.setAreaId(selectedAreaId);
                     holder.setMobile(_mMobile.getText().toString());
-                    holder.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
-                    holder.setCustomerId(getActivity().getIntent().getStringExtra("cust_id"));
-                    holder.setAccountId(Constants.ACCOUNT_ID);
-                    holder.setRate(String.valueOf(Constants.round(Double.parseDouble(_mRate.getText().toString()), 1)));
+                    holder.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
+                    holder.setCustomerId(getActivity().getIntent().getIntExtra("cust_id",0));
+                    holder.setDefaultRate(Double.parseDouble(_mRate.getText().toString()));
                     holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
-                    holder.setStart_date(getActivity().getIntent().getStringExtra("start_delivery_date"));
+                    holder.setStartDate(getActivity().getIntent().getStringExtra("start_delivery_date"));
                     String currentDate = Constants.getCurrentDate();
-                    holder.setBalanceType("1");
+//                    holder.ba("1");
                     holder.setDateModified(currentDate);
                     Calendar c = Calendar.getInstance();
-                    holder.setEnd_date(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
-                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-                    CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getStringExtra("cust_id"));
+//                    holder.setEnd_date(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
+//                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+                    CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getIntExtra("cust_id",0));
 //                    if (ExtcalCustomerSettingTableManagement.isHasStartDate(extDb.getReadableDatabase(),
 //                            getActivity().getIntent().getStringExtra("cust_id"), currentDate))
 //                        ExtcalCustomerSettingTableManagement.updateData(extDb.getWritableDatabase(), holder);

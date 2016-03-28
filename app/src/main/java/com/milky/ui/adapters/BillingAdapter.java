@@ -40,9 +40,9 @@ public class BillingAdapter extends BaseAdapter {
     @Override
     public int getCount() {
 //        if (mCustomersData == null)
-//            return totalBill.size();
+            return totalBill.size();
 //        return mCustomersData.size();
-        return 0;
+//        return 0;
     }
 
     @Override
@@ -113,11 +113,10 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("end_date", shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +
                                 Constants.MONTHS[shownEndDate.get(Calendar.MONTH)] + "-" + shownEndDate.get(Calendar.YEAR))
                         .putExtra("quantity", data.getQuantity())
-                        .putExtra("amount", "0")
+                        .putExtra("amount", 0)
                         .putExtra("balance", data.getBalance())
                         .putExtra("titleString", holder.custName.getText())
-//                        TODO COMMENTED
-//                        .putExtra("totalPrice", data.getRate())
+                        .putExtra("totalPrice", data.getRate())
                         .putExtra("custId", data.getCustomerId())
                         .putExtra("clear", data.getIsCleared())
                         .putExtra("total", data.getTotalAmount())

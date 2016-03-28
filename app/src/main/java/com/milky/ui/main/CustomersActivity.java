@@ -121,7 +121,7 @@ public class CustomersActivity extends AppCompatActivity {
                         CustomersTableMagagement.updatedeletedCustomerDetail(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
 //                        ExtcalCustomerSettingTableManagement.updateDeletetdCustomer(exDb.getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
 //                        DeliveryTableManagement.updateDeletedCustomer(exDb.getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
-                        BillTableManagement.updateDeletedOn(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"));
+                        BillTableManagement.updateDeletedOn(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getIntExtra("cust_id",0));
                         POSITION=0;
                         Constants.REFRESH_BILL=true;
                         Constants.REFRESH_CALANDER=true;

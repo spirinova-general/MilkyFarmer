@@ -148,6 +148,10 @@ public class CalendarAdapter extends BaseAdapter {
                 } catch (IndexOutOfBoundsException iob) {
 
                 }
+                catch (NullPointerException npe)
+                {
+
+                }
             }
             RelativeLayout rl = (RelativeLayout) v.findViewById(R.id.rl);
             ImageView iv = (ImageView) v.findViewById(R.id.imageView1);
@@ -295,7 +299,7 @@ public class CalendarAdapter extends BaseAdapter {
 
     //    static float totalQuantity;
     static boolean isForCustomers = false;
-    static List<Double> totalData;
+    static List<Double> totalData = new ArrayList<>();
 
     public static void totalDataList(final List<Double> totalList) {
         totalData = totalList;

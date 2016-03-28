@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Stack;
 
 /**
  * Created by Neha on 11/20/2015.
@@ -79,8 +80,8 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         _amount_layout = (TextInputLayout) findViewById(R.id.amount_layout);
         _payment = (LinearLayout) findViewById(R.id.payment);
         payment_made = (EditText) findViewById(R.id.payment_amount);
-        payment_made.setText(intent.getStringExtra("payment_made"));
-        if (intent.getStringExtra("balance_type").equals("1"))
+        payment_made.setText(String.valueOf(intent.getDoubleExtra("payment_made", 0)));
+        if (intent.getIntExtra("balance_type",0)==1)
             balanceType = 1;
         Calendar cal = Calendar.getInstance();
         send_bill = (Button) findViewById(R.id.send_bill);
@@ -92,17 +93,17 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         send_bill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Account.getLeftsmsCount(_dbHelper.getReadableDatabase())>=1)
-                new SendBillSMS().execute();
+                if (Account.getLeftsmsCount(_dbHelper.getReadableDatabase()) >= 1)
+                    new SendBillSMS().execute();
                 else
                     Toast.makeText(BillingEdit.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
 
             }
         });
-        rate.setText(intent.getStringExtra("totalPrice"));
+        rate.setText(String.valueOf(intent.getDoubleExtra("totalPrice", 0)));
         start_date.setEnabled(false);
         end_date.setEnabled(false);
-        milk_quantity.setText(intent.getStringExtra("quantity"));
+        milk_quantity.setText(String.valueOf(intent.getDoubleExtra("quantity", 0)));
         milk_quantity.setFocusable(false);
         milk_quantity.setFocusableInTouchMode(false);
         clear_bill = (Button) findViewById(R.id.clear_bill);
@@ -117,7 +118,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         }
 
         if (cal.get(Calendar.DAY_OF_MONTH) >= calendar.get(Calendar.DAY_OF_MONTH) && cal.get(Calendar.MONTH)>=calendar.get(Calendar.MONTH)
-                && cal.get(Calendar.YEAR) >= calendar.get(Calendar.YEAR) && intent.getStringExtra("clear").equals("1")) {
+                && cal.get(Calendar.YEAR) >= calendar.get(Calendar.YEAR) && intent.getIntExtra("clear", 0)==1) {
 //        if ((cal.get(Calendar.DAY_OF_MONTH)) == 5) {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
@@ -133,7 +134,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             clear_bill.setEnabled(false);
         }
         /*If bill is already cleared*/
-        if (intent.getStringExtra("clear").equals("0")) {
+        if (intent.getIntExtra("clear",0)==0){
             clear_bill.setVisibility(View.GONE);
             clera_bill_text.setVisibility(View.GONE);
             send_bill.setVisibility(View.GONE);
@@ -168,10 +169,10 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                         } else {
                             VBill holder = new VBill();
 
-                            float payment_made = Float.parseFloat(payment.getText().toString());
-                            float bill_amount = Float.parseFloat(intent.getStringExtra("total"));
+                            double payment_made = Double.parseDouble(payment.getText().toString());
+                            double bill_amount = intent.getDoubleExtra("total", 0);
 
-                            float bill = payment_made - bill_amount;
+                            double bill = payment_made - bill_amount;
                             if (bill_amount >= payment_made) {
                                 holder.setBalance(bill_amount - payment_made);
                                 holder.setBalanceType(0);
@@ -189,13 +190,13 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             Calendar c = Calendar.getInstance();
                             String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
 
-                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getIntExtra("custId",0), holder.getBalanceType());
+                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getIntExtra("custId", 0), holder.getBalanceType());
 //                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
                             //TODO ExtCal SETTINGS DB
 //                            ExtcalCustomerSettingTableManagement.updateBalance(_exDb.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
-                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"), holder);
+                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getIntExtra("custId", 0), holder);
                             dialog.dismiss();
-                            Constants.REFRESH_CALANDER=true;
+                            Constants.REFRESH_CALANDER = true;
                             BillingEdit.this.finish();
                         }
                     }
@@ -212,17 +213,17 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             }
         });
 
-        balance_amount.setText(intent.getStringExtra("balance"));
+        balance_amount.setText(String.valueOf(intent.getDoubleExtra("balance", 0)));
         balance_amount.setFocusable(false);
         balance_amount.setFocusableInTouchMode(false);
 //        if (balanceType == 1)
 //            balance_amount.setHint("Balance due (Rs)");
 
         total_amount = (TextView) findViewById(R.id.total_amount);
-        total_amount.setText(intent.getStringExtra("total"));
+        total_amount.setText(String.valueOf(intent.getDoubleExtra("total", 0)));
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
-        tax.setText(GlobalSettingsService.getDefautTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase()));
+        tax.setText(String.valueOf(GlobalSettingsService.getDefautTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase())));
         AppUtil.getInstance().getDatabaseHandler().close();
     }
 
@@ -290,7 +291,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), getIntent().getStringExtra("custId")), mesg);
+                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), getIntent().getIntExtra("custId",0)), mesg);
 
 
                         finalI = i + 1;

@@ -100,18 +100,18 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
                 Intent intent = new Intent(mActivity, com.milky.ui.main.CustomersActivity.class)
                         .putExtra("fname", customer.getFirstName())
                         .putExtra("lname", customer.getLastName())
-                        .putExtra("quantity", customer.get_mQuantity())
+                        .putExtra("quantity", customer.getGetDefaultQuantity())
                         .putExtra("areaId", customer.getAreaId())
                         .putExtra("address1", customer.getAddress1())
-                        .putExtra("istoAddCustomer", false)
+                        .putExtra("istoAddCustomer", 1)
                         .putExtra("mobile", customer.getMobile())
-                        .putExtra("defaultrate", customer.getRate())
+                        .putExtra("defaultrate", customer.getDefaultRate())
                         .putExtra("address2", customer.getAddress2())
                         .putExtra("added_date", customer.getDateAdded())
                         .putExtra("balance", customer.getBalance_amount())
                         .putExtra("cust_id", customer.getCustomerId())
                         .putExtra("delivery_date", deliveryDate)
-                        .putExtra("start_delivery_date", customer.getStart_date());
+                        .putExtra("start_delivery_date", customer.getStartDate());
                 mActivity.startActivity(intent);
             }
         });
@@ -172,7 +172,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
                 clear();
                 notifyDataSetChanged();
             }
-            if (!Constants.selectedAreaId.equals("")) {
+            if (Constants.selectedAreaId!=0) {
                 clear();
 
                 VAreaMapper holder = AreaCityTableManagement.getAreaById(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);

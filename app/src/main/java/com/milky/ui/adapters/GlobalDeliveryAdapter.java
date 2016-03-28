@@ -112,7 +112,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
                 final int position2 = finalHolder._quantity.getId();
                 if (s.toString().length() > 0) {
                     VCustomers holder = new VCustomers();
-                    holder.setQuantity(s.toString());
+                    holder.setGetDefaultQuantity(Double.parseDouble(s.toString()));
 //                    holder.setCustomerId(CustomersList._mCustomersList.get(position2).getCustomerId());
 //                    holder.setStart_date(Constants.DELIVERY_DATE);
 //                    holder.setAreaId(CustomersList._mCustomersList.get(position2).getAreaId());
@@ -251,7 +251,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
                     clear();
                     notifyDataSetChanged();
                 }
-                if (!Constants.selectedAreaId.equals("")) {
+                if (Constants.selectedAreaId!=0) {
                     clear();
 
 //                    filterList = ExtcalCustomerSettingTableManagement.getAllCustomersBySelectedDate(exDb.getReadableDatabase(), Constants.selectedAreaId,Constants.DELIVERY_DATE);

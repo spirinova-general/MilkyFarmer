@@ -30,7 +30,7 @@ public class TableColumsDetail {
 
     //CUSTOMER"S BILL
     public static final String CUSTOMERS_BILL = "CREATE TABLE " + TableNames.TABLE_CUSTOMER_BILL + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.START_DATE + " DATETIME," + TableColumns.END_DATE + " DATETIME,"
-            + TableColumns.QUANTITY + " REAL," + TableColumns.BALANCE + " REAL," + TableColumns.ADJUSTMENTS + " REAL," + TableColumns.TAX + " REAL," + TableColumns.IS_CLEARED + " INTEGER,"
+            + TableColumns.DEFAULT_QUANTITY + " REAL," + TableColumns.BALANCE + " REAL," + TableColumns.ADJUSTMENTS + " REAL," + TableColumns.TAX + " REAL," + TableColumns.IS_CLEARED + " INTEGER,"
             + TableColumns.PAYMENT_MADE + " REAL," + TableColumns.IS_OUTSTANDING + " INTEGER," + TableColumns.TOTAL_AMOUNT + " REAL," + TableColumns.BALANCE_TYPE
             + " INTEGER," + TableColumns.ROLL_DATE + " DATETIME," + TableColumns.DATE_ADDED + " DATETIME,"+TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DIRTY + " INTEGER," + TableColumns.CUSTOMER_ID + " INTEGER,"
             + " FOREIGN KEY (" + TableColumns.CUSTOMER_ID + ")" + " REFERENCES " + TableNames.TABLE_CUSTOMER + "(" + TableColumns.ID + ")" + ")";
@@ -43,7 +43,7 @@ public class TableColumsDetail {
             + " FOREIGN KEY (" + TableColumns.CUSTOMER_ID + ")" + " REFERENCES " + TableNames.TABLE_CUSTOMER + "(" + TableColumns.ID + ")" + ")";
 
     //DELIVERY
-    public static final String DELIVERY = "CREATE TABLE " + TableNames.TABLE_DELIVERY + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.QUANTITY + " REAL,"
+    public static final String DELIVERY = "CREATE TABLE " + TableNames.TABLE_DELIVERY + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DATE_MODIFIED + " DATETIME," + TableColumns.DEFAULT_QUANTITY + " REAL,"
             + TableColumns.DELEVERY_DATE + " DATETIME," + TableColumns.DIRTY + " TEXT," + TableColumns.CUSTOMER_ID + " INTEGER,"
             + " FOREIGN KEY (" + TableColumns.CUSTOMER_ID + ")" + " REFERENCES " + TableNames.TABLE_CUSTOMER + "(" + TableColumns.ID + ")" +
             ")";

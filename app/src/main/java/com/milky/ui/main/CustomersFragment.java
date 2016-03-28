@@ -43,7 +43,7 @@ public class CustomersFragment extends Fragment {
         super.onResume();
         if (Constants.REFRESH_CUSTOMERS) {
             if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                if (Constants.selectedAreaId.equals("")) {
+                if (Constants.selectedAreaId==0) {
                     _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
                     if (_mCustomersList.size() == 1)
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");

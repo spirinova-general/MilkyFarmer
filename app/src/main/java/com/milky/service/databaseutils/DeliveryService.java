@@ -42,7 +42,7 @@ public class DeliveryService {
         }
         return data;
     }
-    public  static String selectedCustomer="";
+    public  static int selectedCustomer=0;
     private double calculateDeliveryForCustomers(String date)
     {
         double qty = 0, adjustQty = 0;

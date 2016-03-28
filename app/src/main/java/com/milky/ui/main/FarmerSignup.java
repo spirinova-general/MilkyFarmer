@@ -301,8 +301,6 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 holder.setUsedSms(result.getInt("UsedSms"));
                 holder.setTotalSms(result.getInt("TotalSms"));
                 holder.setServerAccountId(result.getInt("Id"));
-
-
                 edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
                 edit.putString(UserPrefrences.INSERT_BILL, "0");
                 edit.commit();
@@ -318,14 +316,11 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 GlobalSettingsService.insertGlobalSettingsData(_dbhelper.getWritableDatabase(), settinsHolder);
                 startActivity(new Intent(FarmerSignup.this, MainActivity.class));
                 this.finish();
-
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
         } else {
-
             if (otpButton.getText().toString().equals("Get OTP"))
                 otpButton.setText("Resend OTP");
             else {

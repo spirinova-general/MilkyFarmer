@@ -68,7 +68,7 @@ public class BillingFragment extends Fragment {
                 @Override
                 public void run() {
                     payment.clear();
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
                         BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase());
                         BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase());
                     }

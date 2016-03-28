@@ -280,8 +280,8 @@ public class CustomersList extends AppCompatActivity {
                 } else {
                     if (selectedCustomersId.size() > 0)
                         for (VCustomers entry : selectedCustomersId) {
-                            entry.setQuantity(quantity.getText().toString().trim());
-                            entry.setStart_date(Constants.DELIVERY_DATE);
+                            entry.setGetDefaultQuantity(Double.parseDouble(quantity.getText().toString().trim()));
+                            entry.setStartDate(Constants.DELIVERY_DATE);
 //                            if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
 //                                    entry.getCustomerId(), Constants.DELIVERY_DATE))
 //                                DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry);

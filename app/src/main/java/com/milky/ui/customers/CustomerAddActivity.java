@@ -39,7 +39,9 @@ import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.utils.UserPrefrences;
 import com.milky.viewmodel.VAreaMapper;
+import com.milky.viewmodel.VBill;
 import com.milky.viewmodel.VCustomers;
+import com.milky.viewmodel.VCustomersSetting;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,7 +65,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private AutoCompleteTextView _cityAreaAutocomplete;
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
-    private int selectedAreaId =0;
+    private int selectedAreaId = 0;
     private ArrayList<VAreaMapper> _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
@@ -88,16 +90,15 @@ public class CustomerAddActivity extends AppCompatActivity {
 
       /* final boolean phone,final boolean rate,final boolean quantity,final boolean balance
         * Set text field listeners*/
-        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, this, false,false,false,false,false));
-        _firstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, this,  false,false,false,false,false));
-        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, this, false,false,true,false,false));
+        _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, this, false, false, false, false, false));
+        _firstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, this, false, false, false, false, false));
+        _mQuantuty.addTextChangedListener(new TextValidationMessage(_mAddress1, milk_quantity_layout, this, false, false, true, false, false));
         _mBalance.addTextChangedListener(new TextValidationMessage(_mAddress1, balance_layout, this, false, false, false, true, false));
         _mPhone.addTextChangedListener(new TextValidationMessage(_mPhone, _phone_textinput_layout, this, true, false, false, false, false));
 //        _address2.addTextChangedListener(new TextValidationMessage(_mPhone, street_layout, this, false));
         _lastName.addTextChangedListener(new TextValidationMessage(_mPhone, last_name_layout, this, false, false, false, false, false));
         _cityAreaAutocomplete.addTextChangedListener(new TextValidationMessage(_mPhone, autocomplete_layout, this, false, false, false, false, false));
         _rate.addTextChangedListener(new TextValidationMessage(_mPhone, rate_layout, this, false, true, false, false, false));
-
 
 
     }
@@ -136,27 +137,22 @@ public class CustomerAddActivity extends AppCompatActivity {
                         last_name_layout.setError("Enter name!");
                     else if (_rate.getText().toString().equals(""))
                         rate_layout.setError("Enter amount!");
-                    else if(_rate.getText().toString().equals(".")){
+                    else if (_rate.getText().toString().equals(".")) {
                         rate_layout.setError(getResources().getString(R.string.enter_valid_rate));
-                    }
-                    else if (Float.parseFloat(_rate.getText().toString().trim()) <= 0){
+                    } else if (Float.parseFloat(_rate.getText().toString().trim()) <= 0) {
                         rate_layout.setError("Enter valid amount!");
-                    }
-                    else if (_mBalance.getText().toString().equals("")) {
+                    } else if (_mBalance.getText().toString().equals("")) {
                         balance_layout.setError("Enter balance amount");
-                    }
-                    else if(_mBalance.getText().toString().equals(".")){
+                    } else if (_mBalance.getText().toString().equals(".")) {
                         balance_layout.setError(getResources().getString(R.string.enter_valid_balance));
-                    }
-                    else if(_mQuantuty.getText().toString().equals(".")){
+                    } else if (_mQuantuty.getText().toString().equals(".")) {
                         milk_quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
-                    }
-                    else if (_mAddress1.getText().toString().equals(""))
+                    } else if (_mAddress1.getText().toString().equals(""))
                         flat_number_layout.setError("Enter flat number!");
 //                    else if (_address2.getText().toString().equals(""))
 //                        street_layout.setError("Enter street !");
 
-                    else if (selectedAreaId==0)
+                    else if (selectedAreaId == 0)
                         autocomplete_layout.setError("Select valid area");
                     else if (_mPhone.getText().toString().equals(""))
                         _phone_textinput_layout.setError("Enter mobile number!");
@@ -169,7 +165,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                             && !_lastName.getText().toString().equals("") &&
                             !_mBalance.getText().toString().equals("") &&
                             !_mAddress1.getText().toString().equals("")
-                            && selectedAreaId!=0
+                            && selectedAreaId != 0
                             && !_mPhone.getText().toString().equals("") &&
                             !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
                     )) {
@@ -189,58 +185,68 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
                         holder.setAddress1(_mAddress1.getText().toString());
-                        holder.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
+                        holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
-                        holder.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
-                        holder.setAccountId(Constants.ACCOUNT_ID);
-                        holder.setRate(String.valueOf(Constants.round(Double.parseDouble(_rate.getText().toString()), 1)));
-                        holder.setBalanceType("1");
+                        holder.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
+                        holder.setDefaultRate(Double.parseDouble(_rate.getText().toString()));
+//                        holder.setBalanceType("1");
                         holder.setDateAdded(formattedDate);
-                        holder.setStart_date(pickedDate);
-                        holder.setEnd_date("2250" + "-" +
+                        holder.setStartDate(pickedDate);
+                        holder.setEndDate("2250" + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-                        holder.setCustomerId(String.valueOf(System.currentTimeMillis()));
-
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
-                        holder.setBalance_amount(String.valueOf(Constants.round(Double.parseDouble(_mBalance.getText().toString()), 1)));
-                        holder.setTotal(0.0);
+                        holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
+//                        holder.setTotal(0.0);
 //                        holder.setAddress2(_address2.getText().toString());
 //                        holder.setCityId(selectedCityId);
                         autocomplete_layout.setError(null);
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
-                        holder.setQuantity(String.valueOf(Constants.round(Double.parseDouble(_mQuantuty.getText().toString()), 1)));
-                        holder.setAccountId(Constants.ACCOUNT_ID);
-                        holder.setRate(String.valueOf(Constants.round(Double.parseDouble(_rate.getText().toString()), 1)));
-                        holder.setBalanceType("1");
                         holder.setDateAdded(formattedDate);
-                        holder.setStart_date(pickedDate);
-                        holder.setEnd_date(holder.getEnd_date());
-                        holder.setCustomerId(holder.getCustomerId());
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
-                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), holder);
-                        holder.setTax(GlobalSettingsService.getDefautTax(_dbHelper.getReadableDatabase()));
-                        holder.setAdjustment("");
-                        holder.setPaymentMade("0");
-                        holder.setIsCleared("1");
-                        holder.setDateModified(holder.getStart_date());
-                        holder.setRollDate(GlobalSettingsService.getRollDate(_dbHelper.getReadableDatabase()));
+
+                        VCustomersSetting setting = new VCustomersSetting();
+                        setting.setCustomerId(CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase()));
+                        setting.setDefaultRate(holder.getDefaultRate());
+                        setting.setStartDate(pickedDate);
+                        setting.setEndDate(holder.getEndDate());
+                        setting.setGetDefaultQuantity(holder.getGetDefaultQuantity());
+                        setting.setDirty(0);
+
+                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), setting);
+                        VBill bill = new VBill();
+                        bill.setDirty(0);
+                        bill.setPaymentMade(0);
+                        bill.setTotalAmount(0);
+                        bill.setEndDate(holder.getEndDate());
+                        bill.setAdjustment(0);
+                        bill.setBalance(0);
+                        bill.setTax(GlobalSettingsService.getDefautTax(_dbHelper.getReadableDatabase()));
+                        bill.setIsCleared(1);
+                        bill.setDateModified(formattedDate);    
+                        bill.setRollDate(GlobalSettingsService.getRollDate(_dbHelper.getReadableDatabase()));
+                        bill.setBalanceType(1);
+                        bill.setCustomerId(setting.getCustomerId());
+                        bill.setStartDate(holder.getStartDate());
+                        bill.setQuantity(holder.getGetDefaultQuantity());
+                        bill.setDateAdded(formattedDate);
+
                         Calendar cal = Calendar.getInstance();
                         if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-                            holder.setOutstanding("0");
+                            bill.setIsOutstanding(0);
                             SharedPreferences preferences = AppUtil.getInstance().getPrefrences();
                             SharedPreferences.Editor edit = preferences.edit();
                             edit.putString(UserPrefrences.INSERT_BILL, "0");
                             edit.apply();
                         } else
-                            holder.setOutstanding("1");
-                        BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), holder);
+                            bill.setIsOutstanding(1);
+                        BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), bill);
                         Constants.REFRESH_CUSTOMERS = true;
-                        Constants.REFRESH_BILL=true;
-                        Constants.REFRESH_CALANDER=true;
+                        Constants.REFRESH_BILL = true;
+                        Constants.REFRESH_CALANDER = true;
                         CustomerAddActivity.this.finish();
                     }
                 } catch (NullPointerException npe) {
@@ -478,6 +484,6 @@ public class CustomerAddActivity extends AppCompatActivity {
     }
 
 
-    }
+}
 
 

@@ -64,7 +64,7 @@ public class CustomersListAdapter extends BaseAdapter {
         holder._quantityText = (TextView) convertView.findViewById(R.id.quantityText);
         holder._date = (TextView) convertView.findViewById(R.id.date);
         holder._nameView = (TextView) convertView.findViewById(R.id.nameView);
-        holder._date.setText(mCustomersData.get(position).getStart_date() + "-" + mCustomersData.get(position).getEnd_date());
+        holder._date.setText(mCustomersData.get(position).getStartDate() + "-" + mCustomersData.get(position).getEndDate());
         holder._quantity.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -88,7 +88,7 @@ public class CustomersListAdapter extends BaseAdapter {
             holder._clear.setVisibility(View.VISIBLE);
 
         }
-        holder._quantity.setText(mCustomersData.get(position).getBalance_amount());
+        holder._quantity.setText(String.valueOf(mCustomersData.get(position).getBalance_amount()));
 //            holder._dated.setText(mCustomersData.get(position).getStart_date() + " - " + mCustomersData.get(position).getEnd_date());
 //            holder._dated.setVisibility(View.VISIBLE);
         holder._quantityText.setText("Bill Amount ");
@@ -100,11 +100,11 @@ public class CustomersListAdapter extends BaseAdapter {
                 Intent i = new Intent(mContext, BillingEdit.class).putExtra("first_name", mCustomersData.get(position).getFirstName())
                         .putExtra("last_name", mCustomersData.get(position).getLastName())
                         .putExtra("bill_amount", mCustomersData.get(position).getBalance_amount())
-                        .putExtra("start_date", mCustomersData.get(position).getStart_date())
-                        .putExtra("end_date", mCustomersData.get(position).getEnd_date())
-                        .putExtra("quantity", mCustomersData.get(position).getQuantity())
-                        .putExtra("rate", mCustomersData.get(position).getRate())
-                        .putExtra("tax", mCustomersData.get(position).getTax());
+                        .putExtra("start_date", mCustomersData.get(position).getStartDate())
+                        .putExtra("end_date", mCustomersData.get(position).getEndDate())
+                        .putExtra("quantity", mCustomersData.get(position).getGetDefaultQuantity())
+                        .putExtra("rate", mCustomersData.get(position).getDefaultRate());
+//                        .putExtra("tax", mCustomersData.get(position).getT());
                 mContext.startActivity(i);
             }
         });
@@ -112,7 +112,7 @@ public class CustomersListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if (!_mIsCustomer) {
-                    new DialogScreen(mContext, mCustomersData.get(position).getBalance_amount());
+                    new DialogScreen(mContext, String .valueOf(mCustomersData.get(position).getBalance_amount()));
                 }
             }
         });

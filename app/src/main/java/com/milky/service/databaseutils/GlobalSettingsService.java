@@ -82,13 +82,13 @@ public class GlobalSettingsService {
     }
 
     //Get default tax
-    public static String getDefautTax(SQLiteDatabase db) {
+    public static double getDefautTax(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
-        String rate = null;
+        double rate = 0;
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
             do {
-                rate = cursor.getString(cursor.getColumnIndex(TableColumns.TAX));
+                rate = cursor.getDouble(cursor.getColumnIndex(TableColumns.TAX));
 
             }
             while (cursor.moveToNext());

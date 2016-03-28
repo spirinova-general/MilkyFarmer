@@ -38,6 +38,7 @@ import com.milky.R;
 import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
+import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.GlobalSettingsService;
@@ -236,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         return true;
     }
 
-    ArrayList<String> areas;
+    ArrayList<Integer> areas;
 
     @Override
     protected void onResume() {
@@ -553,7 +554,7 @@ _dbHelper.close();
                                     + String.format("%02d", startDate.get(Calendar.DAY_OF_MONTH)) + " to " +
                                     Constants.MONTHS[endDate.get(Calendar.MONTH)] + " " + String.format("%02d", endDate.get(Calendar.DAY_OF_MONTH))
                                     + " is Rs. " + finalList.get(i).getTotalAmount()
-                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + finalList.get(i).get() + "/litre.", "UTF-8");
+                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + CustomerSettingTableManagement.getRateByCustomerId(_dbHelper.getReadableDatabase(),finalList.get(i).getCustomerId()) + "/litre.", "UTF-8");
 
 //                            mesg = URLEncoder.encode("Dear " + finalList.get(i).getFristName() + ", " + "your milk bill is " + finalList.get(i).getBillAmount(), "UTF-8");
                         } catch (UnsupportedEncodingException e) {

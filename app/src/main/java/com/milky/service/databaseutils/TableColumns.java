@@ -10,7 +10,6 @@ public class TableColumns {
     public static final String DATE_ADDED = "date_added";
     public static final String SERVER_ACCOUNT_ID = "account_id";
     public static final String AREA_ID = "area_id";
-    public static final String NAME = "name";
     public static final String CITY_ID = "city_id";
     public static final String CUSTOMER_ID = "customer_id";
     public static final String START_DATE = "start_date";
@@ -18,7 +17,6 @@ public class TableColumns {
     public static final String ROLL_DATE = "roll_date";
     public static final String END_DATE = "end_date";
     public static final String ISDELETED ="id_deleted";
-    public static final String QUANTITY = "quantity";
     public static final String ADJUSTMENTS = "adjustments";
 
     public static final String BALANCE = "balance";
@@ -32,15 +30,12 @@ public class TableColumns {
     public static final String ADDRESS_1 = "address_1";
     public static final String ADDRESS_2 = "address_2";
     public static final String DEFAULT_QUANTITY = "default_quantity";
-    public static final String RATE = "rate";
     public static final String DEFAULT_RATE = "default_rate";
 
     public static final String CITY_NAME = "city";
     public static final String DATE_QUANTITY_MODIFIED = "quantity_modified_date";
-    public static final String DAY = "day";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
-    public static final String IS_QUANTITY_UPDATED = "is_quantity_updated";
     public static final String DELETED_ON = "deleted_on";
     public static final String DIRTY = "dirty";
     public static final String TOTAL_AMOUNT = "total_amount";
@@ -56,7 +51,6 @@ public class TableColumns {
     public static final String USED_SMS="used_sms";
     public static final String VALIDATED="validated";
     public static final String AREA_INDEX="index_area";
-    public static final String CUSTID_INDEX="index_id";
     public static final String DELEVERY_DATE = "delivery_date";
     public static final String CUSTOMER_SETTING_INDEX="index_customer_setting";
     public static final String DELIVERY_INDEX="index_delivery_customer";

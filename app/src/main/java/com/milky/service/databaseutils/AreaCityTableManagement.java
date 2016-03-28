@@ -56,7 +56,7 @@ public class AreaCityTableManagement {
         return areaList;
     }
 
-    public static VAreaMapper getAreaById(SQLiteDatabase db, final String areaid) {
+    public static VAreaMapper getAreaById(SQLiteDatabase db, final int areaid) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ID + " ='" + areaid + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         VAreaMapper holder = null;
@@ -81,7 +81,7 @@ public class AreaCityTableManagement {
         return holder;
     }
 
-    public static String getAreaNameById(SQLiteDatabase db, final String areaId) {
+    public static String getAreaNameById(SQLiteDatabase db, final int areaId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ID + " ='" + areaId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         String area = "";
@@ -99,7 +99,7 @@ public class AreaCityTableManagement {
         return area;
     }
 
-    public static String getLocalityById(SQLiteDatabase db, final String areaId) {
+    public static String getLocalityById(SQLiteDatabase db, final int areaId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ID + " ='" + areaId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         String area = "";
@@ -117,7 +117,7 @@ public class AreaCityTableManagement {
         return area;
     }
 
-    public static String getCityNameById(SQLiteDatabase db, final String cityId) {
+    public static String getCityNameById(SQLiteDatabase db, final int cityId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA + " WHERE " + TableColumns.ID + " ='" + cityId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         String city = "";
@@ -261,15 +261,15 @@ public class AreaCityTableManagement {
         return result;
     }
 
-    public static ArrayList<String> getArea(SQLiteDatabase db) {
+    public static ArrayList<Integer> getArea(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_AREA;
         Cursor cursor = db.rawQuery(selectquery, null);
-        ArrayList<String> areaList = new ArrayList<>();
+        ArrayList<Integer> areaList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
 
                 if (cursor.getString(cursor.getColumnIndex(TableColumns.ID)) != null)
-                    areaList.add(cursor.getString(cursor.getColumnIndex(TableColumns.ID)));
+                    areaList.add(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
             }
             while (cursor.moveToNext());
 
