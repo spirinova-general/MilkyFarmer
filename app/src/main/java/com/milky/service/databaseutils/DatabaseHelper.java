@@ -108,7 +108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //        onCreate(db);
     }
 
-    public static boolean columnIndexExists(SQLiteDatabase db, String table, String index, String indexObj) {
+    public boolean columnIndexExists(SQLiteDatabase db, String table, String index, String indexObj) {
         String selectQuery = "SELECT * FROM sys.indexes WHERE name ='" + index + "' AND object_id =" + indexObj + "('" + table + "')";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -129,10 +129,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public static void updateSyncInfo(SQLiteDatabase db, String tableName) {
+    public void updateSyncInfo(SQLiteDatabase db, String tableName) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DIRTY, "1");
-
         db.update(tableName, values, TableColumns.DIRTY + " ='0'"
                 , null);
     }

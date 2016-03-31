@@ -1,7 +1,6 @@
 package com.milky.ui.adapters;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +14,8 @@ import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Area;
+import com.milky.service.core.Customers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +25,12 @@ import java.util.List;
  * Created by Neha on 11/18/2015.
  */
 public class CustomersFragmentListAdapter extends RecyclerView.Adapter<CustomersFragmentListAdapter.CustomersViewHolder> implements Filterable{
-    private List<VCustomers> mCustomersList, items,tempList,tempItems, suggestions;
+    private List<Customers> mCustomersList, items,tempList,tempItems, suggestions;
     private CustomersFragmentListAdapter mListAdapter;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
 
-    public CustomersFragmentListAdapter(Activity act, List<VCustomers> listData) {
+    public CustomersFragmentListAdapter(Activity act, List<Customers> listData) {
         this.mCustomersList = listData;
         this.mActivity = act;
         _dbhelper = AppUtil.getInstance().getDatabaseHandler();
@@ -52,7 +51,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
 
     @Override
     public void onBindViewHolder(CustomersViewHolder holder, int position) {
-        VCustomers customer = mCustomersList.get(position);
+        Customers customer = mCustomersList.get(position);
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
@@ -75,7 +74,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
     Filter nameFilter = new Filter() {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
-            String str = ((VAreaMapper) resultValue).getCityArea();
+            String str = ((Area) resultValue).getCityArea();
 
             return str;
         }
@@ -84,7 +83,7 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
                 suggestions.clear();
-                for (VCustomers Area : tempItems) {
+                for (Customers Area : tempItems) {
                     if (Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         suggestions.add(Area);
                     }
@@ -106,10 +105,10 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            List<VCustomers> filterList = (ArrayList<VCustomers>) results.values;
+            List<Customers> filterList = (ArrayList<Customers>) results.values;
             if (results != null && results.count > 0) {
                 filterList.clear();
-                for (VCustomers Area : filterList) {
+                for (Customers Area : filterList) {
                     filterList.add(Area);
                     notifyDataSetChanged();
                 }

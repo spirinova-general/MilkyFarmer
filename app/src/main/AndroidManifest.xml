@@ -38,7 +38,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"></activity>
         <activity
-            android:name=".ui.customers.CustomersList"
+            android:name=".ui.customers.DeliveryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"

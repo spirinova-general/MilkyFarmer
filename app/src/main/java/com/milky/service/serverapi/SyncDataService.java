@@ -9,16 +9,14 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.utils.UserPrefrences;
-import com.milky.viewmodel.VAccount;
-import com.milky.viewmodel.VBill;
+import com.milky.service.core.Account;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -26,11 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,7 +35,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     public Context context = this;
     public Handler handler = null;
     public static Runnable runnable = null;
-//    public ExtcalDatabaseHelper _exDb;
+    private AccountService accountService;
 
     @Nullable
     @Override
@@ -51,6 +47,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     public void onCreate() {
         _dbHelper = new DatabaseHelper(this);
         handler = new Handler();
+        accountService = new AccountService();
 //        _exDb = new ExtcalDatabaseHelper(this);
         runnable = new Runnable() {
             SharedPreferences preferences = getApplicationContext().getSharedPreferences("com.milky_prefrences", MODE_PRIVATE);
@@ -61,8 +58,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat work_format = new SimpleDateFormat("yyyy-MM-dd");
                 work_format.format(calendar.getTime());
-                String currentDate = calendar.get(Calendar.YEAR) + "-" + String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "-" +
-                        String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
+
 //                try {
 //                    if (_dbHelper.isTableNotEmpty("account")) {
 //                        Date date = work_format.parse(Account.getRollDate(_dbHelper.getReadableDatabase()));
@@ -71,7 +67,6 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 //                } catch (ParseException e) {
 //                    e.printStackTrace();
 //                }
-                Calendar c = Calendar.getInstance();
 //                if (c.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && c.get(Calendar.MONTH) == calendar.get(Calendar.MONTH))
 //                {
 //                    /*Bill is to be outstanding*/
@@ -152,7 +147,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
     public void SyncNow() {
         HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.ACCOUNT_API, Account.getDetails(_dbHelper.getReadableDatabase()), this, true, null);
+        dataTask.runRequest(ServerApis.ACCOUNT_API, accountService.getJsonData(), this, true, null);
     }
 
     public static HashMap<String, String> requestedList = new HashMap<>();
@@ -161,7 +156,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
         JSONArray jsonArray;
         JSONObject jsonObject = new JSONObject();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
-            VAccount custList = Account.getAccountDetailsToSync(_dbHelper.getReadableDatabase());
+            Account custList = accountService.getDetails();
             if (custList == null) {
 
                 requestedList.put("Account_List", "1");
@@ -295,7 +290,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
         if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
-                VAccount holder = new VAccount();
+                Account holder = new Account();
 //                try {
 //                    JSONObject result = Constants.API_RESPONCE;
 //                    holder.setExpiryDate(result.getString("EndDate"));
@@ -323,7 +318,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
             } else if (requestType.get("Bill_List").equals("0")) {
                 BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
             } else if (requestType.get("Account_List").equals("0")) {
-                Account.updateSyncedData(_dbHelper.getWritableDatabase());
+//                accountService.updateSyncedData(_dbHelper.getWritableDatabase());
             }
 // else if (requestType.get("CustomerSetting_List").equals("0")) {
 //                    CustomerSettingTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());

@@ -26,17 +26,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryTableManagement;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.ui.adapters.GlobalDeliveryAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Area;
+import com.milky.viewmodel.VDelivery;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -44,15 +45,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class CustomersList extends AppCompatActivity {
+public class DeliveryActivity extends AppCompatActivity {
     private ListView _mCustomers;
     private Toolbar _mToolbar;
     public static GlobalDeliveryAdapter _mAdaapter;
     private DatabaseHelper _dbHelper;
-    public static List<VCustomers> _mCustomersList, _mDeliveryList = new ArrayList<>();
-    public static List<VCustomers> selectedCustomersId;
-    public static String bulkQuantity = "";
-
+    public static List<VDelivery> _mCustomersList;
+    public static List<Delivery> _mDeliveryList = new ArrayList<>();
+    public static List<VDelivery> selectedCustomersId;
+    private DeliveryService deliveryService;
+    private String selectedDate="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,12 +65,14 @@ public class CustomersList extends AppCompatActivity {
     private void initResources() {
         _mCustomers = (ListView) findViewById(R.id.customersList);
         selectedCustomersId = new ArrayList<>();
+        selectedDate =Constants.DELIVERY_DATE;
         setActionBar();
+        _mDeliveryList.clear();
+        deliveryService = new DeliveryService();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-            //TODO ExtCal SETTINGS DB
-//            _mCustomersList = CustomerSettingTableManagement.customersForSelectedDates(_dbHelper.getReadableDatabase(), "");
-//            _mCustomersList = ExtcalCustomerSettingTableManagement.customersForSelectedDates(exDb.getReadableDatabase(), "", Constants.DELIVERY_DATE);
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+
+            _mCustomersList = new DeliveryService().getCustomersDelivery(selectedDate);
             _mAdaapter = new GlobalDeliveryAdapter(this, 0, 0, String.valueOf(Constants.SELECTED_DAY), _mCustomersList);
             selectedCustomersId = _mCustomersList;
             _mCustomers.setItemsCanFocus(true);
@@ -78,7 +82,6 @@ public class CustomersList extends AppCompatActivity {
         _dbHelper.close();
         _areaList.clear();
         _areacityList.clear();
-
 //        ArrayList<String> areas = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
 //        if (areas != null) {
 //            for (int i = 0; i < areas.size(); ++i) {
@@ -102,10 +105,8 @@ public class CustomersList extends AppCompatActivity {
 //
 //            }
         _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
-        adp1 = new AreaCitySpinnerAdapter(CustomersList.this, R.id.spinnerText
-                , _areacityList);
+        adp1 = new AreaCitySpinnerAdapter(DeliveryActivity.this, R.id.spinnerText, _areacityList);
 //        }
-
     }
 
     private void setActionBar() {
@@ -119,7 +120,7 @@ public class CustomersList extends AppCompatActivity {
         TextView title = (TextView) mCustomView.findViewById(R.id.title);
         Calendar cal = Calendar.getInstance();
         try {
-            Date date = Constants.work_format.parse(Constants.DELIVERY_DATE);
+            Date date = Constants.work_format.parse(selectedDate);
             cal.setTime(date);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -149,17 +150,16 @@ public class CustomersList extends AppCompatActivity {
             if (selectedCustomersId.size() > 0)
                 bulkEdit();
             else
-                Toast.makeText(CustomersList.this, "No customer is selected !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DeliveryActivity.this, "No customer is selected !", Toast.LENGTH_SHORT).show();
         }
 
         if (id == R.id.save) {
             if (_mDeliveryList.size() > 0)
-                for (VCustomers entry : _mDeliveryList) {
-//                    if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
-//                            entry.getCustomerId(), entry.getStart_date()))
-//                        DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry);
-//                    else
-//                        DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, Constants.ACCOUNT_ID);
+                for (Delivery entry : _mDeliveryList) {
+                    if (deliveryService.isHasDataForDay(entry.getDeliveryDate(), entry.getCustomerId()))
+                        deliveryService.update(entry);
+                    else
+                        deliveryService.insert(entry);
                 }
             Constants.REFRESH_CALANDER = true;
             Constants.REFRESH_BILL = true;
@@ -168,10 +168,10 @@ public class CustomersList extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
+    ArrayList<Area> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
     View searchView;
     AreaCitySpinnerAdapter adp1;
-
+    boolean expended = false;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -191,7 +191,12 @@ public class CustomersList extends AppCompatActivity {
             editSearch.setThreshold(1);
             AreaCityAdapter adapter1 = new AreaCityAdapter(this, 0, R.id.address, _areacityList);
             editSearch.setAdapter(adapter1);
-
+            actionSearchView.setOnSearchClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    expended = true;
+                }
+            });
             editSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -256,9 +261,9 @@ public class CustomersList extends AppCompatActivity {
     private AlertDialog dialog;
 
     private void bulkEdit() {
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(CustomersList.this);
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(DeliveryActivity.this);
         dialog = alertBuilder.create();
-        LayoutInflater inflater = (LayoutInflater) (CustomersList.this).getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) (DeliveryActivity.this).getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
         dialog.setView(view1);
 
@@ -275,21 +280,24 @@ public class CustomersList extends AppCompatActivity {
                 if (quantity.getText().toString().equals("")) {
                     quantity_layout.setError("Enter quantity!");
                 }
-                 if(quantity.getText().toString().equals(".")){
+                if (quantity.getText().toString().equals(".")) {
                     quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
                 } else {
-                    if (selectedCustomersId.size() > 0)
-                        for (VCustomers entry : selectedCustomersId) {
-                            entry.setGetDefaultQuantity(Double.parseDouble(quantity.getText().toString().trim()));
-                            entry.setStartDate(Constants.DELIVERY_DATE);
-//                            if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(),
-//                                    entry.getCustomerId(), Constants.DELIVERY_DATE))
-//                                DeliveryTableManagement.updateCustomerDetail(exDb.getWritableDatabase(), entry);
-//                            else
-//                                DeliveryTableManagement.insertCustomerDetail(exDb.getWritableDatabase(), entry, Constants.ACCOUNT_ID);
-
+                    if (selectedCustomersId.size() > 0) {
+                        for (int i = 0; i < selectedCustomersId.size(); ++i) {
+                            Delivery delivery = new Delivery();
+                            delivery.setDeliveryDate(selectedDate);
+                            delivery.setQuantity(Double.parseDouble(quantity.getText().toString()));
+                            delivery.setCustomerId(selectedCustomersId.get(i).getCustomerId());
+                            delivery.setDateModified(Constants.getCurrentDate());
+                            delivery.setDirty(0);
+                            delivery.setSyncStatus(0);
+                            if (deliveryService.isHasDataForDay(selectedDate, selectedCustomersId.get(i).getCustomerId()))
+                                deliveryService.update(delivery);
+                            else
+                                deliveryService.insert(delivery);
                         }
-
+                    }
                     dialog.hide();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_BILL = true;

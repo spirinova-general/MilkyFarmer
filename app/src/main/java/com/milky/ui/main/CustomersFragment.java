@@ -14,16 +14,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.ui.adapters.MainCustomersListAdapter;
 import com.milky.ui.customers.CustomerAddActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Customers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,19 +33,20 @@ import java.util.List;
  * Created by Neha on 11/17/2015.
  */
 public class CustomersFragment extends Fragment {
-    private List<VCustomers> _mCustomersList = new ArrayList<>();
+    private List<Customers> _mCustomersList = new ArrayList<>();
     public static MainCustomersListAdapter _mAdapter;
     private FloatingActionButton mFab;
     public static TextView mTotalCustomers;
     private DatabaseHelper _dbHelper;
     public static ListView recList;
+    private CustomersService customersSettingService;
 
     public void onResume() {
         super.onResume();
         if (Constants.REFRESH_CUSTOMERS) {
             if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                if (Constants.selectedAreaId==0) {
-                    _mCustomersList = CustomersTableMagagement.getAllCustomers(_dbHelper.getReadableDatabase());
+                if (Constants.selectedAreaId==-1) {
+                    _mCustomersList = customersSettingService.getAllCustomers();
                     if (_mCustomersList.size() == 1)
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
                     else
@@ -52,7 +54,7 @@ public class CustomersFragment extends Fragment {
                     _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
                     recList.setAdapter(_mAdapter);
                 } else {
-                    _mCustomersList = CustomersTableMagagement.getAllCustomersByArea(_dbHelper.getReadableDatabase(), Constants.selectedAreaId);
+                    _mCustomersList = customersSettingService.getByArea(Constants.selectedAreaId);
                     if (_mCustomersList.size() == 1)
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
                     else
@@ -84,7 +86,7 @@ private View view=null;
 
     private void initResources(View view) {
         recList = (ListView) view.findViewById(R.id.customersListView);
-
+        customersSettingService = new CustomersService();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         mTotalCustomers = (TextView) view.findViewById(R.id.totalCustomers);
 

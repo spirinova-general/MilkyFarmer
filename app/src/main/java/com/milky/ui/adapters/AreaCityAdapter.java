@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VAreaMapper;
+import com.milky.service.core.Area;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +23,13 @@ import java.util.List;
 /**
  * Created by akshay on 1/2/15.
  */
-public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
+public class AreaCityAdapter extends ArrayAdapter<Area> {
 
     Context context;
     int resource, textViewResourceId;
-    List<VAreaMapper> items, tempItems, suggestions;
+    List<Area> items, tempItems, suggestions;
 
-    public AreaCityAdapter(Context context, int resource, int textViewResourceId, List<VAreaMapper> items) {
+    public AreaCityAdapter(Context context, int resource, int textViewResourceId, List<Area> items) {
         super(context, resource, textViewResourceId, items);
         this.context = context;
         this.resource = resource;
@@ -46,7 +46,7 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.areacityadapter, parent, false);
         }
-        VAreaMapper Area = items.get(position);
+        Area Area = items.get(position);
         if (Area != null) {
             TextView lblName = (TextView) view.findViewById(R.id.address);
 //            TextView lblName2 = (TextView) view.findViewById(R.id.te2);
@@ -71,7 +71,7 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
     Filter nameFilter = new Filter() {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
-            String str = ((VAreaMapper) resultValue).getCityArea();
+            String str = ((Area) resultValue).getCityArea();
 
             return str;
         }
@@ -80,7 +80,7 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
                 suggestions.clear();
-                for (VAreaMapper Area : tempItems) {
+                for (com.milky.service.core.Area Area : tempItems) {
                     if (Area.getCityArea().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         suggestions.add(Area);
                     }
@@ -102,10 +102,10 @@ public class AreaCityAdapter extends ArrayAdapter<VAreaMapper> {
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            List<VAreaMapper> filterList = (ArrayList<VAreaMapper>) results.values;
+            List<Area> filterList = (ArrayList<Area>) results.values;
             if (results != null && results.count > 0) {
                 clear();
-                for (VAreaMapper Area : filterList) {
+                for (com.milky.service.core.Area Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }

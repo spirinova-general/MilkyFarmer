@@ -40,21 +40,21 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.ui.adapters.PlaceAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
-import com.milky.viewmodel.VAccount;
-import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VGlobalSettings;
+import com.milky.service.core.Account;
+import com.milky.service.core.Area;
+import com.milky.service.core.GlobalSettings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,7 +89,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     private LinearLayout _mBottomLayout;
     private DatabaseHelper _dbHelper;
     //    private AutoCompleteTextView AreaAutocomplete;
-    private ArrayList<VAreaMapper> selectedareacityList = new ArrayList<>();
+    private ArrayList<Area> selectedareacityList = new ArrayList<>();
 
     private String[] autoCompleteData;
     private ImageView add;
@@ -107,7 +107,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     private int _mmonth;
     private int _mYear;
     static final int DATE_DIALOG_ID = 999;
-
+    private AccountService accountSettings;
+    private GlobalSettingsService globalService;
 
     @Override
     protected void onResume() {
@@ -228,7 +229,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
         /*Get DBhelper*/
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-
+        accountSettings = new AccountService();
+        globalService = new GlobalSettingsService();
          /*
         * Set text field listeners*/
 //        custCode.addTextChangedListener(new TextValidationMessage(custCode_layout, this, false));
@@ -241,8 +243,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
         /*Set default cust code*/
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
-            VAccount holder = Account.getAccountDetails(_dbHelper.getReadableDatabase());
-            VGlobalSettings globalSettings = GlobalSettingsService.getGlobalSettingsData(_dbHelper.getReadableDatabase());
+            Account holder = accountSettings.getDetails();
+            GlobalSettings globalSettings = globalService.getData();
             firstname.setText(holder.getFirstName());
             lastname.setText(holder.getLastName());
             rate.setText(String.valueOf(globalSettings.getDefaultRate()));
@@ -270,7 +272,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             _billGenerationDateView.setText(Constants.MONTHS[cal.get(Calendar.MONTH)] + "-"
                     + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(cal.get(Calendar.YEAR)));
 
-            msgCount.setText(String.valueOf(Account.getLeftsmsCount(_dbHelper.getReadableDatabase())));
+            msgCount.setText(String.valueOf(accountSettings.getLeftSMS()));
         }
         custCode.setOnTouchListener(new View.OnTouchListener()
 
@@ -287,52 +289,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         mob = mobile.getText().
 
                 toString();
-
-        changeNumber.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSetting.this);
-                                                View view = LayoutInflater.from(GlobalSetting.this).inflate(R.layout.change_number_popup, null);
-                                                final AlertDialog alertDialog = builder.create();
-
-                                                alertDialog.setView(view);
-                                                final EditText mobileNumber = (EditText) view.findViewById(R.id.number);
-                                                mobileNumber.setText(mob);
-                                                final TextInputLayout layout = (TextInputLayout) view.findViewById(R.id.layout);
-                                                ((Button) view.findViewById(R.id.save)).setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        if (!mobileNumber.getText().toString().equals("")) {
-                                                            if (mob.equals(mobileNumber.getText().toString()))
-                                                                layout.setError("You must change number to update !");
-                                                            else if (mobileNumber.getText().length() < 10)
-                                                                layout.setError("Invalid number");
-                                                            else {
-                                                                Account.updateMobileNumber(_dbHelper.getWritableDatabase(), mobileNumber.getText().toString());
-                                                                Toast.makeText(GlobalSetting.this, "Number changed successfully !", Toast.LENGTH_SHORT).show();
-                                                                layout.setError(null);
-                                                                alertDialog.dismiss();
-                                                            }
-
-                                                        } else
-                                                            mobileNumber.setError("Enter mobile number !");
-                                                    }
-                                                });
-                                                ((Button) view.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        alertDialog.dismiss();
-                                                    }
-                                                });
-
-
-                                                alertDialog.show();
-
-
-                                            }
-                                        }
-
-        );
 
 
         add.setOnClickListener(new View.OnClickListener()
@@ -427,23 +383,23 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     Calendar cl = Calendar.getInstance();
                     String date = String.valueOf(cl.get(Calendar.MONTH))
                             + "-" + String.valueOf(cl.get(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(cl.get(Calendar.YEAR));
-                    VAccount holder = new VAccount();
-                    VGlobalSettings globalSettings = new VGlobalSettings();
+
+                    GlobalSettings globalSettings = new GlobalSettings();
                     globalSettings.setTax(Double.parseDouble(tax.getText().toString().trim()));
                     globalSettings.setDefaultRate(Double.parseDouble(rate.getText().toString().trim()));
                     globalSettings.setRollDate(rollDate);
-
+                    Account holder = new Account();
                     holder.setDateModified(date);
                     holder.setMobile(mobile.getText().toString());
                     holder.setFirstName(firstname.getText().toString());
                     holder.setLastName(lastname.getText().toString());
-                    Account.updateAccountDetails(_dbHelper.getWritableDatabase(), holder);
-                    GlobalSettingsService.updateSettings(_dbHelper.getWritableDatabase(),globalSettings);
+//                    Update details for Account and Global settings
+                    accountSettings.update(holder);
+                    globalService.update(globalSettings);
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL))
                         BillTableManagement.updateRollDate(_dbHelper.getWritableDatabase());
                     _dbHelper.close();
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
-
                     GlobalSetting.this.finish();
                 }
 
@@ -539,7 +495,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     root.addView(linearLayout);
                     localityInputLayout.setError(null);
 //                    AccountAreaMapping.insertmappedareas(_dbHelper.getWritableDatabase(), _areacityList.get(Position));
-                    VAreaMapper holder = new VAreaMapper();
+                    Area holder = new Area();
                     holder.setArea(areaSelected.trim());
                     holder.setCity(citySelected.trim());
                     holder.setLocality(_locality.getText().toString().trim());
@@ -547,7 +503,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     areaSelected = "";
                     citySelected = "";
                     long id = AreaCityTableManagement.insertAreaDetail(_dbHelper.getWritableDatabase(), holder);
-                    holder.setAreaId((int)id);
+                    holder.setAreaId((int) id);
                     selectedareacityList.add(holder);
                     _dbHelper.close();
                     _cityArea.setText("");
@@ -951,7 +907,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
 
         {
-            ArrayList<VAreaMapper> list = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
+            ArrayList<Area> list = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
             selectedareacityList = list;
 //            ArrayList<String> list = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
 //            for (int i = 0; i < list.size(); ++i) {

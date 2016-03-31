@@ -323,8 +323,8 @@ public class CalendarAdapter extends BaseAdapter {
         registeredYear = year;
     }
 
-    private static String custId = "";
-    public static void setcustId(String id) {
+    private static int custId = -1;
+    public static void setcustId(int id) {
         custId = id;
     }
 

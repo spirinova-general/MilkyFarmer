@@ -1,9 +1,13 @@
 package com.milky.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.milky.service.serverapi.HttpAsycTask;
+import com.milky.service.serverapi.OnTaskCompleteListner;
+import com.milky.service.serverapi.ServerApis;
 import com.tyczj.extendedcalendarview.Day;
 
 import org.json.JSONObject;
@@ -30,7 +34,7 @@ public class Constants {
     public static SimpleDateFormat api_format_other = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     public static boolean validArea = false;
     public static String OTP = "";
-    public static int selectedAreaId = 0;
+    public static int selectedAreaId = -1;
     public static String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     public static boolean REFRESH_CALANDER = false,REFRESH_CUSTOMERS=false,REFRESH_BILL=false,REFRESH=false;
     public static boolean REFRESH_DELIVRY_CALANDER = false;
@@ -59,6 +63,12 @@ public class Constants {
 
         return result;
     }
+//Send SMS to Customer
+public static void SendSmsTouser(String mob, final String sms, final OnTaskCompleteListner activity) {
+    String append = "?mobile=" + mob + "&message=" + sms;
+    HttpAsycTask dataTask = new HttpAsycTask();
+    dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, activity, false, null);
+}
 
 //    public static double getQtyOfCustomer(String day, String custId) {
 //        double qty = 0;

@@ -12,11 +12,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.DeliveryService;
-import com.milky.ui.customers.CustomersList;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.DeliveryService;
+import com.milky.ui.customers.DeliveryActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.UserPrefrences;
@@ -33,7 +32,8 @@ public class CalenderFragment extends Fragment {
     private SharedPreferences _prefrences;
     private SharedPreferences.Editor _editor;
     private DatabaseHelper _dbHelper;
-    private  View viewLayout,view = null;
+    private View viewLayout, view = null;
+    private com.milky.service.databaseutils.serviceclasses.DeliveryService deliveryService;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,7 +75,7 @@ public class CalenderFragment extends Fragment {
         if (Constants.REFRESH_CALANDER) {
             Calendar cal = Calendar.getInstance();
             DeliveryService service = new DeliveryService();
-            _mCalenderView.updateQuantityList(service.calculateDeliveryTotal(cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR),false));
+            _mCalenderView.updateQuantityList(service.getTotalDelivery(1, cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), false));
             new UpdataCalander().execute();
         }
     }
@@ -85,10 +85,11 @@ public class CalenderFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
     }
 
-  private void initResources(View view) {
+    private void initResources(View view) {
         viewLayout = view;
         _prefrences = AppUtil.getInstance().getPrefrences();
         _editor = _prefrences.edit();
+        deliveryService = new com.milky.service.databaseutils.serviceclasses.DeliveryService();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
         _mCalenderView.setForCustomersDelivery(false);
@@ -98,9 +99,9 @@ public class CalenderFragment extends Fragment {
                 Constants.SELECTED_DAY = day;
                 Constants.DELIVERY_DATE = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
                         String.format("%02d", day.getDay());
-                if ((CustomerSettingTableManagement.isHasDataForDay(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), Constants.DELIVERY_DATE))
+                if ((new CustomersSettingService().isHasDataForDay(Constants.DELIVERY_DATE))
                         && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
-                    Intent intent = new Intent(getActivity(), CustomersList.class);
+                    Intent intent = new Intent(getActivity(), DeliveryActivity.class);
                     startActivity(intent);
                 }
             }
@@ -110,7 +111,7 @@ public class CalenderFragment extends Fragment {
         * */
         if (_prefrences.contains(UserPrefrences.NEW_USER))
             _mCalenderView.setRegistrationDate(_prefrences.getInt(UserPrefrences.NEW_USER, 0));
-         else {
+        else {
             Calendar cl = Calendar.getInstance();
             _editor.putInt(UserPrefrences.NEW_USER, cl.get(Calendar.DAY_OF_MONTH));
             _editor.commit();

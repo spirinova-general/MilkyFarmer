@@ -14,11 +14,12 @@ import com.milky.R;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Bill;
+import com.milky.service.core.Customers;
 
 import java.util.ArrayList;
 
@@ -29,9 +30,9 @@ import java.util.ArrayList;
 public class BillingFragment extends Fragment {
     public static ListView _mListView;
     private DatabaseHelper _dbHelper;
-    private ArrayList<VCustomers> list;
+    private ArrayList<Customers> list;
     private boolean hasPreviousBills = false;
-
+    int custId=0;
     @Override
     public void onResume() {
         super.onResume();
@@ -62,6 +63,7 @@ public class BillingFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
         }
+
         @Override
         protected Void doInBackground(Void... params) {
             getActivity().runOnUiThread(new Runnable() {
@@ -90,9 +92,13 @@ public class BillingFragment extends Fragment {
         }
     }
 
+    private CustomersSettingService settingData;
+
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersList);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+        custId = getActivity().getIntent().getIntExtra("cust_id",0);
+        settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
         TextView _mTotalBills = (TextView) v.findViewById(R.id.total_pending_bills);
 
         if (hasPreviousBills)
@@ -100,7 +106,8 @@ public class BillingFragment extends Fragment {
         _dbHelper.close();
     }
 
-     public static ArrayList<VBill> payment = new ArrayList<>();
+    public static ArrayList<Bill> payment = new ArrayList<>();
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);

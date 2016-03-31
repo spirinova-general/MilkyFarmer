@@ -8,18 +8,18 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.viewmodel.VAreaMapper;
+import com.milky.service.core.Area;
 
 import java.util.ArrayList;
 
 /**
  * Created by Neha on 12/2/2015.
  */
-public class AreaCitySpinnerAdapter extends ArrayAdapter<VAreaMapper> {
+public class AreaCitySpinnerAdapter extends ArrayAdapter<Area> {
     private Activity _context;
-    private ArrayList<VAreaMapper> dataList;
+    private ArrayList<Area> dataList;
 
-    public AreaCitySpinnerAdapter(Activity context, int resource, ArrayList<VAreaMapper> data) {
+    public AreaCitySpinnerAdapter(Activity context, int resource, ArrayList<Area> data) {
         super(context, resource, data);
         this._context = context;
         this.dataList = data;
@@ -34,7 +34,7 @@ public class AreaCitySpinnerAdapter extends ArrayAdapter<VAreaMapper> {
             row = inflater.inflate(R.layout.spinner_layout, parent, false);
         }
 
-        VAreaMapper item = dataList.get(position);
+        Area item = dataList.get(position);
 
         if (item != null) {
             TextView area = (TextView) row.findViewById(R.id.spinnerText);
@@ -54,7 +54,7 @@ public class AreaCitySpinnerAdapter extends ArrayAdapter<VAreaMapper> {
             row = inflater.inflate(R.layout.spinner_layout, parent, false);
         }
 
-        VAreaMapper item = dataList.get(position);
+        Area item = dataList.get(position);
 
         if (item != null) {
             TextView area = (TextView) row.findViewById(R.id.spinnerText);

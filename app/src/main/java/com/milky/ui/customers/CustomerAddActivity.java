@@ -25,7 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
@@ -38,10 +37,10 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.utils.UserPrefrences;
-import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomers;
-import com.milky.viewmodel.VCustomersSetting;
+import com.milky.service.core.Area;
+import com.milky.service.core.Bill;
+import com.milky.service.core.Customers;
+import com.milky.service.core.CustomersSetting;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -66,7 +65,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
     private int selectedAreaId = 0;
-    private ArrayList<VAreaMapper> _areacityList = new ArrayList<>();
+    private ArrayList<Area> _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
     private TextView _pickdate;
@@ -179,64 +178,54 @@ public class CustomerAddActivity extends AppCompatActivity {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
+                        autocomplete_layout.setError(null);
 
-
-                        VCustomers holder = new VCustomers();
+                        Customers holder = new Customers();
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
                         holder.setAddress1(_mAddress1.getText().toString());
                         holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
-                        holder.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
-                        holder.setDefaultRate(Double.parseDouble(_rate.getText().toString()));
-//                        holder.setBalanceType("1");
                         holder.setDateAdded(formattedDate);
-                        holder.setStartDate(pickedDate);
-                        holder.setEndDate("2250" + "-" +
-                                String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
-                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
                         holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
-//                        holder.setTotal(0.0);
-//                        holder.setAddress2(_address2.getText().toString());
-//                        holder.setCityId(selectedCityId);
-                        autocomplete_layout.setError(null);
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
                         holder.setDateAdded(formattedDate);
                         CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
 
-                        VCustomersSetting setting = new VCustomersSetting();
-                        setting.setCustomerId(CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase()));
-                        setting.setDefaultRate(holder.getDefaultRate());
+                        CustomersSetting setting = new CustomersSetting();
+                        setting.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
+                        setting.setDefaultRate(Double.parseDouble(_rate.getText().toString()));
                         setting.setStartDate(pickedDate);
-                        setting.setEndDate(holder.getEndDate());
-                        setting.setGetDefaultQuantity(holder.getGetDefaultQuantity());
+                        setting.setEndDate("2250" + "-" +
+                                String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
+                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+                        setting.setCustomerId(CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase()));
                         setting.setDirty(0);
 
                         CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), setting);
-                        VBill bill = new VBill();
+                        Bill bill = new Bill();
                         bill.setDirty(0);
                         bill.setPaymentMade(0);
                         bill.setTotalAmount(0);
-                        bill.setEndDate(holder.getEndDate());
+                        bill.setEndDate(setting.getEndDate());
                         bill.setAdjustment(0);
                         bill.setBalance(0);
                         bill.setTax(GlobalSettingsService.getDefautTax(_dbHelper.getReadableDatabase()));
                         bill.setIsCleared(1);
-                        bill.setDateModified(formattedDate);    
+                        bill.setDateModified(formattedDate);
                         bill.setRollDate(GlobalSettingsService.getRollDate(_dbHelper.getReadableDatabase()));
                         bill.setBalanceType(1);
                         bill.setCustomerId(setting.getCustomerId());
-                        bill.setStartDate(holder.getStartDate());
-                        bill.setQuantity(holder.getGetDefaultQuantity());
+                        bill.setStartDate(setting.getStartDate());
+                        bill.setQuantity(setting.getGetDefaultQuantity());
                         bill.setDateAdded(formattedDate);
-
                         Calendar cal = Calendar.getInstance();
                         if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-                            bill.setIsOutstanding(0);
+                            bill.setIsOutstanding(1);
                             SharedPreferences preferences = AppUtil.getInstance().getPrefrences();
                             SharedPreferences.Editor edit = preferences.edit();
                             edit.putString(UserPrefrences.INSERT_BILL, "0");

@@ -1,13 +1,15 @@
-package com.milky.viewmodel;
+package com.milky.service.core;
 
-public class VCustomersSetting
-{
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+
+public class CustomersSetting extends CustomersSettingService {
     private int customerId;
     private double defaultRate;
     private double getDefaultQuantity;
     private String startDate;
     private String endDate;
     private int dirty;
+
 
     public int getCustomerId() {
         return customerId;

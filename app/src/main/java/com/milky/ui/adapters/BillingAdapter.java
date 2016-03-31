@@ -15,7 +15,7 @@ import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VBill;
+import com.milky.service.core.Bill;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -26,13 +26,12 @@ import java.util.List;
  */
 public class BillingAdapter extends BaseAdapter {
 
-//    private List<VCustomers> mCustomersData;
-    private List<VBill> totalBill;
+    private List<Bill> totalBill;
     private Context mContext;
     private boolean _mIsCustomer = false;
     private DatabaseHelper _dbhelper;
 
-    public BillingAdapter(final List<VBill> dataList, final Context con) {
+    public BillingAdapter(final List<Bill> dataList, final Context con) {
         this.mContext = con;
         this.totalBill = dataList;
     }
@@ -64,7 +63,7 @@ public class BillingAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.bill_history_items, parent, false);
 
         }
-        final VBill data = totalBill.get(position);
+        final Bill data = totalBill.get(position);
          holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);

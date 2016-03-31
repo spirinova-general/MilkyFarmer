@@ -3,23 +3,12 @@ package com.milky.ui.main;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
-import com.milky.service.databaseutils.TableNames;
-import com.milky.viewmodel.VAccount;
-
-import java.util.Calendar;
 
 public class About extends AppCompatActivity {
 

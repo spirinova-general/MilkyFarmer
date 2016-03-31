@@ -1,11 +1,11 @@
-package com.milky.viewmodel;
+package com.milky.service.core;
 
 import java.math.BigDecimal;
 
 /**
  * Created by Neha on 11/30/2015.
  */
-public class VBill {
+public class Bill {
     //    private String id;
 //    private String accountId;
     private int customerId;

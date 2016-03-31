@@ -13,7 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.milky.service.core.CustomersSetting;
+import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.Day;
@@ -33,10 +37,11 @@ public class CustomrDeliveryFragment extends Fragment {
     private ExtendedCalendarView _mCalenderView;
     private TextInputLayout bill_amount_layout;
     private int dataCount = 0;
-    private String custId = "";
+    private int custId = 0;
     private DatabaseHelper db;
-//    private ExtcalDatabaseHelper _exDb;
+    //    private ExtcalDatabaseHelper _exDb;
     private String selected_date;
+    private CustomersSetting settingData;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +53,8 @@ public class CustomrDeliveryFragment extends Fragment {
 //        _mCalenderView.customersMilkQuantity(DeliveryTableManagement.getMilkQuantityofCustomer(_exDb.getReadableDatabase(),
 //                getActivity().getIntent().getStringExtra("cust_id")));
 
-        custId = getActivity().getIntent().getStringExtra("cust_id");
+        custId = getActivity().getIntent().getIntExtra("cust_id", 0);
+        settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
         _mCalenderView.setForCustomersDelivery(true);
         _mCalenderView.setCustomerId(custId);
         db = AppUtil.getInstance().getDatabaseHandler();
@@ -67,10 +73,7 @@ public class CustomrDeliveryFragment extends Fragment {
 
     private void initResources() {
         Calendar cal = Calendar.getInstance();
-//        _mCalenderView.calculateDeliveryTotal(cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
-//        _mCalenderView.updateQuantityList(_mCalenderView.totalDeliveryData);
-//        AppUtil.getInstance().getDatabaseHandler().close();
-//        totalData = ExtendedCalendarView.totalDeliveryData;
+        totalData = new DeliveryService().getTotalDelivery(1, cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), true);
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, final int i, long l, final Day day) {
@@ -79,88 +82,66 @@ public class CustomrDeliveryFragment extends Fragment {
 
                 Calendar deliveryDate = Calendar.getInstance();
                 try {
-                    deliveryDate.setTime(Constants.work_format.parse(getActivity().getIntent().getStringExtra("start_delivery_date")));
+                    deliveryDate.setTime(Constants.work_format.parse(settingData.getStartDate()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-//                if ((ExtcalCustomerSettingTableManagement.isHasDataForDayOfCust(_exDb.getReadableDatabase(), selected_date, custId))
-//                        && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
-//                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
-//                    dialog = alertBuilder.create();
-//                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                    View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
-//                    dialog.setView(view1);
-//
-//                    final EditText quantity = (EditText) view1.findViewById(R.id.milk_quantity);
-//                    quantity.setHint("Quantity");
-//                    final TextView title = (TextView) view1.findViewById(R.id.title);
-//                    title.setText("Edit Quantity");
-//                    final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
-//                    quantity.setText(String.valueOf(totalData.get(day.getDay() - 1)));
-//                    ((Button) view1.findViewById(R.id.clear)).setText("Save");
-//                    ((Button) view1.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            if (quantity.getText().toString().equals(""))
-//                                quantity_layout.setError("Enter quantity!");
-//                            else {
-//                                VCustomers holder = new VCustomers();
-//                                holder.setQuantity(quantity.getText().toString());
-//                                holder.setStart_date(selected_date);
-//                                holder.setCustomerId(custId);
-//                                if (DeliveryTableManagement.isHasData(_exDb.getReadableDatabase(),
-//                                        custId, selected_date))
-//                                    DeliveryTableManagement.updateCustomerDetail(_exDb.getWritableDatabase(), holder);
-//                                else
-//                                    DeliveryTableManagement.insertCustomerDetail(_exDb.getWritableDatabase(), holder, Constants.ACCOUNT_ID);
-//
-//                                totalData.set(day.getDay() - 1, Double.parseDouble(quantity.getText().toString()));
-//                                _mCalenderView.refresh();
-//                                Constants.REFRESH_CALANDER = true;
-//                                dialog.dismiss();
-//                            }
-//
-//                        }
-//                    });
-//                    ((Button) view1.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            dialog.dismiss();
-//                        }
-//                    });
-//                    if (dialog != null)
-//                        dialog.show();
-//                }
+                if ((new CustomersSettingService().isHasDataForCustoner(selected_date, custId))
+                        && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
+                    dialog = alertBuilder.create();
+                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
+                    dialog.setView(view1);
+
+                    final EditText quantity = (EditText) view1.findViewById(R.id.milk_quantity);
+                    quantity.setHint("Quantity");
+                    final TextView title = (TextView) view1.findViewById(R.id.title);
+                    title.setText("Edit Quantity");
+                    final TextInputLayout quantity_layout = (TextInputLayout) view1.findViewById(R.id.quantity_layout);
+                    quantity.setText(String.valueOf(totalData.get(day.getDay() - 1)));
+                    ((Button) view1.findViewById(R.id.clear)).setText("Save");
+                    ((Button) view1.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (quantity.getText().toString().equals(""))
+                                quantity_layout.setError("Enter quantity!");
+                            else {
+                                Delivery holder = new Delivery();
+                                holder.setQuantity(Double.parseDouble(quantity.getText().toString()));
+                                holder.setDeliveryDate(selected_date);
+                                holder.setCustomerId(custId);
+                                holder.setDateModified(Constants.getCurrentDate());
+                                DeliveryService deliveryService = new DeliveryService();
+                                if (deliveryService.isHasDataForDay(selected_date, custId))
+                                    deliveryService.update(holder);
+                                else
+                                    deliveryService.insert(holder);
+
+                                totalData.set(day.getDay() - 1, Double.parseDouble(quantity.getText().toString()));
+                                _mCalenderView.refresh();
+                                Constants.REFRESH_CALANDER = true;
+                                dialog.dismiss();
+                            }
+
+                        }
+                    });
+                    ((Button) view1.findViewById(R.id.cancel)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    if (dialog != null)
+                        dialog.show();
+                }
             }
         });
     }
 
 
     public static List<Double> totalData;
-    public static double quantity = 0;
-    static Calendar cal = Calendar.getInstance();
 
-//    public ArrayList<DateQuantityModel> getTotalQuantity() {
-//        totalData.clear();
-//        for (int i = 1; i <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); ++i) {
-//            quantity = getDeliveryOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-//            DateQuantityModel holder = new DateQuantityModel();
-//            holder.setDeliveryDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-//            holder.setCalculatedQuqantity(round(quantity, 1));
-//            totalData.add(holder);
-//        }
-//
-//
-//        return totalData;
-//    }
-
-    public static BigDecimal round(double d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Double.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd;
-    }
-
-    private String d = "";
 
 //    public double getDeliveryOfCustomer(String day) {
 //        double qty = 0;

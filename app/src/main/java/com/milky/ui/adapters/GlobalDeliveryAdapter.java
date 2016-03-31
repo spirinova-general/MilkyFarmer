@@ -14,12 +14,14 @@ import android.widget.Filter;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.ui.customers.CustomersList;
+import com.milky.service.databaseutils.serviceclasses.DeliveryService;
+import com.milky.ui.customers.DeliveryActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Customers;
+import com.milky.viewmodel.VDelivery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +29,14 @@ import java.util.List;
 /**
  * Created by Neha on 11/17/2015.
  */
-public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
+public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
     private Context mContext;
     private String date;
-    private List<VCustomers> filteredList, tempItems, suggestions;
-    private VCustomers filetrHolder;
+    private List<VDelivery> filteredList, tempItems, suggestions;
+    private Customers filetrHolder;
     private DatabaseHelper _dbHelper;
-
-    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate, final List<VCustomers> _mCustomersList) {
+    private DeliveryService deliveryService;
+    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate, final List<VDelivery> _mCustomersList) {
         super(con, resource, textViewResourceId, _mCustomersList);
         this.mContext = con;
         this.date = quantityEditDate;
@@ -42,6 +44,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
         tempItems = new ArrayList<>(filteredList); // this makes the difference.
         suggestions = new ArrayList<>();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
+        deliveryService = new DeliveryService();
 
     }
 
@@ -73,33 +76,19 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-//        DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
-//        if (exDb.isTableNotEmpty("delivery")) {
-//            if (DeliveryTableManagement.isHasData(exDb.getReadableDatabase(), filteredList
-//                    .get(position).getCustomerId(), Constants.DELIVERY_DATE)) {
-//                holder._quantity.setText(DeliveryTableManagement.getQuantityBySelectedDay(exDb.getReadableDatabase(), filteredList
-//                        .get(position).getCustomerId(), Constants.DELIVERY_DATE));
-//            } else {
-//                holder._quantity.setText(filteredList.get(position).getQuantity());
-//            }
-//        } else {
-//            holder._quantity.setText(filteredList.get(position).getQuantity());
-//        }
+
+            holder._quantity.setText(String.valueOf(filteredList.get(position).getQuantity()));
         holder._quantity.setTag(position);
         holder._quantity.setId(position);
-        String a = Character.toString(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                filteredList.get(position).getCustomerId()).charAt(0));
-        String b = Character.toString(CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                filteredList.get(position).getCustomerId()).charAt(0));
+        String a = Character.toString(filteredList.get(position).getFirstname().charAt(0));
+        String b = Character.toString(filteredList.get(position).getLastname().charAt(0));
 
         //get first name and last name letters
         holder._nameView.setText(a + b);
 /*
         * Set text field listeners*/
-        holder._firstName.setText(CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                filteredList.get(position).getCustomerId()));
-        holder._latsName.setText(" " + CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(),
-                filteredList.get(position).getCustomerId()));
+        holder._firstName.setText(filteredList.get(position).getFirstname());
+        holder._latsName.setText(" " + filteredList.get(position).getLastname());
         final ViewHolder finalHolder = holder;
         holder._quantity.addTextChangedListener(new TextWatcher() {
             @Override
@@ -111,12 +100,12 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 final int position2 = finalHolder._quantity.getId();
                 if (s.toString().length() > 0) {
-                    VCustomers holder = new VCustomers();
-                    holder.setGetDefaultQuantity(Double.parseDouble(s.toString()));
-//                    holder.setCustomerId(CustomersList._mCustomersList.get(position2).getCustomerId());
-//                    holder.setStart_date(Constants.DELIVERY_DATE);
-//                    holder.setAreaId(CustomersList._mCustomersList.get(position2).getAreaId());
-//                    CustomersList._mDeliveryList.add(holder);
+                    Delivery holder = new Delivery();
+                    holder.setQuantity(Double.parseDouble(s.toString()));
+                    holder.setCustomerId(DeliveryActivity._mCustomersList.get(position2).getCustomerId());
+                    holder.setDeliveryDate(Constants.DELIVERY_DATE);
+                    holder.setDateModified(Constants.getCurrentDate());
+                    DeliveryActivity._mDeliveryList.add(holder);
                     finalHolder._quantity_input_layout.setError(null);
                 } else {
                     finalHolder._quantity_input_layout.setError(mContext.getString(R.string.field_cant_empty));
@@ -211,7 +200,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
         nameFilter = new Filter() {
             @Override
             public CharSequence convertResultToString(Object resultValue) {
-                String str = ((VCustomers) resultValue).getFirstName();
+                String str = ((Customers) resultValue).getFirstName();
                 notifyDataSetChanged();
                 return str;
             }
@@ -220,9 +209,9 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
             protected FilterResults performFiltering(CharSequence constraint) {
                 if (constraint != null) {
                     suggestions.clear();
-                    for (VCustomers Area : tempItems) {
-                        if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase().trim()) ||
-                                Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase().trim()))) {
+                    for (VDelivery Area : tempItems) {
+                        if ((Area.getFirstname().toLowerCase().contains(constraint.toString().toLowerCase().trim()) ||
+                               Area.getLastname().toLowerCase().contains(constraint.toString().toLowerCase().trim()))) {
                             suggestions.add(Area);
                         }
                     }
@@ -239,11 +228,11 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                List<VCustomers> filterList;
-                filterList = (ArrayList<VCustomers>) results.values;
+                List<VDelivery> filterList;
+                filterList = (ArrayList<VDelivery>) results.values;
                 if (results != null && results.count > 0) {
                     clear();
-                    for (VCustomers Area : filterList) {
+                    for (VDelivery Area : filterList) {
                         add(Area);
                         notifyDataSetChanged();
                     }
@@ -254,15 +243,15 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VCustomers> {
                 if (Constants.selectedAreaId!=0) {
                     clear();
 
-//                    filterList = ExtcalCustomerSettingTableManagement.getAllCustomersBySelectedDate(exDb.getReadableDatabase(), Constants.selectedAreaId,Constants.DELIVERY_DATE);
-                    CustomersList.selectedCustomersId = new ArrayList<>();
-                    for (VCustomers Area : filterList) {
+                    filterList = new DeliveryService().getByAreaAndDay(Constants.selectedAreaId, Constants.DELIVERY_DATE);
+                    DeliveryActivity.selectedCustomersId = new ArrayList<>();
+                    for (VDelivery Area : filterList) {
                         add(Area);
                         notifyDataSetChanged();
-//                        CustomersList.selectedCustomersId.add(Area);
+                        DeliveryActivity.selectedCustomersId.add(Area);
                     }
                 }
-                CustomersList._mAdaapter.notifyDataSetChanged();
+                DeliveryActivity._mAdaapter.notifyDataSetChanged();
             }
         };
     }

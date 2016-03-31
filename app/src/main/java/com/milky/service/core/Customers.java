@@ -1,9 +1,9 @@
-package com.milky.viewmodel;
+package com.milky.service.core;
 
 /**
  * Created by Neha on 11/17/2015.
  */
-public class VCustomers {
+public class Customers {
     private String firstName;
     private String lastName;
 //    private String rollDate;
@@ -32,43 +32,7 @@ public class VCustomers {
     private int isDeleted;
     private String deletedOn;
     private int customerId;
-    private double defaultRate;
-    private double getDefaultQuantity;
-    private String startDate;
-    private String endDate;
     private int dirty;
-
-    public double getDefaultRate() {
-        return defaultRate;
-    }
-
-    public void setDefaultRate(double defaultRate) {
-        this.defaultRate = defaultRate;
-    }
-
-    public double getGetDefaultQuantity() {
-        return getDefaultQuantity;
-    }
-
-    public void setGetDefaultQuantity(double getDefaultQuantity) {
-        this.getDefaultQuantity = getDefaultQuantity;
-    }
-
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
 
     public int getCustomerId() {
         return customerId;

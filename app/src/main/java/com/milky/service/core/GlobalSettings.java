@@ -1,9 +1,9 @@
-package com.milky.viewmodel;
+package com.milky.service.core;
 
 /**
  * Created by Neha on 11/30/2015.
  */
-public class VGlobalSettings {
+public class GlobalSettings {
     private String Id;
     private double DefaultRate;
     private double Tax;

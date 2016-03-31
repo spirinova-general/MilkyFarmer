@@ -18,17 +18,17 @@ import java.util.List;
 
 import com.milky.R;
 import com.milky.utils.DialogScreen;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Customers;
 
 /**
  * Created by Neha on 11/17/2015.
  */
 public class CustomersListAdapter extends BaseAdapter {
-    private List<VCustomers> mCustomersData;
+    private List<Customers> mCustomersData;
     private Context mContext;
     private boolean _mIsCustomer = false;
 
-    public CustomersListAdapter(final List<VCustomers> dataList, final Context con, final boolean isCustomer) {
+    public CustomersListAdapter(final List<Customers> dataList, final Context con, final boolean isCustomer) {
         this.mContext = con;
         this.mCustomersData = dataList;
         this._mIsCustomer = isCustomer;
@@ -64,7 +64,7 @@ public class CustomersListAdapter extends BaseAdapter {
         holder._quantityText = (TextView) convertView.findViewById(R.id.quantityText);
         holder._date = (TextView) convertView.findViewById(R.id.date);
         holder._nameView = (TextView) convertView.findViewById(R.id.nameView);
-        holder._date.setText(mCustomersData.get(position).getStartDate() + "-" + mCustomersData.get(position).getEndDate());
+//        holder._date.setText(mCustomersData.get(position).getDateAdded() + "-" + mCustomersData.get(position).getEndDate());
         holder._quantity.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -97,13 +97,13 @@ public class CustomersListAdapter extends BaseAdapter {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(mContext, BillingEdit.class).putExtra("first_name", mCustomersData.get(position).getFirstName())
-                        .putExtra("last_name", mCustomersData.get(position).getLastName())
-                        .putExtra("bill_amount", mCustomersData.get(position).getBalance_amount())
-                        .putExtra("start_date", mCustomersData.get(position).getStartDate())
-                        .putExtra("end_date", mCustomersData.get(position).getEndDate())
-                        .putExtra("quantity", mCustomersData.get(position).getGetDefaultQuantity())
-                        .putExtra("rate", mCustomersData.get(position).getDefaultRate());
+                Intent i = new Intent(mContext, BillingEdit.class).putExtra("first_name", mCustomersData.get(position).getFirstName());
+//                        .putExtra("last_name", mCustomersData.get(position).getLastName())
+//                        .putExtra("bill_amount", mCustomersData.get(position).getBalance_amount())
+//                        .putExtra("start_date", mCustomersData.get(position).getStartDate())
+//                        .putExtra("end_date", mCustomersData.get(position).getEndDate())
+//                        .putExtra("quantity", mCustomersData.get(position).getGetDefaultQuantity())
+//                        .putExtra("rate", mCustomersData.get(position).getDefaultRate());
 //                        .putExtra("tax", mCustomersData.get(position).getT());
                 mContext.startActivity(i);
             }

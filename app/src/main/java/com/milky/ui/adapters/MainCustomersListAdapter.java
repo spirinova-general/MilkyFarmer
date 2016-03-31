@@ -17,8 +17,8 @@ import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Area;
+import com.milky.service.core.Customers;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -28,12 +28,12 @@ import java.util.List;
 /**
  * Created by Neha on 11/18/2015.
  */
-public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
-    private List<VCustomers> mCustomersList, tempItems, suggestions;
+public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
+    private List<Customers> mCustomersList, tempItems, suggestions;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
 
-    public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<VCustomers> listData) {
+    public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<Customers> listData) {
         super(act, resource, textViewResourceId, listData);
         this.mCustomersList = listData;
         this.mActivity = act;
@@ -68,7 +68,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
         holder._nameView = (TextView) convertView.findViewById(R.id.nameView);
 
 
-        final VCustomers customer = mCustomersList.get(position);
+        final Customers customer = mCustomersList.get(position);
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
@@ -100,18 +100,18 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
                 Intent intent = new Intent(mActivity, com.milky.ui.main.CustomersActivity.class)
                         .putExtra("fname", customer.getFirstName())
                         .putExtra("lname", customer.getLastName())
-                        .putExtra("quantity", customer.getGetDefaultQuantity())
+//                        .putExtra("quantity", customer.getGetDefaultQuantity())
                         .putExtra("areaId", customer.getAreaId())
                         .putExtra("address1", customer.getAddress1())
                         .putExtra("istoAddCustomer", 1)
                         .putExtra("mobile", customer.getMobile())
-                        .putExtra("defaultrate", customer.getDefaultRate())
+//                        .putExtra("defaultrate", customer.getDefaultRate())
                         .putExtra("address2", customer.getAddress2())
                         .putExtra("added_date", customer.getDateAdded())
                         .putExtra("balance", customer.getBalance_amount())
-                        .putExtra("cust_id", customer.getCustomerId())
-                        .putExtra("delivery_date", deliveryDate)
-                        .putExtra("start_delivery_date", customer.getStartDate());
+                        .putExtra("cust_id", customer.getCustomerId());
+//                        .putExtra("delivery_date", deliveryDate)
+//                        .putExtra("start_delivery_date", customer.getStartDate());
                 mActivity.startActivity(intent);
             }
         });
@@ -130,7 +130,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
     Filter nameFilter = new Filter() {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
-            String str = ((VCustomers) resultValue).getFirstName();
+            String str = ((Customers) resultValue).getFirstName();
             notifyDataSetChanged();
             return str;
         }
@@ -139,7 +139,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
                 suggestions.clear();
-                for (VCustomers Area : tempItems) {
+                for (Customers Area : tempItems) {
                     if ((Area.getFirstName().toLowerCase().contains(constraint.toString().toLowerCase()) ||
                             Area.getLastName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
                         suggestions.add(Area);
@@ -157,10 +157,10 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            List<VCustomers> filterList = (ArrayList<VCustomers>) results.values;
+            List<Customers> filterList = (ArrayList<Customers>) results.values;
             if (results != null && results.count > 0) {
                 clear();
-                for (VCustomers Area : filterList) {
+                for (Customers Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }
@@ -175,10 +175,10 @@ public class MainCustomersListAdapter extends ArrayAdapter<VCustomers> {
             if (Constants.selectedAreaId!=0) {
                 clear();
 
-                VAreaMapper holder = AreaCityTableManagement.getAreaById(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
+                Area holder = AreaCityTableManagement.getAreaById(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
 
-                filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
-                for (VCustomers Area : filterList) {
+//                filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
+                for (Customers Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }

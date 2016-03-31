@@ -4,15 +4,14 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.milky.viewmodel.VAccount;
-import com.milky.viewmodel.VGlobalSettings;
+import com.milky.service.core.GlobalSettings;
 
 /**
  * Created by Lead1 on 3/22/2016.
  */
 public class GlobalSettingsService {
     //    Insert GlobalSettings data
-    public static void insertGlobalSettingsData(SQLiteDatabase db, VGlobalSettings holder) {
+    public static void insertGlobalSettingsData(SQLiteDatabase db, GlobalSettings holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.DEFAULT_RATE, holder.getDefaultRate());
         values.put(TableColumns.TAX, holder.getTax());
@@ -21,10 +20,10 @@ public class GlobalSettingsService {
     }
 
     // get Settings data
-    public static VGlobalSettings getGlobalSettingsData(SQLiteDatabase db) {
+    public static GlobalSettings getGlobalSettingsData(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
         Cursor cursor = db.rawQuery(selectquery, null);
-        VGlobalSettings holder = new VGlobalSettings();
+        GlobalSettings holder = new GlobalSettings();
         if (cursor.moveToFirst()) {
             do {
                 holder.setDefaultRate(cursor.getInt(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
@@ -55,7 +54,7 @@ public class GlobalSettingsService {
     }
 
     //Update Settings
-    public static void updateSettings(SQLiteDatabase db, VGlobalSettings holder) {
+    public static void updateSettings(SQLiteDatabase db, GlobalSettings holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.ROLL_DATE, holder.getRollDate());
         values.put(TableColumns.TAX, holder.getTax());

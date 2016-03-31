@@ -35,7 +35,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomerSettingTableManagement;
@@ -43,6 +42,7 @@ import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -50,12 +50,9 @@ import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VAccount;
-import com.milky.viewmodel.VAreaMapper;
-import com.milky.viewmodel.VBill;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.milky.service.core.Account;
+import com.milky.service.core.Area;
+import com.milky.service.core.Bill;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -64,16 +61,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleteListner {
 
     private DatabaseHelper _dbHelper;
     private View _headerView;
-    protected ArrayList<VAreaMapper> selectedareacityList;
+    protected ArrayList<Area> selectedareacityList;
     public static DrawerLayout mDrawerLayout;
     public static NavigationView mNavigationView;
-
+    private AccountService accountService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +94,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 //        mNavigationView.addHeaderView(_headerView);
 
         TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
-        VAccount dataHolder = Account.getFarmerName(_dbHelper.getReadableDatabase());
-
+        Account dataHolder = accountService.getDetails();
         name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -146,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
     ActionBarDrawerToggle mDrawerToggle;
 
-    ArrayList<VAreaMapper> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
+    ArrayList<Area> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
 
     public static String selectedArea = "";
     Menu menu = null;
@@ -247,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         _headerView = mNavigationView.inflateHeaderView(R.layout.nav_headers);
 
         TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
-        VAccount dataHolder = Account.getFarmerName(_dbHelper.getReadableDatabase());
+        Account dataHolder = accountService.getDetails();
         name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
         if (getFragmentRefreshListener() != null) {
             getFragmentRefreshListener().onRefresh();
@@ -332,9 +327,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         selectedareacityList = new ArrayList<>();
 //        MenuItem sync = (MenuItem) mNavigationView.findViewById(R.id.nav_sync);
 //        sync.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_image));
+        accountService = new AccountService();
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
-            if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
-//                expiryDialog();
+            if (accountService.isAccountExpired()) {
+                expiryDialog();
             }
         }
         /**
@@ -405,7 +401,7 @@ _dbHelper.close();
         }
         if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
-                VAccount holder = new VAccount();
+                Account holder = new Account();
 //                try {
 //                    JSONObject result = Constants.API_RESPONCE;
 //                        holder.setFarmerCode(result.getString("FarmerCode"));
@@ -482,7 +478,7 @@ _dbHelper.close();
 
     //Expiry dialog
 
-    ArrayList<VBill> list = new ArrayList<>();
+    ArrayList<Bill> list = new ArrayList<>();
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -495,7 +491,7 @@ _dbHelper.close();
                 }
                 if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
                     if (list.size() > 0) {
-                        if (Account.getLeftsmsCount(_dbHelper.getReadableDatabase()) > list.size())
+                        if (accountService.getLeftSMS() > list.size())
                             new SendBillSMS().execute();
                         else
                             Toast.makeText(MainActivity.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
@@ -534,7 +530,7 @@ _dbHelper.close();
         protected String doInBackground(Void... params) {
             final Calendar startDate = Calendar.getInstance();
             final Calendar endDate = Calendar.getInstance();
-            final ArrayList<VBill> finalList = list;
+            final ArrayList<Bill> finalList = list;
 
             new Thread(new Runnable() {
                 public void run() {
@@ -595,7 +591,7 @@ _dbHelper.close();
             super.onProgressUpdate(values);
             messageSent.setText(values[0]);
             if (list.size() == finalI) {
-                Account.updateSMSCount(_dbHelper.getWritableDatabase(), list.size());
+                accountService.updateSMSCount(list.size());
                 ok.setVisibility(View.VISIBLE);
             }
         }
@@ -691,9 +687,7 @@ _dbHelper.close();
 //            asyncTask.runRequest(ServerApis.ACCOUNT_API, sendDataToServer(), FarmerSignup.this, true, requestedList);
 //            new ServerCommunication().SendHttpPost(ServerApis.ACCOUNT_API, jsonObject);
             HttpAsycTask dataTask = new HttpAsycTask();
-            dataTask.runRequest(ServerApis.ACCOUNT_API, Account.getDetails(_dbHelper.getReadableDatabase()), MainActivity.this, true, null);
-
-
+            dataTask.runRequest(ServerApis.ACCOUNT_API, accountService.getJsonData(), MainActivity.this, true, null);
             return null;
         }
 

@@ -14,8 +14,8 @@
         android:theme="@style/AppTheme" >
         
         <provider
-            android:name="VCustomersCalendarProvider"
-            android:authorities="VCustomerscalendarprovider" />
+            android:name="CalendarProvider"
+            android:authorities="calendarprovider" />
     </application>
 
 </manifest>

@@ -1,9 +1,9 @@
-package com.milky.viewmodel;
+package com.milky.service.core;
 
 /**
  * Created by Neha on 12/2/2015.
  */
-public class VAreaMapper {
+public class Area {
     private String area;
     private int areaId;
     private String city;

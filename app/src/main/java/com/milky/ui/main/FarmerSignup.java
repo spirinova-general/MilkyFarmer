@@ -19,9 +19,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
+import com.milky.service.core.GlobalSettings;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceclasses.AccountService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceinterface.IAccountService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -29,8 +31,7 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.utils.UserPrefrences;
-import com.milky.viewmodel.VAccount;
-import com.milky.viewmodel.VGlobalSettings;
+import com.milky.service.core.Account;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,14 +48,16 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
     private EditText _firstName, _lastName, _mobile, _password, otp;
     private DatabaseHelper _dbhelper;
     private SharedPreferences preferences;
-    private String url;
     private SharedPreferences.Editor edit;
+    private Button otpButton;
+    private AccountService accountService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin_layout);
-        preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+
+//        Check if the file exists in mobile storage..
         File f = new File(Environment.getExternalStorageDirectory() + File.separator + "milky");
         if (!f.isDirectory()) {
             f.mkdirs();
@@ -144,58 +147,13 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                                 jsonObject.put("EndDate", endDate);
                                 jsonObject.put("UsedSms", "0");
                                 jsonObject.put("TotalSms", "10");
-                                //getting the row count from account table
-                                jsonObject.put("Id", Account.getAccountId(_dbhelper.getReadableDatabase()) + 1);
-
-
+                                jsonObject.put("Id", 1);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                             HttpAsycTask dataTask = new HttpAsycTask();
                             dataTask.runRequest(ServerApis.ACCOUNT_API, jsonObject, FarmerSignup.this, true, null);
-
-//                        if (_dbhelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-//                            Account.updateAccountDetails(_dbhelper.getWritableDatabase(), holder);
-//                        else
-//
-//                            Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
-//                        startActivity(new Intent(FarmerSignup.this, MainActivity.class));
-                            _dbhelper.close();
                         } else otp_layout.setError("Invalid OTP");
-//                    _nameLayout.setError(null);
-//                    _lastnameLayout.setError(null);
-//                    _mobileLayout.setError(null);
-//                    _passwordLayout.setError(null);
-//                    otp_layout.setError(null);
-//                    Calendar cal = Calendar.getInstance();
-//                    String date = String.valueOf(cal.get(Calendar.MONTH))
-//                            + "-" + String.valueOf(cal.get(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(cal.get(Calendar.YEAR));
-//                    VAccount holder = new VAccount();
-//                    holder.setDateAdded(date);
-//                    holder.setDateModified(date);
-//                    holder.setFirstName(_firstName.getText().toString());
-//                    holder.setLastName(_lastName.getText().toString());
-//                    holder.setMobile(_mobile.getText().toString());
-//                    holder.setRate("0");
-//                    holder.setTax("0");
-//                    holder.setFarmerCode(Constants.generateOTP());
-//                    if (Constants.OTP.equals("")) {
-//                        otp_layout.setError("OTP expired, Get OTP again");
-//                    } else if (Constants.OTP.equals(otp.getText().toString().trim())) {
-//                        edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
-//                        edit.putString(UserPrefrences.INSERT_BILL, "0");
-//                        edit.commit();
-//
-//                        if (_dbhelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-//                            Account.updateAccountDetails(_dbhelper.getWritableDatabase(), holder);
-//                        else
-//                            Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
-//                        startActivity(new Intent(FarmerSignup.this, MainActivity.class));
-//                        _dbhelper.close();
-//                        finish();
-//                    } else {
-//                        otp_layout.setError("Invalid OTP");
-//                    }
                     }
                 } else
                     Toast.makeText(FarmerSignup.this, "Network is not available. ", Toast.LENGTH_SHORT).show();
@@ -209,12 +167,9 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
         getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
-    Button otpButton;
-
     private void initResources() {
         AppUtil.getInstance().startTimer();
-//        AppUtil.getInstance().showNotification(FarmerSignup.this, getResources().getString(R.string.app_name), "Your OTP for "+getResources().getString(R.string.app_name)+" is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
-
+        preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
         _firstName = (EditText) findViewById(R.id.first_name);
         _lastName = (EditText) findViewById(R.id.last_name);
         _mobile = (EditText) findViewById(R.id.mobile);
@@ -222,7 +177,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
         edit = preferences.edit();
         _dbhelper = AppUtil.getInstance().getDatabaseHandler();
-
+        accountService = new AccountService();
 
         _nameLayout = (TextInputLayout) findViewById(R.id.name_layout);
         _lastnameLayout = (TextInputLayout) findViewById(R.id.last_name_layout);
@@ -251,10 +206,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
                     if (!_mobile.getText().toString().equals("") && _mobile.getText().length() == 10) {
                         _mobileLayout.setError(null);
-
-                        SendSmsTouser(_mobile.getText().toString(), mesg);
-
-
+                        Constants.SendSmsTouser(_mobile.getText().toString(), mesg,FarmerSignup.this);
                     } else
                         _mobileLayout.setError("Enter mobile number !");
                 } else
@@ -266,12 +218,6 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
         });
     }
 
-    private void SendSmsTouser(String mob, final String sms) {
-
-        String append = "?mobile=" + mob + "&message=" + sms;
-        HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
-    }
 
     ProgressDialog progressBar;
 
@@ -279,11 +225,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
     public void onTaskCompleted(String type, HashMap<String, String> listType) {
 
         if (type.equals(ServerApis.ACCOUNT_API)) {
-//            get data from jsonobject and store account details into db
-//            if(progressBar !=null)
-//            progressBar.dismiss();
-
-            VAccount holder = new VAccount();
+            Account holder = new Account();
             try {
                 JSONObject result = Constants.API_RESPONCE;
                 holder.setFarmerCode(result.getString("FarmerCode"));
@@ -304,16 +246,19 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
                 edit.putString(UserPrefrences.INSERT_BILL, "0");
                 edit.commit();
-                if (progressBar != null)
-                    progressBar.dismiss();
-                Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
-                VGlobalSettings settinsHolder = new VGlobalSettings();
+
+//                com.milky.service.databaseutils.Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
+//                Insert Account details into table
+                accountService.insert(holder);
+
+                GlobalSettings settinsHolder = new GlobalSettings();
                 Calendar cal = Calendar.getInstance();
                 settinsHolder.setRollDate(String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) +
                         "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)));
                 settinsHolder.setTax(0);
                 settinsHolder.setDefaultRate(0);
-                GlobalSettingsService.insertGlobalSettingsData(_dbhelper.getWritableDatabase(), settinsHolder);
+//                Insert global settings data..
+               new GlobalSettingsService().insert(settinsHolder);
                 startActivity(new Intent(FarmerSignup.this, MainActivity.class));
                 this.finish();
             } catch (JSONException e) {

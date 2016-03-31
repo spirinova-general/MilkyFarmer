@@ -1,9 +1,9 @@
-package com.milky.viewmodel;
+package com.milky.service.core;
 
 /**
  * Created by Neha on 12/26/2015.
  */
-public class VAccount {
+public class Account {
     public String FarmerCode;
     public String FirstName;
     public String LastName;

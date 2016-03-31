@@ -17,8 +17,8 @@ import com.milky.ui.adapters.BillingAdapter;
 import com.milky.ui.adapters.CustomersListAdapter;
 import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
-import com.milky.viewmodel.VBill;
-import com.milky.viewmodel.VCustomers;
+import com.milky.service.core.Bill;
+import com.milky.service.core.Customers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class CustomersBillingFragment extends Fragment {
     private CustomersListAdapter _mAdapter;
-    private List<VCustomers> _mCustomersList;
+    private List<Customers> _mCustomersList;
     public static ListView _mListView;
     private FloatingActionButton _mAddBillFab;
     private DatabaseHelper _dbHelper;
@@ -68,7 +68,7 @@ public class CustomersBillingFragment extends Fragment {
 
     }
 
-    public static ArrayList<VBill> payment = new ArrayList<>();
+    public static ArrayList<Bill> payment = new ArrayList<>();
     //Calculating total qty
 
     private void generateBill() {

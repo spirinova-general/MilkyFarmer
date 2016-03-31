@@ -366,7 +366,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
 
     private boolean isForCustomers = false;
 
-    public void setCustomerId(final String id) {
+    public void setCustomerId(final int id) {
         CalendarAdapter.setcustId(id);
     }
 

@@ -22,17 +22,17 @@ import android.widget.Toast;
 
 
 import com.milky.R;
-import com.milky.service.databaseutils.Account;
 import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
-import com.milky.viewmodel.VBill;
+import com.milky.service.core.Bill;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -41,7 +41,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Stack;
 
 /**
  * Created by Neha on 11/20/2015.
@@ -59,6 +58,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
     private TextInputLayout _amount_layout;
     private DatabaseHelper _dbHelper;
     private int balanceType = 0;
+    private AccountService accountService;
 
     @Override
     protected void onResume() {
@@ -81,9 +81,10 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         _payment = (LinearLayout) findViewById(R.id.payment);
         payment_made = (EditText) findViewById(R.id.payment_amount);
         payment_made.setText(String.valueOf(intent.getDoubleExtra("payment_made", 0)));
-        if (intent.getIntExtra("balance_type",0)==1)
+        if (intent.getIntExtra("balance_type", 0) == 1)
             balanceType = 1;
         Calendar cal = Calendar.getInstance();
+        accountService = new AccountService();
         send_bill = (Button) findViewById(R.id.send_bill);
         try {
             cal.setTime(Constants._display_format.parse(intent.getStringExtra("end_date")));
@@ -93,7 +94,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         send_bill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Account.getLeftsmsCount(_dbHelper.getReadableDatabase()) >= 1)
+                if (accountService.getLeftSMS() >= 1)
                     new SendBillSMS().execute();
                 else
                     Toast.makeText(BillingEdit.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
@@ -117,8 +118,8 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             e.printStackTrace();
         }
 
-        if (cal.get(Calendar.DAY_OF_MONTH) >= calendar.get(Calendar.DAY_OF_MONTH) && cal.get(Calendar.MONTH)>=calendar.get(Calendar.MONTH)
-                && cal.get(Calendar.YEAR) >= calendar.get(Calendar.YEAR) && intent.getIntExtra("clear", 0)==1) {
+        if (cal.get(Calendar.DAY_OF_MONTH) >= calendar.get(Calendar.DAY_OF_MONTH) && cal.get(Calendar.MONTH) >= calendar.get(Calendar.MONTH)
+                && cal.get(Calendar.YEAR) >= calendar.get(Calendar.YEAR) && intent.getIntExtra("clear", 0) == 1) {
 //        if ((cal.get(Calendar.DAY_OF_MONTH)) == 5) {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
@@ -134,7 +135,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             clear_bill.setEnabled(false);
         }
         /*If bill is already cleared*/
-        if (intent.getIntExtra("clear",0)==0){
+        if (intent.getIntExtra("clear", 0) == 0) {
             clear_bill.setVisibility(View.GONE);
             clera_bill_text.setVisibility(View.GONE);
             send_bill.setVisibility(View.GONE);
@@ -167,7 +168,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                         if (payment.getText().toString().equals("")) {
                             quantity_layout.setError("Enter quantity!");
                         } else {
-                            VBill holder = new VBill();
+                            Bill holder = new Bill();
 
                             double payment_made = Double.parseDouble(payment.getText().toString());
                             double bill_amount = intent.getDoubleExtra("total", 0);
@@ -286,12 +287,12 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                     for (int i = 0; i < 1; ++i) {
                         String mesg = null;
                         try {
-                            mesg = URLEncoder.encode("Dear " + intent.getStringExtra("titleString") + ", " + "Your milk bill from" +start_date.getText().toString()+" to "+end_date.getText().toString()+" is Rs. "+ intent.getStringExtra("total")
-                                    +". Total quantity "+milk_quantity.getText().toString()+" litres. Rate is "+ rate.getText().toString()+"/litre.", "UTF-8");
+                            mesg = URLEncoder.encode("Dear " + intent.getStringExtra("titleString") + ", " + "Your milk bill from" + start_date.getText().toString() + " to " + end_date.getText().toString() + " is Rs. " + intent.getStringExtra("total")
+                                    + ". Total quantity " + milk_quantity.getText().toString() + " litres. Rate is " + rate.getText().toString() + "/litre.", "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), getIntent().getIntExtra("custId",0)), mesg);
+                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), getIntent().getIntExtra("custId", 0)), mesg);
 
 
                         finalI = i + 1;
@@ -328,7 +329,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             messageSent.setText(values[0]);
 
 
-            Account.updateSMSCount(_dbHelper.getWritableDatabase(), 1);
+            accountService.updateSMSCount(1);
             ok.setVisibility(View.VISIBLE);
 
         }
@@ -395,7 +396,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
         String append = "?mobile=" + mob + "&message=" + sms;
         HttpAsycTask dataTask = new HttpAsycTask();
-        url = ServerApis.SMS_API_ROOT + append ;
+        url = ServerApis.SMS_API_ROOT + append;
         dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
     }
 

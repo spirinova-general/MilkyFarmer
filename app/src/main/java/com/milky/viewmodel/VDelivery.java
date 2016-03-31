@@ -1,86 +1,52 @@
 package com.milky.viewmodel;
 
 /**
- * Created by Neha on 11/30/2015.
+ * Created by Lead1 on 3/30/2016.
  */
 public class VDelivery {
-    private String id;
-    private String accountId;
-    private String customerId;
-    private String deliveryDate;
-    private String quantity;
-    private String dateModified;
-    private String day, month, year;
+    String firstname;
+    String lastname;
+    double quantity;
+    int customerId;
+    int areaId;
 
-    public String getDay() {
-        return day;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setDay(String day) {
-        this.day = day;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getMonth() {
-        return month;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
-    public String getYear() {
-        return year;
-    }
-
-    public void setYear(String year) {
-        this.year = year;
-    }
-
-    public String getDateModified() {
-        return dateModified;
-    }
-
-    public void setDateModified(String dateModified) {
-        this.dateModified = dateModified;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getDeliveryDate() {
-        return deliveryDate;
-    }
-
-    public void setDeliveryDate(String deliveryDate) {
-        this.deliveryDate = deliveryDate;
-    }
-
-    public String getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(int areaId) {
+        this.areaId = areaId;
     }
 }
