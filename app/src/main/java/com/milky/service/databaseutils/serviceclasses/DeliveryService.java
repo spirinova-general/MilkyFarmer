@@ -5,13 +5,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.service.core.Delivery;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.utils.AppUtil;
-import com.milky.utils.Constants;
 import com.milky.viewmodel.VDelivery;
 
 import java.util.ArrayList;
@@ -204,7 +202,9 @@ public class DeliveryService implements IDelivery {
 
     public double getQuantityOfDayByDate(String day) {
         String selectquery = "";
-        selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.DELEVERY_DATE + " ='" + day + "'";
+        selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY +" INNER JOIN "+TableNames.TABLE_CUSTOMER
+                +" ON "+TableNames.TABLE_DELIVERY+"."+TableColumns.CUSTOMER_ID+" ="+TableNames.TABLE_CUSTOMER+"."+TableColumns.ID
+                + " WHERE " + TableColumns.DELEVERY_DATE + " ='" + day + "' AND "+TableColumns.ISDELETED+" ='1'";
         custIds = new ArrayList<>();
         Cursor cursor = getDb().rawQuery(selectquery, null);
         double quantity = 0;

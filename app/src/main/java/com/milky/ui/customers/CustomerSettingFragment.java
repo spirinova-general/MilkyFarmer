@@ -19,14 +19,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.AreaService;
+import com.milky.service.databaseutils.serviceclasses.BillService;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
@@ -40,6 +39,7 @@ import com.milky.service.core.CustomersSetting;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 /**
@@ -59,12 +59,13 @@ public class CustomerSettingFragment extends Fragment {
     private String[] autoCompleteData;
     private String previousSelectedArea = "";
     private String[] mData;
-    private ArrayList<Area> areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
+    private List<Area> areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
     private Calendar c;
     private TextView pick_date;
     private int custId = -1;
     private boolean updatedQty = false, updateRate = false;
     private CustomersSetting settingData;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -195,16 +196,16 @@ public class CustomerSettingFragment extends Fragment {
         rate_layout = (TextInputLayout) view.findViewById(R.id.rate_layout);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         pick_date = (TextView) view.findViewById(R.id.pick_date);
-        custId = getActivity().getIntent().getIntExtra("cust_id",0);
+        custId = getActivity().getIntent().getIntExtra("cust_id", 0);
 
         pick_date.setBackgroundColor(getResources().getColor(R.color.gray_lighter));
         pick_date.setEnabled(false);
-        settingData = new CustomersSettingService().getByCustId(custId,Constants.getCurrentDate());
+        settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
         pick_date.setText(settingData.getStartDate());
         /*Set defaul rate
         * */
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-            _mRate.setText(GlobalSettingsService.getDefaultRate(_dbHelper.getReadableDatabase()));
+            _mRate.setText(String.valueOf(new GlobalSettingsService().getData().getDefaultRate()));
 
         /*
         * If to edit customer details
@@ -214,18 +215,16 @@ public class CustomerSettingFragment extends Fragment {
         _mQuantuty.setText(String.valueOf(settingData.getGetDefaultQuantity()));
         _mFirstName.setText(getActivity().getIntent().getStringExtra("fname"));
         _mLastName.setText(getActivity().getIntent().getStringExtra("lname"));
-        _mBalance.setText(String.valueOf(getActivity().getIntent().getDoubleExtra("balance",0)));
+        _mBalance.setText(String.valueOf(getActivity().getIntent().getDoubleExtra("balance", 0)));
 //        _mAddress2.setText(getActivity().getIntent().getStringExtra("address2"));
         _mAddress1.setText(getActivity().getIntent().getStringExtra("address1"));
         _mRate.setText(String.valueOf(settingData.getDefaultRate()));
-        if (!AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)).equals(""))
-            _autocomplete_city_area.setText(AreaCityTableManagement.getLocalityById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0))
-                    + ", " +
-                    AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)) +
-                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)));
+        Area area = new AreaService().getAreaById( getActivity().getIntent().getIntExtra("areaId", 0));
+        if (!area.getLocality().equals(""))
+            _autocomplete_city_area.setText(area.getLocality()+ ", " + area.getArea() +", " + area.getCity());
         else
-            _autocomplete_city_area.setText(AreaCityTableManagement.getAreaNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)) +
-                    ", " + AreaCityTableManagement.getCityNameById(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("areaId",0)));
+            _autocomplete_city_area.setText(area.getArea() +
+                    ", " + area.getCity());
 
         previousSelectedArea = _autocomplete_city_area.getText().toString();
         _mFirstName.setSelection(getActivity().getIntent().getStringExtra("fname").length());
@@ -239,7 +238,7 @@ public class CustomerSettingFragment extends Fragment {
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
         _mQuantuty.setSelection(String.valueOf(settingData.getGetDefaultQuantity()).length());
 
-        _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
+        _areacityList = new AreaService().getStoredAddresses();
         AreaCityAdapter adapter1 = new AreaCityAdapter(getActivity(), 0, R.id.address, _areacityList);
         _autocomplete_city_area.setAdapter(adapter1);
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
@@ -272,7 +271,7 @@ public class CustomerSettingFragment extends Fragment {
         int index = Arrays.asList(mData).indexOf(data);*/
         //  _autocomplete_city_area.setAdapter(adapter);
         //setting the adapter data into the AutoCompleteTextView
-        selectedAreaId = getActivity().getIntent().getIntExtra("areaId",0);
+        selectedAreaId = getActivity().getIntent().getIntExtra("areaId", 0);
 
         _autocomplete_city_area.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -374,7 +373,7 @@ public class CustomerSettingFragment extends Fragment {
                 else if (_mAddress1.getText().toString().equals(""))
                     flat_number_layout.setError("Enter flat number!");
 
-                else if ((!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()) && tempAreaId==0)) {
+                else if ((!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()) && tempAreaId == 0)) {
 
                     autocomplete_layout.setError("Select valid area!");
 
@@ -389,7 +388,7 @@ public class CustomerSettingFragment extends Fragment {
                         !_mBalance.getText().toString().equals("") &&
                         !_mAddress1.getText().toString().equals("")
                         && !_mRate.getText().toString().equals("")
-                        && selectedAreaId!=0
+                        && selectedAreaId != 0
                         && !_mMobile.getText().toString().equals("") &&
                         !_mQuantuty.getText().toString().equals("")
                         ) {
@@ -398,67 +397,67 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setLastName(_mLastName.getText().toString());
                     holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
                     holder.setAddress1(_mAddress1.getText().toString());
-//                    holder.setAddress2(_mAddress2.getText().toString());
+                    holder.setAreaId(selectedAreaId);
+                    holder.setMobile(_mMobile.getText().toString());
+                    holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
+                    String currentDate = Constants.getCurrentDate();
+                    holder.setDateModified(currentDate);
+                    holder.setCustomerId(getActivity().getIntent().getIntExtra("cust_id", 0));
+                    holder.setIsDeleted(1);
+                    holder.setDeletedOn("1");
+                    //Update data into custmers table
+                    new CustomersService().update(holder);
 
-//                    holder.setAreaId(selectedAreaId);
-//                    holder.setMobile(_mMobile.getText().toString());
-//                    holder.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
-//                    holder.setCustomerId(getActivity().getIntent().getIntExtra("cust_id",0));
-//                    holder.setDefaultRate(Double.parseDouble(_mRate.getText().toString()));
-//                    holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
-//                    holder.setStartDate(getActivity().getIntent().getStringExtra("start_delivery_date"));
-//                    String currentDate = Constants.getCurrentDate();
-////                    holder.ba("1");
-//                    holder.setDateModified(currentDate);
-//                    Calendar c = Calendar.getInstance();
-//                    holder.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
-//                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-//                    CustomersTableMagagement.updateCustomerDetail(_dbHelper.getWritableDatabase(), holder, getActivity().getIntent().getIntExtra("cust_id", 0));
-//
-//                    CustomersSetting setting = new CustomersSetting();
-//                    setting.setCustomerId(holder.getCustomerId());
-//                    setting.setDefaultRate(holder.getDefaultRate());
-////                    setting.setStartDate(holder.getStartDate());
-//                    setting.setStartDate(currentDate);
-//                    setting.setEndDate(holder.getEndDate());
-//                    setting.setGetDefaultQuantity(holder.getGetDefaultQuantity());
-//                    setting.setDirty(0);
-//                    if (CustomerSettingTableManagement.isHasDataForDayOfCust(_dbHelper.getReadableDatabase(), currentDate,
-//                            getActivity().getIntent().getIntExtra("cust_id", 0)))
-//                        CustomerSettingTableManagement.updateAllData(_dbHelper.getWritableDatabase(), setting);
-//                    else {
-//                        if (updatedQty) {
-//                            String enddate = CustomerSettingTableManagement.getOldEndDate(_dbHelper.getReadableDatabase(), getActivity().getIntent().getIntExtra("cust_id",0), currentDate);
-//                            CustomerSettingTableManagement.updateEndDateByArea(_dbHelper.getWritableDatabase(), holder, enddate, currentDate);
-//                            holder.setStartDate(currentDate);
-//                            CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), setting);
-//                        } else if (updateRate)
-//
-//                            CustomerSettingTableManagement.updateRate(_dbHelper.getWritableDatabase(), setting);
-//
-//
-//                        else
-//
-//                            CustomerSettingTableManagement.updateAllData(_dbHelper.getWritableDatabase(), setting);
+
+                    CustomersSetting setting = new CustomersSetting();
+                    setting.setCustomerId(holder.getCustomerId());
+//                    setting.setStartDate(holder.getStartDate());
+                    setting.setStartDate(currentDate);
+                    setting.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
+                    setting.setDefaultRate(Double.parseDouble(_mRate.getText().toString()));
+                    setting.setStartDate(new CustomersSettingService().getByCustId(custId, currentDate).getStartDate());
+
+                    Calendar c = Calendar.getInstance();
+                    setting.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
+                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+
+                    setting.setDirty(0);
+                    CustomersSettingService customersSettingService = new CustomersSettingService();
+                    if (customersSettingService.isHasDataForCustoner(currentDate,
+                            getActivity().getIntent().getIntExtra("cust_id", 0)))
+                        customersSettingService.update(setting);
+                    else {
+                        if (updatedQty) {
+                            //Update old bill
+                            String enddate = customersSettingService.getEndDate(getActivity().getIntent().getIntExtra("cust_id", 0), currentDate);
+                            setting.setEndDate(currentDate);
+                            customersSettingService.updateEndDate(setting, enddate);
+                            //insert new Bill..
+                            setting.setStartDate(currentDate);
+                            customersSettingService.insert(setting);
+                        } else
+                            //update customers setting detail..
+                            new CustomersSettingService().update(setting);
 
 
                     }
 
-//                    Bill bill = new Bill();
-//                    bill.setBalance(holder.getBalance_amount());
-//                    bill.setCustomerId(setting.getCustomerId());
-//                    bill.setQuantity(holder.getGetDefaultQuantity());
-//                    BillTableManagement.updateData(_dbHelper.getWritableDatabase(), bill);
-//                    Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
-//                    Constants.REFRESH_CALANDER = true;
-//                    Constants.REFRESH_CUSTOMERS = true;
-//                    Constants.REFRESH_BILL = true;
+                    Bill bill = new Bill();
+                    bill.setBalance(holder.getBalance_amount());
+                    bill.setCustomerId(setting.getCustomerId());
+                    bill.setQuantity(setting.getGetDefaultQuantity());
+
+                    new BillService().updateQuantity(bill);
+                    Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
+                    Constants.REFRESH_CALANDER = true;
+                    Constants.REFRESH_CUSTOMERS = true;
+                    Constants.REFRESH_BILL = true;
                     getActivity().finish();
 
-//                } else {
-//                    Toast.makeText(getActivity(), getResources().getString(R.string.fill_require_fields), Toast.LENGTH_SHORT).show();
-//
-//                }
+                } else {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.fill_require_fields), Toast.LENGTH_SHORT).show();
+
+                }
             }
         });
 

@@ -10,19 +10,15 @@ import android.widget.Filter;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Area;
 import com.milky.service.core.Customers;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -32,6 +28,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
     private List<Customers> mCustomersList, tempItems, suggestions;
     private Activity mActivity;
     private DatabaseHelper _dbhelper;
+    private AreaService areaService;
 
     public MainCustomersListAdapter(Activity act, int resource, int textViewResourceId, List<Customers> listData) {
         super(act, resource, textViewResourceId, listData);
@@ -40,6 +37,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
         _dbhelper = AppUtil.getInstance().getDatabaseHandler();
         tempItems = new ArrayList<>(mCustomersList); // this makes the difference.
         suggestions = new ArrayList<>();
+        areaService = new AreaService();
     }
 
     @Override
@@ -72,13 +70,13 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
-        if (!AreaCityTableManagement.getLocalityById(_dbhelper.getReadableDatabase(), customer.getAreaId()).equals(""))
-            holder.userAreaName.setText(AreaCityTableManagement.getLocalityById(_dbhelper.getReadableDatabase(), customer.getAreaId())
-                    + ", " + AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
+        Area area = new AreaService().getAreaById(customer.getAreaId());
+        if (!area.getLocality().equals(""))
+            holder.userAreaName.setText(area.getLocality() + ", " + area.getArea());
         else
-            holder.userAreaName.setText(AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
+            holder.userAreaName.setText(area.getArea());
         holder.userStreet.setText(customer.getAddress2() + ", ");
-        holder.userCity.setText(AreaCityTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()));
+        holder.userCity.setText(area.getCity());
         String a = Character.toString(customer.getFirstName().charAt(0));
         String b = Character.toString(customer.getLastName().charAt(0));
 
@@ -90,13 +88,6 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar c = Calendar.getInstance();
-                try {
-                    c.setTime(Constants.work_format.parse(CustomerSettingTableManagement.getStartDeliveryDate(_dbhelper.getReadableDatabase(),customer.getCustomerId())));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                String deliveryDate = c.get(Calendar.DAY_OF_MONTH) + "-" + Constants.MONTHS[c.get(Calendar.MONTH)] + "-" + c.get(Calendar.YEAR);
                 Intent intent = new Intent(mActivity, com.milky.ui.main.CustomersActivity.class)
                         .putExtra("fname", customer.getFirstName())
                         .putExtra("lname", customer.getLastName())
@@ -172,10 +163,10 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
                 clear();
                 notifyDataSetChanged();
             }
-            if (Constants.selectedAreaId!=0) {
+            if (Constants.selectedAreaId != 0) {
                 clear();
 
-                Area holder = AreaCityTableManagement.getAreaById(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
+                Area holder = areaService.getAreaById(Constants.selectedAreaId);
 
 //                filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
                 for (Customers Area : filterList) {

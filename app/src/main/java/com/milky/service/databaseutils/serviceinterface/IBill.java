@@ -6,13 +6,20 @@ import com.milky.service.core.Bill;
 import java.util.List;
 
 public interface IBill {
-    public void insert(Bill bill);
+    void insert(Bill bill);
 
-    public void update(Bill bill);
+    void update(Bill bill);
 
-    public List<Bill> getAllBill();
+    List<Bill> getTotalAllBill();
 
-    public List<Bill> getOutstandingBill();
+    List<Bill> getOutstandingBill();
 
-    public List<Bill> getBillById(int id);
+    List<Bill> getOutstandingBillsById(int id);
+
+    List<Bill> getTotalBillById(int id);
+
+    void updateBillById(Bill bill);
+
+    void updateOutstandingBills(Bill bill);
+    void updateRollDate();
 }

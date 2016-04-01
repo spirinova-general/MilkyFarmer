@@ -14,17 +14,21 @@ import java.util.Calendar;
 public class DatabaseHelper extends SQLiteOpenHelper {
     Context context;
     SQLiteDatabase db;
-    public DatabaseHelper(final Context context) {
-        super(context, Environment.getExternalStorageDirectory()
-                + File.separator + "milky"
-                + File.separator + DatabaseVersioControl.DATABASE_NAME, null, DatabaseVersioControl.DATABASE_VERSION);
-    }
 
-//    public DatabaseHelper(Context context) {
-//        super(context, DatabaseVersioControl.DATABASE_NAME, null,
-//                DatabaseVersioControl.DATABASE_VERSION);
-//        this.context = context;
+ //Database for External Storage use..
+
+//    public DatabaseHelper(final Context context) {
+//        super(context, Environment.getExternalStorageDirectory()
+//                + File.separator + "milky"
+//                + File.separator + DatabaseVersioControl.DATABASE_NAME, null, DatabaseVersioControl.DATABASE_VERSION);
 //    }
+
+    //Database for internal use..
+    public DatabaseHelper(Context context) {
+        super(context, DatabaseVersioControl.DATABASE_NAME, null,
+                DatabaseVersioControl.DATABASE_VERSION);
+        this.context = context;
+    }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -53,20 +57,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //                + TableNames.TABLE_CUSTOMER_BILL + " ADD COLUMN " + TableColumns.DELETED_ON + " TEXT NOT NULL DEFAULT '" +"1" + "'";
 //        if (!BillTableManagement.columnRollDateExistsDeletedOn(db))
 //            db.execSQL(DELETED_FOR_BILLS);
-        String areaIndex = "CREATE UNIQUE INDEX " + TableColumns.AREA_INDEX + " ON " + TableNames.TABLE_CUSTOMER + " (" + TableColumns.AREA_ID + ", " + TableColumns.ID +  " )";
+        String areaIndex = "CREATE UNIQUE INDEX " + TableColumns.AREA_INDEX + " ON " + TableNames.TABLE_CUSTOMER + " (" + TableColumns.AREA_ID + ", " + TableColumns.ID + " )";
         db.execSQL(areaIndex);
         String custIndex = "CREATE UNIQUE INDEX " + TableColumns.BILL_INDEX + " ON " + TableNames.TABLE_CUSTOMER_BILL + " (" + TableColumns.ID + " )";
         db.execSQL(custIndex);
-        String custSettingIndex = "CREATE UNIQUE INDEX " + TableColumns.CUSTOMER_SETTING_INDEX + " ON " + TableNames.TABLE_CUSTOMER_SETTINGS + " (" +TableColumns.ID+", "+TableColumns.ID+ " )";
+        String custSettingIndex = "CREATE UNIQUE INDEX " + TableColumns.CUSTOMER_SETTING_INDEX + " ON " + TableNames.TABLE_CUSTOMER_SETTINGS + " (" + TableColumns.ID + ", " + TableColumns.ID + " )";
         db.execSQL(custSettingIndex);
         //        Adding custId Index..
-        String deliveryIndex = "CREATE UNIQUE INDEX " + TableColumns.DELIVERY_INDEX + " ON " + TableNames.TABLE_DELIVERY + " (" +TableColumns.ID+", "+TableColumns.ID+ " )";
+        String deliveryIndex = "CREATE UNIQUE INDEX " + TableColumns.DELIVERY_INDEX + " ON " + TableNames.TABLE_DELIVERY + " (" + TableColumns.ID + ", " + TableColumns.ID + " )";
         db.execSQL(deliveryIndex);
 
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
 //        for (String tableName : tables) {
 //            db.execSQL(String.format("DROP TABLE IF EXISTS %s", tableName));
 //        }
@@ -86,7 +90,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //            db.execSQL(ADD_ROLL_DATE_COLUMN_BILL);
 //        if (newVersion > oldVersion && !BillTableManagement.columnRollDateExistsDeletedOn(db))
 //            db.execSQL(ADD_DELETE_COLUMN_TO_BILL);
-
 
 
 //        Adding indexes..

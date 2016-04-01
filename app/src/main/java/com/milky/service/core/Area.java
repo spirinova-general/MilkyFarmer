@@ -1,5 +1,7 @@
 package com.milky.service.core;
 
+import com.milky.service.databaseutils.TableColumns;
+
 /**
  * Created by Neha on 12/2/2015.
  */
@@ -57,5 +59,18 @@ public class Area {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getFullAddress(Area area)
+    {
+        String address ="";
+        if (area.getLocality().equals("")) {
+            address = area.getArea() + ", "
+                    + area.getCity();
+
+        } else
+            address = area.getLocality() + ", " + area.getArea() + ", "
+                    +area.getCity();
+        return address;
     }
 }

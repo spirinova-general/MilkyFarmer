@@ -38,8 +38,6 @@ public class CustomrDeliveryFragment extends Fragment {
     private TextInputLayout bill_amount_layout;
     private int dataCount = 0;
     private int custId = 0;
-    private DatabaseHelper db;
-    //    private ExtcalDatabaseHelper _exDb;
     private String selected_date;
     private CustomersSetting settingData;
 
@@ -57,9 +55,9 @@ public class CustomrDeliveryFragment extends Fragment {
         settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
         _mCalenderView.setForCustomersDelivery(true);
         _mCalenderView.setCustomerId(custId);
-        db = AppUtil.getInstance().getDatabaseHandler();
 
         initResources();
+        _mCalenderView.updateQuantityList(totalData);
 
 //        if (totalData.size() > 0) {
 //            _mCalenderView.setForCustomersDelivery(true);
@@ -73,6 +71,7 @@ public class CustomrDeliveryFragment extends Fragment {
 
     private void initResources() {
         Calendar cal = Calendar.getInstance();
+        DeliveryService.selectedCustomer = custId;
         totalData = new DeliveryService().getTotalDelivery(1, cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), true);
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
@@ -119,8 +118,9 @@ public class CustomrDeliveryFragment extends Fragment {
                                     deliveryService.insert(holder);
 
                                 totalData.set(day.getDay() - 1, Double.parseDouble(quantity.getText().toString()));
-                                _mCalenderView.refresh();
+                                _mCalenderView.refreshAdapter();
                                 Constants.REFRESH_CALANDER = true;
+                                Constants.REFRESH_BILL=true;
                                 dialog.dismiss();
                             }
 

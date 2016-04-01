@@ -49,12 +49,7 @@ public class AreaCityAdapter extends ArrayAdapter<Area> {
         Area Area = items.get(position);
         if (Area != null) {
             TextView lblName = (TextView) view.findViewById(R.id.address);
-//            TextView lblName2 = (TextView) view.findViewById(R.id.te2);
             lblName.setText(Area.getCityArea());
-
-
-//            lblName2.setText(AreaMapTableManagement.getCityNameById(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), Area.getCityId()));
-//            lblName2.setText(Area.getArea()+", "+Area.getCity());
             AppUtil.getInstance().getDatabaseHandler().close();
         }
         return view;

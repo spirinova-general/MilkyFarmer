@@ -1,4 +1,4 @@
-package com.milky.service.databaseutils;
+package com.milky.service.legacy;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
+import com.milky.service.databaseutils.TableColumns;
+import com.milky.service.databaseutils.TableNames;
 
 import java.util.ArrayList;
 
@@ -40,10 +42,8 @@ public class CustomersTableMagagement {
 
     public static void updateBalance(SQLiteDatabase db, double balance, int custId, int balanceType) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DIRTY, "1");
-        values.put(TableColumns.SYNC_STATUS, "1");
         values.put(TableColumns.BALANCE, balance);
-        values.put(TableColumns.BALANCE_TYPE, balanceType);
+//        values.put(TableColumns.BALANCE_TYPE, balanceType);
 
         db.update(TableNames.TABLE_CUSTOMER, values, TableColumns.ID + " ='" + custId + "'", null);
     }
@@ -54,7 +54,6 @@ public class CustomersTableMagagement {
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
             do {
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.ID)) != null)
                     holder.add(cursor.getString(cursor.getColumnIndex(TableColumns.ID)));
             }
             while (cursor.moveToNext());
@@ -63,29 +62,25 @@ public class CustomersTableMagagement {
         return holder;
     }
 
-    //Get CustomerId
-
-    public static int getCustomerId(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
-        int id = 0;
-        Cursor cursor = db.rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-
-                id = cursor.getInt(cursor.getColumnIndex(TableColumns.ID));
-
-            }
-            while (cursor.moveToNext());
-
-        }
-        cursor.close();
-
-        return id;
-    }
-
-
-
+//    //Get CustomerId
+//    public static int getCustomerId(SQLiteDatabase db) {
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
+//        int id = 0;
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//
+//        if (cursor.moveToFirst()) {
+//            do {
+//
+//                id = cursor.getInt(cursor.getColumnIndex(TableColumns.ID));
+//
+//            }
+//            while (cursor.moveToNext());
+//
+//        }
+//        cursor.close();
+//
+//        return id;
+//    }
 
     public static String getAccountId(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER;
@@ -114,8 +109,6 @@ public class CustomersTableMagagement {
 
         if (cursor.moveToFirst()) {
             do {
-
-
                 list.add(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
             }
             while (cursor.moveToNext());
@@ -125,54 +118,47 @@ public class CustomersTableMagagement {
         return list;
     }
 
+//    public static String getFirstName(SQLiteDatabase db, final int custId) {
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE "
+//                + TableColumns.ID + " ='" + custId + "'";
+//        String name = "";
+//
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//
+//        if (cursor.moveToFirst()) {
+//            do {
+//                    name = cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME));
+//            }
+//            while (cursor.moveToNext());
+//        }
+//        cursor.close();
+//
+//        return name;
+//    }
 
-
-    public static String getFirstName(SQLiteDatabase db, final int custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE "
-                + TableColumns.ID + " ='" + custId + "'";
-        String name = "";
-
-        Cursor cursor = db.rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-
-
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)) != null)
-                    name = cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME));
-
-
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-
-        return name;
-    }
-
-    public static String getLastName(SQLiteDatabase db, final int custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE "
-                + TableColumns.ID + " ='" + custId + "'";
-
-        String name = "";
-
-        Cursor cursor = db.rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-
-
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
-                    name = cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME));
-
-
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-
-        return name;
-    }
+//    public static String getLastName(SQLiteDatabase db, final int custId) {
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE "
+//                + TableColumns.ID + " ='" + custId + "'";
+//
+//        String name = "";
+//
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//
+//        if (cursor.moveToFirst()) {
+//            do {
+//
+//
+//                if (cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)) != null)
+//                    name = cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME));
+//
+//
+//            }
+//            while (cursor.moveToNext());
+//        }
+//        cursor.close();
+//
+//        return name;
+//    }
 
 //    public static VCustomers getAllCustomersByCustId(SQLiteDatabase db, final String areaId) {
 //        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='" + "1'" +
@@ -478,7 +464,7 @@ public class CustomersTableMagagement {
 
         if (cursor.moveToFirst()) {
             do {
-                CustomersSetting holder = CustomerSettingTableManagement.getAllCustomersByCustomerId(db,cursor.getInt(cursor.getColumnIndex(TableColumns.ID)), date);
+                CustomersSetting holder = CustomerSettingTableManagement.getAllCustomersByCustomerId(db, cursor.getInt(cursor.getColumnIndex(TableColumns.ID)), date);
                 list.add(holder);
             }
             while (cursor.moveToNext());

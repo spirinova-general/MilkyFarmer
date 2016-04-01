@@ -35,14 +35,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
+import com.milky.service.databaseutils.serviceclasses.AreaService;
+import com.milky.service.databaseutils.serviceclasses.BillService;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -61,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleteListner {
 
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     public static DrawerLayout mDrawerLayout;
     public static NavigationView mNavigationView;
     private AccountService accountService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
     ActionBarDrawerToggle mDrawerToggle;
 
-    ArrayList<Area> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
+    List<Area> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
 
     public static String selectedArea = "";
     Menu menu = null;
@@ -201,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                         Constants.selectedAreaId = 0;
                     }
                 }
+
                 @Override
                 public void afterTextChanged(Editable s) {
                 }
@@ -232,7 +236,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         return true;
     }
 
-    ArrayList<Integer> areas;
 
     @Override
     protected void onResume() {
@@ -249,16 +252,17 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         }
         _areaList.clear();
         _areacityList.clear();
-        areas = AreaCityTableManagement.getArea(_dbHelper.getReadableDatabase());
-        for (int i = 0; i < areas.size(); ++i) {
-            _areaList.add(AreaCityTableManagement.getAreaById(_dbHelper.getReadableDatabase(), areas.get(i)));
+        AreaService areaService = new AreaService();
+        _areacityList = areaService.getStoredAddresses();
+
+        for (int i = 0; i < _areacityList.size(); ++i) {
+            _areaList.add(areaService.getAreaById(_areacityList.get(i).getAreaId()));
         }
         _dbHelper.close();
 
-        _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
-      }
+    }
 
 
     private void supportActionBar() {
@@ -344,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
 
         //check if global setting has been set
-        if ("0".equals(GlobalSettingsService.getDefaultRate(_dbHelper.getReadableDatabase()))) {
+        if ("0".equals(new GlobalSettingsService().getData().getDefaultRate())) {
             mDrawerLayout.openDrawer(mNavigationView);
             Toast.makeText(MainActivity.this, getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
             _dbHelper.close();
@@ -433,9 +437,9 @@ _dbHelper.close();
 
         } else if (type == ServerApis.SYNC) {
             if (requestType.get("Customer_List").equals("0")) {
-                CustomersTableMagagement.updateSyncedData(_dbHelper.getWritableDatabase());
+//                CustomersTableMagagement.updateSyncedData(_dbHelper.getWritableDatabase());
             } else if (requestType.get("Bill_List").equals("0")) {
-                BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
+//                BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
             }
         }
         _dbHelper.close();
@@ -478,7 +482,7 @@ _dbHelper.close();
 
     //Expiry dialog
 
-    ArrayList<Bill> list = new ArrayList<>();
+    List<Bill> list = new ArrayList<>();
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -487,7 +491,7 @@ _dbHelper.close();
         switch (id) {
             case R.id.sens_sms:
                 if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                    list = BillTableManagement.getTotalBillList(_dbHelper.getReadableDatabase());
+                    list = new BillService().getTotalAllBill();
                 }
                 if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
                     if (list.size() > 0) {
@@ -530,12 +534,14 @@ _dbHelper.close();
         protected String doInBackground(Void... params) {
             final Calendar startDate = Calendar.getInstance();
             final Calendar endDate = Calendar.getInstance();
-            final ArrayList<Bill> finalList = list;
+            final List<Bill> finalList = list;
 
             new Thread(new Runnable() {
                 public void run() {
                     for (int i = 0; i < finalList.size(); ++i) {
                         String mesg = null;
+                        final Customers customers = new CustomersService().getCustomerDetail(finalList.get(i).getCustomerId());
+
                         try {
 
                             try {
@@ -546,17 +552,16 @@ _dbHelper.close();
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
-                            mesg = URLEncoder.encode("Dear " + CustomersTableMagagement.getFirstName(_dbHelper.getReadableDatabase(), finalList.get(i).getCustomerId()) + ", " + "Your milk bill from " + Constants.MONTHS[startDate.get(Calendar.MONTH)] + " "
+                            mesg = URLEncoder.encode("Dear " + customers.getFirstName() + ", " + "Your milk bill from " + Constants.MONTHS[startDate.get(Calendar.MONTH)] + " "
                                     + String.format("%02d", startDate.get(Calendar.DAY_OF_MONTH)) + " to " +
                                     Constants.MONTHS[endDate.get(Calendar.MONTH)] + " " + String.format("%02d", endDate.get(Calendar.DAY_OF_MONTH))
                                     + " is Rs. " + finalList.get(i).getTotalAmount()
-                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + CustomerSettingTableManagement.getRateByCustomerId(_dbHelper.getReadableDatabase(),finalList.get(i).getCustomerId()) + "/litre.", "UTF-8");
+                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + new CustomersSettingService().getByCustId(finalList.get(i).getCustomerId(), Constants.getCurrentDate()) + "/litre.", "UTF-8");
 
-//                            mesg = URLEncoder.encode("Dear " + finalList.get(i).getFristName() + ", " + "your milk bill is " + finalList.get(i).getBillAmount(), "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), finalList.get(i).getCustomerId()), mesg);
+                        SendSmsTouser(customers.getMobile(), mesg);
 
                         finalI = i + 1;
                         progressHandler.post(new Runnable() {

@@ -22,11 +22,12 @@ import android.widget.Toast;
 
 
 import com.milky.R;
-import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
+import com.milky.service.databaseutils.serviceclasses.BillService;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -182,20 +183,12 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                                 holder.setBalanceType(1);
                             }
                             holder.setPaymentMade(payment_made);
-
+                            holder.setIsCleared(0);
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
                             holder.setTotalAmount(bill_amount);
-//                            holder.setRate(intent.getStringExtra("totalPrice"));
-//                            BillTableManagement.updateBillData(_dbHelper.getWritableDatabase(), holder);
-                            Calendar c = Calendar.getInstance();
-                            String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
-
-                            CustomersTableMagagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getIntExtra("custId", 0), holder.getBalanceType());
-//                            CustomerSettingTableManagement.updateBalance(_dbHelper.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
-                            //TODO ExtCal SETTINGS DB
-//                            ExtcalCustomerSettingTableManagement.updateBalance(_exDb.getWritableDatabase(), holder.getBalance(), intent.getStringExtra("custId"), holder.getBalanceType(), day);
-                            BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getIntExtra("custId", 0), holder);
+                            new BillService().updateBillById(holder);
+                             //TODO ExtCal SETTINGS DB
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER = true;
                             BillingEdit.this.finish();
@@ -224,7 +217,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         total_amount.setText(String.valueOf(intent.getDoubleExtra("total", 0)));
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
-        tax.setText(String.valueOf(GlobalSettingsService.getDefautTax(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase())));
+        tax.setText(String.valueOf(new GlobalSettingsService().getData().getTax()));
         AppUtil.getInstance().getDatabaseHandler().close();
     }
 
@@ -280,19 +273,18 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
         @Override
         protected String doInBackground(Void... params) {
-
-
+            final Customers customers = new CustomersService().getCustomerDetail( getIntent().getIntExtra("custId", 0));
             new Thread(new Runnable() {
                 public void run() {
                     for (int i = 0; i < 1; ++i) {
                         String mesg = null;
                         try {
-                            mesg = URLEncoder.encode("Dear " + intent.getStringExtra("titleString") + ", " + "Your milk bill from" + start_date.getText().toString() + " to " + end_date.getText().toString() + " is Rs. " + intent.getStringExtra("total")
+                            mesg = URLEncoder.encode("Dear " + customers.getFirstName() + ", " + "Your milk bill from" + start_date.getText().toString() + " to " + end_date.getText().toString() + " is Rs. " + String.valueOf(intent.getDoubleExtra("total",0))
                                     + ". Total quantity " + milk_quantity.getText().toString() + " litres. Rate is " + rate.getText().toString() + "/litre.", "UTF-8");
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(CustomersTableMagagement.getCustomerMobileNo(_dbHelper.getReadableDatabase(), getIntent().getIntExtra("custId", 0)), mesg);
+                        SendSmsTouser(customers.getMobile(), mesg);
 
 
                         finalI = i + 1;

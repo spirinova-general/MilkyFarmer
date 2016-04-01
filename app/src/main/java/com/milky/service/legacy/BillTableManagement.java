@@ -1,9 +1,12 @@
-package com.milky.service.databaseutils;
+package com.milky.service.legacy;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.milky.service.databaseutils.TableColumns;
+import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.ui.customers.CustomersBillingFragment;
 import com.milky.ui.main.BillingFragment;
@@ -140,18 +143,18 @@ public class BillTableManagement {
                 , null);
     }
 
-    public static void updateClearBills(SQLiteDatabase db, String date, int custid, Bill holder) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.IS_CLEARED, "0");
-        values.put(TableColumns.END_DATE, date);
-        values.put(TableColumns.PAYMENT_MADE, holder.getPaymentMade());
-        values.put(TableColumns.BALANCE, holder.getBalance());
-        values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
-        values.put(TableColumns.TOTAL_AMOUNT, holder.getTotalAmount());
-//        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
-        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "'"
-                + " AND " + TableColumns.START_DATE + " ='" + holder.getStartDate() + "' AND " + TableColumns.IS_CLEARED + " ='1' AND " + TableColumns.IS_OUTSTANDING + " ='0'", null);
-    }
+//    public static void updateClearBills(SQLiteDatabase db, String date, int custid, Bill holder) {
+//        ContentValues values = new ContentValues();
+//        values.put(TableColumns.IS_CLEARED, "0");
+//        values.put(TableColumns.END_DATE, date);
+//        values.put(TableColumns.PAYMENT_MADE, holder.getPaymentMade());
+//        values.put(TableColumns.BALANCE, holder.getBalance());
+//        values.put(TableColumns.BALANCE_TYPE, holder.getBalanceType());
+//        values.put(TableColumns.TOTAL_AMOUNT, holder.getTotalAmount());
+////        values.put(TableColumns.DEFAULT_RATE, holder.getRate());
+//        long i = db.update(TableNames.TABLE_CUSTOMER_BILL, values, TableColumns.CUSTOMER_ID + " ='" + custid + "'"
+//                + " AND " + TableColumns.START_DATE + " ='" + holder.getStartDate() + "' AND " + TableColumns.IS_CLEARED + " ='1' AND " + TableColumns.IS_OUTSTANDING + " ='0'", null);
+//    }
 
 //    public static void updateCurrentDateData(SQLiteDatabase db, VCustomers holder) {
 //        ContentValues values = new ContentValues();
@@ -491,9 +494,13 @@ public class BillTableManagement {
     }
 
     public static ArrayList<Bill> getTotalBillById(SQLiteDatabase db, int id) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " WHERE " + TableColumns.IS_CLEARED + " ='" + "1'"
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_BILL + " INNER JOIN " + TableNames.TABLE_CUSTOMER
+                + " ON " + TableNames.TABLE_CUSTOMER_BILL + "." + TableColumns.CUSTOMER_ID + "=" + TableNames.TABLE_CUSTOMER + "." + TableColumns.ID + " WHERE " + TableColumns.IS_CLEARED + " ='" + "1'"
                 + " AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.END_DATE + " >='"
-                + Constants.getCurrentDate() + "' AND " + TableColumns.IS_OUTSTANDING + " ='1' AND " + TableColumns.CUSTOMER_ID + " ='" + id + "'";
+                + Constants.getCurrentDate() + "' AND " + TableColumns.IS_OUTSTANDING + " ='1' AND" +
+                " (" + TableColumns.DELETED_ON + " ='1' OR " + TableColumns.DELETED_ON + " >'" + Constants.getCurrentDate() + "')" +
+                " AND " + TableColumns.CUSTOMER_ID + " ='" + id + "'";
+
         ArrayList<Bill> list = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
@@ -501,14 +508,7 @@ public class BillTableManagement {
                 Bill holder = new Bill();
                 holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
                 holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-
-//                String deletionDate = CustomersTableMagagement.getCustomerDeletionDate(db, holder.getCustomerId());
-//                if ("1".equals(deletionDate))
-//                    holder.setEndDate(Constants.getCurrentDate());
-//                else
-//                    holder.setEndDate(deletionDate);
                 Calendar cal = Calendar.getInstance();
-                Calendar currentDate = Calendar.getInstance();
                 double totalQty = 0;
                 try {
                     Date d = Constants.work_format.parse(holder.getStartDate());
@@ -516,9 +516,25 @@ public class BillTableManagement {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                for (int i = cal.get(Calendar.DAY_OF_MONTH); i <= currentDate.get(Calendar.DAY_OF_MONTH); ++i) {
-//                    totalQty += getQuatity(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i));
-//                    totalQty += Constants.getQtyOfCustomer(cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", i), holder.getCustomerId());
+                Calendar currentDate = Calendar.getInstance();
+                if ("1".equals(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)))) {
+                    holder.setEndDate(Constants.getCurrentDate());
+                    totalQty += new DeliveryService().getTotalQuantityConsumed(cal.get(Calendar.DAY_OF_MONTH), currentDate.get(Calendar.DAY_OF_MONTH),
+                            cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), false);
+
+                } else {
+                    Calendar deletedCal = Calendar.getInstance();
+                    try {
+                        Date date = Constants.work_format.parse(cursor.getString(cursor.getColumnIndex(TableColumns.DELETED_ON)));
+                        deletedCal.setTime(date);
+                        holder.setEndDate(String.valueOf(deletedCal.get(Calendar.YEAR)) + "-" + String.format("%02d", deletedCal.get(Calendar.MONTH))
+                                + "-" + String.format("%02d", deletedCal.get(Calendar.DAY_OF_MONTH) - 1));
+                        totalQty += new DeliveryService().getTotalQuantityConsumed(cal.get(Calendar.DAY_OF_MONTH), currentDate.get(Calendar.DAY_OF_MONTH),
+                                cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), false);//
+//
+                    } catch (ParseException pexp) {
+
+                    }
                 }
                 holder.setQuantity(totalQty);
                 holder.setBalance(cursor.getDouble(cursor.getColumnIndex(TableColumns.BALANCE)));
@@ -530,16 +546,21 @@ public class BillTableManagement {
                 holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
                 holder.setIsOutstanding(cursor.getInt(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)));
                 holder.setBalanceType(cursor.getInt(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
-                double payMade = 0;
+                holder.setRate(new CustomersSettingService().getByCustId(holder.getCustomerId(), Constants.getCurrentDate()).getDefaultRate());
+                double billMade = 0;
                 if (holder.getBalanceType() == 1)
-                    payMade = BillTableManagement.getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    billMade = BillTableManagement.getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             + holder.getBalance();
                 else
-                    payMade = BillTableManagement.getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    billMade = getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             - holder.getBalance();
-                holder.setTotalAmount(payMade);
-//                holder.setRate(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
-//                updateOutstandingBills(db, holder.getQuantity(), holder.getTotal(), holder.getCustomerId());
+
+
+                holder.setTotalAmount(billMade);
+
+//                holder.setPaymentMade(cursor.getDouble(cursor.getColumnIndex(TableColumns.PAYMENT_MADE)));
+                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE)));
+                updateOutstandingBills(db, holder.getQuantity(), holder.getTotalAmount(), holder.getCustomerId());
 //                BillingFragment.custIdsList.add(holder.getCustomerId());
                 CustomersBillingFragment.payment.add(holder);
             }
@@ -596,8 +617,6 @@ public class BillTableManagement {
 
 
                 }
-
-
                 holder.setQuantity(totalQty);
                 holder.setBalance(cursor.getDouble(cursor.getColumnIndex(TableColumns.BALANCE)));
                 holder.setAdjustment(cursor.getDouble(cursor.getColumnIndex(TableColumns.ADJUSTMENTS)));
@@ -608,13 +627,13 @@ public class BillTableManagement {
                 holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
                 holder.setIsOutstanding(cursor.getInt(cursor.getColumnIndex(TableColumns.IS_OUTSTANDING)));
                 holder.setBalanceType(cursor.getInt(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
-                holder.setRate(CustomerSettingTableManagement.getRateByCustomerId(db, holder.getCustomerId()));
+                holder.setRate(new CustomersSettingService().getByCustId(holder.getCustomerId(), Constants.getCurrentDate()).getDefaultRate());
                 double billMade = 0;
                 if (holder.getBalanceType() == 1)
-                    billMade = BillTableManagement.getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    billMade = getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             + holder.getBalance();
                 else
-                    billMade = BillTableManagement.getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    billMade = getTotalAmount(db, holder.getCustomerId(), cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             - holder.getBalance();
 
 
@@ -816,10 +835,10 @@ public class BillTableManagement {
                 String type = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE));
                 double payMade = 0;
                 if (type.equals("1"))
-                    payMade = BillTableManagement.getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    payMade = getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             + Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
                 else
-                    payMade = BillTableManagement.getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    payMade = getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
 
 
@@ -865,10 +884,10 @@ public class BillTableManagement {
                 String type = cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE_TYPE));
                 double payMade = 0;
                 if (type.equals("1"))
-                    payMade = BillTableManagement.getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    payMade = getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             + Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
                 else
-                    payMade = BillTableManagement.getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
+                    payMade = getTotalAmount(db, custId, cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)), totalQty)
                             - Float.parseFloat(cursor.getString(cursor.getColumnIndex(TableColumns.BALANCE)));
 
 

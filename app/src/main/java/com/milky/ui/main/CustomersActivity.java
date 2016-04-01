@@ -18,10 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.core.Customers;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.ui.customers.CustomerTabFragment;
-import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 
 import java.text.ParseException;
@@ -117,11 +116,19 @@ public class CustomersActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        CustomersTableMagagement.updatedeletedCustomerDetail(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-//                        ExtcalCustomerSettingTableManagement.updateDeletetdCustomer(exDb.getWritableDatabase(), getIntent().getStringExtra("cust_id"), Constants.getCurrentDate());
-//                        DeliveryTableManagement.updateDeletedCustomer(exDb.getWritableDatabase(), Constants.getCurrentDate(), getIntent().getStringExtra("cust_id"));
-                        BillTableManagement.updateDeletedOn(AppUtil.getInstance().getDatabaseHandler().getWritableDatabase(), getIntent().getIntExtra("cust_id",0));
+                        Customers data = new Customers();
+                        data.setFirstName(_mIntent.getStringExtra("fname"));
+                        data.setLastName(_mIntent.getStringExtra("lname"));
+                        data.setBalance_amount(_mIntent.getDoubleExtra("balance", 0));
+                        data.setAddress1(_mIntent.getStringExtra("address1"));
+                        data.setAreaId(_mIntent.getIntExtra("areaId", 0));
+                        data.setMobile(_mIntent.getStringExtra("mobile"));
+                        data.setDateAdded(_mIntent.getStringExtra("added_date"));
+                        data.setDateModified(_mIntent.getStringExtra(Constants.getCurrentDate()));
+                        data.setIsDeleted(0);
+                        data.setCustomerId(_mIntent.getIntExtra("cust_id",0));
+                        data.setDeletedOn(Constants.getCurrentDate());
+                        new CustomersService().update(data);
                         POSITION=0;
                         Constants.REFRESH_BILL=true;
                         Constants.REFRESH_CALANDER=true;

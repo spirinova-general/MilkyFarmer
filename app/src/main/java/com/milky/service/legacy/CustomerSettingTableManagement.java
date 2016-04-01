@@ -1,66 +1,66 @@
-package com.milky.service.databaseutils;
+package com.milky.service.legacy;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.milky.utils.Constants;
 import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
+import com.milky.service.databaseutils.TableColumns;
+import com.milky.service.databaseutils.TableNames;
+import com.milky.utils.Constants;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by Neha on 12/11/2015.
  */
 public class CustomerSettingTableManagement {
 
-    public static void insertCustomersSetting(SQLiteDatabase db, CustomersSetting holder) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
-        values.put(TableColumns.DEFAULT_RATE, holder.getDefaultRate());
-        values.put(TableColumns.DEFAULT_QUANTITY, holder.getGetDefaultQuantity());
-        values.put(TableColumns.START_DATE, holder.getStartDate());
-        values.put(TableColumns.END_DATE, holder.getEndDate());
-        values.put(TableColumns.DIRTY, "1");
-        db.insert(TableNames.TABLE_CUSTOMER_SETTINGS, null, values);
-    }
+//    public static void insertCustomersSetting(SQLiteDatabase db, CustomersSetting holder) {
+//        ContentValues values = new ContentValues();
+//        values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
+//        values.put(TableColumns.DEFAULT_RATE, holder.getDefaultRate());
+//        values.put(TableColumns.DEFAULT_QUANTITY, holder.getGetDefaultQuantity());
+//        values.put(TableColumns.START_DATE, holder.getStartDate());
+//        values.put(TableColumns.END_DATE, holder.getEndDate());
+//        values.put(TableColumns.DIRTY, "1");
+//        db.insert(TableNames.TABLE_CUSTOMER_SETTINGS, null, values);
+//    }
 
     //Get Start Delivery Date..
-    public static String getStartDeliveryDate(SQLiteDatabase db, int custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "' AND " + TableColumns.END_DATE + " >'" + Constants.getCurrentDate() + "'";
-        String date = "";
-        Cursor cursor = db.rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                date = cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE));
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-        return date;
-    }
+//    public static String getStartDeliveryDate(SQLiteDatabase db, int custId) {
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'"
+//                + " AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "' AND " + TableColumns.END_DATE + " >'" + Constants.getCurrentDate() + "'";
+//        String date = "";
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//        if (cursor.moveToFirst()) {
+//            do {
+//                date = cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE));
+//            }
+//            while (cursor.moveToNext());
+//        }
+//        cursor.close();
+//        return date;
+//    }
 
     //Get milk Rate for customer.
-    public static double getRateByCustomerId(SQLiteDatabase db, int custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'"
-                + " AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "' AND " + TableColumns.END_DATE + " >'" + Constants.getCurrentDate() + "'";
-        double date = 0;
-        Cursor cursor = db.rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                date = cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_RATE));
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-        return date;
-    }
+//    public static double getRateByCustomerId(SQLiteDatabase db, int custId) {
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.CUSTOMER_ID + " ='" + custId + "'"
+//                + " AND " + TableColumns.START_DATE + " <='" + Constants.getCurrentDate() + "' AND " + TableColumns.END_DATE + " >'" + Constants.getCurrentDate() + "'";
+//        double date = 0;
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//        if (cursor.moveToFirst()) {
+//            do {
+//                date = cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_RATE));
+//            }
+//            while (cursor.moveToNext());
+//        }
+//        cursor.close();
+//        return date;
+//    }
 
 
     //Get Settings data for customer..
@@ -73,7 +73,6 @@ public class CustomerSettingTableManagement {
 
         CustomersSetting holder = null;
         Cursor cursor = db.rawQuery(selectquery, null);
-        String deletedOnDate = CustomersTableMagagement.getCustomerDeletionDate(db, custId);
 
         if (cursor.moveToFirst()) {
             do {
@@ -83,10 +82,6 @@ public class CustomerSettingTableManagement {
                     holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
                     holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
                     holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
-
-//                if (cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)) != null)
-//                    holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
-
 
             }
             while (cursor.moveToNext());
@@ -98,80 +93,80 @@ public class CustomerSettingTableManagement {
         return holder;
     }
 
-    public static ArrayList<CustomersSetting> customersForSelectedDates(SQLiteDatabase db, String areaid, String date) {
-        String selectquery;
-
-        if (areaid.equals(""))
-//            if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
-            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
-                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'";
-//            } else
-//                selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
-//                        + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.DELETED_ON + " >'" + Constants.DELIVERY_DATE + "'";
-
-// else if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
-        else
-            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
-                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
-                ;
-//        } else
+//    public static ArrayList<CustomersSetting> customersForSelectedDates(SQLiteDatabase db, String areaid, String date) {
+//        String selectquery;
+//
+//        if (areaid.equals(""))
+////            if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
 //            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
-//                    + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
-//                    + " AND " + TableColumns.DELETED_ON + " >'" + Constants.DELIVERY_DATE + "'";
-
-
-        ArrayList<CustomersSetting> list = new ArrayList<>();
-        Cursor cursor = db.rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-
-                String deletedOn = CustomersTableMagagement.getCustomerDeletionDate(db,cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                String endDate = cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE));
-                Calendar deletedDate = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-                try
-                {
-                    if(deletedOn.equals("1"))
-                    { CustomersSetting holder = new CustomersSetting();
-                        holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-                        holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                        holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
-                        holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
-                        holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-                        list.add(holder);
-                    }
-                    else
-                    { CustomersSetting holder = new CustomersSetting();
-                        Date delete = Constants.work_format.parse(deletedOn);
-                        Date endDateSelected = Constants.work_format.parse(endDate);
-                        end.setTime(endDateSelected);
-                        deletedDate.setTime(delete);
-                        if(deletedDate.before(end))
-                        {
-                            holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
-                            holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                            holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
-                            holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
-                            holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-                            list.add(holder);
-                        }
-                    }
-                }
-                catch (ParseException pexp)
-                {
-
-                }
-
-            }
-            while (cursor.moveToNext());
-
-
-        }
-        cursor.close();
-
-        return list;
-    }
+//                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'";
+////            } else
+////                selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
+////                        + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.DELETED_ON + " >'" + Constants.DELIVERY_DATE + "'";
+//
+//// else if (isDeletedCustomer(db, Constants.DELIVERY_DATE)) {
+//        else
+//            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
+//                    + " <='" + date + "' AND " + TableColumns.END_DATE + " >'" + date + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
+//                ;
+////        } else
+////            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.START_DATE
+////                    + " <='" + Constants.DELIVERY_DATE + "' AND " + TableColumns.END_DATE + " >'" + Constants.DELIVERY_DATE + "'" + " AND " + TableColumns.AREA_ID + " ='" + areaid + "'"
+////                    + " AND " + TableColumns.DELETED_ON + " >'" + Constants.DELIVERY_DATE + "'";
+//
+//
+//        ArrayList<CustomersSetting> list = new ArrayList<>();
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//
+//        if (cursor.moveToFirst()) {
+//            do {
+//
+//                String deletedOn = CustomersTableMagagement.getCustomerDeletionDate(db,cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+//                String endDate = cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE));
+//                Calendar deletedDate = Calendar.getInstance();
+//                Calendar end = Calendar.getInstance();
+//                try
+//                {
+//                    if(deletedOn.equals("1"))
+//                    { CustomersSetting holder = new CustomersSetting();
+//                        holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+//                        holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+//                        holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+//                        holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+//                        holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
+//                        list.add(holder);
+//                    }
+//                    else
+//                    { CustomersSetting holder = new CustomersSetting();
+//                        Date delete = Constants.work_format.parse(deletedOn);
+//                        Date endDateSelected = Constants.work_format.parse(endDate);
+//                        end.setTime(endDateSelected);
+//                        deletedDate.setTime(delete);
+//                        if(deletedDate.before(end))
+//                        {
+//                            holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.START_DATE)));
+//                            holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
+//                            holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+//                            holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
+//                            holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
+//                            list.add(holder);
+//                        }
+//                    }
+//                }
+//                catch (ParseException pexp)
+//                {
+//
+//                }
+//
+//            }
+//            while (cursor.moveToNext());
+//
+//
+//        }
+//        cursor.close();
+//
+//        return list;
+//    }
 
     public static boolean isHasDataForDayById(SQLiteDatabase db, String custId, String day) {
         String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
@@ -239,24 +234,24 @@ public class CustomerSettingTableManagement {
 //
 //    }
 
-    public static String getAreaId(SQLiteDatabase db, String custId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.ID + " ='" + custId + "'";
-        String areaId = "";
-        Cursor cursor = db.rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
-                    areaId = cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID));
-            }
-            while (cursor.moveToNext());
-
-        }
-        cursor.close();
-
-        return areaId;
-
-    }
+//    public static String getAreaId(SQLiteDatabase db, String custId) {
+//        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.ID + " ='" + custId + "'";
+//        String areaId = "";
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//
+//        if (cursor.moveToFirst()) {
+//            do {
+//                if (cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID)) != null)
+//                    areaId = cursor.getString(cursor.getColumnIndex(TableColumns.AREA_ID));
+//            }
+//            while (cursor.moveToNext());
+//
+//        }
+//        cursor.close();
+//
+//        return areaId;
+//
+//    }
 
     public static String getPrice(SQLiteDatabase db, String custId) {
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE " + TableColumns.ID + " ='" + custId + "'";
@@ -441,35 +436,35 @@ public class CustomerSettingTableManagement {
 //        return startDate;
 //    }
 
-    public static double getAllCustomersByCustId(SQLiteDatabase db, String day, int id) {
-        String selectquery = "";
-        String deletedOn = CustomersTableMagagement.getCustomerDeletionDate(db, id);
-
-        if ("1".equals(deletedOn)) {
-            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
-                    + " AND " + TableColumns.CUSTOMER_ID + " ='" + id + "'";
-        } else
-            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
-                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
-                    + " AND " + TableColumns.START_DATE + " >'" + deletedOn + "' AND " + TableColumns.END_DATE + " >'" + deletedOn + " AND "
-                    + TableColumns.CUSTOMER_ID + " ='" + id + "'";
-        double qty = 0;
-
-        Cursor cursor = db.rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                qty = Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
-            }
-            while (cursor.moveToNext());
-        }
-
-
-        cursor.close();
-
-        return qty;
-    }
+//    public static double getAllCustomersByCustId(SQLiteDatabase db, String day, int id) {
+//        String selectquery = "";
+//        String deletedOn = CustomersTableMagagement.getCustomerDeletionDate(db, id);
+//
+//        if ("1".equals(deletedOn)) {
+//            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+//                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+//                    + " AND " + TableColumns.CUSTOMER_ID + " ='" + id + "'";
+//        } else
+//            selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+//                    + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
+//                    + " AND " + TableColumns.START_DATE + " >'" + deletedOn + "' AND " + TableColumns.END_DATE + " >'" + deletedOn + " AND "
+//                    + TableColumns.CUSTOMER_ID + " ='" + id + "'";
+//        double qty = 0;
+//
+//        Cursor cursor = db.rawQuery(selectquery, null);
+//
+//        if (cursor.moveToFirst()) {
+//            do {
+//                qty = Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+//            }
+//            while (cursor.moveToNext());
+//        }
+//
+//
+//        cursor.close();
+//
+//        return qty;
+//    }
 
 
     public static double getAllCustomersByDay(SQLiteDatabase db, String day) {

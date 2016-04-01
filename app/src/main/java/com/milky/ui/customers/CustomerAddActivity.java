@@ -2,7 +2,6 @@ package com.milky.ui.customers;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
@@ -25,18 +24,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomerSettingTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.core.GlobalSettings;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.AreaService;
+import com.milky.service.databaseutils.serviceclasses.BillService;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
-import com.milky.utils.UserPrefrences;
 import com.milky.service.core.Area;
 import com.milky.service.core.Bill;
 import com.milky.service.core.Customers;
@@ -46,6 +45,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class CustomerAddActivity extends AppCompatActivity {
     private Toolbar _mToolbar;
@@ -65,7 +65,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
     private int selectedAreaId = 0;
-    private ArrayList<Area> _areacityList = new ArrayList<>();
+    private List<Area> _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
     private TextView _pickdate;
@@ -75,6 +75,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private int mday;
     private String pickedDate = "";
     static final int DATE_DIALOG_ID = 999;
+    private GlobalSettings globalSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,7 +195,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
                         holder.setDateAdded(formattedDate);
-                        CustomersTableMagagement.insertCustomerDetail(_dbHelper.getWritableDatabase(), holder);
+                        //Insert new Customer..
+                        long id = new CustomersService().insert(holder);
 
                         CustomersSetting setting = new CustomersSetting();
                         setting.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
@@ -203,10 +205,11 @@ public class CustomerAddActivity extends AppCompatActivity {
                         setting.setEndDate("2250" + "-" +
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-                        setting.setCustomerId(CustomersTableMagagement.getCustomerId(_dbHelper.getReadableDatabase()));
+                        setting.setCustomerId((int) id);
                         setting.setDirty(0);
+                        //Insert customers setting detail...
+                        new CustomersSettingService().insert(setting);
 
-                        CustomerSettingTableManagement.insertCustomersSetting(_dbHelper.getWritableDatabase(), setting);
                         Bill bill = new Bill();
                         bill.setDirty(0);
                         bill.setPaymentMade(0);
@@ -214,25 +217,27 @@ public class CustomerAddActivity extends AppCompatActivity {
                         bill.setEndDate(setting.getEndDate());
                         bill.setAdjustment(0);
                         bill.setBalance(0);
-                        bill.setTax(GlobalSettingsService.getDefautTax(_dbHelper.getReadableDatabase()));
+                        bill.setTax(globalSettings.getTax());
                         bill.setIsCleared(1);
                         bill.setDateModified(formattedDate);
-                        bill.setRollDate(GlobalSettingsService.getRollDate(_dbHelper.getReadableDatabase()));
+                        bill.setRollDate(globalSettings.getRollDate());
                         bill.setBalanceType(1);
                         bill.setCustomerId(setting.getCustomerId());
                         bill.setStartDate(setting.getStartDate());
                         bill.setQuantity(setting.getGetDefaultQuantity());
                         bill.setDateAdded(formattedDate);
                         Calendar cal = Calendar.getInstance();
-                        if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-                            bill.setIsOutstanding(1);
-                            SharedPreferences preferences = AppUtil.getInstance().getPrefrences();
-                            SharedPreferences.Editor edit = preferences.edit();
-                            edit.putString(UserPrefrences.INSERT_BILL, "0");
-                            edit.apply();
-                        } else
-                            bill.setIsOutstanding(1);
-                        BillTableManagement.insertBillData(_dbHelper.getWritableDatabase(), bill);
+//                        if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+//                            bill.setIsOutstanding(0);
+//                            SharedPreferences preferences = AppUtil.getInstance().getPrefrences();
+//                            SharedPreferences.Editor edit = preferences.edit();
+//                            edit.putString(UserPrefrences.INSERT_BILL, "0");
+//                            edit.apply();
+//                        } else
+                        bill.setIsOutstanding(1);
+                        //Insert new Bills...
+                        new BillService().insert(bill);
+
                         Constants.REFRESH_CUSTOMERS = true;
                         Constants.REFRESH_BILL = true;
                         Constants.REFRESH_CALANDER = true;
@@ -376,13 +381,14 @@ public class CustomerAddActivity extends AppCompatActivity {
         _mCancel.setVisibility(View.GONE);
         _pickdate = (TextView) findViewById(R.id.pick_date);
         _pickdate.setText(formattedDate);
+        globalSettings = new GlobalSettingsService().getData();
 
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         _cityAreaAutocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete_city_area);
         /*Set defaul rate
         * */
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
-            _rate.setText(GlobalSettingsService.getDefaultRate(_dbHelper.getReadableDatabase()));
+        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS))
+            _rate.setText(String.valueOf(globalSettings.getDefaultRate()));
 
         _phone_textinput_layout = (TextInputLayout) findViewById(R.id.phone_textinput_layout);
         rate_layout = (TextInputLayout) findViewById(R.id.rate_layout);
@@ -397,7 +403,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 //        for (int i = 0; i < areas.size(); ++i) {
 //            _areaList.add(AreaMapTableManagement.getAreabyAreaId(_dbHelper.getReadableDatabase(), areas.get(i)));
 //        }
-        _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
+        _areacityList = new AreaService().getStoredAddresses();
         autoCompleteData = new String[_areacityList.size()];
 //        for (int i = 0; i < _areaList.size(); i++) {
 //            VAreaMapper areacity = new VAreaMapper();

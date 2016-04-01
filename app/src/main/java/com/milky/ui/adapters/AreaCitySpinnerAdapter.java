@@ -11,15 +11,16 @@ import com.milky.R;
 import com.milky.service.core.Area;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Neha on 12/2/2015.
  */
 public class AreaCitySpinnerAdapter extends ArrayAdapter<Area> {
     private Activity _context;
-    private ArrayList<Area> dataList;
+    private List<Area> dataList;
 
-    public AreaCitySpinnerAdapter(Activity context, int resource, ArrayList<Area> data) {
+    public AreaCitySpinnerAdapter(Activity context, int resource, List<Area> data) {
         super(context, resource, data);
         this._context = context;
         this.dataList = data;

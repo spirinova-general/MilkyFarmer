@@ -14,12 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
-import com.milky.service.databaseutils.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
-import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.ui.adapters.MainCustomersListAdapter;
 import com.milky.ui.customers.CustomerAddActivity;
 import com.milky.utils.AppUtil;
@@ -54,7 +52,7 @@ public class CustomersFragment extends Fragment {
                     _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
                     recList.setAdapter(_mAdapter);
                 } else {
-                    _mCustomersList = customersSettingService.getByArea(Constants.selectedAreaId);
+                    _mCustomersList = customersSettingService.getCustomersLisytByArea(Constants.selectedAreaId);
                     if (_mCustomersList.size() == 1)
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
                     else
@@ -96,7 +94,7 @@ private View view=null;
             @Override
             public void onClick(View v) {
                 //check if global setting has been set
-                if ("0".equals(GlobalSettingsService.getDefaultRate(_dbHelper.getReadableDatabase()))) {
+                if ("0".equals(new GlobalSettingsService().getData().getDefaultRate())) {
                     MainActivity.mDrawerLayout.openDrawer(MainActivity.mNavigationView);
                     Toast.makeText(getActivity(), getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
                 } else {

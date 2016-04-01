@@ -48,6 +48,24 @@ public class GlobalSettingsService implements IGlobalSetting {
         return holder;
     }
 
+    @Override
+    public String getRollDate() {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
+        String rate = null;
+        Cursor cursor = getDb().rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                rate = cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE));
+
+            }
+            while (cursor.moveToNext());
+
+        }
+        cursor.close();
+
+        return rate;
+    }
+
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
     }

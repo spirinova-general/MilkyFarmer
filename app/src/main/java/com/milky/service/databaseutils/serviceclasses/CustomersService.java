@@ -7,16 +7,16 @@ import android.database.sqlite.SQLiteDatabase;
 import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
-import com.milky.service.databaseutils.serviceinterface.ICustomersService;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.utils.AppUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomersService implements ICustomersService {
+public class CustomersService implements ICustomers {
 
     @Override
-    public void insert(Customers customers) {
+    public long insert(Customers customers) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.FIRST_NAME, customers.getFirstName());
         values.put(TableColumns.LAST_NAME, customers.getLastName());
@@ -30,7 +30,7 @@ public class CustomersService implements ICustomersService {
         values.put(TableColumns.ISDELETED, 1);
         values.put(TableColumns.DELETED_ON, 1);
         values.put(TableColumns.DIRTY, 1);
-        getDb().insert(TableNames.TABLE_CUSTOMER, null, values);
+        return getDb().insert(TableNames.TABLE_CUSTOMER, null, values);
     }
 
     @Override
@@ -40,14 +40,12 @@ public class CustomersService implements ICustomersService {
         values.put(TableColumns.LAST_NAME, customers.getLastName());
         values.put(TableColumns.BALANCE, customers.getBalance_amount());
         values.put(TableColumns.ADDRESS_1, customers.getAddress1());
-        values.put(TableColumns.ADDRESS_2, customers.getAddress2());
         values.put(TableColumns.AREA_ID, customers.getAreaId());
         values.put(TableColumns.MOBILE, customers.getMobile());
         values.put(TableColumns.DATE_ADDED, customers.getDateAdded());
         values.put(TableColumns.DATE_MODIFIED, customers.getDateAdded());
         values.put(TableColumns.ISDELETED, customers.getIsDeleted());
-        values.put(TableColumns.DELETED_ON, customers.getDeletedOn()
-        );
+        values.put(TableColumns.DELETED_ON, customers.getDeletedOn());
         values.put(TableColumns.DIRTY, 1);
         getDb().update(TableNames.TABLE_CUSTOMER, values, TableColumns.ID + " ='" + customers.getCustomerId() + "'", null);
     }
@@ -58,8 +56,8 @@ public class CustomersService implements ICustomersService {
     }
 
     @Override
-    public List<Customers> getByArea(int areaId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='" + "1'"
+    public List<Customers> getCustomersLisytByArea(int areaId) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.ISDELETED + " ='" + "1'"
                 + " AND " + TableColumns.AREA_ID + " ='" + areaId + "'";
         ArrayList<Customers> list = new ArrayList<>();
 
@@ -90,7 +88,7 @@ public class CustomersService implements ICustomersService {
 
     @Override
     public List<Customers> getAllCustomers() {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.DELETED_ON + " ='" + "1'";
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.ISDELETED + " ='" + "1'";
         ArrayList<Customers> list = new ArrayList<>();
 
         Cursor cursor = getDb().rawQuery(selectquery, null);
@@ -118,7 +116,49 @@ public class CustomersService implements ICustomersService {
         return list;
     }
 
+    @Override
+    public Customers getCustomerDetail(int id) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.ID + " ='" + id + "'";
+        Customers customers = null;
+
+        Cursor cursor = getDb().rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                customers = new Customers();
+                customers.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                customers.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
+                customers.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
+                customers.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
+                customers.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.BALANCE)));
+                customers.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
+                customers.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
+                customers.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AREA_ID)));
+                customers.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
+                customers.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.ISDELETED)));
+                customers.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return customers;
+    }
+
+
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
+    }
+
+    @Override
+    public boolean isAreaAssociated(int areaId) {
+        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.AREA_ID + " ='"
+                + areaId + "'";
+
+        Cursor cursor = getDb().rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+
+        cursor.close();
+        return result;
     }
 }

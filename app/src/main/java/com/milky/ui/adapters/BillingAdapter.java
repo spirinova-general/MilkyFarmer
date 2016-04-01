@@ -10,10 +10,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.CustomersTableMagagement;
+import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.ui.main.BillingEdit;
-import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Bill;
 
@@ -70,9 +70,9 @@ public class BillingAdapter extends BaseAdapter {
         holder.name = (TextView) convertView.findViewById(R.id.name);
         holder.custName = (TextView) convertView.findViewById(R.id.quantityText);
         holder.history = (TextView) convertView.findViewById(R.id.history);
-
-        String nfNAme = CustomersTableMagagement.getFirstName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), data.getCustomerId());
-        String lfNAme = CustomersTableMagagement.getLastName(AppUtil.getInstance().getDatabaseHandler().getReadableDatabase(), data.getCustomerId());
+        Customers customers = new CustomersService().getCustomerDetail(data.getCustomerId());
+        String nfNAme = customers.getFirstName();
+        String lfNAme = customers.getLastName();
         String a = Character.toString(nfNAme.charAt(0));
         String b = Character.toString(lfNAme.charAt(0));
         holder.custName.setText(nfNAme + " " + lfNAme);

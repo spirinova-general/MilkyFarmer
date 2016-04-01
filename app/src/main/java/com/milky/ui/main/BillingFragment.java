@@ -11,9 +11,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.BillTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.utils.AppUtil;
@@ -71,8 +71,8 @@ public class BillingFragment extends Fragment {
                 public void run() {
                     payment.clear();
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
-                        BillTableManagement.getOutstandingsBill(_dbHelper.getReadableDatabase());
-                        BillTableManagement.getTotalBill(_dbHelper.getReadableDatabase());
+                        new BillService().getOutstandingBill();
+                        new BillService().getTotalAllBill();
                     }
                     if (payment.size() > 0) {
                         adapter = new BillingAdapter(payment, getActivity());

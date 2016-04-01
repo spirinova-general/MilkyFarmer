@@ -10,8 +10,8 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Area;
@@ -55,9 +55,10 @@ public class CustomersFragmentListAdapter extends RecyclerView.Adapter<Customers
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
-        holder.userAreaName.setText(AreaCityTableManagement.getAreaNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()) + ", ");
+        Area areaDate = new AreaService().getAreaById(customer.getAreaId());
+        holder.userAreaName.setText(areaDate.getArea());
         holder.userStreet.setText(customer.getAddress2() + ", ");
-        holder.userCity.setText(AreaCityTableManagement.getCityNameById(_dbhelper.getReadableDatabase(), customer.getAreaId()));
+        holder.userCity.setText(areaDate.getCity());
         String a = Character.toString(customer.getFirstName().charAt(0));
         String b = Character.toString(customer.getLastName().charAt(0));
 

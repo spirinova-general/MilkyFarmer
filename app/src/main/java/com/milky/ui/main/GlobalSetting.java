@@ -40,10 +40,10 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.milky.R;
-import com.milky.service.databaseutils.AreaCityTableManagement;
-import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.serviceclasses.AreaService;
+import com.milky.service.databaseutils.serviceclasses.BillService;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
@@ -71,6 +71,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Neha on 11/19/2015.
@@ -89,7 +90,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     private LinearLayout _mBottomLayout;
     private DatabaseHelper _dbHelper;
     //    private AutoCompleteTextView AreaAutocomplete;
-    private ArrayList<Area> selectedareacityList = new ArrayList<>();
+    private List<Area> selectedareacityList = new ArrayList<>();
 
     private String[] autoCompleteData;
     private ImageView add;
@@ -109,6 +110,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     static final int DATE_DIALOG_ID = 999;
     private AccountService accountSettings;
     private GlobalSettingsService globalService;
+    private AreaService areaService;
 
     @Override
     protected void onResume() {
@@ -231,6 +233,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         accountSettings = new AccountService();
         globalService = new GlobalSettingsService();
+        areaService = new AreaService();
          /*
         * Set text field listeners*/
 //        custCode.addTextChangedListener(new TextValidationMessage(custCode_layout, this, false));
@@ -397,7 +400,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     accountSettings.update(holder);
                     globalService.update(globalSettings);
                     if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL))
-                        BillTableManagement.updateRollDate(_dbHelper.getWritableDatabase());
+                        new BillService().updateRollDate();
                     _dbHelper.close();
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
                     GlobalSetting.this.finish();
@@ -466,8 +469,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                 @Override
                 public void onClick(View v) {
                     a = remove.getId();
-                    if (!CustomersTableMagagement.isAreaAssociated(_dbHelper.getReadableDatabase(), selectedareacityList.get(a).getAreaId())) {
-                        if (AreaCityTableManagement.deleteArea(_dbHelper.getWritableDatabase(), selectedareacityList.get(a).getAreaId())) {
+                    if (!new CustomersService().isAreaAssociated(selectedareacityList.get(a).getAreaId())) {
+                        if (new AreaService().deleteAreaById(selectedareacityList.get(a).getAreaId())) {
                             Toast.makeText(GlobalSetting.this, "Area removed!", Toast.LENGTH_SHORT).show();
                             ((ViewGroup) label.getParent()).removeView(label);
                             ((ViewGroup) remove.getParent()).removeView(remove);
@@ -480,7 +483,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             });
 
             if (isNewAdded) {
-                if (!AreaCityTableManagement.hasAddress(_dbHelper.getReadableDatabase(), _locality.getText().toString().trim(), areaSelected.trim(), citySelected.trim())) {
+                if (!areaService.hasAddress(_locality.getText().toString().trim(), areaSelected.trim(), citySelected.trim())) {
                     label.setTextColor(getResources().getColor(R.color.white));
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     layoutParams.leftMargin = 10;
@@ -502,7 +505,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
                     areaSelected = "";
                     citySelected = "";
-                    long id = AreaCityTableManagement.insertAreaDetail(_dbHelper.getWritableDatabase(), holder);
+                    long id = areaService.insert(holder);
                     holder.setAreaId((int) id);
                     selectedareacityList.add(holder);
                     _dbHelper.close();
@@ -883,8 +886,10 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                         resultList = autocomplete(constraint.toString());
 
                         // Assign the data to the FilterResults
-                        filterResults.values = resultList;
-                        filterResults.count = resultList.size();
+                        if(resultList !=null) {
+                            filterResults.values = resultList;
+                            filterResults.count = resultList.size();
+                        }
                     }
                     return filterResults;
                 }
@@ -907,7 +912,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
         if (_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
 
         {
-            ArrayList<Area> list = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
+            List<Area> list = new AreaService().getStoredAddresses();
             selectedareacityList = list;
 //            ArrayList<String> list = AccountAreaMapping.getArea(_dbHelper.getReadableDatabase());
 //            for (int i = 0; i < list.size(); ++i) {

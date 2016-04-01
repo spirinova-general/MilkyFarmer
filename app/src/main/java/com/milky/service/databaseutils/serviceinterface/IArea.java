@@ -6,9 +6,15 @@ import com.milky.service.core.Area;
 import java.util.List;
 
 public interface IArea {
-    public void insert(Area area);
+    long insert(Area area);
 
-    public List<Area> getAllArea();
+    List<Area> getAllArea();
 
-    public boolean deleteAreaById(int areaId);
+    boolean deleteAreaById(int areaId);
+
+    boolean hasAddress(String locality, String area, String city);
+
+    Area getAreaById(int areaId);
+
+    List<Area> getStoredAddresses();
 }

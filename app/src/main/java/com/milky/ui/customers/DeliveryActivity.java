@@ -27,9 +27,9 @@ import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.core.Delivery;
-import com.milky.service.databaseutils.AreaCityTableManagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
@@ -104,7 +104,7 @@ public class DeliveryActivity extends AppCompatActivity {
 //
 //
 //            }
-        _areacityList = AreaCityTableManagement.getFullAddress(_dbHelper.getReadableDatabase());
+        _areacityList = new AreaService().getStoredAddresses();
         adp1 = new AreaCitySpinnerAdapter(DeliveryActivity.this, R.id.spinnerText, _areacityList);
 //        }
     }
@@ -168,7 +168,7 @@ public class DeliveryActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    ArrayList<Area> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
+    List<Area> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
     View searchView;
     AreaCitySpinnerAdapter adp1;
     boolean expended = false;

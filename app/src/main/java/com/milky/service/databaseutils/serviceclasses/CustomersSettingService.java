@@ -5,18 +5,16 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
-import com.milky.service.databaseutils.serviceinterface.ICustomersSetting;
+import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.utils.AppUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomersSettingService implements ICustomersSetting {
+public class CustomersSettingService implements ICustomersSettings {
     @Override
     public void insert(CustomersSetting customers) {
         ContentValues values = new ContentValues();
@@ -40,6 +38,14 @@ public class CustomersSettingService implements ICustomersSetting {
         values.put(TableColumns.DIRTY, 0);
         getDb().update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + customers.getCustomerId() + "'"
                 + " AND " + TableColumns.START_DATE + " <='" + customers.getStartDate() + "'" + " AND " + TableColumns.END_DATE + " >'" + customers.getEndDate() + "'", null);
+    }
+
+    public void updateEndDate(CustomersSetting holder, String enddate) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.END_DATE, holder.getEndDate());
+
+        getDb().update(TableNames.TABLE_CUSTOMER_SETTINGS, values, TableColumns.CUSTOMER_ID + " ='" + holder.getCustomerId() + "'"
+                + " AND " + TableColumns.END_DATE + " ='" + enddate + "'", null);
     }
 
     @Override
@@ -163,13 +169,37 @@ public class CustomersSettingService implements ICustomersSetting {
         return list;
     }
 
+    @Override
+    public String getEndDate(int id, String date) {
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS +
+                " WHERE " + TableColumns.CUSTOMER_ID + " ='" + id + "' AND "
+                + TableColumns.START_DATE + " <='" + date + "'" + " AND " +
+                TableColumns.END_DATE + " >'" + date + "'";
+        String enddate = "";
+        Cursor cursor = getDb().rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+
+                enddate = cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE));
+
+            }
+            while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        return enddate;
+    }
+
 
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
     }
 
     public static double getQuantityById(SQLiteDatabase db, String day, int id) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " WHERE "
+        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " INNER JOIN " + TableNames.TABLE_CUSTOMER + " ON "
+                + TableNames.TABLE_CUSTOMER_SETTINGS + "." + TableColumns.CUSTOMER_ID + " =" + TableNames.TABLE_CUSTOMER + "." + TableColumns.ID
+                + " WHERE "
                 + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >='" + day + "'"
                 + " AND " + TableColumns.CUSTOMER_ID + " ='" + id + "'";
         double qty = 0;
@@ -183,7 +213,6 @@ public class CustomersSettingService implements ICustomersSetting {
             while (cursor.moveToNext());
         }
 
-
         cursor.close();
 
         return qty;
@@ -193,7 +222,8 @@ public class CustomersSettingService implements ICustomersSetting {
 
         String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER_SETTINGS + " INNER JOIN " + TableNames.TABLE_CUSTOMER +
                 " ON " + TableNames.TABLE_CUSTOMER_SETTINGS + "." + TableColumns.CUSTOMER_ID + " =" + TableNames.TABLE_CUSTOMER + "." + TableColumns.ID
-                + " WHERE " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'"
+                + " WHERE " + TableColumns.START_DATE + " <='" + day + "'" + " AND " + TableColumns.END_DATE + " >'" + day + "'" + " AND " +
+                TableColumns.ISDELETED + " ='1'"
                 + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + day + "')";
 
         double qty = 0;
@@ -214,5 +244,6 @@ public class CustomersSettingService implements ICustomersSetting {
 
         return qty;
     }
+
 
 }

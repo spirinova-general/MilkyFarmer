@@ -9,8 +9,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.milky.service.databaseutils.BillTableManagement;
-import com.milky.service.databaseutils.CustomersTableMagagement;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
@@ -314,9 +312,9 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
         } else if (type.equals(ServerApis.SYNC)) {
             if (requestType.get("Customer_List").equals("0")) {
-                CustomersTableMagagement.updateSyncedData(_dbHelper.getWritableDatabase());
+//                CustomersTableMagagement.updateSyncedData(_dbHelper.getWritableDatabase());
             } else if (requestType.get("Bill_List").equals("0")) {
-                BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
+//                BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
             } else if (requestType.get("Account_List").equals("0")) {
 //                accountService.updateSyncedData(_dbHelper.getWritableDatabase());
             }

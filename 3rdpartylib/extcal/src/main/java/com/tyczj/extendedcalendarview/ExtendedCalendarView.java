@@ -340,10 +340,10 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     }
 
 
-//    public void refreshAdapter()
-//    {if(mAdapter!=null)
-//        calendar.setAdapter(mAdapter);
-//    }
+    public void refreshAdapter()
+    {if(mAdapter!=null)
+        calendar.setAdapter(mAdapter);
+    }
 
 
     public void updateQuantityList(final List<Double> totalList) {

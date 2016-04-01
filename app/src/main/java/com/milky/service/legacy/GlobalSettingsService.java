@@ -1,10 +1,12 @@
-package com.milky.service.databaseutils;
+package com.milky.service.legacy;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.service.core.GlobalSettings;
+import com.milky.service.databaseutils.TableColumns;
+import com.milky.service.databaseutils.TableNames;
 
 /**
  * Created by Lead1 on 3/22/2016.
