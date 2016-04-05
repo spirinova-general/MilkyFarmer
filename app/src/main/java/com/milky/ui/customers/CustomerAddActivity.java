@@ -64,7 +64,7 @@ public class CustomerAddActivity extends AppCompatActivity {
     private AutoCompleteTextView _cityAreaAutocomplete;
     private DatabaseHelper _dbHelper;
     private TextInputLayout name_layout, rate_layout, balance_layout, autocomplete_layout, last_name_layout, flat_number_layout, street_layout, milk_quantity_layout, _phone_textinput_layout;
-    private int selectedAreaId = 0;
+    private int selectedAreaId = -1;
     private List<Area> _areacityList = new ArrayList<>();
     private String[] autoCompleteData;
     private Calendar c;
@@ -152,7 +152,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 //                    else if (_address2.getText().toString().equals(""))
 //                        street_layout.setError("Enter street !");
 
-                    else if (selectedAreaId == 0)
+                    else if (selectedAreaId == -1)
                         autocomplete_layout.setError("Select valid area");
                     else if (_mPhone.getText().toString().equals(""))
                         _phone_textinput_layout.setError("Enter mobile number!");
@@ -165,7 +165,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                             && !_lastName.getText().toString().equals("") &&
                             !_mBalance.getText().toString().equals("") &&
                             !_mAddress1.getText().toString().equals("")
-                            && selectedAreaId != 0
+                            && selectedAreaId != -1
                             && !_mPhone.getText().toString().equals("") &&
                             !_mQuantuty.getText().toString().equals("") && !_rate.getText().toString().equals("")
                     )) {
@@ -185,12 +185,6 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
                         holder.setAddress1(_mAddress1.getText().toString());
-                        holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
-                        holder.setAreaId(selectedAreaId);
-                        holder.setMobile(_mPhone.getText().toString());
-                        holder.setDateAdded(formattedDate);
-                        holder.setFirstName(_firstName.getText().toString());
-                        holder.setLastName(_lastName.getText().toString());
                         holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
@@ -218,10 +212,9 @@ public class CustomerAddActivity extends AppCompatActivity {
                         bill.setAdjustment(0);
                         bill.setBalance(0);
                         bill.setTax(globalSettings.getTax());
-                        bill.setIsCleared(1);
+                        bill.setIsCleared(0);
                         bill.setDateModified(formattedDate);
                         bill.setRollDate(globalSettings.getRollDate());
-                        bill.setBalanceType(1);
                         bill.setCustomerId(setting.getCustomerId());
                         bill.setStartDate(setting.getStartDate());
                         bill.setQuantity(setting.getGetDefaultQuantity());
@@ -234,7 +227,7 @@ public class CustomerAddActivity extends AppCompatActivity {
 //                            edit.putString(UserPrefrences.INSERT_BILL, "0");
 //                            edit.apply();
 //                        } else
-                        bill.setIsOutstanding(1);
+                        bill.setIsOutstanding(0);
                         //Insert new Bills...
                         new BillService().insert(bill);
 
@@ -387,7 +380,7 @@ public class CustomerAddActivity extends AppCompatActivity {
         _cityAreaAutocomplete = (AutoCompleteTextView) findViewById(R.id.autocomplete_city_area);
         /*Set defaul rate
         * */
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_GLOBAL_SETTINGS))
+        if (_dbHelper.isTableNotEmpty(TableNames.GlobalSetting))
             _rate.setText(String.valueOf(globalSettings.getDefaultRate()));
 
         _phone_textinput_layout = (TextInputLayout) findViewById(R.id.phone_textinput_layout);
@@ -443,7 +436,7 @@ public class CustomerAddActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
-                    selectedAreaId = 0;
+                    selectedAreaId = -1;
 //                    selectedCityId = "";
 
                 }

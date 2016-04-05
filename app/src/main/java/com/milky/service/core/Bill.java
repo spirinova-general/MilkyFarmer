@@ -26,7 +26,6 @@ public class Bill {
 //    private String lastName;
 //    private String message;
 //    private String billMade;
-    private int balanceType;
     private String rollDate;
     //    private String deletedOn;
     private int dirty;
@@ -54,15 +53,6 @@ public class Bill {
     public void setRollDate(String rollDate) {
         this.rollDate = rollDate;
     }
-
-    public int getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(int balanceType) {
-        this.balanceType = balanceType;
-    }
-
     public int getIsOutstanding() {
         return isOutstanding;
     }

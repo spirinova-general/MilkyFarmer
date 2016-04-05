@@ -70,7 +70,7 @@ public class DeliveryActivity extends AppCompatActivity {
         _mDeliveryList.clear();
         deliveryService = new DeliveryService();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_SETTINGS)) {
+        if (_dbHelper.isTableNotEmpty(TableNames.CustomerSetting)) {
 
             _mCustomersList = new DeliveryService().getCustomersDelivery(selectedDate);
             _mAdaapter = new GlobalDeliveryAdapter(this, 0, 0, String.valueOf(Constants.SELECTED_DAY), _mCustomersList);
@@ -226,7 +226,7 @@ public class DeliveryActivity extends AppCompatActivity {
                     _mCustomers.setAdapter(_mAdaapter);
                     _mAdaapter.notifyDataSetChanged();
                     if (s.length() == 0) {
-                        Constants.selectedAreaId = 0;
+                        Constants.selectedAreaId =-1;
                     }
 
                 }

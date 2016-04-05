@@ -27,13 +27,9 @@ import com.milky.service.core.Customers;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Neha on 11/17/2015.
- */
 public class CustomersFragment extends Fragment {
     private List<Customers> _mCustomersList = new ArrayList<>();
     public static MainCustomersListAdapter _mAdapter;
-    private FloatingActionButton mFab;
     public static TextView mTotalCustomers;
     private DatabaseHelper _dbHelper;
     public static ListView recList;
@@ -42,7 +38,7 @@ public class CustomersFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (Constants.REFRESH_CUSTOMERS) {
-            if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
+            if (_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
                 if (Constants.selectedAreaId==-1) {
                     _mCustomersList = customersSettingService.getAllCustomers();
                     if (_mCustomersList.size() == 1)
@@ -89,12 +85,12 @@ private View view=null;
         mTotalCustomers = (TextView) view.findViewById(R.id.totalCustomers);
 
 
-        mFab = (FloatingActionButton) view.findViewById(R.id.fab);
+        FloatingActionButton mFab = (FloatingActionButton) view.findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //check if global setting has been set
-                if ("0".equals(new GlobalSettingsService().getData().getDefaultRate())) {
+                if (new GlobalSettingsService().getData().getDefaultRate() < 1) {
                     MainActivity.mDrawerLayout.openDrawer(MainActivity.mNavigationView);
                     Toast.makeText(getActivity(), getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
                 } else {

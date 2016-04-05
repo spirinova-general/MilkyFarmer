@@ -20,19 +20,19 @@ public class DeliveryTableManagement {
     public static void insertCustomerDetail(SQLiteDatabase db, CustomersSetting holder) {
 
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DEFAULT_QUANTITY, holder.getGetDefaultQuantity());
-        values.put(TableColumns.CUSTOMER_ID, holder.getCustomerId());
-        values.put(TableColumns.DELEVERY_DATE, holder.getStartDate());
-        values.put(TableColumns.DIRTY, 1);
-//        values.put(TableColumns.DATE_MODIFIED, holder.getDateModified());
-        long i =db.insert(TableNames.TABLE_DELIVERY, null, values);
+        values.put(TableColumns.DefaultQuantity, holder.getGetDefaultQuantity());
+        values.put(TableColumns.CustomerId, holder.getCustomerId());
+        values.put(TableColumns.DeliveryDate, holder.getStartDate());
+        values.put(TableColumns.Dirty, 1);
+//        values.put(TableColumns.DateModified, holder.getDateModified());
+        long i =db.insert(TableNames.DELIVERY, null, values);
     }
 
 
     public static boolean isHasData(SQLiteDatabase db, int custId, String deliveryDate) {
-        String selectQuery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.DELEVERY_DATE + " ='"
+        String selectQuery = "SELECT * FROM " + TableNames.DELIVERY + " WHERE " + TableColumns.DeliveryDate + " ='"
                 + deliveryDate + "'" + " AND "
-                + TableColumns.CUSTOMER_ID + " ='" + custId + "'";
+                + TableColumns.CustomerId + " ='" + custId + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
@@ -44,15 +44,15 @@ public class DeliveryTableManagement {
     public static double getQuantityBySelectedDay(SQLiteDatabase db, int custId, String deliveryDate) {
         String selectQuery = "";
         double quantity =0;
-        String selectquery = "SELECT * FROM "+TableNames.TABLE_CUSTOMER+" customer INNER JOIN "+TableNames.TABLE_DELIVERY+
-                " customer_delivery ON  customer."+TableColumns.ID+" ='customer_setting."+TableColumns.CUSTOMER_ID
-                +"' WHERE "+ TableColumns.DELEVERY_DATE
-                + " ='" + deliveryDate + "'" + " AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'"
-                + " AND (" + TableColumns.DELETED_ON + " ='1'" + " OR " + TableColumns.DELETED_ON + " >'" + deliveryDate + "')";
+        String selectquery = "SELECT * FROM "+TableNames.CUSTOMER +" customer INNER JOIN "+TableNames.DELIVERY +
+                " customer_delivery ON  customer."+TableColumns.ID+" ='customer_setting."+TableColumns.CustomerId
+                +"' WHERE "+ TableColumns.DeliveryDate
+                + " ='" + deliveryDate + "'" + " AND " + TableColumns.CustomerId + " ='" + custId + "'"
+                + " AND (" + TableColumns.DeletedOn + " ='1'" + " OR " + TableColumns.DeletedOn + " >'" + deliveryDate + "')";
 
 //        if (CustomersTableMagagement.isDeletedCustomer(db, deliveryDate,custId))
-            selectQuery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.DELEVERY_DATE
-                    + " ='" + deliveryDate + "'" + " AND " + TableColumns.CUSTOMER_ID + " ='" + custId + "'" ;
+            selectQuery = "SELECT * FROM " + TableNames.DELIVERY + " WHERE " + TableColumns.DeliveryDate
+                    + " ='" + deliveryDate + "'" + " AND " + TableColumns.CustomerId + " ='" + custId + "'" ;
 
 
 
@@ -61,7 +61,7 @@ public class DeliveryTableManagement {
         if (cursor.moveToFirst()) {
             do {
 
-                quantity = cursor.getDouble(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY));
+                quantity = cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity));
 
             }
             while (cursor.moveToNext());
@@ -75,16 +75,16 @@ public class DeliveryTableManagement {
 
     public static void updateCustomerDetail(SQLiteDatabase db, CustomersSetting holder) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DEFAULT_QUANTITY, holder.getGetDefaultQuantity());
-        long i = db.update(TableNames.TABLE_DELIVERY, values, TableColumns.DELEVERY_DATE + " ='" + holder.getStartDate() + "'"
-                + " AND " + TableColumns.CUSTOMER_ID +
+        values.put(TableColumns.DefaultQuantity, holder.getGetDefaultQuantity());
+        long i = db.update(TableNames.DELIVERY, values, TableColumns.DeliveryDate + " ='" + holder.getStartDate() + "'"
+                + " AND " + TableColumns.CustomerId +
                 " ='" + holder.getCustomerId() + "'", null);
     }
 
 
     public static void updateDeletedCustomer(SQLiteDatabase db, String deletedon, String custId) {
         ContentValues values = new ContentValues();
-        db.update(TableNames.TABLE_DELIVERY, values, TableColumns.CUSTOMER_ID +
+        db.update(TableNames.DELIVERY, values, TableColumns.CustomerId +
                 " ='" + custId + "'", null);
     }
 
@@ -93,14 +93,14 @@ public class DeliveryTableManagement {
 
     public static double getQuantityOfDayByDate(SQLiteDatabase db, String day) {
         String selectquery = "";
-        selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.DELEVERY_DATE + " ='" + day + "'";
+        selectquery = "SELECT * FROM " + TableNames.DELIVERY + " WHERE " + TableColumns.DeliveryDate + " ='" + day + "'";
         custIds = new ArrayList<>();
         Cursor cursor = db.rawQuery(selectquery, null);
         double quantity = 0;
         if (cursor.moveToFirst()) {
             do {
-                custIds.add(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+                custIds.add(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
+                quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
 
             }
             while (cursor.moveToNext());
@@ -117,16 +117,16 @@ public class DeliveryTableManagement {
     public static boolean isFromDelivery = false;
 
     public static double getQuantityOfDayByDateForCustomer(SQLiteDatabase db, String day, int CustId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_DELIVERY + " WHERE " + TableColumns.DELEVERY_DATE + " ='" + day + "'"
-                 + " AND " + TableColumns.CUSTOMER_ID + " ='" + CustId + "'";
+        String selectquery = "SELECT * FROM " + TableNames.DELIVERY + " WHERE " + TableColumns.DeliveryDate + " ='" + day + "'"
+                 + " AND " + TableColumns.CustomerId + " ='" + CustId + "'";
         Cursor cursor = db.rawQuery(selectquery, null);
         double quantity = 0;
         isFromDelivery = false;
         custIds = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                custIds.add(cursor.getInt(cursor.getColumnIndex(TableColumns.CUSTOMER_ID)));
-                quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_QUANTITY)));
+                custIds.add(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
+                quantity += Double.parseDouble(cursor.getString(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
                 isFromDelivery = true;
             }
             while (cursor.moveToNext());

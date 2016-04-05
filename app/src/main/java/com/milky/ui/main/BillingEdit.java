@@ -19,11 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import com.milky.R;
 import com.milky.service.core.Customers;
-import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
@@ -43,22 +40,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-/**
- * Created by Neha on 11/20/2015.
- */
 public class BillingEdit extends AppCompatActivity implements OnTaskCompleteListner {
     private Intent intent;
-    private Toolbar _mToolbar;
     private EditText milk_quantity;
     private EditText rate;
-    private EditText balance_amount;
-    private EditText tax, payment_made;
-    private Button save, clear_bill, send_bill;
-    private TextView start_date, end_date, total_amount, clera_bill_text;
-    private LinearLayout _payment;
-    private TextInputLayout _amount_layout;
-    private DatabaseHelper _dbHelper;
-    private int balanceType = 0;
+    private TextView start_date;
+    private TextView end_date;
+    protected TextInputLayout _amount_layout;
     private AccountService accountService;
 
     @Override
@@ -70,23 +58,20 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
     private void getview() {
         milk_quantity = (EditText) findViewById(R.id.milk_quantity);
         rate = (EditText) findViewById(R.id.rate);
-        balance_amount = (EditText) findViewById(R.id.balance_amount);
-        tax = (EditText) findViewById(R.id.tax);
-        save = (Button) findViewById(R.id.save);
+        EditText balance_amount = (EditText) findViewById(R.id.balance_amount);
+        EditText tax = (EditText) findViewById(R.id.tax);
         start_date = (TextView) findViewById(R.id.start_date);
         end_date = (TextView) findViewById(R.id.end_date);
-        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         start_date.setText(intent.getStringExtra("start_date"));
         end_date.setText(intent.getStringExtra("end_date"));
         _amount_layout = (TextInputLayout) findViewById(R.id.amount_layout);
-        _payment = (LinearLayout) findViewById(R.id.payment);
-        payment_made = (EditText) findViewById(R.id.payment_amount);
+        LinearLayout _payment = (LinearLayout) findViewById(R.id.payment);
+        EditText payment_made = (EditText) findViewById(R.id.payment_amount);
         payment_made.setText(String.valueOf(intent.getDoubleExtra("payment_made", 0)));
-        if (intent.getIntExtra("balance_type", 0) == 1)
-            balanceType = 1;
+
         Calendar cal = Calendar.getInstance();
         accountService = new AccountService();
-        send_bill = (Button) findViewById(R.id.send_bill);
+        Button send_bill = (Button) findViewById(R.id.send_bill);
         try {
             cal.setTime(Constants._display_format.parse(intent.getStringExtra("end_date")));
         } catch (ParseException e) {
@@ -99,7 +84,6 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                     new SendBillSMS().execute();
                 else
                     Toast.makeText(BillingEdit.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
-
             }
         });
         rate.setText(String.valueOf(intent.getDoubleExtra("totalPrice", 0)));
@@ -108,9 +92,8 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         milk_quantity.setText(String.valueOf(intent.getDoubleExtra("quantity", 0)));
         milk_quantity.setFocusable(false);
         milk_quantity.setFocusableInTouchMode(false);
-        clear_bill = (Button) findViewById(R.id.clear_bill);
-        clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
-        //TODo changed roll date
+        Button clear_bill = (Button) findViewById(R.id.clear_bill);
+        TextView clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
         Calendar calendar = Calendar.getInstance();
         try {
             Date date = Constants.work_format.parse(intent.getStringExtra("roll_date"));
@@ -121,13 +104,9 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
         if (cal.get(Calendar.DAY_OF_MONTH) >= calendar.get(Calendar.DAY_OF_MONTH) && cal.get(Calendar.MONTH) >= calendar.get(Calendar.MONTH)
                 && cal.get(Calendar.YEAR) >= calendar.get(Calendar.YEAR) && intent.getIntExtra("clear", 0) == 1) {
-//        if ((cal.get(Calendar.DAY_OF_MONTH)) == 5) {
             clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
             clera_bill_text.setVisibility(View.GONE);
-
             clear_bill.setEnabled(true);
-
-
             clear_bill.setTextColor(getResources().getColor(R.color.white));
         } else {
             clear_bill.setBackgroundColor(getResources().getColor(R.color.gray));
@@ -144,14 +123,9 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         } else
             _payment.setVisibility(View.GONE);
 
-
         clear_bill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Calendar c = Calendar.getInstance();
-//                String day = c.get(Calendar.YEAR) + "-" + String.format("%02d", c.get(Calendar.MONTH)) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH));
-//                BillTableManagement.updateClearBills(_dbHelper.getWritableDatabase(), day, getIntent().getStringExtra("custId"));
-
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(BillingEdit.this);
                 final AlertDialog dialog = alertBuilder.create();
                 LayoutInflater inflater = (LayoutInflater) BillingEdit.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -177,18 +151,15 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             double bill = payment_made - bill_amount;
                             if (bill_amount >= payment_made) {
                                 holder.setBalance(bill_amount - payment_made);
-                                holder.setBalanceType(0);
                             } else {
                                 holder.setBalance(bill);
-                                holder.setBalanceType(1);
                             }
                             holder.setPaymentMade(payment_made);
-                            holder.setIsCleared(0);
+                            holder.setIsCleared(1);
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
                             holder.setTotalAmount(bill_amount);
                             new BillService().updateBillById(holder);
-                             //TODO ExtCal SETTINGS DB
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER = true;
                             BillingEdit.this.finish();
@@ -201,7 +172,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                         dialog.dismiss();
                     }
                 });
-                if (dialog != null)
+                if(dialog != null)
                     dialog.show();
 
             }
@@ -213,7 +184,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 //        if (balanceType == 1)
 //            balance_amount.setHint("Balance due (Rs)");
 
-        total_amount = (TextView) findViewById(R.id.total_amount);
+        TextView total_amount = (TextView) findViewById(R.id.total_amount);
         total_amount.setText(String.valueOf(intent.getDoubleExtra("total", 0)));
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
@@ -290,7 +261,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                         finalI = i + 1;
                         progressHandler.post(new Runnable() {
                             public void run() {
-                                progress += (100 / 1);
+                                progress += 100;
                                 androidProgressBar.setProgress(progress);
                                 //Status update in textview
 
@@ -335,14 +306,8 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         }
     }
 
-    public static BigDecimal round(double d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Double.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd;
-    }
-
     private void setActionBar() {
-        _mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar _mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(_mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
@@ -364,8 +329,6 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
             }
         });
-
-
         getSupportActionBar().setCustomView(mCustomView);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);

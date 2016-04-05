@@ -26,17 +26,15 @@ import com.milky.utils.Constants;
 import java.text.ParseException;
 import java.util.Calendar;
 
-/**
- * Created by Neha on 11/19/2015.
- */
 public class CustomersActivity extends AppCompatActivity {
+
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
-    private Toolbar _mToolbar;
     public static int POSITION = 0;
     private FloatingActionButton fabDelete;
     public static Intent _mIntent;
     public static String titleString = "";
+    public static LinearLayout saveManu;
 
     @Override
     protected void onResume() {
@@ -58,21 +56,19 @@ public class CustomersActivity extends AppCompatActivity {
          * Lets inflate the very first fragment
          * Here , we are inflating the TabFragment as the first Fragment
          */
-
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.containerView, new CustomerTabFragment()).commit();
-
-
     }
 
-    public static LinearLayout saveManu;
 
     private void setActionBar() {
-        _mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar _mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(_mToolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
+
         /*
         * Set Custome action bar
         * */
@@ -87,14 +83,13 @@ public class CustomersActivity extends AppCompatActivity {
 
         title.setText(_mIntent.getStringExtra("fname") + " " + _mIntent.getStringExtra("lname"));
         titleString = _mIntent.getStringExtra("fname") + " " + _mIntent.getStringExtra("lname");
-        Calendar shownDate = Calendar.getInstance();
 
+        Calendar shownDate = Calendar.getInstance();
         try {
             shownDate.setTime(Constants.work_format.parse(_mIntent.getStringExtra("added_date")));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        String date = Constants._display_format.format(shownDate.getTime());
         subTitle.setText("Date Added- " + Constants._display_format.format(shownDate.getTime()));
         subTitle.setVisibility(View.VISIBLE);
         getSupportActionBar().setCustomView(mCustomView);
@@ -113,7 +108,6 @@ public class CustomersActivity extends AppCompatActivity {
                 builder.setMessage("Want to delete " + getIntent().getStringExtra("fname") + " " + getIntent().getStringExtra("lname")
                         + "?");
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Customers data = new Customers();
@@ -125,7 +119,7 @@ public class CustomersActivity extends AppCompatActivity {
                         data.setMobile(_mIntent.getStringExtra("mobile"));
                         data.setDateAdded(_mIntent.getStringExtra("added_date"));
                         data.setDateModified(_mIntent.getStringExtra(Constants.getCurrentDate()));
-                        data.setIsDeleted(0);
+                        data.setIsDeleted(1);
                         data.setCustomerId(_mIntent.getIntExtra("cust_id",0));
                         data.setDeletedOn(Constants.getCurrentDate());
                         new CustomersService().update(data);

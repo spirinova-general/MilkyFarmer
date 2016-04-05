@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -19,24 +18,16 @@ import com.milky.ui.adapters.BillingAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Bill;
-import com.milky.service.core.Customers;
 
 import java.util.ArrayList;
 
-
-/**
- * Created by Neha on 11/18/2015.
- */
 public class BillingFragment extends Fragment {
     public static ListView _mListView;
     private DatabaseHelper _dbHelper;
-    private ArrayList<Customers> list;
-    private boolean hasPreviousBills = false;
     int custId=0;
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
     @Override
@@ -70,7 +61,7 @@ public class BillingFragment extends Fragment {
                 @Override
                 public void run() {
                     payment.clear();
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL)) {
+                    if (_dbHelper.isTableNotEmpty(TableNames.Bill)) {
                         new BillService().getOutstandingBill();
                         new BillService().getTotalAllBill();
                     }
@@ -87,27 +78,22 @@ public class BillingFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
-
         }
     }
 
-    private CustomersSettingService settingData;
+    protected CustomersSettingService settingData;
 
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersList);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         custId = getActivity().getIntent().getIntExtra("cust_id",0);
         settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
-        TextView _mTotalBills = (TextView) v.findViewById(R.id.total_pending_bills);
-
+        boolean hasPreviousBills = false;
         if (hasPreviousBills)
             ((TextView) v.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         _dbHelper.close();
     }
-
     public static ArrayList<Bill> payment = new ArrayList<>();
-
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -118,5 +104,4 @@ public class BillingFragment extends Fragment {
             Constants.REFRESH_BILL = false;
         }
     }
-
 }

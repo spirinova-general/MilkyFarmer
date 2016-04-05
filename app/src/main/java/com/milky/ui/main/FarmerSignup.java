@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.core.GlobalSettings;
-import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.IAccountService;
@@ -46,7 +45,6 @@ import java.util.HashMap;
 public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteListner {
     private TextInputLayout _nameLayout, _lastnameLayout, _mobileLayout, _passwordLayout, otp_layout;
     private EditText _firstName, _lastName, _mobile, _password, otp;
-    private DatabaseHelper _dbhelper;
     private SharedPreferences preferences;
     private SharedPreferences.Editor edit;
     private Button otpButton;
@@ -77,7 +75,6 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
     private void setActionBar() {
         Toolbar _mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(_mToolbar);
-        ActionBar actionBar = getSupportActionBar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         /*
@@ -176,7 +173,6 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
         _password = (EditText) findViewById(R.id.password);
 
         edit = preferences.edit();
-        _dbhelper = AppUtil.getInstance().getDatabaseHandler();
         accountService = new AccountService();
 
         _nameLayout = (TextInputLayout) findViewById(R.id.name_layout);

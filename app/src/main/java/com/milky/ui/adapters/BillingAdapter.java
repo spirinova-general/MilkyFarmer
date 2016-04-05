@@ -80,11 +80,11 @@ public class BillingAdapter extends BaseAdapter {
         holder.name.setText(a + b);
 
 
-        if ("1".equals(data.getIsCleared()) && "0".equals(data.isOutstanding())) {
+        if (0==data.getIsCleared() && 1==data.isOutstanding()) {
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("Outstanding");
         }
-        if ("0".equals(data.getIsCleared()) && "0".equals(data.isOutstanding())) {
+        if (1==data.getIsCleared() && 1==data.isOutstanding()) {
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("History");
         }
@@ -119,7 +119,6 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("custId", data.getCustomerId())
                         .putExtra("clear", data.getIsCleared())
                         .putExtra("total", data.getTotalAmount())
-                        .putExtra("balance_type", data.getBalanceType())
                         .putExtra("payment_made", data.getPaymentMade())
                         .putExtra("start_date_work_format", data.getStartDate())
                         .putExtra("end_date_work_format", data.getEndDate())
@@ -136,6 +135,5 @@ public class BillingAdapter extends BaseAdapter {
     class ViewHolder {
         TextView startDate, endDate, amount, name, custName, history;
     }
-
 
 }

@@ -68,7 +68,7 @@ public class SignUp extends AppCompatActivity {
                     startActivity(i);
                     finish();
                 }
-//                if(_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
+//                if(_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
 //                {
 //                    Intent i = new Intent(SignUp.this, MainActivity.class);
 //                    startActivity(i);

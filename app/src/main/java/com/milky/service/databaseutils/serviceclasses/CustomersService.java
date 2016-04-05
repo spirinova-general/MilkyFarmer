@@ -18,36 +18,36 @@ public class CustomersService implements ICustomers {
     @Override
     public long insert(Customers customers) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.FIRST_NAME, customers.getFirstName());
-        values.put(TableColumns.LAST_NAME, customers.getLastName());
-        values.put(TableColumns.BALANCE, customers.getBalance_amount());
-        values.put(TableColumns.ADDRESS_1, customers.getAddress1());
-        values.put(TableColumns.ADDRESS_2, customers.getAddress2());
-        values.put(TableColumns.AREA_ID, customers.getAreaId());
-        values.put(TableColumns.MOBILE, customers.getMobile());
-        values.put(TableColumns.DATE_ADDED, customers.getDateAdded());
-        values.put(TableColumns.DATE_MODIFIED, customers.getDateAdded());
-        values.put(TableColumns.ISDELETED, 1);
-        values.put(TableColumns.DELETED_ON, 1);
-        values.put(TableColumns.DIRTY, 1);
-        return getDb().insert(TableNames.TABLE_CUSTOMER, null, values);
+        values.put(TableColumns.FirstName, customers.getFirstName());
+        values.put(TableColumns.LastName, customers.getLastName());
+        values.put(TableColumns.Balance, customers.getBalance_amount());
+        values.put(TableColumns.Address1, customers.getAddress1());
+        values.put(TableColumns.Address2, customers.getAddress2());
+        values.put(TableColumns.AreaId, customers.getAreaId());
+        values.put(TableColumns.Mobile, customers.getMobile());
+        values.put(TableColumns.DateAdded, customers.getDateAdded());
+        values.put(TableColumns.DateModified, customers.getDateAdded());
+        values.put(TableColumns.IsDeleted, 0);
+        values.put(TableColumns.DeletedOn, "null");
+        values.put(TableColumns.Dirty, 0);
+        return getDb().insert(TableNames.CUSTOMER, null, values);
     }
 
     @Override
     public void update(Customers customers) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.FIRST_NAME, customers.getFirstName());
-        values.put(TableColumns.LAST_NAME, customers.getLastName());
-        values.put(TableColumns.BALANCE, customers.getBalance_amount());
-        values.put(TableColumns.ADDRESS_1, customers.getAddress1());
-        values.put(TableColumns.AREA_ID, customers.getAreaId());
-        values.put(TableColumns.MOBILE, customers.getMobile());
-        values.put(TableColumns.DATE_ADDED, customers.getDateAdded());
-        values.put(TableColumns.DATE_MODIFIED, customers.getDateAdded());
-        values.put(TableColumns.ISDELETED, customers.getIsDeleted());
-        values.put(TableColumns.DELETED_ON, customers.getDeletedOn());
-        values.put(TableColumns.DIRTY, 1);
-        getDb().update(TableNames.TABLE_CUSTOMER, values, TableColumns.ID + " ='" + customers.getCustomerId() + "'", null);
+        values.put(TableColumns.FirstName, customers.getFirstName());
+        values.put(TableColumns.LastName, customers.getLastName());
+        values.put(TableColumns.Balance, customers.getBalance_amount());
+        values.put(TableColumns.Address1, customers.getAddress1());
+        values.put(TableColumns.AreaId, customers.getAreaId());
+        values.put(TableColumns.Mobile, customers.getMobile());
+        values.put(TableColumns.DateAdded, customers.getDateAdded());
+        values.put(TableColumns.DateModified, customers.getDateAdded());
+        values.put(TableColumns.IsDeleted, customers.getIsDeleted());
+        values.put(TableColumns.DeletedOn, customers.getDeletedOn());
+        values.put(TableColumns.Dirty, 1);
+        getDb().update(TableNames.CUSTOMER, values, TableColumns.ID + " ='" + customers.getCustomerId() + "'", null);
     }
 
     @Override
@@ -57,8 +57,8 @@ public class CustomersService implements ICustomers {
 
     @Override
     public List<Customers> getCustomersLisytByArea(int areaId) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.ISDELETED + " ='" + "1'"
-                + " AND " + TableColumns.AREA_ID + " ='" + areaId + "'";
+        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE " + TableColumns.IsDeleted + " ='" + "1'"
+                + " AND " + TableColumns.AreaId + " ='" + areaId + "'";
         ArrayList<Customers> list = new ArrayList<>();
 
         Cursor cursor = getDb().rawQuery(selectquery, null);
@@ -66,17 +66,17 @@ public class CustomersService implements ICustomers {
         if (cursor.moveToFirst()) {
             do {
                 Customers holder = new Customers();
-                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
                 holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
-                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
-                holder.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.BALANCE)));
-                holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
-                holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AREA_ID)));
-                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.ISDELETED)));
-                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
+                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
+                holder.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
+                holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.Address1)));
+                holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.Address2)));
+                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
+                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
+                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -88,7 +88,7 @@ public class CustomersService implements ICustomers {
 
     @Override
     public List<Customers> getAllCustomers() {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.ISDELETED + " ='" + "1'";
+        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE " + TableColumns.IsDeleted + " ='" + "0'";
         ArrayList<Customers> list = new ArrayList<>();
 
         Cursor cursor = getDb().rawQuery(selectquery, null);
@@ -96,17 +96,17 @@ public class CustomersService implements ICustomers {
         if (cursor.moveToFirst()) {
             do {
                 Customers holder = new Customers();
-                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
                 holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
-                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
-                holder.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.BALANCE)));
-                holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
-                holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AREA_ID)));
-                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.ISDELETED)));
-                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
+                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
+                holder.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
+                holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.Address1)));
+                holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.Address2)));
+                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
+                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
+                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -118,7 +118,7 @@ public class CustomersService implements ICustomers {
 
     @Override
     public Customers getCustomerDetail(int id) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.ID + " ='" + id + "'";
+        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE " + TableColumns.ID + " ='" + id + "'";
         Customers customers = null;
 
         Cursor cursor = getDb().rawQuery(selectquery, null);
@@ -126,17 +126,17 @@ public class CustomersService implements ICustomers {
         if (cursor.moveToFirst()) {
             do {
                 customers = new Customers();
-                customers.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
+                customers.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
                 customers.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                customers.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
-                customers.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
-                customers.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.BALANCE)));
-                customers.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_1)));
-                customers.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.ADDRESS_2)));
-                customers.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AREA_ID)));
-                customers.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                customers.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.ISDELETED)));
-                customers.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
+                customers.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
+                customers.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
+                customers.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
+                customers.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.Address1)));
+                customers.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.Address2)));
+                customers.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
+                customers.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
+                customers.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+                customers.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
             }
             while (cursor.moveToNext());
         }
@@ -152,7 +152,7 @@ public class CustomersService implements ICustomers {
 
     @Override
     public boolean isAreaAssociated(int areaId) {
-        String selectQuery = "SELECT * FROM " + TableNames.TABLE_CUSTOMER + " WHERE " + TableColumns.AREA_ID + " ='"
+        String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE " + TableColumns.AreaId + " ='"
                 + areaId + "'";
 
         Cursor cursor = getDb().rawQuery(selectQuery, null);

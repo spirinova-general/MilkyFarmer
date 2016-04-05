@@ -21,28 +21,28 @@ public class AccountService implements IAccountService {
     @Override
     public void insert(Account account) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.FARMER_CODE, account.getFarmerCode());
-        values.put(TableColumns.DATE_MODIFIED, account.getDateModified());
-        values.put(TableColumns.DATE_ADDED, account.getDateAdded());
-        values.put(TableColumns.FIRST_NAME, account.getFirstName());
-        values.put(TableColumns.LAST_NAME, account.getLastName());
-        values.put(TableColumns.MOBILE, account.getMobile());
-        values.put(TableColumns.END_DATE, account.getEndDate());
-        values.put(TableColumns.TOTAL_SMS, account.getTotalSms());
-        values.put(TableColumns.USED_SMS, account.getUsedSms());
-        values.put(TableColumns.SERVER_ACCOUNT_ID, account.getServerAccountId());
-        values.put(TableColumns.VALIDATED, account.getValidated());
-        getDb().insert(TableNames.TABLE_ACCOUNT, null, values);
+        values.put(TableColumns.FarmerCode, account.getFarmerCode());
+        values.put(TableColumns.DateModified, account.getDateModified());
+        values.put(TableColumns.DateAdded, account.getDateAdded());
+        values.put(TableColumns.FirstName, account.getFirstName());
+        values.put(TableColumns.LastName, account.getLastName());
+        values.put(TableColumns.Mobile, account.getMobile());
+        values.put(TableColumns.EndDate, account.getEndDate());
+        values.put(TableColumns.TotalSms, account.getTotalSms());
+        values.put(TableColumns.UsedSms, account.getUsedSms());
+        values.put(TableColumns.ServerAccountId, account.getServerAccountId());
+        values.put(TableColumns.Validated, account.getValidated());
+        getDb().insert(TableNames.ACCOUNT, null, values);
     }
 
     @Override
     public void update(Account account) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.END_DATE, account.getEndDate());
-        values.put(TableColumns.TOTAL_SMS, account.getTotalSms());
-        values.put(TableColumns.SERVER_ACCOUNT_ID, account.getServerAccountId());
+        values.put(TableColumns.EndDate, account.getEndDate());
+        values.put(TableColumns.TotalSms, account.getTotalSms());
+        values.put(TableColumns.ServerAccountId, account.getServerAccountId());
 
-        getDb().update(TableNames.TABLE_ACCOUNT, values, TableColumns.SERVER_ACCOUNT_ID + " ='" + account.getServerAccountId() + "'", null);
+        getDb().update(TableNames.ACCOUNT, values, TableColumns.ServerAccountId + " ='" + account.getServerAccountId() + "'", null);
     }
 
     @Override
@@ -52,17 +52,17 @@ public class AccountService implements IAccountService {
 
     @Override
     public Account getDetails() {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        String selectquery = "SELECT * FROM " + TableNames.ACCOUNT;
         Cursor cursor = getDb().rawQuery(selectquery, null);
         com.milky.service.core.Account holder = new com.milky.service.core.Account();
         if (cursor.moveToFirst()) {
             do {
 
-                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
-                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
-                holder.setFarmerCode(cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                holder.setFarmerCode(cursor.getString(cursor.getColumnIndex(TableColumns.FARMER_CODE)));
+                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
+                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
+                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
+                holder.setFarmerCode(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
+                holder.setFarmerCode(cursor.getString(cursor.getColumnIndex(TableColumns.FarmerCode)));
             }
             while (cursor.moveToNext());
 
@@ -70,20 +70,14 @@ public class AccountService implements IAccountService {
         cursor.close();
         return holder;
     }
-
-    @Override
-    public String getRollDate() {
-        return null;
-    }
-
     @Override
     public int getLeftSMS() {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        String selectquery = "SELECT * FROM " + TableNames.ACCOUNT;
         int sms = 0;
         Cursor cursor = getDb().rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
             do {
-                sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.TOTAL_SMS)))
+                sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.TotalSms)))
                         - getUsedSMS();
 
             }
@@ -97,12 +91,12 @@ public class AccountService implements IAccountService {
 
     @Override
     public int getUsedSMS() {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        String selectquery = "SELECT * FROM " + TableNames.ACCOUNT;
         int sms = 0;
         Cursor cursor = getDb().rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
             do {
-                sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.USED_SMS)));
+                sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.UsedSms)));
 
             }
             while (cursor.moveToNext());
@@ -117,8 +111,8 @@ public class AccountService implements IAccountService {
     public boolean isAccountExpired() {
         Calendar cal = Calendar.getInstance();
         String day = Constants.api_format.format(cal.getTime());
-        String selectQuery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT + " WHERE "
-                + TableColumns.END_DATE + " <'" + day + "'";
+        String selectQuery = "SELECT * FROM " + TableNames.ACCOUNT + " WHERE "
+                + TableColumns.EndDate + " <'" + day + "'";
         Cursor cursor = getDb().rawQuery(selectQuery, null);
         Boolean result = cursor.getCount() > 0;
 
@@ -128,25 +122,25 @@ public class AccountService implements IAccountService {
 
     @Override
     public JSONObject getJsonData() {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_ACCOUNT;
+        String selectquery = "SELECT * FROM " + TableNames.ACCOUNT;
         Cursor cursor = getDb().rawQuery(selectquery, null);
         JSONObject jsonObject = new JSONObject();
         if (cursor.moveToFirst()) {
             do {
                 try {
-                    jsonObject.put("FarmerCode", cursor.getString(cursor.getColumnIndex(TableColumns.FARMER_CODE)));
-                    jsonObject.put("FirstName", cursor.getString(cursor.getColumnIndex(TableColumns.FIRST_NAME)));
-                    jsonObject.put("LastName", cursor.getString(cursor.getColumnIndex(TableColumns.LAST_NAME)));
-                    jsonObject.put("Mobile", cursor.getString(cursor.getColumnIndex(TableColumns.MOBILE)));
-                    jsonObject.put("Validated", cursor.getString(cursor.getColumnIndex(TableColumns.VALIDATED)));
+                    jsonObject.put("FarmerCode", cursor.getString(cursor.getColumnIndex(TableColumns.FarmerCode)));
+                    jsonObject.put("FirstName", cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
+                    jsonObject.put("LastName", cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
+                    jsonObject.put("Mobile", cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
+                    jsonObject.put("Validated", cursor.getString(cursor.getColumnIndex(TableColumns.Validated)));
                     jsonObject.put("Dirty", 1);
-                    jsonObject.put("DateAdded", cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
-                    jsonObject.put("DateModified", cursor.getString(cursor.getColumnIndex(TableColumns.DATE_MODIFIED)));
-                    jsonObject.put("StartDate", cursor.getString(cursor.getColumnIndex(TableColumns.DATE_ADDED)));
-                    jsonObject.put("EndDate", cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE)));
-                    jsonObject.put("UsedSms", cursor.getString(cursor.getColumnIndex(TableColumns.USED_SMS)));
-                    jsonObject.put("TotalSms", cursor.getString(cursor.getColumnIndex(TableColumns.TOTAL_SMS)));
-                    jsonObject.put("Id", cursor.getString(cursor.getColumnIndex(TableColumns.SERVER_ACCOUNT_ID)));
+                    jsonObject.put("DateAdded", cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
+                    jsonObject.put("DateModified", cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+                    jsonObject.put("StartDate", cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
+                    jsonObject.put("EndDate", cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
+                    jsonObject.put("UsedSms", cursor.getString(cursor.getColumnIndex(TableColumns.UsedSms)));
+                    jsonObject.put("TotalSms", cursor.getString(cursor.getColumnIndex(TableColumns.TotalSms)));
+                    jsonObject.put("Id", cursor.getString(cursor.getColumnIndex(TableColumns.ServerAccountId)));
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -165,11 +159,12 @@ public class AccountService implements IAccountService {
     @Override
     public void updateSMSCount(int count) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.USED_SMS, String.valueOf(getUsedSMS() + count));
-        getDb().update(TableNames.TABLE_ACCOUNT, values, null, null);
+        values.put(TableColumns.UsedSms, String.valueOf(getUsedSMS() + count));
+        getDb().update(TableNames.ACCOUNT, values, null, null);
     }
 
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
     }
+
 }

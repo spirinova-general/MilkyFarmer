@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.ui.main.CustomersFragment;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
@@ -45,7 +46,6 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
         return mCustomersList.size();
     }
 
-
     @Override
     public long getItemId(int position) {
         return position;
@@ -64,7 +64,6 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
         holder.userStreet = (TextView) convertView.findViewById(R.id.street);
         holder.userCity = (TextView) convertView.findViewById(R.id.city);
         holder._nameView = (TextView) convertView.findViewById(R.id.nameView);
-
 
         final Customers customer = mCustomersList.get(position);
         holder.userFirstName.setText(customer.getFirstName());
@@ -91,12 +90,10 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
                 Intent intent = new Intent(mActivity, com.milky.ui.main.CustomersActivity.class)
                         .putExtra("fname", customer.getFirstName())
                         .putExtra("lname", customer.getLastName())
-//                        .putExtra("quantity", customer.getGetDefaultQuantity())
                         .putExtra("areaId", customer.getAreaId())
                         .putExtra("address1", customer.getAddress1())
                         .putExtra("istoAddCustomer", 1)
                         .putExtra("mobile", customer.getMobile())
-//                        .putExtra("defaultrate", customer.getDefaultRate())
                         .putExtra("address2", customer.getAddress2())
                         .putExtra("added_date", customer.getDateAdded())
                         .putExtra("balance", customer.getBalance_amount())
@@ -106,7 +103,6 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
                 mActivity.startActivity(intent);
             }
         });
-
         return convertView;
     }
 
@@ -144,6 +140,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
                 suggestions.clear();
                 return new FilterResults();
             }
+
         }
 
         @Override
@@ -163,27 +160,22 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
                 clear();
                 notifyDataSetChanged();
             }
-            if (Constants.selectedAreaId != 0) {
+            if (Constants.selectedAreaId != -1) {
                 clear();
-
                 Area holder = areaService.getAreaById(Constants.selectedAreaId);
-
-//                filterList = CustomersTableMagagement.getAllCustomersByArea(_dbhelper.getReadableDatabase(), Constants.selectedAreaId);
+                filterList = new CustomersService().getCustomersLisytByArea(Constants.selectedAreaId);
                 for (Customers Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();
                 }
-                if (filterList.size() == 1) {
-
+                if (filterList.size() == 1)
                     CustomersFragment.mTotalCustomers.setText(filterList.size() + " Customer in " + holder.getLocality() + ", " + holder.getArea()
                             + ", " + holder.getCity());
 
-                } else if (filterList.size() > 1)
+                else if (filterList.size() > 1)
                     CustomersFragment.mTotalCustomers.setText(filterList.size() + " Customers");
             }
-            notifyDataSetChanged();
-
-
+            CustomersFragment._mAdapter.notifyDataSetChanged();
         }
     };
 

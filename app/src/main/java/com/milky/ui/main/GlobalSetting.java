@@ -245,7 +245,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
 
         /*Set default cust code*/
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+        if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
             Account holder = accountSettings.getDetails();
             GlobalSettings globalSettings = globalService.getData();
             firstname.setText(holder.getFirstName());
@@ -373,14 +373,14 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     rate_layout.setError(getResources().getString(R.string.field_cant_empty));
 //                } else if (Float.parseFloat(rate.getText().toString().trim()) <= 0) {
 //                    rate_layout.setError(getResources().getString(R.string.fill_valid_amount));
-                } else if (rate.getText().toString().equals(".")) {
+                } else if ((rate.getText().toString().equals(".") || Double.parseDouble(rate.getText().toString())<1)) {
                     rate_layout.setError(getResources().getString(R.string.enter_valid_rate));
                 } else if (tax.getText().toString().trim().equals("")) {
                     tax_layouts.setError(getResources().getString(R.string.field_cant_empty));
 
                 } else if (tax.getText().toString().equals(".")) {
                     tax_layouts.setError(getResources().getString(R.string.enter_valid_tax));
-                } else if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA)) {
+                } else if (!_dbHelper.isTableNotEmpty(TableNames.AREA)) {
                     google_autocomplete_layout.setError("Please add atleast one area !");
                 } else {
                     Calendar cl = Calendar.getInstance();
@@ -399,7 +399,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 //                    Update details for Account and Global settings
                     accountSettings.update(holder);
                     globalService.update(globalSettings);
-                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER_BILL))
+                    if (_dbHelper.isTableNotEmpty(TableNames.Bill))
                         new BillService().updateRollDate();
                     _dbHelper.close();
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
@@ -898,8 +898,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                 protected void publishResults(CharSequence constraint, FilterResults results) {
                     if (results != null && results.count > 0) {
                         notifyDataSetChanged();
-                    } else {
-                        notifyDataSetInvalidated();
                     }
                 }
             };
@@ -909,7 +907,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
     private void populateAreaView() {
          /*Fill fields from db*/
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
+        if (_dbHelper.isTableNotEmpty(TableNames.AREA))
 
         {
             List<Area> list = new AreaService().getStoredAddresses();

@@ -51,7 +51,7 @@ public class CustomerSettingFragment extends Fragment {
     private Button _mSave, _mCancel;
     private TextInputLayout _phone_textinput_layout;
     private AutoCompleteTextView _autocomplete_city_area;
-    private int selectedAreaId = 0, tempAreaId = 0;
+    private int selectedAreaId = -1, tempAreaId = -1;
     private TextInputLayout name_layout, last_name_layout, balance_layout, flat_number_layout, street_layout, milk_quantity_layout, rate_layout;
     private Customers dataHolder;
     private DatabaseHelper _dbHelper;
@@ -204,7 +204,7 @@ public class CustomerSettingFragment extends Fragment {
         pick_date.setText(settingData.getStartDate());
         /*Set defaul rate
         * */
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT))
+        if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
             _mRate.setText(String.valueOf(new GlobalSettingsService().getData().getDefaultRate()));
 
         /*
@@ -219,9 +219,9 @@ public class CustomerSettingFragment extends Fragment {
 //        _mAddress2.setText(getActivity().getIntent().getStringExtra("address2"));
         _mAddress1.setText(getActivity().getIntent().getStringExtra("address1"));
         _mRate.setText(String.valueOf(settingData.getDefaultRate()));
-        Area area = new AreaService().getAreaById( getActivity().getIntent().getIntExtra("areaId", 0));
+        Area area = new AreaService().getAreaById(getActivity().getIntent().getIntExtra("areaId", 0));
         if (!area.getLocality().equals(""))
-            _autocomplete_city_area.setText(area.getLocality()+ ", " + area.getArea() +", " + area.getCity());
+            _autocomplete_city_area.setText(area.getLocality() + ", " + area.getArea() + ", " + area.getCity());
         else
             _autocomplete_city_area.setText(area.getArea() +
                     ", " + area.getCity());
@@ -373,7 +373,7 @@ public class CustomerSettingFragment extends Fragment {
                 else if (_mAddress1.getText().toString().equals(""))
                     flat_number_layout.setError("Enter flat number!");
 
-                else if ((!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()) && tempAreaId == 0)) {
+                else if ((!previousSelectedArea.equals(_autocomplete_city_area.getText().toString()) && tempAreaId == -1)) {
 
                     autocomplete_layout.setError("Select valid area!");
 
@@ -388,7 +388,7 @@ public class CustomerSettingFragment extends Fragment {
                         !_mBalance.getText().toString().equals("") &&
                         !_mAddress1.getText().toString().equals("")
                         && !_mRate.getText().toString().equals("")
-                        && selectedAreaId != 0
+                        && selectedAreaId != -1
                         && !_mMobile.getText().toString().equals("") &&
                         !_mQuantuty.getText().toString().equals("")
                         ) {
@@ -403,8 +403,8 @@ public class CustomerSettingFragment extends Fragment {
                     String currentDate = Constants.getCurrentDate();
                     holder.setDateModified(currentDate);
                     holder.setCustomerId(getActivity().getIntent().getIntExtra("cust_id", 0));
-                    holder.setIsDeleted(1);
-                    holder.setDeletedOn("1");
+                    holder.setIsDeleted(0);
+                    holder.setDeletedOn("null");
                     //Update data into custmers table
                     new CustomersService().update(holder);
 
@@ -421,24 +421,26 @@ public class CustomerSettingFragment extends Fragment {
                     setting.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
                             String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
 
-                    setting.setDirty(0);
+                    setting.setDirty(1);
                     CustomersSettingService customersSettingService = new CustomersSettingService();
                     if (customersSettingService.isHasDataForCustoner(currentDate,
                             getActivity().getIntent().getIntExtra("cust_id", 0)))
                         customersSettingService.update(setting);
                     else {
-                        if (updatedQty) {
+                        if ((updatedQty)) {
                             //Update old bill
                             String enddate = customersSettingService.getEndDate(getActivity().getIntent().getIntExtra("cust_id", 0), currentDate);
                             setting.setEndDate(currentDate);
                             customersSettingService.updateEndDate(setting, enddate);
                             //insert new Bill..
                             setting.setStartDate(currentDate);
+                            setting.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
+                                    String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+
                             customersSettingService.insert(setting);
                         } else
                             //update customers setting detail..
-                            new CustomersSettingService().update(setting);
-
+                            customersSettingService.update(setting);
 
                     }
 

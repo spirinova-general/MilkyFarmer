@@ -15,21 +15,21 @@ public class GlobalSettingsService {
     //    Insert GlobalSettings data
     public static void insertGlobalSettingsData(SQLiteDatabase db, GlobalSettings holder) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DEFAULT_RATE, holder.getDefaultRate());
+        values.put(TableColumns.DefaultRate, holder.getDefaultRate());
         values.put(TableColumns.TAX, holder.getTax());
-        values.put(TableColumns.ROLL_DATE, holder.getRollDate());
-        db.insert(TableNames.TABLE_GLOBAL_SETTINGS, null, values);
+        values.put(TableColumns.RollDate, holder.getRollDate());
+        db.insert(TableNames.GlobalSetting, null, values);
     }
 
     // get Settings data
     public static GlobalSettings getGlobalSettingsData(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
+        String selectquery = "SELECT * FROM " + TableNames.GlobalSetting;
         Cursor cursor = db.rawQuery(selectquery, null);
         GlobalSettings holder = new GlobalSettings();
         if (cursor.moveToFirst()) {
             do {
-                holder.setDefaultRate(cursor.getInt(cursor.getColumnIndex(TableColumns.DEFAULT_RATE)));
-                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE)));
+                holder.setDefaultRate(cursor.getInt(cursor.getColumnIndex(TableColumns.DefaultRate)));
+                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
                 holder.setTax(cursor.getInt(cursor.getColumnIndex(TableColumns.TAX)));
             }
             while (cursor.moveToNext());
@@ -41,12 +41,12 @@ public class GlobalSettingsService {
     //get account expirationDate
 
     public static String getExpirationDate(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
+        String selectquery = "SELECT * FROM " + TableNames.GlobalSetting;
         String date = "";
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
             do {
-                date = cursor.getString(cursor.getColumnIndex(TableColumns.END_DATE));
+                date = cursor.getString(cursor.getColumnIndex(TableColumns.EndDate));
             }
             while (cursor.moveToNext());
 
@@ -58,20 +58,20 @@ public class GlobalSettingsService {
     //Update Settings
     public static void updateSettings(SQLiteDatabase db, GlobalSettings holder) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.ROLL_DATE, holder.getRollDate());
+        values.put(TableColumns.RollDate, holder.getRollDate());
         values.put(TableColumns.TAX, holder.getTax());
-        values.put(TableColumns.DEFAULT_RATE, holder.getDefaultRate());
-        db.update(TableNames.TABLE_GLOBAL_SETTINGS, values, null, null);
+        values.put(TableColumns.DefaultRate, holder.getDefaultRate());
+        db.update(TableNames.GlobalSetting, values, null, null);
     }
 
     //    Check if user set any default rate yet..
     public static String getDefaultRate(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
+        String selectquery = "SELECT * FROM " + TableNames.GlobalSetting;
         String rate = null;
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
             do {
-                rate = cursor.getString(cursor.getColumnIndex(TableColumns.DEFAULT_RATE));
+                rate = cursor.getString(cursor.getColumnIndex(TableColumns.DefaultRate));
 
             }
             while (cursor.moveToNext());
@@ -84,7 +84,7 @@ public class GlobalSettingsService {
 
     //Get default tax
     public static double getDefautTax(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
+        String selectquery = "SELECT * FROM " + TableNames.GlobalSetting;
         double rate = 0;
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
@@ -102,12 +102,12 @@ public class GlobalSettingsService {
 
     //Get Roll date
     public static String getRollDate(SQLiteDatabase db) {
-        String selectquery = "SELECT * FROM " + TableNames.TABLE_GLOBAL_SETTINGS;
+        String selectquery = "SELECT * FROM " + TableNames.GlobalSetting;
         String rate = null;
         Cursor cursor = db.rawQuery(selectquery, null);
         if (cursor.moveToFirst()) {
             do {
-                rate = cursor.getString(cursor.getColumnIndex(TableColumns.ROLL_DATE));
+                rate = cursor.getString(cursor.getColumnIndex(TableColumns.RollDate));
 
             }
             while (cursor.moveToNext());

@@ -31,20 +31,13 @@ import java.util.List;
  */
 public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
     private Context mContext;
-    private String date;
     private List<VDelivery> filteredList, tempItems, suggestions;
-    private Customers filetrHolder;
-    private DatabaseHelper _dbHelper;
-    private DeliveryService deliveryService;
     public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final String quantityEditDate, final List<VDelivery> _mCustomersList) {
         super(con, resource, textViewResourceId, _mCustomersList);
         this.mContext = con;
-        this.date = quantityEditDate;
         this.filteredList = _mCustomersList;
         tempItems = new ArrayList<>(filteredList); // this makes the difference.
         suggestions = new ArrayList<>();
-        _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-        deliveryService = new DeliveryService();
 
     }
 
@@ -210,8 +203,8 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
                 if (constraint != null) {
                     suggestions.clear();
                     for (VDelivery Area : tempItems) {
-                        if ((Area.getFirstname().toLowerCase().contains(constraint.toString().toLowerCase().trim()) ||
-                               Area.getLastname().toLowerCase().contains(constraint.toString().toLowerCase().trim()))) {
+                        if ((Area.getFirstname().toLowerCase().contains(constraint.toString().toLowerCase()) ||
+                               Area.getLastname().toLowerCase().contains(constraint.toString().toLowerCase()))) {
                             suggestions.add(Area);
                         }
                     }
@@ -228,8 +221,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                List<VDelivery> filterList;
-                filterList = (ArrayList<VDelivery>) results.values;
+                List<VDelivery> filterList = (ArrayList<VDelivery>) results.values;
                 if (results != null && results.count > 0) {
                     clear();
                     for (VDelivery Area : filterList) {
@@ -240,7 +232,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
                     clear();
                     notifyDataSetChanged();
                 }
-                if (Constants.selectedAreaId!=0) {
+                if (Constants.selectedAreaId!=-1) {
                     clear();
 
                     filterList = new DeliveryService().getByAreaAndDay(Constants.selectedAreaId, Constants.DELIVERY_DATE);

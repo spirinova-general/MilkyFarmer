@@ -40,7 +40,6 @@ import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
-import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
@@ -201,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                     if (CustomersFragment._mAdapter != null)
                         CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
                     if (s.length() == 0) {
-                        Constants.selectedAreaId = 0;
+                        Constants.selectedAreaId =-1;
                     }
                 }
 
@@ -332,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 //        MenuItem sync = (MenuItem) mNavigationView.findViewById(R.id.nav_sync);
 //        sync.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_image));
         accountService = new AccountService();
-        if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+        if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
             if (accountService.isAccountExpired()) {
                 expiryDialog();
             }
@@ -348,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
 
         //check if global setting has been set
-        if ("0".equals(new GlobalSettingsService().getData().getDefaultRate())) {
+        if (0.0 == new GlobalSettingsService().getData().getDefaultRate()) {
             mDrawerLayout.openDrawer(mNavigationView);
             Toast.makeText(MainActivity.this, getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
             _dbHelper.close();
@@ -359,7 +358,7 @@ int AreaID[] = new int[]{1, 2, 3, 4, 5};
 String City[] = new String[]{"Pune", "Mumbai", "Mohali"};
 int CityId[] = new int[]{1, 2, 3};
 
-if (!_dbHelper.isTableNotEmpty(TableNames.TABLE_AREA))
+if (!_dbHelper.isTableNotEmpty(TableNames.AREA))
 for (int i = 0; i < 5; i++) {
 VAreaMapper holder = new VAreaMapper();
 holder.setArea(Area[i]);
@@ -405,7 +404,6 @@ _dbHelper.close();
         }
         if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
-                Account holder = new Account();
 //                try {
 //                    JSONObject result = Constants.API_RESPONCE;
 //                        holder.setFarmerCode(result.getString("FarmerCode"));
@@ -423,7 +421,7 @@ _dbHelper.close();
 //                    holder.setId(String.valueOf(result.getInt("Id")));
 
 //                    Account.updateAllAccountDetails(_dbHelper.getWritableDatabase(), holder);
-//                    if (_dbHelper.isTableNotEmpty(TableNames.TABLE_ACCOUNT)) {
+//                    if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
 //                        if (Account.isAccountExpired(_dbHelper.getReadableDatabase())) {
 //                            Toast.makeText(MainActivity.this, "Account is expired !", Toast.LENGTH_LONG).show();
 //                        } else
@@ -447,10 +445,6 @@ _dbHelper.close();
 
     public FragmentRefreshListener getFragmentRefreshListener() {
         return fragmentRefreshListener;
-    }
-
-    public void setFragmentRefreshListener(FragmentRefreshListener fragmentRefreshListener) {
-        this.fragmentRefreshListener = fragmentRefreshListener;
     }
 
     private FragmentRefreshListener fragmentRefreshListener;
@@ -482,7 +476,6 @@ _dbHelper.close();
 
     //Expiry dialog
 
-    List<Bill> list = new ArrayList<>();
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -490,17 +483,16 @@ _dbHelper.close();
         int id = item.getItemId();
         switch (id) {
             case R.id.sens_sms:
-                if (_dbHelper.isTableNotEmpty(TableNames.TABLE_CUSTOMER)) {
-                    list = new BillService().getTotalAllBill();
-                }
-                if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
-                    if (list.size() > 0) {
-                        if (accountService.getLeftSMS() > list.size())
+                if (!_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
+                    Toast.makeText(MainActivity.this, "Please add customer !", Toast.LENGTH_SHORT).show();
+                } else if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
+                    if (BillingFragment.payment != null && BillingFragment.payment.size() > 0) {
+                        if (accountService.getLeftSMS() > BillingFragment.payment.size())
                             new SendBillSMS().execute();
                         else
                             Toast.makeText(MainActivity.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
-                    } else
-                        Toast.makeText(MainActivity.this, "Please add customer !", Toast.LENGTH_SHORT).show();
+                    }
+
                 } else
                     Toast.makeText(MainActivity.this, "No network available. ", Toast.LENGTH_SHORT).show();
 
@@ -534,7 +526,7 @@ _dbHelper.close();
         protected String doInBackground(Void... params) {
             final Calendar startDate = Calendar.getInstance();
             final Calendar endDate = Calendar.getInstance();
-            final List<Bill> finalList = list;
+            final List<Bill> finalList = BillingFragment.payment;
 
             new Thread(new Runnable() {
                 public void run() {
@@ -546,7 +538,7 @@ _dbHelper.close();
 
                             try {
                                 Date date = Constants.work_format.parse(finalList.get(i).getStartDate());
-                                Date end = Constants.work_format.parse(finalList.get(i).getStartDate());
+                                Date end = Constants.work_format.parse(finalList.get(i).getEndDate());
                                 startDate.setTime(date);
                                 endDate.setTime(end);
                             } catch (ParseException e) {
@@ -556,7 +548,7 @@ _dbHelper.close();
                                     + String.format("%02d", startDate.get(Calendar.DAY_OF_MONTH)) + " to " +
                                     Constants.MONTHS[endDate.get(Calendar.MONTH)] + " " + String.format("%02d", endDate.get(Calendar.DAY_OF_MONTH))
                                     + " is Rs. " + finalList.get(i).getTotalAmount()
-                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + new CustomersSettingService().getByCustId(finalList.get(i).getCustomerId(), Constants.getCurrentDate()) + "/litre.", "UTF-8");
+                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + new CustomersSettingService().getByCustId(finalList.get(i).getCustomerId(), Constants.getCurrentDate()).getDefaultRate() + "/litre.", "UTF-8");
 
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
@@ -595,8 +587,8 @@ _dbHelper.close();
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             messageSent.setText(values[0]);
-            if (list.size() == finalI) {
-                accountService.updateSMSCount(list.size());
+            if (BillingFragment.payment.size() == finalI) {
+                accountService.updateSMSCount(BillingFragment.payment.size());
                 ok.setVisibility(View.VISIBLE);
             }
         }

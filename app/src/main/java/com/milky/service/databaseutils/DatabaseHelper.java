@@ -4,12 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 
 import java.io.File;
-import java.util.Calendar;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     Context context;
@@ -45,26 +43,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //                "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH));
 //
 //        final String ADD_ROLL_DATE_COLUMN = "ALTER TABLE "
-//                + TableNames.TABLE_ACCOUNT + " ADD COLUMN " + TableColumns.ROLL_DATE + " TEXT NOT NULL DEFAULT '" + date + "'";
+//                + TableNames.ACCOUNT + " ADD COLUMN " + TableColumns.RollDate + " TEXT NOT NULL DEFAULT '" + date + "'";
 //        if (!Account.columnRollDateExists(db))
 //            db.execSQL(ADD_ROLL_DATE_COLUMN);
 //
 //        final String ADD_ROLL_DATE_COLUMN_BILL = "ALTER TABLE "
-//                + TableNames.TABLE_CUSTOMER_BILL + " ADD COLUMN " + TableColumns.ROLL_DATE + " TEXT NOT NULL DEFAULT '" + date + "'";
+//                + TableNames.Bill + " ADD COLUMN " + TableColumns.RollDate + " TEXT NOT NULL DEFAULT '" + date + "'";
 //        if (!BillTableManagement.columnRollDateExists(db))
 //            db.execSQL(ADD_ROLL_DATE_COLUMN_BILL);
 //        final String DELETED_FOR_BILLS = "ALTER TABLE "
-//                + TableNames.TABLE_CUSTOMER_BILL + " ADD COLUMN " + TableColumns.DELETED_ON + " TEXT NOT NULL DEFAULT '" +"1" + "'";
+//                + TableNames.Bill + " ADD COLUMN " + TableColumns.DeletedOn + " TEXT NOT NULL DEFAULT '" +"1" + "'";
 //        if (!BillTableManagement.columnRollDateExistsDeletedOn(db))
 //            db.execSQL(DELETED_FOR_BILLS);
-        String areaIndex = "CREATE UNIQUE INDEX " + TableColumns.AREA_INDEX + " ON " + TableNames.TABLE_CUSTOMER + " (" + TableColumns.AREA_ID + ", " + TableColumns.ID + " )";
+        String areaIndex = "CREATE INDEX " + TableColumns.IndexCustomerArea + " ON " + TableNames.CUSTOMER + " (" + TableColumns.AreaId +" )";
         db.execSQL(areaIndex);
-        String custIndex = "CREATE UNIQUE INDEX " + TableColumns.BILL_INDEX + " ON " + TableNames.TABLE_CUSTOMER_BILL + " (" + TableColumns.ID + " )";
+        String custIndex = "CREATE INDEX " + TableColumns.IndexBillCustomer + " ON " + TableNames.Bill + " (" + TableColumns.CustomerId + " )";
         db.execSQL(custIndex);
-        String custSettingIndex = "CREATE UNIQUE INDEX " + TableColumns.CUSTOMER_SETTING_INDEX + " ON " + TableNames.TABLE_CUSTOMER_SETTINGS + " (" + TableColumns.ID + ", " + TableColumns.ID + " )";
+        String custSettingIndex = "CREATE INDEX " + TableColumns.Index_Customer_Customer_Setting + " ON " + TableNames.CustomerSetting + " (" + TableColumns.CustomerId+ " )";
         db.execSQL(custSettingIndex);
         //        Adding custId Index..
-        String deliveryIndex = "CREATE UNIQUE INDEX " + TableColumns.DELIVERY_INDEX + " ON " + TableNames.TABLE_DELIVERY + " (" + TableColumns.ID + ", " + TableColumns.ID + " )";
+        String deliveryIndex = "CREATE INDEX " + TableColumns.Index_Delivery_Customer + " ON " + TableNames.DELIVERY + " (" + TableColumns.CustomerId+ " )";
         db.execSQL(deliveryIndex);
 
     }
@@ -78,12 +76,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //        String date = String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d", cal.get(Calendar.MONTH) + 1) +
 //                "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH));
 //        final String ADD_ROLL_DATE_COLUMN = "ALTER TABLE "
-//                + TableNames.TABLE_ACCOUNT + " ADD COLUMN " + TableColumns.ROLL_DATE + " TEXT NOT NULL DEFAULT '" + date + "'";
+//                + TableNames.ACCOUNT + " ADD COLUMN " + TableColumns.RollDate + " TEXT NOT NULL DEFAULT '" + date + "'";
 //
 //        final String ADD_ROLL_DATE_COLUMN_BILL = "ALTER TABLE "
-//                + TableNames.TABLE_CUSTOMER_BILL + " ADD COLUMN " + TableColumns.ROLL_DATE + " TEXT NOT NULL DEFAULT '" + date + "'";
+//                + TableNames.Bill + " ADD COLUMN " + TableColumns.RollDate + " TEXT NOT NULL DEFAULT '" + date + "'";
 //        final String ADD_DELETE_COLUMN_TO_BILL = "ALTER TABLE "
-//                + TableNames.TABLE_CUSTOMER_BILL + " ADD COLUMN " + TableColumns.DELETED_ON + " TEXT NOT NULL DEFAULT '" + "1" + "'";
+//                + TableNames.Bill + " ADD COLUMN " + TableColumns.DeletedOn + " TEXT NOT NULL DEFAULT '" + "1" + "'";
 //        if (newVersion > oldVersion && !Account.columnRollDateExists(db))
 //            db.execSQL(ADD_ROLL_DATE_COLUMN);
 //        if (newVersion > oldVersion && !BillTableManagement.columnRollDateExists(db))
@@ -94,9 +92,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 //        Adding indexes..
 //        try {
-//            String areaIndex = "CREATE UNIQUE INDEX " + TableColumns.AREA_INDEX + " ON " + TableNames.TABLE_CUSTOMER + " (" + TableColumns.AREA_ID + ", " + TableColumns.ID + ", " + TableColumns.ID + " )";
+//            String areaIndex = "CREATE UNIQUE INDEX " + TableColumns.IndexCustomerArea + " ON " + TableNames.CUSTOMER + " (" + TableColumns.AreaId + ", " + TableColumns.ID + ", " + TableColumns.ID + " )";
 //            db.execSQL(areaIndex);
-//            String custIndex = "CREATE UNIQUE INDEX " + TableColumns.CUSTID_INDEX + " ON " + TableNames.TABLE_CUSTOMER_BILL + " (" + TableColumns.ID + ", " + TableColumns.ID + " )";
+//            String custIndex = "CREATE UNIQUE INDEX " + TableColumns.CUSTID_INDEX + " ON " + TableNames.Bill + " (" + TableColumns.ID + ", " + TableColumns.ID + " )";
 //            db.execSQL(custIndex);
 //        }
 //        catch (SQLiteException exp)
@@ -134,8 +132,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void updateSyncInfo(SQLiteDatabase db, String tableName) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DIRTY, "1");
-        db.update(tableName, values, TableColumns.DIRTY + " ='0'"
+        values.put(TableColumns.Dirty, "1");
+        db.update(tableName, values, TableColumns.Dirty + " ='0'"
                 , null);
     }
 
