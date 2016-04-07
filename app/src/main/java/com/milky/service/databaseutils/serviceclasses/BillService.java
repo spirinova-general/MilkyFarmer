@@ -5,8 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.service.core.Bill;
+import com.milky.service.core.Customers;
+import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.*;
 import com.milky.service.databaseutils.serviceinterface.IBill;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
 import com.milky.ui.customers.CustomersBillingFragment;
 import com.milky.ui.main.BillingFragment;
 import com.milky.utils.AppUtil;
@@ -16,16 +20,21 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class BillService implements IBill {
+
+    ICustomers _customerService = new CustomersService();
+    IGlobalSetting _globalSettingService = new GlobalSettingsService();
+
     @Override
     public void insert(Bill holder) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.CustomerId, holder.getCustomerId());
         values.put(TableColumns.StartDate, holder.getStartDate());
         values.put(TableColumns.EndDate, holder.getEndDate());
-        values.put(TableColumns.DefaultQuantity, holder.getQuantity());
+        values.put(TableColumns.TotalQuantity, holder.getQuantity());
         values.put(TableColumns.Balance, holder.getBalance());
         values.put(TableColumns.Adjustment, 0);
         values.put(TableColumns.TAX, holder.getTax());
@@ -46,7 +55,7 @@ public class BillService implements IBill {
         values.put(TableColumns.CustomerId, bill.getCustomerId());
         values.put(TableColumns.StartDate, bill.getStartDate());
         values.put(TableColumns.EndDate, bill.getEndDate());
-        values.put(TableColumns.DefaultQuantity, bill.getQuantity());
+        values.put(TableColumns.TotalQuantity, bill.getQuantity());
         values.put(TableColumns.Balance, bill.getBalance());
         values.put(TableColumns.Adjustment, 0);
         values.put(TableColumns.TAX, bill.getTax());
@@ -62,7 +71,136 @@ public class BillService implements IBill {
     }
 
     @Override
-    public List<Bill> getTotalAllBill() {
+    public List<Bill> getAllUnClearedBills() {
+        String selectquery = "SELECT * FROM " + TableNames.Bill  + " WHERE " + TableColumns.IsCleared + " ='" + "0')";
+
+        ArrayList<Bill> list = new ArrayList<>();
+        Cursor cursor = getDb().rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Bill holder = new Bill();
+                holder.PopulateFromCursor(cursor);
+                list.add(holder);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+
+    @Override
+    public List<Bill> getBillsOfCustomer(int customerId) {
+
+        String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.CustomerId + " ='" + customerId + "'";
+        ArrayList<Bill> list = new ArrayList<>();
+
+        Cursor cursor = getDb().rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Bill holder = new Bill();
+                holder.PopulateFromCursor(cursor);
+                list.add(holder);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return list;
+    }
+
+    @Override
+    public void RecalculateAllOutstandingBills() throws Exception
+    {
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        Date rollDate = Utils.FromDateString(_globalSettingService.getRollDate());
+        //Umesh check this - I just want to find the first day of current month
+        cal.set(today.getYear(), today.getMonth(), 1);
+        Date firstDayOfMonth = cal.getTime();
+
+        HashMap<Integer, Bill> currentbillsMap = getAllCurrentBills();
+        if( today.before(rollDate)) {
+            InsertOrUpdateCurrentBills(currentbillsMap);
+        }
+        else{
+            PerformBillRoll();
+        }
+    }
+
+    private void PerformBillRoll() throws Exception{
+        //Mark all current bills outstanding
+        String selectquery =  "UPDATE " + TableNames.Bill  + " SET " + TableColumns.IsOutstanding + " ='" + "1'"
+                +  " WHERE " + TableColumns.IsOutstanding + " ='" + "0' AND " + TableColumns.IsCleared + " ='" + "0'";
+
+        //Umesh check if it updates values
+        getDb().execSQL(selectquery);
+
+        InsertOrUpdateCurrentBills(null);
+
+    }
+
+    private void InsertOrUpdateCurrentBills(HashMap<Integer, Bill> currentbillsMap) throws Exception
+    {
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        //Umesh check this - I just want to find the first day of current month
+        cal.set(today.getYear(), today.getMonth(), 1);
+        Date firstDayOfMonth = cal.getTime();
+
+        List<Customers> customers =  _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth, today);
+
+        for(Customers customer: customers) {
+            Bill bill;
+            if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())) {
+                bill = currentbillsMap.get(customer.getCustomerId());
+            }
+            else
+            {
+                bill = new Bill();
+            }
+
+            QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer,firstDayOfMonth, today);
+            bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
+            bill.setEndDate(Utils.ToDateString(today));
+            bill.setQuantity(qa.quantity);
+            bill.setTotalAmount(qa.amount);
+            bill.setBalance(customer.getBalance_amount());
+            bill.setIsCleared(0);
+            bill.setPaymentMade(0);
+            bill.setIsOutstanding(0);
+
+            if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())){
+                update(bill);
+            }
+            else
+            {
+                insert(bill);
+            }
+        }
+    }
+
+    //Gets current month's bills - that are not yet marked outstanding, get bills in a map with customer id for easier access
+    private HashMap<Integer, Bill> getAllCurrentBills() {
+        String selectquery = "SELECT * FROM " + TableNames.Bill  + " WHERE " + TableColumns.IsOutstanding + " ='" + "0'"
+                +  " AND " + TableColumns.IsCleared + " ='" + "0'";
+
+        HashMap<Integer, Bill> map = new HashMap<Integer, Bill>();
+        Cursor cursor = getDb().rawQuery(selectquery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Bill holder = new Bill();
+                holder.PopulateFromCursor(cursor);
+                map.put(holder.getCustomerId(), holder);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return map;
+    }
+
+    //Umesh - clean up the old code when they are not in use. Comment them and put them at the bottom of the file - don't delete
+     public List<Bill>getTotalAllBill() {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " INNER JOIN " + TableNames.CUSTOMER
                 + " ON " + TableNames.Bill + "." + TableColumns.CustomerId + "=" + TableNames.CUSTOMER + "." + TableColumns.ID + " WHERE " + TableColumns.IsCleared + " ='" + "0'"
                 + " AND " + TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.EndDate + " >='"
@@ -123,6 +261,7 @@ public class BillService implements IBill {
 
                 holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
                 updateOutstandingBills(holder);
+                //Umesh - never use UI elements back in the service layer
                 if (BillingFragment.payment != null)
                     BillingFragment.payment.add(holder);
             }
@@ -138,7 +277,7 @@ public class BillService implements IBill {
     public void updateQuantity(Bill bill) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.CustomerId, bill.getCustomerId());
-        values.put(TableColumns.DefaultQuantity, bill.getQuantity());
+        values.put(TableColumns.TotalQuantity, bill.getQuantity());
         values.put(TableColumns.Balance, bill.getBalance());
         getDb().update(TableNames.Bill, values, TableColumns.CustomerId + " ='" + bill.getCustomerId() + "'", null);
     }
@@ -158,7 +297,7 @@ public class BillService implements IBill {
                 holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
                 holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
                 holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
-                holder.setQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
+                holder.setQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalQuantity)));
                 holder.setBalance(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
                 holder.setAdjustment(cursor.getDouble(cursor.getColumnIndex(TableColumns.Adjustment)));
                 holder.setTax(cursor.getDouble(cursor.getColumnIndex(TableColumns.TAX)));
@@ -179,7 +318,6 @@ public class BillService implements IBill {
         cursor.close();
 
         return list;
-
     }
 
     @Override
@@ -197,7 +335,7 @@ public class BillService implements IBill {
                 holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
                 holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
                 holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
-                holder.setQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
+                holder.setQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalQuantity)));
                 holder.setBalance(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
                 holder.setAdjustment(cursor.getDouble(cursor.getColumnIndex(TableColumns.Adjustment)));
                 holder.setTax(cursor.getDouble(cursor.getColumnIndex(TableColumns.TAX)));
@@ -297,7 +435,7 @@ public class BillService implements IBill {
     @Override
     public void updateOutstandingBills(Bill bill) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.DefaultQuantity, bill.getQuantity());
+        values.put(TableColumns.TotalQuantity, bill.getQuantity());
         values.put(TableColumns.TotalAmount, bill.getPaymentMade());
         if (Constants.getCurrentDate().equals(new GlobalSettingsService().getRollDate())) {
             values.put(TableColumns.EndDate, Constants.getCurrentDate());

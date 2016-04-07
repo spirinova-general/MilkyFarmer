@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+
 public class DeliveryService implements IDelivery {
 
     ICustomers _customerService = new CustomersService();
@@ -60,23 +61,24 @@ public class DeliveryService implements IDelivery {
             insert(delivery);
     }
 
-    //Umesh doing it in memory for less database hits
+    //Umesh doing it in memory for less database hits, remove maxday, startdate its not needed
     @Override
     public List<Double> getMonthlyDeliveryOfAllCustomers(int startDate, int maxDay, int month, int year) {
         try {
             List<Double> result = new ArrayList<Double>();
-            Calendar cal = Calendar.getInstance();
+            Calendar start = Calendar.getInstance();
             //Umesh - Get first day and last days of the month...Review this - dont use deprecated APIs
-            cal.set(year, month, 1);
-            Date firstDayOfTheMonth = cal.getTime();
-            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-            Date lastDayOfTheMonth = cal.getTime();
+            start.set(year, month, 1);
+            Date firstDayOfTheMonth = start.getTime();
+            Calendar end = Calendar.getInstance();
+            end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+            Date lastDayOfTheMonth = end.getTime();
+
 
             List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfTheMonth, lastDayOfTheMonth);
-            for (int i = firstDayOfTheMonth.getDay(); i <= lastDayOfTheMonth.getDay(); i++) {
+            for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()){
                 double totalQuantity = 0;
                 for (Customers customer : customers) {
-                    Date date = new Date(year, month, i);
                     CustomersSetting setting = _customerService.getCustomerSetting(customer, date);
                     if (setting != null)
                         totalQuantity += setting.getGetDefaultQuantity();

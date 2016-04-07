@@ -13,6 +13,7 @@ import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.utils.AppUtil;
 import com.milky.viewmodel.VDelivery;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -171,8 +172,34 @@ public class CustomersService implements ICustomers {
             }
         }
 
-        //did not find any setting
+        //did not find any setting, might happen for deleted customer
         return null;
+    }
+
+    public QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception
+    {
+        //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up
+        if( customer.customerSettings == null)
+            throw new Exception("Customer setting is not populated");
+
+        Calendar start = Calendar.getInstance();
+        start.setTime(startDate);
+        Date firstDayOfTheMonth = start.getTime();
+        Calendar end = Calendar.getInstance();
+        end.setTime(endDate);
+
+        double totalQuantity = 0, totalAmount = 0;
+        for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()){
+            CustomersSetting setting = getCustomerSetting(customer, date);
+            totalQuantity += setting.getGetDefaultQuantity();
+            double rate = setting.getDefaultRate();
+            totalAmount += rate*totalQuantity;
+        }
+
+        QuantityAmount qa = new QuantityAmount();
+        qa.amount = totalAmount;
+        qa.quantity = totalQuantity;
+        return qa;
     }
 
     @Override

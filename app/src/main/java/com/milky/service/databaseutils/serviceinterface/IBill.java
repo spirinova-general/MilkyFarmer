@@ -22,4 +22,9 @@ public interface IBill {
 
     void updateOutstandingBills(Bill bill);
     void updateRollDate();
+
+    //Umesh - the ones to be used now
+    void RecalculateAllOutstandingBills() throws Exception;
+    List<Bill> getAllUnClearedBills();
+    List<Bill> getBillsOfCustomer(int customerId);
 }

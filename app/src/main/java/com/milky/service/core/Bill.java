@@ -1,5 +1,9 @@
 package com.milky.service.core;
 
+import android.database.Cursor;
+
+import com.milky.service.databaseutils.TableColumns;
+
 import java.math.BigDecimal;
 
 /**
@@ -166,5 +170,23 @@ public class Bill {
         BigDecimal bd = new BigDecimal(Double.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd;
+    }
+
+    public void PopulateFromCursor(Cursor cursor)
+    {
+        this.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
+        this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
+        this.setQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalQuantity)));
+        this.setBalance(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
+        this.setAdjustment(cursor.getDouble(cursor.getColumnIndex(TableColumns.Adjustment)));
+        this.setTax(cursor.getDouble(cursor.getColumnIndex(TableColumns.TAX)));
+        this.setIsCleared(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCleared)));
+        this.setPaymentMade(cursor.getDouble(cursor.getColumnIndex(TableColumns.PaymentMade)));
+        this.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
+        this.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+        this.setIsOutstanding(cursor.getInt(cursor.getColumnIndex(TableColumns.IsOutstanding)));
+        this.setRate(cursor.getInt(cursor.getColumnIndex(TableColumns.Rate)));
+        this.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
+        this.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
     }
 }
