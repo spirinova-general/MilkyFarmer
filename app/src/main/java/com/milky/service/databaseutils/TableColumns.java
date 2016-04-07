@@ -39,6 +39,7 @@ public class TableColumns {
     public static final String TotalAmount = "TotalAmount";
     public static final String IsOutstanding = "IsOutstanding";
     public static final String Locality ="Locality" ;
+    public static final String IsCustomDelivery ="IsCustomDelivery" ;
 
 
 //    public static final String SYNC_STATUS = "sync_status";

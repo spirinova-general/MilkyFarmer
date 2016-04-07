@@ -23,6 +23,7 @@ public class CustomersSettingService implements ICustomersSettings {
         values.put(TableColumns.DefaultQuantity, customers.getGetDefaultQuantity());
         values.put(TableColumns.StartDate, customers.getStartDate());
         values.put(TableColumns.EndDate, customers.getEndDate());
+        values.put(TableColumns.IsCustomDelivery, customers.getIsCustomDelivery());
         values.put(TableColumns.Dirty, 0);
         getDb().insert(TableNames.CustomerSetting, null, values);
     }
@@ -35,6 +36,7 @@ public class CustomersSettingService implements ICustomersSettings {
         values.put(TableColumns.DefaultQuantity, customers.getGetDefaultQuantity());
         values.put(TableColumns.StartDate, customers.getStartDate());
         values.put(TableColumns.EndDate, customers.getEndDate());
+        values.put(TableColumns.IsCustomDelivery, customers.getIsCustomDelivery());
         values.put(TableColumns.Dirty, 1);
         getDb().update(TableNames.CustomerSetting, values, TableColumns.CustomerId + " ='" + customers.getCustomerId() + "'"
                 + " AND " + TableColumns.StartDate + " <='" + customers.getStartDate() + "'" + " AND " + TableColumns.EndDate + " >='" + customers.getEndDate() + "'", null);
@@ -85,6 +87,7 @@ public class CustomersSettingService implements ICustomersSettings {
                 holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultRate)));
                 holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
                 holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
+                holder.setIsCustomDelivery(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery)));
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -103,12 +106,7 @@ public class CustomersSettingService implements ICustomersSettings {
         if (cursor.moveToFirst()) {
             do {
                 CustomersSetting holder = new CustomersSetting();
-                holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
-                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
-                holder.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
-                holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultRate)));
-                holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
-                holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
+                holder.PopulateFromCursor(cursor);
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -126,12 +124,7 @@ public class CustomersSettingService implements ICustomersSettings {
         if (cursor.moveToFirst()) {
             do {
                 holder = new CustomersSetting();
-                holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
-                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
-                holder.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
-                holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultRate)));
-                holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
-                holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
+                holder.PopulateFromCursor(cursor);
             }
             while (cursor.moveToNext());
         }
@@ -159,12 +152,7 @@ public class CustomersSettingService implements ICustomersSettings {
         if (cursor.moveToFirst()) {
             do {
                 CustomersSetting holder = new CustomersSetting();
-                holder.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
-                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                holder.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
-                holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultRate)));
-                holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
-                holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
+                holder.PopulateFromCursor(cursor);
                 list.add(holder);
             }
             while (cursor.moveToNext());

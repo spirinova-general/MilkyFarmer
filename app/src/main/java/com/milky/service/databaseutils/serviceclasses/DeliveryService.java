@@ -4,18 +4,29 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.milky.service.core.Customers;
+import com.milky.service.core.CustomersSetting;
 import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.utils.AppUtil;
 import com.milky.viewmodel.VDelivery;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-
+import java.util.Map;
+import java.util.HashMap;
 public class DeliveryService implements IDelivery {
+
+    ICustomers _customerService = new CustomersService();
+
+
     @Override
     public void insert(Delivery delivery) {
         ContentValues values = new ContentValues();
@@ -39,8 +50,127 @@ public class DeliveryService implements IDelivery {
                 " AND " + TableColumns.DeliveryDate + " ='" + delivery.getDeliveryDate() + "'", null);
     }
 
+
     @Override
-    public boolean isHasDataForDay(String day, int custId) {
+    public void insertOrUpdate(Delivery delivery)
+    {
+        if (isHasDataForDay(delivery.getDeliveryDate(), delivery.getCustomerId()))
+            update(delivery);
+        else
+            insert(delivery);
+    }
+
+    //Umesh doing it in memory for less database hits
+    @Override
+    public List<Double> getMonthlyDeliveryOfAllCustomers(int startDate, int maxDay, int month, int year) {
+        try {
+            List<Double> result = new ArrayList<Double>();
+            Calendar cal = Calendar.getInstance();
+            //Umesh - Get first day and last days of the month...Review this - dont use deprecated APIs
+            cal.set(year, month, 1);
+            Date firstDayOfTheMonth = cal.getTime();
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            Date lastDayOfTheMonth = cal.getTime();
+
+            List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfTheMonth, lastDayOfTheMonth);
+            for (int i = firstDayOfTheMonth.getDay(); i <= lastDayOfTheMonth.getDay(); i++) {
+                double totalQuantity = 0;
+                for (Customers customer : customers) {
+                    Date date = new Date(year, month, i);
+                    CustomersSetting setting = _customerService.getCustomerSetting(customer, date);
+                    if (setting != null)
+                        totalQuantity += setting.getGetDefaultQuantity();
+                }
+                result.add(totalQuantity);
+            }
+            return result;
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
+
+    }
+
+    @Override
+    public List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year) {
+        try {
+            List<Double> result = new ArrayList<Double>();
+            Calendar cal = Calendar.getInstance();
+            //Umesh - Get first day and last days of the month...Review this - dont use deprecated APIs
+            cal.set(year, month, 1);
+            int firstDayOfTheMonth = cal.getTime().getDay();
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            int lastDayOfTheMonth = cal.getTime().getDay();
+
+            Customers customer = _customerService.getCustomerDetail(customerId, true);
+            for (int i = firstDayOfTheMonth; i <= lastDayOfTheMonth; i++) {
+                Date date = new Date(year, month, i);
+                CustomersSetting setting = _customerService.getCustomerSetting(customer, date);
+                result.add(setting.getGetDefaultQuantity());
+            }
+
+            return result;
+        }
+        catch(Exception ex)
+        {
+            //ALl these should be logged or re thrown when needed....
+            return null;
+        }
+    }
+
+    @Override
+    public List<VDelivery> getDeliveryDetails(String day) {
+       return getDeliveryDetails(null, day);
+    }
+
+    //Umesh use stringbuilder for appending, rather than strings, also select only columns that are needed
+    //Corresponding Table column constants should be part of the core classes itself...
+    @Override
+    public List<VDelivery> getDeliveryDetails(Integer areaId, String day) {
+        try {
+
+            Date date = Utils.FromDateString(day);
+
+            List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(areaId, date, date);
+            List<VDelivery> result = new ArrayList<VDelivery>();
+            for(Customers customer: customers) {
+                VDelivery holder = new VDelivery();
+                CustomersSetting setting = _customerService.getCustomerSetting(customer, date);
+                holder.setCustomerId(customer.getCustomerId());
+                holder.setQuantity(setting.getGetDefaultQuantity());
+                holder.setAreaId(customer.getAreaId());
+                holder.setFirstname(customer.getFirstName());
+                holder.setLastname(customer.getLastName());
+                result.add(holder);
+            }
+            return result;
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
+    }
+
+    //Get quantity total for some dates, for bill
+    public double getTotalQuantityConsumed(int startDate, int maxDay, int month, int year, boolean isForCustomers, int id) {
+        double data = 0;
+        for (int i = startDate; i <= maxDay; ++i) {
+            if (!isForCustomers) {
+                data += getTotalDeliveryTillDayforCustomer(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
+                        "-" + String.format("%02d", i), id);
+            } else {
+                data += calculateDeliveryForCustomers(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
+                        "-" + String.format("%02d", i), id);
+            }
+        }
+        return data;
+    }
+
+
+    //Umesh - the dates should have been converted to date in the UI itself, the core classes
+    //should have Date rather than string.
+    private boolean isHasDataForDay(String day, int custId) {
         String selectQuery = "SELECT * FROM " + TableNames.DELIVERY + " WHERE " + TableColumns.DeliveryDate + " ='"
                 + day + "'" + " AND "
                 + TableColumns.CustomerId + " ='" + custId + "'";
@@ -52,13 +182,12 @@ public class DeliveryService implements IDelivery {
         return result;
     }
 
-    @Override
-    public void updateByDayandId(Delivery delivery, String day, int id) {
-
+    private SQLiteDatabase getDb() {
+        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
     }
 
-    @Override
-    public double getTotalDeliveryByDay(int id, String day) {
+
+    private double getTotalDeliveryByDay(int id, String day) {
         double quantity = 0;
 
         String selectquery = "SELECT * FROM " + TableNames.DELIVERY + " WHERE " + TableColumns.DeliveryDate + " ='" + day + "'" + " AND " + TableColumns.CustomerId + " ='" + id + "'";
@@ -81,80 +210,13 @@ public class DeliveryService implements IDelivery {
         return quantity;
     }
 
-    public static int selectedCustomer = 0;
-
-    @Override
-    public List<Double> getTotalDelivery(int startDate, int maxDay, int month, int year, boolean isForCustomers) {
-        List<Double> data = new ArrayList<>();
-        for (int i = startDate; i <= maxDay; ++i) {
-            if (!isForCustomers) {
-                data.add(getTotalDeliveriesForMonth(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i)));
-            } else {
-                data.add(calculateDeliveryForCustomers(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i), selectedCustomer));
-            }
-        }
-        return data;
-    }
-
-    @Override
-    public List<VDelivery> getCustomersDelivery(String date) {
-        List<VDelivery> deliveryList = new ArrayList<>();
-        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE (" + TableColumns.IsDeleted + " ='0'" + " OR " + TableColumns.DeletedOn + " >'" + date + "')";
-
-//        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE (" + TableColumns.DeletedOn + " ='1'" + " OR " + TableColumns.DeletedOn + " >'" + date + "')";
-        custIds = new ArrayList<>();
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                VDelivery holder = new VDelivery();
-                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                holder.setQuantity(calculateDeliveryForCustomers(date, holder.getCustomerId()));
-                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
-                holder.setFirstname(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
-                holder.setLastname(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
-                deliveryList.add(holder);
-            }
-            while (cursor.moveToNext());
-
-        }
-        cursor.close();
-        return deliveryList;
-    }
-
-    @Override
-    public List<VDelivery> getByAreaAndDay(int areaId, String day) {
-
-        List<VDelivery> deliveryList = new ArrayList<>();
-        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " INNER JOIN " + TableNames.CustomerSetting + " ON " + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.StartDate + " <='" + day + "'" + " AND " + TableColumns.EndDate + " >'" + day + "'"
-                + " AND (" + TableColumns.IsDeleted + " ='0'" + " OR " + TableColumns.DeletedOn + " >'" + day + "') AND "
-                + TableColumns.AreaId + " ='" + areaId + "'";
-        custIds = new ArrayList<>();
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                VDelivery holder = new VDelivery();
-                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                holder.setQuantity(calculateDeliveryForCustomers(day, holder.getCustomerId()));
-                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
-                holder.setFirstname(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
-                holder.setLastname(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
-                deliveryList.add(holder);
-            }
-            while (cursor.moveToNext());
 
 
-        }
-        cursor.close();
-        return deliveryList;
 
-    }
 
     public static List<Integer> custIds;
 
-    public double getTotalDeliveriesForMonth(String date) {
+    private double getTotalDeliveriesForMonth(String date) {
         double qty = 0, adjustQty = 0;
         CustomersSettingService settingService = new CustomersSettingService();
         DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
@@ -195,11 +257,9 @@ public class DeliveryService implements IDelivery {
         return qty;
     }
 
-    private SQLiteDatabase getDb() {
-        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
-    }
 
-    public double getQuantityOfDayByDate(String day) {
+
+    private double getQuantityOfDayByDate(String day) {
         String selectquery = "";
         selectquery = "SELECT * FROM " + TableNames.DELIVERY + " INNER JOIN " + TableNames.CUSTOMER
                 + " ON " + TableNames.DELIVERY + "." + TableColumns.CustomerId + " =" + TableNames.CUSTOMER + "." + TableColumns.ID
@@ -223,23 +283,10 @@ public class DeliveryService implements IDelivery {
         return quantity;
     }
 
-    //Get quantity total for some dates, for bill
-    public double getTotalQuantityConsumed(int startDate, int maxDay, int month, int year, boolean isForCustomers, int id) {
-        double data = 0;
-        for (int i = startDate; i <= maxDay; ++i) {
-            if (!isForCustomers) {
-                data += getTotalDeliveryTillDayforCustomer(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i), id);
-            } else {
-                data += calculateDeliveryForCustomers(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i), id);
-            }
-        }
-        return data;
-    }
+
 
     //Get totaldelivery for a customer to generate bill
-    public double getTotalDeliveryTillDayforCustomer(String date, int id) {
+    private double getTotalDeliveryTillDayforCustomer(String date, int id) {
         double qty = 0, adjustQty = 0;
         CustomersSettingService settingService = new CustomersSettingService();
         DatabaseHelper db = AppUtil.getInstance().getDatabaseHandler();
@@ -256,7 +303,7 @@ public class DeliveryService implements IDelivery {
         return qty;
     }
 
-    public double getQuantityOfDayByDateById(String day, int id) {
+    private double getQuantityOfDayByDateById(String day, int id) {
         String selectquery = "";
         selectquery = "SELECT * FROM " + TableNames.DELIVERY + " INNER JOIN " + TableNames.CUSTOMER
                 + " ON " + TableNames.DELIVERY + "." + TableColumns.CustomerId + " =" + TableNames.CUSTOMER + "." + TableColumns.ID

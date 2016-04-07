@@ -1,5 +1,8 @@
 package com.milky.service.core;
 
+import android.database.Cursor;
+
+import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 
 public class CustomersSetting extends CustomersSettingService {
@@ -9,7 +12,7 @@ public class CustomersSetting extends CustomersSettingService {
     private String startDate;
     private String endDate;
     private int dirty;
-
+    private boolean isCustomDelivery;
 
     public int getCustomerId() {
         return customerId;
@@ -55,7 +58,26 @@ public class CustomersSetting extends CustomersSettingService {
         return dirty;
     }
 
+    public void setIsCustomDelivery(int isCustomDelivery) {
+        this.isCustomDelivery = isCustomDelivery == 1? true:false;
+    }
+
+    public boolean getIsCustomDelivery() {
+        return isCustomDelivery;
+    }
+
     public void setDirty(int dirty) {
         this.dirty = dirty;
     }
+
+    public void PopulateFromCursor(Cursor cursor) {
+        this.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
+        this.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
+        this.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
+        this.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultRate)));
+        this.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
+        this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
+        this.setIsCustomDelivery(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery)));
+    }
+
 }

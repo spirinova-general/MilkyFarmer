@@ -72,7 +72,7 @@ public class DeliveryActivity extends AppCompatActivity {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         if (_dbHelper.isTableNotEmpty(TableNames.CustomerSetting)) {
 
-            _mCustomersList = new DeliveryService().getCustomersDelivery(selectedDate);
+            _mCustomersList = new DeliveryService().getDeliveryDetails(selectedDate);
             _mAdaapter = new GlobalDeliveryAdapter(this, 0, 0, String.valueOf(Constants.SELECTED_DAY), _mCustomersList);
             selectedCustomersId = _mCustomersList;
             _mCustomers.setItemsCanFocus(true);
@@ -156,10 +156,7 @@ public class DeliveryActivity extends AppCompatActivity {
         if (id == R.id.save) {
             if (_mDeliveryList.size() > 0)
                 for (Delivery entry : _mDeliveryList) {
-                    if (deliveryService.isHasDataForDay(entry.getDeliveryDate(), entry.getCustomerId()))
-                        deliveryService.update(entry);
-                    else
-                        deliveryService.insert(entry);
+                    deliveryService.insertOrUpdate(entry);
                 }
             Constants.REFRESH_CALANDER = true;
             Constants.REFRESH_BILL = true;
@@ -292,10 +289,7 @@ public class DeliveryActivity extends AppCompatActivity {
                             delivery.setDateModified(Constants.getCurrentDate());
                             delivery.setDirty(0);
                             delivery.setSyncStatus(0);
-                            if (deliveryService.isHasDataForDay(selectedDate, selectedCustomersId.get(i).getCustomerId()))
-                                deliveryService.update(delivery);
-                            else
-                                deliveryService.insert(delivery);
+                            deliveryService.insertOrUpdate(delivery);
                         }
                     }
                     dialog.hide();

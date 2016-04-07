@@ -15,10 +15,8 @@ import android.widget.TextView;
 
 import com.milky.R;
 import com.milky.service.core.Delivery;
-import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.ui.customers.DeliveryActivity;
-import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Customers;
 import com.milky.viewmodel.VDelivery;
@@ -235,7 +233,7 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
                 if (Constants.selectedAreaId!=-1) {
                     clear();
 
-                    filterList = new DeliveryService().getByAreaAndDay(Constants.selectedAreaId, Constants.DELIVERY_DATE);
+                    filterList = new DeliveryService().getDeliveryDetails(Constants.selectedAreaId, Constants.DELIVERY_DATE);
                     DeliveryActivity.selectedCustomersId = new ArrayList<>();
                     for (VDelivery Area : filterList) {
                         add(Area);

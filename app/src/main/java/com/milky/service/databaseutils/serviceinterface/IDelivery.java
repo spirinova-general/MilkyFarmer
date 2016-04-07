@@ -10,15 +10,14 @@ public interface IDelivery {
 
      void update(Delivery delivery);
 
-     boolean isHasDataForDay(String day, int id);
+     void insertOrUpdate(Delivery delivery);
 
-     void updateByDayandId(Delivery delivery, String day, int id);
+     List<Double> getMonthlyDeliveryOfAllCustomers(int startDate, int maxDay, int month, int year);
 
-     double getTotalDeliveryByDay(int id, String day);
+     List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year);
 
-     List<Double> getTotalDelivery(int start,int maxDay, int month, int year, boolean isForCustomers);
 
-     List<VDelivery> getCustomersDelivery(String date);
+     List<VDelivery> getDeliveryDetails(String date);
 
-     List<VDelivery> getByAreaAndDay(int areaId, String day);
+     List<VDelivery> getDeliveryDetails(Integer areaId, String day);
 }

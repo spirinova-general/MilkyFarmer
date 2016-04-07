@@ -3,6 +3,7 @@ package com.milky.service.databaseutils.serviceinterface;
 import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ICustomersSettings {
@@ -23,6 +24,8 @@ public interface ICustomersSettings {
     boolean isHasDataForCustoner(String day, int id);
 
     List<CustomersSetting> getCustomersByArea(int id, String day);
+
+
 
     String getEndDate(int id, String date);
 }

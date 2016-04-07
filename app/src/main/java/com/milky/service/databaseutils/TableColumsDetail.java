@@ -38,7 +38,7 @@ public class TableColumsDetail {
     public static final String CUSTOMER_SETTINGS = "CREATE TABLE " + TableNames.CustomerSetting + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             TableColumns.DefaultRate + " REAL," + TableColumns.DefaultQuantity + " TEXT,"
             + TableColumns.Balance + " REAL," + TableColumns.StartDate + " DATETIME," + TableColumns.EndDate + " DATETIME,"
-            + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
+            + TableColumns.IsCustomDelivery + " INTEGER," + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
             + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" + ")";
 
     //DELIVERY
