@@ -19,7 +19,7 @@ public class AreaService implements IArea  {
         ContentValues values = new ContentValues();
         values.put(TableColumns.Dirty,0);
         values.put(TableColumns.City, area.getCity());
-        values.put(TableColumns.Name, area.getCity());
+        values.put(TableColumns.Name, area.getArea());
         values.put(TableColumns.Locality, area.getLocality());
         return getDb().insert(TableNames.AREA, null, values);
     }
