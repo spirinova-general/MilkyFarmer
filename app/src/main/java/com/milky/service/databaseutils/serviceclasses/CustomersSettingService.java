@@ -6,12 +6,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.service.core.CustomersSetting;
+import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.utils.AppUtil;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class CustomersSettingService implements ICustomersSettings {
@@ -29,18 +32,22 @@ public class CustomersSettingService implements ICustomersSettings {
     }
 
     @Override
-    public void update(CustomersSetting customers) {
+    public void update(CustomersSetting setting) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.CustomerId, customers.getCustomerId());
-        values.put(TableColumns.DefaultRate, customers.getDefaultRate());
-        values.put(TableColumns.DefaultQuantity, customers.getGetDefaultQuantity());
-        values.put(TableColumns.StartDate, customers.getStartDate());
-        values.put(TableColumns.EndDate, customers.getEndDate());
-        values.put(TableColumns.IsCustomDelivery, customers.getIsCustomDelivery());
+        values.put(TableColumns.CustomerId, setting.getCustomerId());
+        values.put(TableColumns.DefaultRate, setting.getDefaultRate());
+        values.put(TableColumns.DefaultQuantity, setting.getGetDefaultQuantity());
+        values.put(TableColumns.StartDate, setting.getStartDate());
+        values.put(TableColumns.EndDate, setting.getEndDate());
+        values.put(TableColumns.IsCustomDelivery, setting.getIsCustomDelivery());
         values.put(TableColumns.Dirty, 1);
-        getDb().update(TableNames.CustomerSetting, values, TableColumns.CustomerId + " ='" + customers.getCustomerId() + "'"
-                + " AND " + TableColumns.StartDate + " <='" + customers.getStartDate() + "'" + " AND " + TableColumns.EndDate + " >='" + customers.getEndDate() + "'", null);
+        getDb().update(TableNames.CustomerSetting, values, TableColumns.CustomerId + " ='" + setting.getCustomerId() + "'"
+                + " AND " + TableColumns.StartDate + " <='" + setting.getStartDate() + "'" + " AND " +
+                TableColumns.EndDate + " >='" + setting.getEndDate() + "'", null);
+
     }
+
+
 
     public void updateEndDate(CustomersSetting holder, String enddate) {
         ContentValues values = new ContentValues();
@@ -54,6 +61,7 @@ public class CustomersSettingService implements ICustomersSettings {
     public void delete(CustomersSetting customers) {
 
     }
+
     public void updateEndDateForRoll(String enddate, int customerId) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.EndDate, enddate);
@@ -87,7 +95,7 @@ public class CustomersSettingService implements ICustomersSettings {
                 holder.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultRate)));
                 holder.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
                 holder.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
-                holder.setIsCustomDelivery(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery)));
+                holder.setIsCustomDelivery(Utils.GetBoolean(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery))));
                 list.add(holder);
             }
             while (cursor.moveToNext());

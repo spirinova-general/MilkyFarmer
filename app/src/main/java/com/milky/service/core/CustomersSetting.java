@@ -3,6 +3,7 @@ package com.milky.service.core;
 import android.database.Cursor;
 
 import com.milky.service.databaseutils.TableColumns;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 
 public class CustomersSetting extends CustomersSettingService {
@@ -58,8 +59,8 @@ public class CustomersSetting extends CustomersSettingService {
         return dirty;
     }
 
-    public void setIsCustomDelivery(int isCustomDelivery) {
-        this.isCustomDelivery = isCustomDelivery == 1? true:false;
+    public void setIsCustomDelivery(boolean isCustomDelivery) {
+        this.isCustomDelivery = isCustomDelivery;
     }
 
     public boolean getIsCustomDelivery() {
@@ -77,7 +78,7 @@ public class CustomersSetting extends CustomersSettingService {
         this.setDefaultRate(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultRate)));
         this.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
         this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
-        this.setIsCustomDelivery(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery)));
+        this.setIsCustomDelivery(Utils.GetBoolean(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery))));
     }
 
 }

@@ -2,6 +2,7 @@ package com.milky.service.databaseutils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -30,5 +31,20 @@ public class Utils {
     {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         return format.parse(date);
+    }
+
+    public static Date GetMaxDate() throws ParseException
+    {
+        Calendar c = Calendar.getInstance();
+        //This must change, have just kept this arbitrary date as it was there earlier
+        return FromDateString("2250-12-1");
+    }
+
+    public static boolean GetBoolean(int i)
+    {
+        if( i == 0)
+            return false;
+        else
+            return true;
     }
 }

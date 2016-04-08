@@ -200,7 +200,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                                 String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
                         setting.setCustomerId((int) id);
-                        setting.setDirty(0);
+                        setting.setDirty(1);
+                        setting.setIsCustomDelivery(false);
                         //Insert customers setting detail...
                         new CustomersSettingService().insert(setting);
 

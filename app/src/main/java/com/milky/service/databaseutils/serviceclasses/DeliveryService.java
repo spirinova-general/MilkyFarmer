@@ -12,6 +12,7 @@ import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.utils.AppUtil;
 import com.milky.viewmodel.VDelivery;
@@ -26,7 +27,7 @@ import java.util.HashMap;
 public class DeliveryService implements IDelivery {
 
     ICustomers _customerService = new CustomersService();
-
+    ICustomersSettings _customerSettingService = new CustomersSettingService();
 
     @Override
     public void insert(Delivery delivery) {
@@ -55,10 +56,47 @@ public class DeliveryService implements IDelivery {
     @Override
     public void insertOrUpdate(Delivery delivery)
     {
-        if (isHasDataForDay(delivery.getDeliveryDate(), delivery.getCustomerId()))
-            update(delivery);
-        else
-            insert(delivery);
+        String deliveryDate = delivery.getDeliveryDate();
+        String whereClause = TableColumns.StartDate + " ='" + deliveryDate + "'"
+                + " AND " + TableColumns.EndDate + " ='" + deliveryDate
+                + " AND " + TableColumns.IsCustomDelivery + " ='1'";
+
+        String selectQuery = "SELECT * FROM " + TableNames.CustomerSetting + " WHERE " + whereClause;
+
+        Cursor cursor = getDb().rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+        cursor.close();
+
+        if (result) {
+            ContentValues values = new ContentValues();
+            values.put(TableColumns.DefaultQuantity, delivery.getQuantity());
+            getDb().update(TableNames.CustomerSetting, values, whereClause, null);
+        } else {
+            Customers customer = _customerService.getCustomerDetail(delivery.getCustomerId(), true);
+            Date date = null;
+            CustomersSetting setting = null;
+
+            //Review date parsing later
+            try {
+             date = Utils.FromDateString(deliveryDate);
+             setting = _customerService.getCustomerSetting(customer, date, false);
+            }
+            catch(Exception ex) {
+                return;
+            }
+
+            CustomersSetting newSetting = new CustomersSetting();
+
+            newSetting.setCustomerId(setting.getCustomerId());
+            newSetting.setDefaultRate(setting.getDefaultRate());
+            newSetting.setGetDefaultQuantity(delivery.getQuantity());
+            newSetting.setStartDate(deliveryDate);
+            newSetting.setEndDate(deliveryDate);
+            newSetting.setIsCustomDelivery(true);
+            newSetting.setDirty(1);
+            _customerSettingService.insert(newSetting);
+        }
+
     }
 
     //Umesh doing it in memory for less database hits, remove maxday, startdate its not needed
@@ -154,22 +192,6 @@ public class DeliveryService implements IDelivery {
         }
     }
 
-    //Get quantity total for some dates, for bill
-    public double getTotalQuantityConsumed(int startDate, int maxDay, int month, int year, boolean isForCustomers, int id) {
-        double data = 0;
-        for (int i = startDate; i <= maxDay; ++i) {
-            if (!isForCustomers) {
-                data += getTotalDeliveryTillDayforCustomer(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i), id);
-            } else {
-                data += calculateDeliveryForCustomers(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
-                        "-" + String.format("%02d", i), id);
-            }
-        }
-        return data;
-    }
-
-
     //Umesh - the dates should have been converted to date in the UI itself, the core classes
     //should have Date rather than string.
     private boolean isHasDataForDay(String day, int custId) {
@@ -186,6 +208,22 @@ public class DeliveryService implements IDelivery {
 
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
+    }
+
+ /*
+  //Get quantity total for some dates, for bill
+    public double getTotalQuantityConsumed(int startDate, int maxDay, int month, int year, boolean isForCustomers, int id) {
+        double data = 0;
+        for (int i = startDate; i <= maxDay; ++i) {
+            if (!isForCustomers) {
+                data += getTotalDeliveryTillDayforCustomer(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
+                        "-" + String.format("%02d", i), id);
+            } else {
+                data += calculateDeliveryForCustomers(String.valueOf(year) + "-" + String.format("%02d", month + 1) +
+                        "-" + String.format("%02d", i), id);
+            }
+        }
+        return data;
     }
 
 
@@ -328,5 +366,5 @@ public class DeliveryService implements IDelivery {
         cursor.close();
 
         return quantity;
-    }
+    }*/
 }

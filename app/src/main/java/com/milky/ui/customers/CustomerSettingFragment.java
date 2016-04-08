@@ -26,6 +26,8 @@ import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
@@ -422,27 +424,9 @@ public class CustomerSettingFragment extends Fragment {
                             String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
 
                     setting.setDirty(1);
-                    CustomersSettingService customersSettingService = new CustomersSettingService();
-                    if (customersSettingService.isHasDataForCustoner(currentDate,
-                            getActivity().getIntent().getIntExtra("cust_id", 0)))
-                        customersSettingService.update(setting);
-                    else {
-                        if ((updatedQty)) {
-                            //Update old bill
-                            String enddate = customersSettingService.getEndDate(getActivity().getIntent().getIntExtra("cust_id", 0), currentDate);
-                            setting.setEndDate(currentDate);
-                            customersSettingService.updateEndDate(setting, enddate);
-                            //insert new Bill..
-                            setting.setStartDate(currentDate);
-                            setting.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
-                                    String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+                    ICustomers customerService = new CustomersService();
+                    customerService.insertOrUpdateCustomerSetting(setting);
 
-                            customersSettingService.insert(setting);
-                        } else
-                            //update customers setting detail..
-                            customersSettingService.update(setting);
-
-                    }
 
                     Bill bill = new Bill();
                     bill.setBalance(holder.getBalance_amount());

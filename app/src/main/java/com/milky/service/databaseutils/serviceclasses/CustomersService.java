@@ -10,6 +10,7 @@ import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.utils.AppUtil;
 import com.milky.viewmodel.VDelivery;
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CustomersService implements ICustomers {
+
+    private ICustomersSettings _customerSettingsService = new CustomersSettingService();
 
     //Umesh - can write opposite of PopulateFromCursor to put values
 
@@ -61,6 +64,33 @@ public class CustomersService implements ICustomers {
     @Override
     public void delete(Customers customers) {
 
+    }
+
+    @Override
+    public void insertOrUpdateCustomerSetting(CustomersSetting setting) {
+        try {
+            Customers customer = getCustomerDetail(setting.getCustomerId(), true);
+            Calendar cal = Calendar.getInstance();
+            Date today = cal.getTime();
+            CustomersSetting existingSetting = getCustomerSetting(customer, today, false);
+            boolean toInsert = (existingSetting.getGetDefaultQuantity() != setting.getGetDefaultQuantity()) ||
+                    (existingSetting.getDefaultRate() != setting.getDefaultRate());
+
+            if (toInsert) {
+                existingSetting.setEndDate(Utils.ToDateString(today));
+                _customerSettingsService.update(existingSetting);
+
+                setting.setStartDate(Utils.ToDateString(today));
+                setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
+                setting.setIsCustomDelivery(false);
+                _customerSettingsService.insert(setting);
+            } else {
+                _customerSettingsService.update(setting);
+            }
+        }
+        catch(Exception ex) {
+        //TBD
+        }
     }
 
     @Override
