@@ -76,9 +76,9 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Calendar c = Calendar.getInstance();
+                /*Calendar c = Calendar.getInstance();
                 if (c.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && c.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)) {
-                    /*Bill is to be outstanding*/
+                    //Bill is to be outstanding
                     // update outstanding bills
                     if (_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
                         BillService billService = new BillService();
@@ -143,7 +143,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                 } else {
                     edit.putString(UserPrefrences.INSERT_BILL, "0");
                     edit.apply();
-                }
+                }*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
                     SyncNow();

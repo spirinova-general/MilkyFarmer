@@ -159,7 +159,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
                             holder.setTotalAmount(bill_amount);
-                            new BillService().updateBillById(holder);
+                            new BillService().update(holder);
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER = true;
                             BillingEdit.this.finish();

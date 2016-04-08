@@ -12,7 +12,7 @@ public interface IDelivery {
 
      void insertOrUpdate(Delivery delivery);
 
-     List<Double> getMonthlyDeliveryOfAllCustomers(int startDate, int maxDay, int month, int year);
+     List<Double> getMonthlyDeliveryOfAllCustomers(int month, int year);
 
      List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year);
 

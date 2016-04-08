@@ -63,7 +63,7 @@ public class DeliveryService implements IDelivery {
 
     //Umesh doing it in memory for less database hits, remove maxday, startdate its not needed
     @Override
-    public List<Double> getMonthlyDeliveryOfAllCustomers(int startDate, int maxDay, int month, int year) {
+    public List<Double> getMonthlyDeliveryOfAllCustomers( int month, int year) {
         try {
             List<Double> result = new ArrayList<Double>();
             Calendar start = Calendar.getInstance();

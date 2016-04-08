@@ -11,8 +11,7 @@ import com.milky.service.databaseutils.*;
 import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
-import com.milky.ui.customers.CustomersBillingFragment;
-import com.milky.ui.main.BillingFragment;
+
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 
@@ -71,7 +70,7 @@ public class BillService implements IBill {
     }
 
     @Override
-    public List<Bill> getAllUnClearedBills() {
+    public List<Bill> getAllGlobalBills() {
         String selectquery = "SELECT * FROM " + TableNames.Bill  + " WHERE " + TableColumns.IsCleared + " ='" + "0')";
 
         ArrayList<Bill> list = new ArrayList<>();
@@ -199,8 +198,22 @@ public class BillService implements IBill {
         return map;
     }
 
+    public void updateQuantity(Bill bill) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.CustomerId, bill.getCustomerId());
+        values.put(TableColumns.TotalQuantity, bill.getQuantity());
+        values.put(TableColumns.Balance, bill.getBalance());
+        getDb().update(TableNames.Bill, values, TableColumns.CustomerId + " ='" + bill.getCustomerId() + "'", null);
+    }
+
+    private SQLiteDatabase getDb() {
+        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
+    }
+
     //Umesh - clean up the old code when they are not in use. Comment them and put them at the bottom of the file - don't delete
-     public List<Bill>getTotalAllBill() {
+    //Umesh commented these since they are now not used and also because they were accessing UI fragments.
+    // Never access UI back in service layer
+    /* public List<Bill>getTotalAllBill() {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " INNER JOIN " + TableNames.CUSTOMER
                 + " ON " + TableNames.Bill + "." + TableColumns.CustomerId + "=" + TableNames.CUSTOMER + "." + TableColumns.ID + " WHERE " + TableColumns.IsCleared + " ='" + "0'"
                 + " AND " + TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.EndDate + " >='"
@@ -274,16 +287,9 @@ public class BillService implements IBill {
         return list;
     }
 
-    public void updateQuantity(Bill bill) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.CustomerId, bill.getCustomerId());
-        values.put(TableColumns.TotalQuantity, bill.getQuantity());
-        values.put(TableColumns.Balance, bill.getBalance());
-        getDb().update(TableNames.Bill, values, TableColumns.CustomerId + " ='" + bill.getCustomerId() + "'", null);
-    }
 
-    @Override
-    public List<Bill> getOutstandingBill() {
+
+    private List<Bill> getOutstandingBill() {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsCleared + " ='" + "0'"
                 + " AND " + TableColumns.IsOutstanding + " ='" + "1'" + " AND "
                 + TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "'";
@@ -320,8 +326,8 @@ public class BillService implements IBill {
         return list;
     }
 
-    @Override
-    public List<Bill> getOutstandingBillsById(int id) {
+
+   private List<Bill> getOutstandingBillsById(int id) {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsCleared + " ='" + "0'"
                 + " AND " + TableColumns.IsOutstanding + " ='" + "1'" + " AND "
                 + TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "' AND " + TableColumns.CustomerId + " ='" + id + "'";
@@ -355,8 +361,7 @@ public class BillService implements IBill {
         return list;
     }
 
-    @Override
-    public List<Bill> getTotalBillById(int id) {
+    private List<Bill> getTotalBillById(int id) {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " INNER JOIN " + TableNames.CUSTOMER
                 + " ON " + TableNames.Bill + "." + TableColumns.CustomerId + "=" + TableNames.CUSTOMER + "." +
                 TableColumns.ID + " WHERE " + TableColumns.IsCleared + " ='" + "0'"
@@ -427,13 +432,8 @@ public class BillService implements IBill {
 
     }
 
-    @Override
-    public void updateBillById(Bill bill) {
 
-    }
-
-    @Override
-    public void updateOutstandingBills(Bill bill) {
+    private void updateOutstandingBills(Bill bill) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.TotalQuantity, bill.getQuantity());
         values.put(TableColumns.TotalAmount, bill.getPaymentMade());
@@ -447,9 +447,7 @@ public class BillService implements IBill {
                 + " AND " + TableColumns.EndDate + " >'" + Constants.getCurrentDate() + "'", null);
     }
 
-    private SQLiteDatabase getDb() {
-        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
-    }
+
 
     public double calculateTotalAmount(final int custId, final String day, final double quantity) {
         String selectquery = "SELECT * FROM " + TableNames.CustomerSetting + " WHERE " + TableColumns.CustomerId + " ='"
@@ -479,5 +477,5 @@ public class BillService implements IBill {
         values.put(TableColumns.RollDate, new GlobalSettingsService().getRollDate());
         long i = getDb().update(TableNames.Bill, values, TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "' AND " +
                 TableColumns.IsOutstanding + " ='1'", null);
-    }
+    }*/
 }

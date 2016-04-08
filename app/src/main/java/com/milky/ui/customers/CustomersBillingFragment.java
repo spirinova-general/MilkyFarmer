@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.BillService;
+import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.ui.adapters.CustomersListAdapter;
 import com.milky.ui.main.BillingEdit;
@@ -43,8 +44,11 @@ public class CustomersBillingFragment extends Fragment {
             view = inflater.inflate(R.layout.customer_billing_list, container, false);
 
         initResources(view);
+        //Umesh check if we need this in both OnCrateView and setUserVisibleHint
+        IBill billService = new BillService();
+        List<Bill> bills = billService.getBillsOfCustomer(custId);
 
-        if (payment.size() > 0)
+        if (bills.size() > 0)
             ((TextView) view.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         return view;
     }
@@ -68,20 +72,20 @@ public class CustomersBillingFragment extends Fragment {
 
     }
 
-    public static ArrayList<Bill> payment = new ArrayList<>();
     //Calculating total qty
 
-    private void generateBill() {
+    /*private void generateBill() {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         BillService billService = new BillService();
-        billService.getOutstandingBillsById(custId);
-        billService.getTotalBillById(custId);
-        if (payment.size() > 0) {
-            BillingAdapter  adapter = new BillingAdapter(payment, getActivity());
+        //billService.getOutstandingBillsById(custId);
+        //billService.getTotalBillById(custId);
+        List<Bill> bills = billService.getBillsOfCustomer(custId);
+        if (bills.size() > 0) {
+            BillingAdapter  adapter = new BillingAdapter(bills, getActivity());
             _mListView.setAdapter(adapter);
 
         }
-    }
+    }*/
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -92,10 +96,17 @@ public class CustomersBillingFragment extends Fragment {
             if (view == null)
                 view = inflater.inflate(R.layout.customer_billing_list, null, false);
             _mListView = (ListView) view.findViewById(R.id.customersListView);
-            payment.clear();
-            generateBill();
-            if (payment.size() > 0) {
-                _mListView.setAdapter(new BillingAdapter(payment, getActivity()));
+
+            IBill billService = new BillService();
+            List<Bill> bills = billService.getBillsOfCustomer(custId);
+            if (bills.size() > 0) {
+                BillingAdapter  adapter = new BillingAdapter(bills, getActivity());
+                _mListView.setAdapter(adapter);
+
+            }
+
+            if (bills.size() > 0) {
+                _mListView.setAdapter(new BillingAdapter(bills, getActivity()));
             }
             _dbHelper.close();
         }

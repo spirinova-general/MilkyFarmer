@@ -417,7 +417,7 @@ public class BillTableManagement {
                 + TableColumns.IsOutstanding + " ='1'  AND " + TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.EndDate + " >'" + Constants.getCurrentDate() + "'", null);
     }
 
-    public static ArrayList<Bill> getHistoryBills(SQLiteDatabase db, int custId) {
+    /* static ArrayList<Bill> getHistoryBills(SQLiteDatabase db, int custId) {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE "
                 + TableColumns.CustomerId + " ='" + custId + "'" + " AND " + TableColumns.IsOutstanding + " ='" + "0'" + " AND "
                 + TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "'";
@@ -451,7 +451,7 @@ public class BillTableManagement {
 
         return list;
     }
-
+*/
 
     public static ArrayList<Bill> getOutstandingsBill(SQLiteDatabase db) {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsCleared + " ='" + "1'"

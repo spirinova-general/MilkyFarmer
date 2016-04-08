@@ -75,7 +75,7 @@ public class CalenderFragment extends Fragment {
         if (Constants.REFRESH_CALANDER) {
             Calendar cal = Calendar.getInstance();
             DeliveryService service = new DeliveryService();
-            _mCalenderView.updateQuantityList(service.getMonthlyDeliveryOfAllCustomers(1, cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR)));
+            _mCalenderView.updateQuantityList(service.getMonthlyDeliveryOfAllCustomers(cal.get(Calendar.MONTH), cal.get(Calendar.YEAR)));
             new UpdataCalander().execute();
         }
     }

@@ -10,21 +10,23 @@ public interface IBill {
 
     void update(Bill bill);
 
-    List<Bill> getTotalAllBill();
+    //Umesh - this needs to be removed
+    //List<Bill> getTotalAllBill();
 
-    List<Bill> getOutstandingBill();
+    /*List<Bill> getOutstandingBill();
 
     List<Bill> getOutstandingBillsById(int id);
 
-    List<Bill> getTotalBillById(int id);
+    List<Bill> getTotalBillById(int id);*/
 
-    void updateBillById(Bill bill);
+    //void updateBillById(Bill bill);
 
-    void updateOutstandingBills(Bill bill);
-    void updateRollDate();
+    //void updateOutstandingBills(Bill bill);
 
     //Umesh - the ones to be used now
     void RecalculateAllOutstandingBills() throws Exception;
-    List<Bill> getAllUnClearedBills();
+    //To be called from global bill tab
+    List<Bill> getAllGlobalBills();
+    //To be called from customer bill tab
     List<Bill> getBillsOfCustomer(int customerId);
 }
