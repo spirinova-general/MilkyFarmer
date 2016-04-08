@@ -119,10 +119,12 @@ public class BillService implements IBill {
         Date firstDayOfMonth = cal.getTime();
 
         HashMap<Integer, Bill> currentbillsMap = getAllCurrentBills();
-        if( today.before(rollDate)) {
-            InsertOrUpdateCurrentBills(currentbillsMap);
-        }
-        else{
+
+        //First update all bills with quantity, total, end date etc.
+        InsertOrUpdateCurrentBills(currentbillsMap);
+
+        //if we are after roll date...
+        if( !today.before(rollDate)) {
             PerformBillRoll();
         }
     }
@@ -131,11 +133,15 @@ public class BillService implements IBill {
         //Mark all current bills outstanding
         String selectquery =  "UPDATE " + TableNames.Bill  + " SET " + TableColumns.IsOutstanding + " ='" + "1'"
                 +  " WHERE " + TableColumns.IsOutstanding + " ='" + "0' AND " + TableColumns.IsCleared + " ='" + "0'";
-
+      
         //Umesh check if it updates values
         getDb().execSQL(selectquery);
 
         InsertOrUpdateCurrentBills(null);
+
+
+
+       _globalSettingService.setNextRollDate();
 
     }
 
