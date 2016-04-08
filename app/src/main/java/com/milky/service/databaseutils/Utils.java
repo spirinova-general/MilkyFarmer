@@ -22,7 +22,8 @@ public class Utils {
     public static String ToDateString(Date date)
     {
         //Umesh - change to calendar ones
-        return ToDateString(date.getDay(), date.getMonth(), date.getYear());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        return df.format(date);
     }
 
     //Umesh - Correct the format and use similar method for above function too. These functionos can be later part of Utils

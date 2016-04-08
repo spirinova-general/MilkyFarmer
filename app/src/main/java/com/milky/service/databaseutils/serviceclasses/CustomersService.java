@@ -268,11 +268,11 @@ public class CustomersService implements ICustomers {
         String startDate = Utils.ToDateString(startDateObj);
         String endDate = Utils.ToDateString(endDateObj);
 
-        String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER + " INNER JOIN " + TableNames.CustomerSetting + " ON "
-                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.StartDate + " <='" + startDate + "'" + " AND " + TableColumns.EndDate + " >='" + endDate + "'"
-                + " AND (" + TableColumns.IsDeleted + " ='0'" + " OR "
-                + TableColumns.DeletedOn + " >='" + startDate + "'" + " AND " + TableColumns.DeletedOn + " <='" + endDate + "'";
+        String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
+                + " WHERE " + TableColumns.IsDeleted + " ='0'" + " OR (" + TableColumns.IsDeleted +  "='1' AND "
+                + TableColumns.DeletedOn + " >='" + startDate + "')"
+                + " INNER JOIN " + TableNames.CustomerSetting + " ON "
+                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId;
 
         if (areaId != null)
             selectQuery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
