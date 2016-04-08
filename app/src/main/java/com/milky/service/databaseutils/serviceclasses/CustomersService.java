@@ -149,10 +149,13 @@ public class CustomersService implements ICustomers {
 
     //This does not hit the database gets a complete customersetting for a particular date
     @Override
-    public CustomersSetting getCustomerSetting(Customers customer, Date date) throws Exception
+    public CustomersSetting getCustomerSetting(Customers customer, Date date, boolean populateSettings) throws Exception
     {
-        //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up
-        if( customer.customerSettings == null)
+        if( populateSettings)
+            customer = getCustomerDetail(customer.getCustomerId(), true);
+
+        //throwing just for safety
+        if( !populateSettings && customer.customerSettings == null)
             throw new Exception("Customer setting is not populated");
 
         for(CustomersSetting setting: customer.customerSettings)
@@ -190,7 +193,7 @@ public class CustomersService implements ICustomers {
 
         double totalQuantity = 0, totalAmount = 0;
         for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()){
-            CustomersSetting setting = getCustomerSetting(customer, date);
+            CustomersSetting setting = getCustomerSetting(customer, date, false);
             totalQuantity += setting.getGetDefaultQuantity();
             double rate = setting.getDefaultRate();
             totalAmount += rate*totalQuantity;

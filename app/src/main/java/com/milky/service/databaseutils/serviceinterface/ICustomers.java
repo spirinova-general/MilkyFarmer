@@ -23,9 +23,7 @@ public interface ICustomers {
     boolean isAreaAssociated(int areaId);
 
     List<Customers> getCustomersWithinDeliveryRange(Integer areaId, Date startDateObj, Date endDateObj);
-
-    CustomersSetting getCustomerSetting(Customers customer, Date date) throws Exception;
+    CustomersSetting getCustomerSetting(Customers customer, Date date, boolean populateSettings) throws Exception;
     QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception;
-
     Customers getCustomerDetail(int id, boolean populateSettings);
 }
