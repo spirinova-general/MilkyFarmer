@@ -437,7 +437,7 @@ public class CustomerSettingFragment extends Fragment {
 
                     setting.setDirty(1);
                     ICustomers customerService = new CustomersService();
-                    
+
 
                     customerService.insertOrUpdateCustomerSetting(setting);
 
