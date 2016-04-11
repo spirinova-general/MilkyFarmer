@@ -15,8 +15,10 @@ import android.widget.TextView;
 
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.core.Delivery;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
@@ -36,7 +38,7 @@ public class CustomrDeliveryFragment extends Fragment {
     private int dataCount = 0;
     private int custId = 0;
     private String selected_date;
-    private CustomersSetting settingData;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,7 +51,7 @@ public class CustomrDeliveryFragment extends Fragment {
 //                getActivity().getIntent().getStringExtra("cust_id")));
 
         custId = getActivity().getIntent().getIntExtra("cust_id", 0);
-        settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
+
         _mCalenderView.setForCustomersDelivery(true);
         _mCalenderView.setCustomerId(custId);
 
@@ -75,6 +77,7 @@ public class CustomrDeliveryFragment extends Fragment {
                 selected_date = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
                         String.format("%02d", day.getDay());
 
+                CustomersSetting settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
                 Calendar deliveryDate = Calendar.getInstance();
                 try {
                     deliveryDate.setTime(Constants.work_format.parse(settingData.getStartDate()));
@@ -102,13 +105,14 @@ public class CustomrDeliveryFragment extends Fragment {
                             if (quantity.getText().toString().equals(""))
                                 quantity_layout.setError("Enter quantity!");
                             else {
-                                Delivery holder = new Delivery();
-                                holder.setQuantity(Double.parseDouble(quantity.getText().toString()));
-                                holder.setDeliveryDate(selected_date);
+                                CustomersSetting holder = new CustomersSetting();
+                                holder.setGetDefaultQuantity(Double.parseDouble(quantity.getText().toString()));
+                                holder.setStartDate(selected_date);
+                                holder.setEndDate(selected_date);
                                 holder.setCustomerId(custId);
-                                holder.setDateModified(Constants.getCurrentDate());
-                                DeliveryService deliveryService = new DeliveryService();
-                                deliveryService.insertOrUpdate(holder);
+                                holder.setIsCustomDelivery(true);
+                                ICustomers customerService = new CustomersService();
+                                customerService.insertOrUpdateCustomerSetting(holder);
 
 
                                 totalData.set(day.getDay() - 1, Double.parseDouble(quantity.getText().toString()));

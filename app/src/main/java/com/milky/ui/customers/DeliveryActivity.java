@@ -26,11 +26,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.core.CustomersSetting;
 import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
+import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.adapters.AreaCitySpinnerAdapter;
 import com.milky.ui.adapters.GlobalDeliveryAdapter;
@@ -153,10 +156,18 @@ public class DeliveryActivity extends AppCompatActivity {
                 Toast.makeText(DeliveryActivity.this, "No customer is selected !", Toast.LENGTH_SHORT).show();
         }
 
+
         if (id == R.id.save) {
             if (_mDeliveryList.size() > 0)
                 for (Delivery entry : _mDeliveryList) {
-                    deliveryService.insertOrUpdate(entry);
+                    CustomersSetting holder = new CustomersSetting();
+                    holder.setGetDefaultQuantity(entry.getQuantity());
+                    holder.setStartDate(entry.getDeliveryDate());
+                    holder.setEndDate(entry.getDeliveryDate());
+                    holder.setCustomerId(entry.getCustomerId());
+                    holder.setIsCustomDelivery(true);
+                    ICustomers customerService = new CustomersService();
+                    customerService.insertOrUpdateCustomerSetting(holder);
                 }
             Constants.REFRESH_CALANDER = true;
             Constants.REFRESH_BILL = true;
@@ -282,14 +293,14 @@ public class DeliveryActivity extends AppCompatActivity {
                 } else {
                     if (selectedCustomersId.size() > 0) {
                         for (int i = 0; i < selectedCustomersId.size(); ++i) {
-                            Delivery delivery = new Delivery();
-                            delivery.setDeliveryDate(selectedDate);
-                            delivery.setQuantity(Double.parseDouble(quantity.getText().toString()));
-                            delivery.setCustomerId(selectedCustomersId.get(i).getCustomerId());
-                            delivery.setDateModified(Constants.getCurrentDate());
-                            delivery.setDirty(0);
-                            delivery.setSyncStatus(0);
-                            deliveryService.insertOrUpdate(delivery);
+                            CustomersSetting holder = new CustomersSetting();
+                            holder.setGetDefaultQuantity(Double.parseDouble(quantity.getText().toString()));
+                            holder.setStartDate(selectedDate);
+                            holder.setEndDate(selectedDate);
+                            holder.setCustomerId(selectedCustomersId.get(i).getCustomerId());
+                            holder.setIsCustomDelivery(true);
+                            ICustomers customerService = new CustomersService();
+                            customerService.insertOrUpdateCustomerSetting(holder);
                         }
                     }
                     dialog.hide();

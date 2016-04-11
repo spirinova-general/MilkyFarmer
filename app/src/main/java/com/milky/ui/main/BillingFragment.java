@@ -86,13 +86,13 @@ public class BillingFragment extends Fragment {
         }
     }
 
-    protected CustomersSettingService settingData;
+    //protected CustomersSettingService settingData;
 
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersList);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         custId = getActivity().getIntent().getIntExtra("cust_id",0);
-        settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
+        //settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
         boolean hasPreviousBills = false;
         if (hasPreviousBills)
             ((TextView) v.findViewById(R.id.preivousBills)).setVisibility(View.GONE);

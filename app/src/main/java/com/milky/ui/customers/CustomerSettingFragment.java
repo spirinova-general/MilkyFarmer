@@ -206,14 +206,22 @@ public class CustomerSettingFragment extends Fragment {
 
         pick_date.setBackgroundColor(getResources().getColor(R.color.gray_lighter));
         pick_date.setEnabled(false);
-        settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
+
+        ICustomers customersService = new CustomersService();
+        Customers customer = customersService.getCustomerDetail(custId, true);
         Calendar cal = Calendar.getInstance();
+        Date today = null;
+
         try {
+            today = cal.getTime();
             Date date = Constants.work_format.parse(settingData.getStartDate());
             cal.setTime(date);
-        } catch (ParseException e) {
+            settingData = customersService.getCustomerSetting(customer, today, false, true);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
+
         pick_date.setText(String.format("%02d",cal.get(Calendar.DAY_OF_MONTH))+"-"+Constants.MONTHS[cal.get(Calendar.MONTH)]+"-"
         +String.valueOf(cal.get(Calendar.YEAR)));
         /*Set defaul rate
@@ -429,7 +437,7 @@ public class CustomerSettingFragment extends Fragment {
                     setting.setStartDate(currentDate);
                     setting.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
                     setting.setDefaultRate(Double.parseDouble(_mRate.getText().toString()));
-                    setting.setStartDate(new CustomersSettingService().getByCustId(custId, currentDate).getStartDate());
+                    //setting.setStartDate(new CustomersSettingService().getByCustId(custId, currentDate).getStartDate());
 
                     Calendar c = Calendar.getInstance();
                     setting.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
