@@ -75,39 +75,37 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Calendar c = Calendar.getInstance();
+                /*Calendar c = Calendar.getInstance();
                 if (c.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && c.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)) {
                     //Bill is to be outstanding
                     // update outstanding bills
                     if (_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
                         BillService billService = new BillService();
-                        billService.getAllGlobalBills();
-                        Calendar cal = Calendar.getInstance();
-                        String currentDate = String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d",cal.get(Calendar.MONTH)+1) + "-" + String.format("%02d",cal.get(Calendar.DAY_OF_MONTH));
-//
-                        // update outstanding bills
-                        billService.updateOutstandingBills(_dbHelper.getWritableDatabase(), currentDate);
+                        billService.getTotalAllBill();
+
                         if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
                             CustomersService customersService = new CustomersService();
                             List<Customers> list = customersService.getAllCustomers();
-
+                            Calendar cal = Calendar.getInstance();
+                            String
+                                    currentDate = String.valueOf(cal.get(Calendar.YEAR)) + "-" + String.format("%02d",cal.get(Calendar.MONTH)+1) + "-" + String.format("%02d",cal.get(Calendar.DAY_OF_MONTH));
+//
                             for (int i = 0; i < list.size(); ++i) {
                                 CustomersSetting custHolder = new CustomersSettingService().getByCustId(list.get(i).getCustomerId(), currentDate);
                                 Calendar nextMonth = Calendar.getInstance();
                                 nextMonth.add(Calendar.MONTH, 1);
-
+                                new CustomersSettingService().updateEndDateForRoll(currentDate, custHolder.getCustomerId());
+//                                custHolder.setStart_date(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+//                                        "01");
                                 if (cal.getActualMaximum(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH))
                                     custHolder.setStartDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
                                             "01");
                                 else
                                     custHolder.setStartDate(cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH)) + "-" +
                                             String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
-                                //Update end date
-                                new CustomersSettingService().updateEndDateForRoll(custHolder.getStartDate(), custHolder.getCustomerId());
-
                                 custHolder.setEndDate("2250" + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 13) + "-" +
                                         String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-                                String newRolldate = nextMonth.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+                                String newRolldate = cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
                                         String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
                                 new GlobalSettingsService().updateRollDate(newRolldate);
                                 CustomersSettingService customersSettingService = new CustomersSettingService();
@@ -130,7 +128,8 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                                     bill.setPaymentMade(0);
                                     bill.setQuantity(custHolder.getGetDefaultQuantity());
                                     bill.setRate(custHolder.getDefaultRate());
-                                    billService.insert(bill);
+                                    bill.setRollDate(newRolldate);
+                                    new BillService().insert(bill);
                                 }
                             }
                             edit.putString(UserPrefrences.INSERT_BILL, "1");
@@ -143,7 +142,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                 } else {
                     edit.putString(UserPrefrences.INSERT_BILL, "0");
                     edit.apply();
-                }
+                }*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
                     SyncNow();

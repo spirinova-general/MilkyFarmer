@@ -22,7 +22,7 @@ app/proguard-rules.pro
 .idea/inspectionProfiles/profiles_settings.xml
 
 
-
+3rdpartylib/extcal/build
 3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/date_number_background.xml
 3rdpartylib/extcal/build/tmp/packageReleaseJar/MANIFEST.MF
 3rdpartylib/extcal/build/outputs/aar/extcal-release.aar

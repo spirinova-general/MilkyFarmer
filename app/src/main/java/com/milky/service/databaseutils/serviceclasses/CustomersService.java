@@ -217,15 +217,10 @@ public class CustomersService implements ICustomers {
         for (Date date = start.getTime(); start.before(end) || start.equals(end); start.add(Calendar.DATE, 1), date = start.getTime())
         {
             CustomersSetting setting = getCustomerSetting(customer, date, false);
-            try {
-                totalQuantity += setting.getGetDefaultQuantity();
-                rate = setting.getDefaultRate();
-            }
-            catch (NullPointerException npe)
-            {
-                totalQuantity += 0;
-                rate = 0;
-            }
+            totalQuantity += setting.getGetDefaultQuantity();
+            double rate = setting.getDefaultRate();
+            totalAmount += rate*totalQuantity;
+        }
 
         }
         totalAmount += rate * totalQuantity;
@@ -241,16 +236,15 @@ public class CustomersService implements ICustomers {
             return getCustomerDetail(id);
 
         String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
-                + " INNER JOIN " + TableNames.CustomerSetting + " ON "
-                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.CustomerId + " ='" + id + "'";
+                + " WHERE " + TableColumns.CustomerId + " ='" + id + "' INNER JOIN " + TableNames.CustomerSetting + " ON "
+                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId;
 
         Cursor cursor = getDb().rawQuery(selectQuery, null);
         Customers customers = new Customers();
 
         if (cursor.moveToFirst()) {
             customers.PopulateFromCursor(cursor);
-            customers.customerSettings = new ArrayList<>();
+            customers.customerSettings = new ArrayList<CustomersSetting>();
             do {
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
@@ -263,22 +257,23 @@ public class CustomersService implements ICustomers {
     }
 
 
+
     private List<Customers> searchCustomers(Integer areaId, Date startDateObj, Date endDateObj) {
 
         String startDate = Utils.ToDateString(startDateObj);
         String endDate = Utils.ToDateString(endDateObj);
-        List<Customers> customersData = new ArrayList<>();
+
         String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
+                + " WHERE " + TableColumns.IsDeleted + " ='0'" + " OR (" + TableColumns.IsDeleted +  "='1' AND "
+                + TableColumns.DeletedOn + " >='" + startDate + "')"
                 + " INNER JOIN " + TableNames.CustomerSetting + " ON "
-                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.IsDeleted + " ='0'" + " OR (" + TableColumns.IsDeleted + "='1' AND "
-                + TableColumns.DeletedOn + " >='" + startDate + "')";
+                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId;
 
         if (areaId != null)
             selectQuery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
 
         Cursor cursor = getDb().rawQuery(selectQuery, null);
-        HashMap<Integer, Customers> customersMap = new HashMap<>();
+        HashMap<Integer, Customers> customersMap = new HashMap<Integer, Customers>();
 
         if (cursor.moveToFirst()) {
             do {
@@ -292,16 +287,15 @@ public class CustomersService implements ICustomers {
                     customers = customersMap.get(customerId);
                 }
 
-                customers.customerSettings = new ArrayList<>();
+                customers.customerSettings = new ArrayList<CustomersSetting>();
 
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
                 customers.customerSettings.add(holder);
-                customersData= new ArrayList<>(customersMap.values());
             }
             while (cursor.moveToNext());
         }
         cursor.close();
-        return customersData;
+        return  new ArrayList<Customers>(customersMap.values());
     }
 }
