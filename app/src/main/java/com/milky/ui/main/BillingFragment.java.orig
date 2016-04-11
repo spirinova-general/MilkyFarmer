@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.BillService;
@@ -20,12 +21,18 @@ import com.milky.utils.Constants;
 import com.milky.service.core.Bill;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
+import java.util.Collections;
+=======
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
 import java.util.List;
 
 public class BillingFragment extends Fragment {
     public static ListView _mListView;
     private DatabaseHelper _dbHelper;
-    int custId=0;
+    private int custId = 0;
+    private View view = null;
+    public static List<Bill> payment = new ArrayList<>();
     @Override
     public void onResume() {
         super.onResume();
@@ -36,7 +43,7 @@ public class BillingFragment extends Fragment {
         super.onPause();
     }
 
-    private View view = null;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,7 +52,6 @@ public class BillingFragment extends Fragment {
             initResources(view);
         }
         return view;
-
     }
 
     private BillingAdapter adapter;
@@ -61,19 +67,25 @@ public class BillingFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+<<<<<<< HEAD
+                    payment.clear();
+                    if (_dbHelper.isTableNotEmpty(TableNames.Bill)) {
+//                        new BillService().getOutstandingBill();
+                        payment = new BillService().getUnclearedBills(Constants.getCurrentDate(), true);
+                    }
+                    if (payment.size() > 0) {
+                        adapter = new BillingAdapter(payment, getActivity());
+                        _mListView.setAdapter(adapter);
+                        Collections.sort(payment);
+=======
                     IBill billService = new BillService();
-                    if(Constants.REFRESH_BILL)
-                        try {
-                            billService.RecalculateAllOutstandingBills();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                     List<Bill> bills = billService.getAllGlobalBills();
                         /*new BillService().getOutstandingBill();
                         new BillService().getTotalAllBill();*/
                     if (bills.size() > 0) {
                         adapter = new BillingAdapter(bills, getActivity());
                         _mListView.setAdapter(adapter);
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
                     }
                 }
             });
@@ -91,14 +103,14 @@ public class BillingFragment extends Fragment {
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersList);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-        custId = getActivity().getIntent().getIntExtra("cust_id",0);
+        custId = getActivity().getIntent().getIntExtra("cust_id", 0);
         settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
         boolean hasPreviousBills = false;
         if (hasPreviousBills)
             ((TextView) v.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         _dbHelper.close();
     }
-    public static ArrayList<Bill> payment = new ArrayList<>();
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -106,7 +118,7 @@ public class BillingFragment extends Fragment {
             if (Constants.REFRESH_BILL) {
                 new UpdataBills().execute();
             }
-
+            Constants.REFRESH_BILL = false;
         }
     }
 }

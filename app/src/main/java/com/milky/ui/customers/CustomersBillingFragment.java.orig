@@ -20,6 +20,7 @@ import com.milky.ui.main.BillingEdit;
 import com.milky.utils.AppUtil;
 import com.milky.service.core.Bill;
 import com.milky.service.core.Customers;
+import com.milky.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,16 +73,27 @@ public class CustomersBillingFragment extends Fragment {
 
     }
 
+<<<<<<< HEAD
+    private List<Bill> payment = new ArrayList<>();
+=======
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
     //Calculating total qty
 
     /*private void generateBill() {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         BillService billService = new BillService();
+<<<<<<< HEAD
+//        billService.getOutstandingBillsById(custId);
+        payment = billService.getUnclearedBillById(Constants.getCurrentDate(),custId);
+        if (payment.size() > 0) {
+            BillingAdapter  adapter = new BillingAdapter(payment, getActivity());
+=======
         //billService.getOutstandingBillsById(custId);
         //billService.getTotalBillById(custId);
         List<Bill> bills = billService.getBillsOfCustomer(custId);
         if (bills.size() > 0) {
             BillingAdapter  adapter = new BillingAdapter(bills, getActivity());
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
             _mListView.setAdapter(adapter);
 
         }

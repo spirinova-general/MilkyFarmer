@@ -19,13 +19,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.core.Account;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
@@ -432,35 +436,29 @@ public class CustomerSettingFragment extends Fragment {
                             String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
 
                     setting.setDirty(1);
-                    CustomersSettingService customersSettingService = new CustomersSettingService();
-                    if (customersSettingService.isHasDataForCustoner(currentDate,
-                            getActivity().getIntent().getIntExtra("cust_id", 0)))
-                        customersSettingService.update(setting);
-                    else {
-                        if ((updatedQty)) {
-                            //Update old bill
-                            String enddate = customersSettingService.getEndDate(getActivity().getIntent().getIntExtra("cust_id", 0), currentDate);
-                            setting.setEndDate(currentDate);
-                            customersSettingService.updateEndDate(setting, enddate);
-                            //insert new Bill..
-                            setting.setStartDate(currentDate);
-                            setting.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
-                                    String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+                    ICustomers customerService = new CustomersService();
+                    
 
-                            customersSettingService.insert(setting);
-                        } else
-                            //update customers setting detail..
-                            customersSettingService.update(setting);
+                    customerService.insertOrUpdateCustomerSetting(setting);
 
-                    }
-
-                    Bill bill = new BillService().getBillById(Constants.getCurrentDate(), holder.getCustomerId());
+                    Bill bill = new Bill();
+                    bill.setCustomerId(holder.getCustomerId());
+                    bill.setStartDate(setting.getStartDate());
+                    bill.setEndDate(setting.getEndDate());
                     bill.setBalance(holder.getBalance_amount());
                     bill.setCustomerId(setting.getCustomerId());
                     bill.setQuantity(setting.getGetDefaultQuantity());
-
-
-                    new BillService().updateBills(bill);
+                    bill.setAdjustment(0);
+                    bill.setTax(0);
+                    bill.setIsCleared(0);
+                    bill.setPaymentMade(0);
+                    bill.setDateModified(Constants.getCurrentDate());
+                    bill.setTotalAmount(0);
+                    bill.setIsOutstanding(0);
+                    bill.setDateAdded(holder.getDateAdded());
+                    bill.setDirty(1);
+                    bill.setRollDate(new GlobalSettingsService().getRollDate());
+                    new BillService().update(bill);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_CUSTOMERS = true;

@@ -35,7 +35,7 @@ public class Constants {
     public static String OTP = "";
     public static int selectedAreaId = -1;
     public static String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-    public static boolean REFRESH_CALANDER = false,REFRESH_CUSTOMERS=false,REFRESH_BILL=false,REFRESH=false;
+    public static boolean REFRESH_CALANDER = false,REFRESH_CUSTOMERS=false,REFRESH_BILL=false;
     public static boolean REFRESH_DELIVRY_CALANDER = false;
     public static JSONObject API_RESPONCE = null;
     public static Boolean TIME_OUT = false;

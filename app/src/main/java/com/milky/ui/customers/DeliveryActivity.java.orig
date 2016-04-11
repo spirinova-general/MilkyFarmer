@@ -72,8 +72,12 @@ public class DeliveryActivity extends AppCompatActivity {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         if (_dbHelper.isTableNotEmpty(TableNames.CustomerSetting)) {
 
+<<<<<<< HEAD
+            _mCustomersList = new DeliveryService().getDelivery(selectedDate);
+=======
             _mCustomersList = new DeliveryService().getDeliveryDetails(selectedDate);
-            _mAdaapter = new GlobalDeliveryAdapter(this, 0, 0, _mCustomersList);
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
+            _mAdaapter = new GlobalDeliveryAdapter(this, 0, 0, String.valueOf(Constants.SELECTED_DAY), _mCustomersList);
             selectedCustomersId = _mCustomersList;
             _mCustomers.setItemsCanFocus(true);
             _mCustomers.setAdapter(_mAdaapter);

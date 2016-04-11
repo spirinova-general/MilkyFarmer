@@ -115,7 +115,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             clear_bill.setEnabled(false);
         }
         /*If bill is already cleared*/
-        if (intent.getIntExtra("clear", 0) == 1) {
+        if (intent.getIntExtra("clear", 0) == 0) {
             clear_bill.setVisibility(View.GONE);
             clera_bill_text.setVisibility(View.GONE);
             send_bill.setVisibility(View.GONE);
@@ -160,6 +160,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
                             holder.setEndDate(intent.getStringExtra("end_date_work_format"));
                             holder.setTotalAmount(bill_amount);
+<<<<<<< HEAD
                             holder.setRate(intent.getDoubleExtra("totalPrice", 0));
                             holder.setRollDate(intent.getStringExtra("roll_date"));
                             holder.setQuantity(intent.getDoubleExtra("quantity", 0));
@@ -168,8 +169,10 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             holder.setCustomerId(intent.getIntExtra("custId", 0));
                             holder.setTax(intent.getDoubleExtra("tax", 0));
                             holder.setDateModified(Constants.getCurrentDate());
-
+                            new BillService().updateBills(holder);
+=======
                             new BillService().update(holder);
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER = true;
                             BillingEdit.this.finish();

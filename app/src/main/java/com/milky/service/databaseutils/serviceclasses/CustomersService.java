@@ -5,15 +5,27 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.service.core.Customers;
+import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.utils.AppUtil;
+import com.milky.viewmodel.VDelivery;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CustomersService implements ICustomers {
+
+    private ICustomersSettings _customerSettingsService = new CustomersSettingService();
+
+    //Umesh - can write opposite of PopulateFromCursor to put values
 
     @Override
     public long insert(Customers customers) {
@@ -56,6 +68,32 @@ public class CustomersService implements ICustomers {
     }
 
     @Override
+    public void insertOrUpdateCustomerSetting(CustomersSetting setting) {
+        try {
+            Customers customer = getCustomerDetail(setting.getCustomerId(), true);
+            Calendar cal = Calendar.getInstance();
+            Date today = cal.getTime();
+            CustomersSetting existingSetting = getCustomerSetting(customer, today, false);
+            boolean toInsert = (existingSetting.getGetDefaultQuantity() != setting.getGetDefaultQuantity()) ||
+                    (existingSetting.getDefaultRate() != setting.getDefaultRate());
+
+            if (toInsert) {
+                existingSetting.setEndDate(Utils.ToDateString(today));
+                _customerSettingsService.update(existingSetting);
+
+                setting.setStartDate(Utils.ToDateString(today));
+                setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
+                setting.setIsCustomDelivery(false);
+                _customerSettingsService.insert(setting);
+            } else {
+                _customerSettingsService.update(setting);
+            }
+        } catch (Exception ex) {
+            //TBD
+        }
+    }
+
+    @Override
     public List<Customers> getCustomersLisytByArea(int areaId) {
         String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE " + TableColumns.IsDeleted + " ='" + "1'"
                 + " AND " + TableColumns.AreaId + " ='" + areaId + "'";
@@ -66,18 +104,7 @@ public class CustomersService implements ICustomers {
         if (cursor.moveToFirst()) {
             do {
                 Customers holder = new Customers();
-                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
-                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
-                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
-                holder.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
-                holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.Address1)));
-                holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.Address2)));
-                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
-                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
-                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
-                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
-                list.add(holder);
+                holder.PopulateFromCursor(cursor);
             }
             while (cursor.moveToNext());
         }
@@ -96,17 +123,7 @@ public class CustomersService implements ICustomers {
         if (cursor.moveToFirst()) {
             do {
                 Customers holder = new Customers();
-                holder.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
-                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
-                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
-                holder.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
-                holder.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.Address1)));
-                holder.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.Address2)));
-                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
-                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
-                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
-                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+                holder.PopulateFromCursor(cursor);
                 list.add(holder);
             }
             while (cursor.moveToNext());
@@ -126,17 +143,7 @@ public class CustomersService implements ICustomers {
         if (cursor.moveToFirst()) {
             do {
                 customers = new Customers();
-                customers.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
-                customers.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
-                customers.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
-                customers.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
-                customers.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
-                customers.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.Address1)));
-                customers.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.Address2)));
-                customers.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
-                customers.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
-                customers.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
-                customers.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+                customers.PopulateFromCursor(cursor);
             }
             while (cursor.moveToNext());
         }
@@ -160,5 +167,140 @@ public class CustomersService implements ICustomers {
 
         cursor.close();
         return result;
+    }
+
+    //Umesh interface names should be same as class names except "I" and core class names should be like "Customer" without the "s"
+    //as it represents one row of the table
+    @Override
+    public List<Customers> getCustomersWithinDeliveryRange(Integer areaId, Date startDateObj, Date endDateObj) {
+        return searchCustomers(areaId, startDateObj, endDateObj);
+    }
+
+    //This does not hit the database gets a complete customersetting for a particular date
+    @Override
+    public CustomersSetting getCustomerSetting(Customers customer, Date date, boolean populateSettings) throws Exception {
+        if (populateSettings)
+            customer = getCustomerDetail(customer.getCustomerId(), true);
+
+        //throwing just for safety
+        if (!populateSettings && customer.customerSettings == null)
+            throw new Exception("Customer setting is not populated");
+
+        for (CustomersSetting setting : customer.customerSettings) {
+            Date endDate = Utils.FromDateString(setting.getEndDate());
+            Date startDate = Utils.FromDateString(setting.getStartDate());
+
+            if (setting.getIsCustomDelivery()) {
+                if (endDate == date && startDate == date)
+                    return setting;
+            } else {
+                if ((startDate.before(date) || startDate.equals(date)) && endDate.after(date))
+                    return setting;
+            }
+        }
+
+        //did not find any setting, might happen for deleted customer
+        return null;
+    }
+
+    public QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception {
+        //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up
+        if (customer.customerSettings == null)
+            throw new Exception("Customer setting is not populated");
+        Calendar start = Calendar.getInstance();
+        start.setTime(startDate);
+        Date firstDayOfTheMonth = start.getTime();
+        Calendar end = Calendar.getInstance();
+        end.setTime(endDate);
+
+        double totalQuantity = 0, totalAmount = 0,rate=0;
+        for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime())
+        {
+            CustomersSetting setting = getCustomerSetting(customer, date, false);
+            try {
+                totalQuantity += setting.getGetDefaultQuantity();
+                rate = setting.getDefaultRate();
+            }
+            catch (NullPointerException npe)
+            {
+                totalQuantity += 0;
+                rate = 0;
+            }
+            totalAmount += rate * totalQuantity;
+        }
+        QuantityAmount qa = new QuantityAmount();
+        qa.amount = totalAmount;
+        qa.quantity = totalQuantity;
+        return qa;
+    }
+
+    @Override
+    public Customers getCustomerDetail(int id, boolean populateSettings) {
+        if (!populateSettings)
+            return getCustomerDetail(id);
+
+        String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
+                + " INNER JOIN " + TableNames.CustomerSetting + " ON "
+                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
+                + " WHERE " + TableColumns.CustomerId + " ='" + id + "'";
+
+        Cursor cursor = getDb().rawQuery(selectQuery, null);
+        Customers customers = new Customers();
+
+        if (cursor.moveToFirst()) {
+            customers.PopulateFromCursor(cursor);
+            customers.customerSettings = new ArrayList<>();
+            do {
+                CustomersSetting holder = new CustomersSetting();
+                holder.PopulateFromCursor(cursor);
+                customers.customerSettings.add(holder);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return customers;
+    }
+
+
+    private List<Customers> searchCustomers(Integer areaId, Date startDateObj, Date endDateObj) {
+
+        String startDate = Utils.ToDateString(startDateObj);
+        String endDate = Utils.ToDateString(endDateObj);
+        List<Customers> customersData = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
+                + " INNER JOIN " + TableNames.CustomerSetting + " ON "
+                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
+                + " WHERE " + TableColumns.IsDeleted + " ='0'" + " OR (" + TableColumns.IsDeleted + "='1' AND "
+                + TableColumns.DeletedOn + " >='" + startDate + "')";
+
+        if (areaId != null)
+            selectQuery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
+
+        Cursor cursor = getDb().rawQuery(selectQuery, null);
+        HashMap<Integer, Customers> customersMap = new HashMap<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Integer customerId = cursor.getInt(cursor.getColumnIndex(TableColumns.ID));
+                Customers customers = null;
+                if (!customersMap.containsKey(customerId)) {
+                    customers = new Customers();
+                    customers.PopulateFromCursor(cursor);
+                    customersMap.put(customerId, customers);
+                } else {
+                    customers = customersMap.get(customerId);
+                }
+
+                customers.customerSettings = new ArrayList<>();
+
+                CustomersSetting holder = new CustomersSetting();
+                holder.PopulateFromCursor(cursor);
+                customers.customerSettings.add(holder);
+                customersData= new ArrayList<>(customersMap.values());
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        return customersData;
     }
 }

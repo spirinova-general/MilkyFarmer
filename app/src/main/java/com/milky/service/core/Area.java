@@ -13,6 +13,7 @@ public class Area {
     private String locality;
     private int dirty;
 
+    ///Umesh Since we will always have public getters and setters for these fields of core classes we can just keep them public
     public int getDirty() {
         return dirty;
     }

@@ -1,10 +1,13 @@
 package com.milky.service.core;
 
+<<<<<<< HEAD
+=======
 import android.database.Cursor;
 
 import com.milky.service.databaseutils.TableColumns;
 
 import java.math.BigDecimal;
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
 
 public class Bill {
     public double paymentMade;
@@ -156,7 +159,6 @@ public class Bill {
     {
         this.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
         this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
-        this.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
         this.setQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalQuantity)));
         this.setBalance(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
         this.setAdjustment(cursor.getDouble(cursor.getColumnIndex(TableColumns.Adjustment)));

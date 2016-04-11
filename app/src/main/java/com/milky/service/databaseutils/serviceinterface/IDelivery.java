@@ -2,26 +2,18 @@ package com.milky.service.databaseutils.serviceinterface;
 
 import com.milky.service.core.Delivery;
 import com.milky.viewmodel.VDelivery;
+
 import java.util.List;
 
 public interface IDelivery {
-    void insert(Delivery delivery);
+     void insert(Delivery delivery);
 
-    void update(Delivery delivery);
+     void update(Delivery delivery);
 
-    boolean isHasDataForDay(String day, int id);
+     void insertOrUpdate(Delivery delivery) throws Exception;
 
-    //For all customers delivery (Calendar)..
-    List<Double> getAllTotalDeliveries(int start, int maxDay, int month, int year);
-
-    //For customer delivery
-    List<Double> getTotalDeliveriesForCustomer(int start, int maxDay, int month, int year);
-
-    List<VDelivery> getDelivery(String date);
-
-    List<VDelivery> getByAreaAndDay(int areaId, String day);
-
-    double getTotalDeliveryOfCustomerTillDate(String date, int id);
-
-    double getDeliveryOfCustomerTillDate(String date, int id);
+     List<Double> getMonthlyDeliveryOfAllCustomers(int month, int year);
+     List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year);
+     List<VDelivery> getDeliveryDetails(String date);
+     List<VDelivery> getDeliveryDetails(Integer areaId, String day);
 }

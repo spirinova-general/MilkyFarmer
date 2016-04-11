@@ -384,8 +384,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 //                    Update details for Account and Global settings
                     accountSettings.update(holder);
                     globalService.update(globalSettings);
-                    if (_dbHelper.isTableNotEmpty(TableNames.Bill))
-                        new BillService().updateRollDate();
+                    /*if (_dbHelper.isTableNotEmpty(TableNames.Bill))
+                        new BillService().updateRollDate();*/
                     _dbHelper.close();
                     Toast.makeText(GlobalSetting.this, getResources().getString(R.string.data_saved_successfully), Toast.LENGTH_SHORT).show();
                     GlobalSetting.this.finish();

@@ -30,7 +30,7 @@ public class TableColumsDetail {
 
     //CUSTOMER"S BILL
     public static final String CUSTOMERS_BILL = "CREATE TABLE " + TableNames.Bill + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.StartDate + " DATETIME," + TableColumns.EndDate + " DATETIME,"
-            + TableColumns.DefaultQuantity + " REAL," + TableColumns.Balance + " REAL," + TableColumns.Adjustment + " REAL," + TableColumns.TAX + " REAL," + TableColumns.IsCleared + " INTEGER,"
+            + TableColumns.TotalQuantity + " REAL," +  TableColumns.Rate + " REAL," + TableColumns.Balance + " REAL," + TableColumns.Adjustment + " REAL," + TableColumns.TAX + " REAL," + TableColumns.IsCleared + " INTEGER,"
             + TableColumns.PaymentMade + " REAL," + TableColumns.IsOutstanding + " INTEGER," + TableColumns.TotalAmount + " REAL," + TableColumns.RollDate + " DATETIME," + TableColumns.DateAdded + " DATETIME,"+TableColumns.DateModified + " DATETIME," + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
             + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" + ")";
 
@@ -38,7 +38,7 @@ public class TableColumsDetail {
     public static final String CUSTOMER_SETTINGS = "CREATE TABLE " + TableNames.CustomerSetting + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             TableColumns.DefaultRate + " REAL," + TableColumns.DefaultQuantity + " TEXT,"
             + TableColumns.Balance + " REAL," + TableColumns.StartDate + " DATETIME," + TableColumns.EndDate + " DATETIME,"
-            + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
+            + TableColumns.IsCustomDelivery + " INTEGER," + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
             + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" + ")";
 
     //DELIVERY

@@ -15,18 +15,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
  //Database for External Storage use..
 
-//    public DatabaseHelper(final Context context) {
-//        super(context, Environment.getExternalStorageDirectory()
-//                + File.separator + "milky"
-//                + File.separator + DatabaseVersioControl.DATABASE_NAME, null, DatabaseVersioControl.DATABASE_VERSION);
-//    }
+    public DatabaseHelper(final Context context) {
+        super(context, Environment.getExternalStorageDirectory()
+                + File.separator + "milky"
+                + File.separator + DatabaseVersioControl.DATABASE_NAME, null, DatabaseVersioControl.DATABASE_VERSION);
+    }
 
     //Database for internal use..
-    public DatabaseHelper(Context context) {
-        super(context, DatabaseVersioControl.DATABASE_NAME, null,
-                DatabaseVersioControl.DATABASE_VERSION);
-        this.context = context;
-    }
+//    public DatabaseHelper(Context context) {
+//        super(context, DatabaseVersioControl.DATABASE_NAME, null,
+//                DatabaseVersioControl.DATABASE_VERSION);
+//        this.context = context;
+//    }
 
     @Override
     public void onCreate(SQLiteDatabase db) {

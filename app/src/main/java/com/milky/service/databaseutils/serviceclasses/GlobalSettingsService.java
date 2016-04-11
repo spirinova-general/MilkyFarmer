@@ -7,8 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import com.milky.service.core.GlobalSettings;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
 import com.milky.utils.AppUtil;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class GlobalSettingsService implements IGlobalSetting {
 
@@ -64,6 +68,30 @@ public class GlobalSettingsService implements IGlobalSetting {
         cursor.close();
 
         return rate;
+    }
+
+    @Override
+    public void setNextRollDate() {
+        try {
+            //Calculate  next roll date and update it in global settings
+            //Next roll date - the last day of the month for (date + 1 day)
+            Date rollDate = Utils.FromDateString(getRollDate());
+
+            Date newRollDate = null;
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.DATE, 1);
+            newRollDate = c.getTime();
+
+
+            c.setTime(newRollDate);
+            c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+            newRollDate = c.getTime();
+        }
+        catch(Exception ex)
+        {
+            //TBD...should not eat exceptions like these...will fix later
+        }
+
     }
 
     private SQLiteDatabase getDb() {

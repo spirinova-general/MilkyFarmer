@@ -29,6 +29,9 @@ public class TableColumns {
     public static final String Address1 = "Address1";
     public static final String Address2 = "Address2";
     public static final String DefaultQuantity = "DefaultQuantity";
+    public static final String TotalQuantity = "TotalQuantity";
+    public static final String Rate = "Rate";
+
     public static final String DefaultRate = "DefaultRate";
     public static final String DeliveryDate = "DeliveryDate";
 
@@ -39,6 +42,7 @@ public class TableColumns {
     public static final String TotalAmount = "TotalAmount";
     public static final String IsOutstanding = "IsOutstanding";
     public static final String Locality ="Locality" ;
+    public static final String IsCustomDelivery ="IsCustomDelivery" ;
 
 
 //    public static final String SYNC_STATUS = "sync_status";

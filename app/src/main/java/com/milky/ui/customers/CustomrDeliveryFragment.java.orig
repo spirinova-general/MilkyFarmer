@@ -68,7 +68,12 @@ public class CustomrDeliveryFragment extends Fragment {
 
     private void initResources() {
         Calendar cal = Calendar.getInstance();
+<<<<<<< HEAD
+        DeliveryService.selectedCustomer = custId;
+        totalData = new DeliveryService().getTotalDeliveriesForCustomer(1, cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
+=======
         totalData = new DeliveryService().getMonthlyDeliveryOfCustomer(custId, cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
+>>>>>>> d9e7a98aa0bf0c330214867e1acdbf2908f3341b
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, final int i, long l, final Day day) {

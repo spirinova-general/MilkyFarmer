@@ -1,5 +1,11 @@
 package com.milky.service.core;
 
+import android.database.Cursor;
+
+import com.milky.service.databaseutils.TableColumns;
+
+import java.util.List;
+
 /**
  * Created by Neha on 11/17/2015.
  */
@@ -33,6 +39,12 @@ public class Customers {
     private String deletedOn;
     private int customerId;
     private int dirty;
+
+
+    public List<CustomersSetting> customerSettings;
+
+
+  
 
     public int getCustomerId() {
         return customerId;
@@ -140,5 +152,19 @@ public class Customers {
         this.areaId = areaId;
     }
 
+    public void PopulateFromCursor(Cursor cursor)
+    {
+        this.setDateAdded(cursor.getString(cursor.getColumnIndex(TableColumns.DateAdded)));
+        this.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
+        this.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
+        this.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
+        this.setBalance_amount(cursor.getDouble(cursor.getColumnIndex(TableColumns.Balance)));
+        this.setAddress1(cursor.getString(cursor.getColumnIndex(TableColumns.Address1)));
+        this.setAddress2(cursor.getString(cursor.getColumnIndex(TableColumns.Address2)));
+        this.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
+        this.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
+        this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+        this.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+    }
 
 }
