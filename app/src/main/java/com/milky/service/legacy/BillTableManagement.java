@@ -443,7 +443,7 @@ public class BillTableManagement {
 //                holder.setBalanceType(cursor.getInt(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
                 holder.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
                 holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
-                CustomersBillingFragment.payment.add(holder);
+//                CustomersBillingFragment.payment.add(holder);
             }
             while (cursor.moveToNext());
         }
@@ -479,7 +479,7 @@ public class BillTableManagement {
 //                holder.setBalanceType(cursor.getInt(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
                 holder.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
                 holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
-                BillingFragment.payment.add(holder);
+//                BillingFragment.payment.add(holder);
             }
             while (cursor.moveToNext());
 
@@ -490,7 +490,7 @@ public class BillTableManagement {
         return list;
     }
 
-//    public static ArrayList<Bill> getTotalBillById(SQLiteDatabase db, int id) {
+//    public static ArrayList<Bill> getUnclearedBillById(SQLiteDatabase db, int id) {
 //        String selectquery = "SELECT * FROM " + TableNames.Bill + " INNER JOIN " + TableNames.CUSTOMER
 //                + " ON " + TableNames.Bill + "." + TableColumns.CustomerId + "=" + TableNames.CUSTOMER + "." + TableColumns.ID + " WHERE " + TableColumns.IsCleared + " ='" + "1'"
 //                + " AND " + TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "'" + " AND " + TableColumns.EndDate + " >='"

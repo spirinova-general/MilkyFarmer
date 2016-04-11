@@ -128,7 +128,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             public void onClick(View v) {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(BillingEdit.this);
                 final AlertDialog dialog = alertBuilder.create();
-                LayoutInflater inflater = (LayoutInflater) BillingEdit.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                final LayoutInflater inflater = (LayoutInflater) BillingEdit.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View view1 = inflater.inflate(R.layout.edit_quantity_popup, null, false);
                 dialog.setView(view1);
 
@@ -158,8 +158,17 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             holder.setIsCleared(1);
 
                             holder.setStartDate(intent.getStringExtra("start_date_work_format"));
+                            holder.setEndDate(intent.getStringExtra("end_date_work_format"));
                             holder.setTotalAmount(bill_amount);
-                            new BillService().updateBillById(holder);
+                            holder.setRate(intent.getDoubleExtra("totalPrice", 0));
+                            holder.setRollDate(intent.getStringExtra("roll_date"));
+                            holder.setQuantity(intent.getDoubleExtra("quantity", 0));
+                            holder.setAdjustment(0);
+                            holder.setIsOutstanding(intent.getIntExtra("is_outstanding", 0));
+                            holder.setCustomerId(intent.getIntExtra("custId", 0));
+                            holder.setTax(intent.getDoubleExtra("tax", 0));
+                            holder.setDateModified(Constants.getCurrentDate());
+                            new BillService().updateBills(holder);
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER = true;
                             BillingEdit.this.finish();

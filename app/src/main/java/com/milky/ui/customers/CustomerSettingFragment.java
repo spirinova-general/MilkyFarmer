@@ -37,8 +37,10 @@ import com.milky.service.core.Bill;
 import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -201,7 +203,15 @@ public class CustomerSettingFragment extends Fragment {
         pick_date.setBackgroundColor(getResources().getColor(R.color.gray_lighter));
         pick_date.setEnabled(false);
         settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
-        pick_date.setText(settingData.getStartDate());
+        Calendar cal = Calendar.getInstance();
+        try {
+            Date date = Constants.work_format.parse(settingData.getStartDate());
+            cal.setTime(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        pick_date.setText(String.format("%02d",cal.get(Calendar.DAY_OF_MONTH))+"-"+Constants.MONTHS[cal.get(Calendar.MONTH)]+"-"
+        +String.valueOf(cal.get(Calendar.YEAR)));
         /*Set defaul rate
         * */
         if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
@@ -444,12 +454,13 @@ public class CustomerSettingFragment extends Fragment {
 
                     }
 
-                    Bill bill = new Bill();
+                    Bill bill = new BillService().getBillById(Constants.getCurrentDate(), holder.getCustomerId());
                     bill.setBalance(holder.getBalance_amount());
                     bill.setCustomerId(setting.getCustomerId());
                     bill.setQuantity(setting.getGetDefaultQuantity());
 
-                    new BillService().updateQuantity(bill);
+
+                    new BillService().updateBills(bill);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_CUSTOMERS = true;

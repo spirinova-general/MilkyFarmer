@@ -15,17 +15,14 @@ import android.widget.TextView;
 
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.core.Delivery;
-import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
-import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import com.milky.R;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
@@ -72,7 +69,7 @@ public class CustomrDeliveryFragment extends Fragment {
     private void initResources() {
         Calendar cal = Calendar.getInstance();
         DeliveryService.selectedCustomer = custId;
-        totalData = new DeliveryService().getTotalDelivery(1, cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR), true);
+        totalData = new DeliveryService().getTotalDeliveriesForCustomer(1, cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, final int i, long l, final Day day) {

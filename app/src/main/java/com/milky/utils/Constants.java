@@ -40,8 +40,7 @@ public class Constants {
     public static JSONObject API_RESPONCE = null;
     public static Boolean TIME_OUT = false;
     static Calendar cal = Calendar.getInstance();
-
-
+    public static List<Integer> selectedcustIds;
     public static String getCurrentDate() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         df.format(cal.getTime());
@@ -59,7 +58,6 @@ public class Constants {
         for (int i = 0; i < 4; i++) {
             result += numbers.get(i).toString();
         }
-
         return result;
     }
 //Send SMS to Customer
@@ -122,7 +120,7 @@ public static void SendSmsTouser(String mob, final String sms, final OnTaskCompl
 //        return qty;
 //    }
 //
-//
+
 //public static void calculateDeliveryTotal()
 //{
 //    List<Double> data = new ArrayList<>();

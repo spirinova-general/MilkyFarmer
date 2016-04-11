@@ -1,34 +1,23 @@
 package com.milky.service.core;
 
-import java.math.BigDecimal;
 
-/**
- * Created by Neha on 11/30/2015.
- */
 public class Bill {
-    //    private String id;
-//    private String accountId;
-    private int customerId;
-    private String startDate;
-    private String endDate;
-    private double quantity;
-    private double balance;
-    private double adjustment;
-    private double tax;
-    private double rate;
-    private int isCleared;
-    private double paymentMade;
-    private String dateAdded;
-    private String dateModified;
-    private double totalAmount;
-    private int isOutstanding;
-    //    private String firstname;
-//    private String lastName;
-//    private String message;
-//    private String billMade;
-    private String rollDate;
-    //    private String deletedOn;
-    private int dirty;
+    public double paymentMade;
+    public int dirty;
+    public double totalAmount;
+    public String endDate;
+    public double adjustment;
+    public double balance;
+    public double tax;
+    public int isCleared;
+    public String dateModified;
+    public String rollDate;
+    public int customerId;
+    public String startDate;
+    public double quantity;
+    public String dateAdded;
+    public int isOutstanding;
+    public double rate;
 
     public double getRate() {
         return rate;
@@ -36,6 +25,14 @@ public class Bill {
 
     public void setRate(double rate) {
         this.rate = rate;
+    }
+
+    public double getPaymentMade() {
+        return paymentMade;
+    }
+
+    public void setPaymentMade(double paymentMade) {
+        this.paymentMade = paymentMade;
     }
 
     public int getDirty() {
@@ -46,47 +43,12 @@ public class Bill {
         this.dirty = dirty;
     }
 
-    public String getRollDate() {
-        return rollDate;
-    }
-
-    public void setRollDate(String rollDate) {
-        this.rollDate = rollDate;
-    }
-    public int getIsOutstanding() {
-        return isOutstanding;
-    }
-
     public double getTotalAmount() {
         return totalAmount;
     }
 
     public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
-    }
-
-    public int isOutstanding() {
-        return isOutstanding;
-    }
-
-    public void setIsOutstanding(int isOutstanding) {
-        this.isOutstanding = isOutstanding;
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
     }
 
     public String getEndDate() {
@@ -97,12 +59,12 @@ public class Bill {
         this.endDate = endDate;
     }
 
-    public double getQuantity() {
-        return quantity;
+    public double getAdjustment() {
+        return adjustment;
     }
 
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
+    public void setAdjustment(double adjustment) {
+        this.adjustment = adjustment;
     }
 
     public double getBalance() {
@@ -111,14 +73,6 @@ public class Bill {
 
     public void setBalance(double balance) {
         this.balance = balance;
-    }
-
-    public double getAdjustment() {
-        return adjustment;
-    }
-
-    public void setAdjustment(double adjustment) {
-        this.adjustment = adjustment;
     }
 
     public double getTax() {
@@ -137,12 +91,44 @@ public class Bill {
         this.isCleared = isCleared;
     }
 
-    public double getPaymentMade() {
-        return paymentMade;
+    public String getDateModified() {
+        return dateModified;
     }
 
-    public void setPaymentMade(double paymentMade) {
-        this.paymentMade = paymentMade;
+    public void setDateModified(String dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public String getRollDate() {
+        return rollDate;
+    }
+
+    public void setRollDate(String rollDate) {
+        this.rollDate = rollDate;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 
     public String getDateAdded() {
@@ -153,18 +139,11 @@ public class Bill {
         this.dateAdded = dateAdded;
     }
 
-    public String getDateModified() {
-        return dateModified;
+    public int getIsOutstanding() {
+        return isOutstanding;
     }
 
-    public void setDateModified(String dateModified) {
-        this.dateModified = dateModified;
-    }
-
-
-    public static BigDecimal round(double d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Double.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd;
+    public void setIsOutstanding(int isOutstanding) {
+        this.isOutstanding = isOutstanding;
     }
 }

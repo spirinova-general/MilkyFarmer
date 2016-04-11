@@ -115,8 +115,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     @Override
     protected void onResume() {
         super.onResume();
-            /*init xml resources*/
-
     }
 
     @Override
@@ -195,8 +193,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
         }
     };
-
-    private Calendar cal = Calendar.getInstance();
 
     private void initResources() {
         _billGenerationDateView = (TextView) findViewById(R.id.bill_generation_view);
@@ -277,17 +273,6 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 
             msgCount.setText(String.valueOf(accountSettings.getLeftSMS()));
         }
-        custCode.setOnTouchListener(new View.OnTouchListener()
-
-                                    {
-                                        @Override
-                                        public boolean onTouch(View v, MotionEvent event) {
-                                            return true;
-                                        }
-                                    }
-
-        );
-
         populateAreaView();
         mob = mobile.getText().
 

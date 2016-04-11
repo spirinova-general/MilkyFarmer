@@ -82,7 +82,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                     // update outstanding bills
                     if (_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
                         BillService billService = new BillService();
-                        billService.getTotalAllBill();
+                        billService.getUnclearedBills(Constants.getCurrentDate(),true);
 
                         if (preferences.contains(UserPrefrences.INSERT_BILL) && !preferences.getString(UserPrefrences.INSERT_BILL, "0").equals("1")) {
                             CustomersService customersService = new CustomersService();
@@ -106,7 +106,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                                             String.format("%02d", cal.get(Calendar.DAY_OF_MONTH) + 1));
                                 custHolder.setEndDate("2250" + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 13) + "-" +
                                         String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
-                                String newRolldate = cal.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
+                                String newRolldate = nextMonth.get(Calendar.YEAR) + "-" + String.format("%02d", nextMonth.get(Calendar.MONTH) + 1) + "-" +
                                         String.format("%02d", nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
                                 new GlobalSettingsService().updateRollDate(newRolldate);
                                 CustomersSettingService customersSettingService = new CustomersSettingService();
@@ -130,7 +130,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                                     bill.setQuantity(custHolder.getGetDefaultQuantity());
                                     bill.setRate(custHolder.getDefaultRate());
                                     bill.setRollDate(newRolldate);
-                                    new BillService().insert(bill);
+                                    billService.insert(bill);
                                 }
                             }
                             edit.putString(UserPrefrences.INSERT_BILL, "1");

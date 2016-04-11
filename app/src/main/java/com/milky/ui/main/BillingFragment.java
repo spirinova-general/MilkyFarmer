@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -20,11 +21,15 @@ import com.milky.utils.Constants;
 import com.milky.service.core.Bill;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class BillingFragment extends Fragment {
     public static ListView _mListView;
     private DatabaseHelper _dbHelper;
-    int custId=0;
+    private int custId = 0;
+    private View view = null;
+    public static List<Bill> payment = new ArrayList<>();
     @Override
     public void onResume() {
         super.onResume();
@@ -35,7 +40,7 @@ public class BillingFragment extends Fragment {
         super.onPause();
     }
 
-    private View view = null;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,7 +49,6 @@ public class BillingFragment extends Fragment {
             initResources(view);
         }
         return view;
-
     }
 
     private BillingAdapter adapter;
@@ -62,13 +66,13 @@ public class BillingFragment extends Fragment {
                 public void run() {
                     payment.clear();
                     if (_dbHelper.isTableNotEmpty(TableNames.Bill)) {
-                        new BillService().getOutstandingBill();
-                        new BillService().getTotalAllBill();
+//                        new BillService().getOutstandingBill();
+                        payment = new BillService().getUnclearedBills(Constants.getCurrentDate(), true);
                     }
                     if (payment.size() > 0) {
                         adapter = new BillingAdapter(payment, getActivity());
                         _mListView.setAdapter(adapter);
-
+                        Collections.sort(payment);
                     }
                 }
             });
@@ -86,14 +90,14 @@ public class BillingFragment extends Fragment {
     private void initResources(View v) {
         _mListView = (ListView) v.findViewById(R.id.customersList);
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
-        custId = getActivity().getIntent().getIntExtra("cust_id",0);
+        custId = getActivity().getIntent().getIntExtra("cust_id", 0);
         settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
         boolean hasPreviousBills = false;
         if (hasPreviousBills)
             ((TextView) v.findViewById(R.id.preivousBills)).setVisibility(View.GONE);
         _dbHelper.close();
     }
-    public static ArrayList<Bill> payment = new ArrayList<>();
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);

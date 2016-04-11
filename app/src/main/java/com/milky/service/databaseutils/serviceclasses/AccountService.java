@@ -41,7 +41,6 @@ public class AccountService implements IAccountService {
         values.put(TableColumns.EndDate, account.getEndDate());
         values.put(TableColumns.TotalSms, account.getTotalSms());
         values.put(TableColumns.ServerAccountId, account.getServerAccountId());
-
         getDb().update(TableNames.ACCOUNT, values, TableColumns.ServerAccountId + " ='" + account.getServerAccountId() + "'", null);
     }
 

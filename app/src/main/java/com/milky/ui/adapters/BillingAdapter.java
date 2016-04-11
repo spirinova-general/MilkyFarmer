@@ -21,9 +21,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
-/**
- * Created by Neha on 12/17/2015.
- */
+
 public class BillingAdapter extends BaseAdapter {
 
     private List<Bill> totalBill;
@@ -39,7 +37,7 @@ public class BillingAdapter extends BaseAdapter {
     @Override
     public int getCount() {
 //        if (mCustomersData == null)
-            return totalBill.size();
+        return totalBill.size();
 //        return mCustomersData.size();
 //        return 0;
     }
@@ -64,7 +62,7 @@ public class BillingAdapter extends BaseAdapter {
 
         }
         final Bill data = totalBill.get(position);
-         holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
+        holder.startDate = (TextView) convertView.findViewById(R.id.startDate);
         holder.endDate = (TextView) convertView.findViewById(R.id.endDate);
         holder.amount = (TextView) convertView.findViewById(R.id.amount);
         holder.name = (TextView) convertView.findViewById(R.id.name);
@@ -80,11 +78,11 @@ public class BillingAdapter extends BaseAdapter {
         holder.name.setText(a + b);
 
 
-        if (0==data.getIsCleared() && 1==data.isOutstanding()) {
+        if (0 == data.getIsCleared() && 1 == data.getIsOutstanding()) {
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("Outstanding");
         }
-        if (1==data.getIsCleared() && 1==data.isOutstanding()) {
+        if (1 == data.getIsCleared() && 1 == data.getIsOutstanding()) {
             holder.history.setVisibility(View.VISIBLE);
             holder.history.setText("History");
         }
@@ -123,7 +121,8 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("start_date_work_format", data.getStartDate())
                         .putExtra("end_date_work_format", data.getEndDate())
                         .putExtra("roll_date", data.getRollDate())
-                        .putExtra("is_outstanding", data.getIsOutstanding());
+                        .putExtra("is_outstanding", data.getIsOutstanding())
+                        .putExtra("tax", data.getTax());
                 mContext.startActivity(intent);
 
             }

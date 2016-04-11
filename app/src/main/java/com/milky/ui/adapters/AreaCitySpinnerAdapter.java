@@ -6,16 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import com.milky.R;
 import com.milky.service.core.Area;
-
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Neha on 12/2/2015.
- */
 public class AreaCitySpinnerAdapter extends ArrayAdapter<Area> {
     private Activity _context;
     private List<Area> dataList;
@@ -41,9 +35,7 @@ public class AreaCitySpinnerAdapter extends ArrayAdapter<Area> {
             TextView area = (TextView) row.findViewById(R.id.spinnerText);
             area.setTextColor(_context.getResources().getColor(R.color.white));
             area.setText(item.getCityArea());
-
         }
-
         return row;
     }
 
@@ -54,17 +46,13 @@ public class AreaCitySpinnerAdapter extends ArrayAdapter<Area> {
             LayoutInflater inflater = _context.getLayoutInflater();
             row = inflater.inflate(R.layout.spinner_layout, parent, false);
         }
-
         Area item = dataList.get(position);
-
         if (item != null) {
             TextView area = (TextView) row.findViewById(R.id.spinnerText);
             area.setTextColor(_context.getResources().getColor(R.color.colorPrimary));
             area.setBackgroundColor(_context.getResources().getColor(R.color.white));
             area.setText(item.getCityArea());
-
         }
-
         return row;
     }
 }

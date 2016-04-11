@@ -6,20 +6,16 @@ import com.milky.service.core.Bill;
 import java.util.List;
 
 public interface IBill {
+    //Insert new bill
     void insert(Bill bill);
 
-    void update(Bill bill);
+    //Update bills
+    void updateBills(Bill bill);
 
-    List<Bill> getTotalAllBill();
+    //getAll uncleared bills by date
+    List<Bill> getUnclearedBills(String day, boolean recalculate);
 
-    List<Bill> getOutstandingBill();
+    //Get uncleared bills by customer id and day
+    List<Bill> getUnclearedBillById(String day,int id);
 
-    List<Bill> getOutstandingBillsById(int id);
-
-    List<Bill> getTotalBillById(int id);
-
-    void updateBillById(Bill bill);
-
-    void updateOutstandingBills(Bill bill);
-    void updateRollDate();
 }

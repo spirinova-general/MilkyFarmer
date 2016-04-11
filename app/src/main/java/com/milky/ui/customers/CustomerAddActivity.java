@@ -213,6 +213,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         bill.setBalance(0);
                         bill.setTax(globalSettings.getTax());
                         bill.setIsCleared(0);
+                        bill.setRate(setting.getDefaultRate());
                         bill.setDateModified(formattedDate);
                         bill.setRollDate(globalSettings.getRollDate());
                         bill.setCustomerId(setting.getCustomerId());
