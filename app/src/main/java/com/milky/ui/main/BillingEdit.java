@@ -96,7 +96,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         TextView clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
         Calendar calendar = Calendar.getInstance();
         try {
-            Date date = Constants.work_format.parse(intent.getStringExtra("roll_date"));
+            Date date = Constants.work_format.parse(new GlobalSettingsService().getRollDate());
             calendar.setTime(date);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -161,7 +161,6 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             holder.setEndDate(intent.getStringExtra("end_date_work_format"));
                             holder.setTotalAmount(bill_amount);
                             holder.setRate(intent.getDoubleExtra("totalPrice", 0));
-                            holder.setRollDate(intent.getStringExtra("roll_date"));
                             holder.setQuantity(intent.getDoubleExtra("quantity", 0));
                             holder.setAdjustment(0);
                             holder.setIsOutstanding(intent.getIntExtra("is_outstanding", 0));

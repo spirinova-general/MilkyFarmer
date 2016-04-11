@@ -103,7 +103,7 @@ public class DeliveryService implements IDelivery {
     @Override
     public List<Double> getMonthlyDeliveryOfAllCustomers( int month, int year) {
         try {
-            List<Double> result = new ArrayList<Double>();
+            List<Double> result = new ArrayList<>();
             Calendar start = Calendar.getInstance();
             //Umesh - Get first day and last days of the month...Review this - dont use deprecated APIs
             start.set(year, month, 1);
@@ -111,7 +111,6 @@ public class DeliveryService implements IDelivery {
             Calendar end = Calendar.getInstance();
             end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
             Date lastDayOfTheMonth = end.getTime();
-
 
             List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfTheMonth, lastDayOfTheMonth);
             for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()){

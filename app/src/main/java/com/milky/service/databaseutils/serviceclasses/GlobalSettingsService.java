@@ -100,7 +100,6 @@ public class GlobalSettingsService implements IGlobalSetting {
     public void updateRollDate(String date) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.RollDate,date);
-
         getDb().update(TableNames.GlobalSetting, values,null, null);
     }
 }

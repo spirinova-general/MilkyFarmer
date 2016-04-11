@@ -31,7 +31,7 @@ public class TableColumsDetail {
     //CUSTOMER"S BILL
     public static final String CUSTOMERS_BILL = "CREATE TABLE " + TableNames.Bill + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.StartDate + " DATETIME," + TableColumns.EndDate + " DATETIME,"
             + TableColumns.TotalQuantity + " REAL," +  TableColumns.Rate + " REAL," + TableColumns.Balance + " REAL," + TableColumns.Adjustment + " REAL," + TableColumns.TAX + " REAL," + TableColumns.IsCleared + " INTEGER,"
-            + TableColumns.PaymentMade + " REAL," + TableColumns.IsOutstanding + " INTEGER," + TableColumns.TotalAmount + " REAL," + TableColumns.RollDate + " DATETIME," + TableColumns.DateAdded + " DATETIME,"+TableColumns.DateModified + " DATETIME," + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
+            + TableColumns.PaymentMade + " REAL," + TableColumns.IsOutstanding + " INTEGER," + TableColumns.TotalAmount + " REAL," + TableColumns.DateAdded + " DATETIME,"+TableColumns.DateModified + " DATETIME," + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
             + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" + ")";
 
     //Customers Setting
@@ -41,9 +41,9 @@ public class TableColumsDetail {
             + TableColumns.IsCustomDelivery + " INTEGER," + TableColumns.Dirty + " INTEGER," + TableColumns.CustomerId + " INTEGER,"
             + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" + ")";
 
-    //DELIVERY
-    public static final String DELIVERY = "CREATE TABLE " + TableNames.DELIVERY + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DateModified + " DATETIME," + TableColumns.DefaultQuantity + " REAL,"
-            + TableColumns.DeliveryDate + " DATETIME," + TableColumns.Dirty + " TEXT," + TableColumns.CustomerId + " INTEGER,"
-            + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" +
-            ")";
+//    //DELIVERY
+//    public static final String DELIVERY = "CREATE TABLE " + TableNames.DELIVERY + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DateModified + " DATETIME," + TableColumns.DefaultQuantity + " REAL,"
+//            + TableColumns.DeliveryDate + " DATETIME," + TableColumns.Dirty + " TEXT," + TableColumns.CustomerId + " INTEGER,"
+//            + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" +
+//            ")";
 }

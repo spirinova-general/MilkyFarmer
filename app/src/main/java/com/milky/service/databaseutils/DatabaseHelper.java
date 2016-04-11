@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(TableColumsDetail.AREA);
         db.execSQL(TableColumsDetail.CUSTOMER);
         db.execSQL(TableColumsDetail.CUSTOMER_SETTINGS);
-        db.execSQL(TableColumsDetail.DELIVERY);
+//        db.execSQL(TableColumsDetail.DELIVERY);
         db.execSQL(TableColumsDetail.CUSTOMERS_BILL);
         db.execSQL(TableColumsDetail.GLOBAL_ETTINGS);
 //Add extra tables
@@ -61,9 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(custIndex);
         String custSettingIndex = "CREATE INDEX " + TableColumns.Index_Customer_Customer_Setting + " ON " + TableNames.CustomerSetting + " (" + TableColumns.CustomerId+ " )";
         db.execSQL(custSettingIndex);
-        //        Adding custId Index..
-        String deliveryIndex = "CREATE INDEX " + TableColumns.Index_Delivery_Customer + " ON " + TableNames.DELIVERY + " (" + TableColumns.CustomerId+ " )";
-        db.execSQL(deliveryIndex);
+
 
     }
 

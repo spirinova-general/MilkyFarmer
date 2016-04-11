@@ -16,7 +16,6 @@ public class Bill {
     public double tax;
     public int isCleared;
     public String dateModified;
-    public String rollDate;
     public int customerId;
     public String startDate;
     public double quantity;
@@ -104,13 +103,6 @@ public class Bill {
         this.dateModified = dateModified;
     }
 
-    public String getRollDate() {
-        return rollDate;
-    }
-
-    public void setRollDate(String rollDate) {
-        this.rollDate = rollDate;
-    }
 
     public int getCustomerId() {
         return customerId;
@@ -168,6 +160,5 @@ public class Bill {
         this.setIsOutstanding(cursor.getInt(cursor.getColumnIndex(TableColumns.IsOutstanding)));
         this.setRate(cursor.getInt(cursor.getColumnIndex(TableColumns.Rate)));
         this.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
-        this.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
     }
 }

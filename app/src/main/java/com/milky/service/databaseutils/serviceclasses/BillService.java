@@ -44,7 +44,6 @@ public class BillService implements IBill {
         values.put(TableColumns.IsOutstanding, holder.getIsOutstanding());
         values.put(TableColumns.DateAdded, holder.getDateAdded());
         values.put(TableColumns.Dirty, 0);
-        values.put(TableColumns.RollDate, holder.getRollDate());
         values.put(TableColumns.Rate, holder.getRate());
         getDb().insert(TableNames.Bill, null, values);
     }
@@ -66,7 +65,6 @@ public class BillService implements IBill {
         values.put(TableColumns.IsOutstanding, bill.getIsOutstanding());
         values.put(TableColumns.DateAdded, bill.getDateAdded());
         values.put(TableColumns.Dirty, 1);
-        values.put(TableColumns.RollDate, bill.getRollDate());
         values.put(TableColumns.Rate, bill.getRate());
         getDb().update(TableNames.Bill, values, TableColumns.CustomerId + " ='" + bill.getCustomerId() + "'", null);
     }
@@ -478,4 +476,11 @@ public class BillService implements IBill {
         long i = getDb().update(TableNames.Bill, values, TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "' AND " +
                 TableColumns.IsOutstanding + " ='1'", null);
     }*/
+    public static void updateOutstandingBills(SQLiteDatabase db, String date) {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.IsOutstanding, 1);
+        values.put(TableColumns.EndDate, date);
+        long i = db.update(TableNames.Bill, values, TableColumns.StartDate + " <='" + date + "'", null);
+
+    }
 }

@@ -191,7 +191,7 @@ public class CustomersService implements ICustomers {
             Date startDate = Utils.FromDateString(setting.getStartDate());
 
             if (setting.getIsCustomDelivery()) {
-                if (endDate == date && startDate == date)
+                if (endDate == date &&startDate == date)
                     return setting;
             } else {
                 if ((startDate.before(date) || startDate.equals(date)) && endDate.after(date))
@@ -214,7 +214,7 @@ public class CustomersService implements ICustomers {
         end.setTime(endDate);
 
         double totalQuantity = 0, totalAmount = 0,rate=0;
-        for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime())
+        for (Date date = start.getTime(); start.before(end) || start.equals(end); start.add(Calendar.DATE, 1), date = start.getTime())
         {
             CustomersSetting setting = getCustomerSetting(customer, date, false);
             try {
@@ -226,8 +226,9 @@ public class CustomersService implements ICustomers {
                 totalQuantity += 0;
                 rate = 0;
             }
-            totalAmount += rate * totalQuantity;
+
         }
+        totalAmount += rate * totalQuantity;
         QuantityAmount qa = new QuantityAmount();
         qa.amount = totalAmount;
         qa.quantity = totalQuantity;

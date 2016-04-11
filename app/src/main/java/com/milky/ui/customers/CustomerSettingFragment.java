@@ -457,7 +457,6 @@ public class CustomerSettingFragment extends Fragment {
                     bill.setIsOutstanding(0);
                     bill.setDateAdded(holder.getDateAdded());
                     bill.setDirty(1);
-                    bill.setRollDate(new GlobalSettingsService().getRollDate());
                     new BillService().update(bill);
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;

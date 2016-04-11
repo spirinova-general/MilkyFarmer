@@ -23,3 +23,45 @@ app/proguard-rules.pro
 
 
 
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/date_number_background.xml
+3rdpartylib/extcal/build/tmp/packageReleaseJar/MANIFEST.MF
+3rdpartylib/extcal/build/outputs/aar/extcal-release.aar
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/navigation_previous_item.png
+3rdpartylib/extcal/build/intermediates/incremental/packageResourcesrelease/merger.xml
+3rdpartylib/extcal/build/intermediates/incremental/mergeAssets/release/merger.xml
+3rdpartylib/extcal/build/intermediates/incremental/aidl/release/dependency.store
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values/values.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values-v14/values-v14.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values-v11/values-v11.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values-sw720dp/values-sw720dp.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values-sw720dp-land/values-sw720dp-land.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values-sw600dp/values-sw600dp.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values-sw600dp-land/values-sw600dp-land.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/values-land/values-land.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/layout/day_view.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/layout/day_of_week.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/today.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/past_days.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/normal_day.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable/day_selected.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-xhdpi/navigation_previous_item.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-xhdpi/navigation_next_item.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-xhdpi/ic_launcher.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-xhdpi/day_bg.9.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-mdpi/ic_launcher.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/red.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/quickcontact_badge_overlay_normal_light.9.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/purple.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/orange.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/navigation_next_item.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/ic_launcher.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/green.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/day_bg.9.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/drawable-hdpi/blue.png
+3rdpartylib/extcal/build/intermediates/bundles/release/res/color/date_number_text_color.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/classes.jar
+3rdpartylib/extcal/build/intermediates/bundles/release/aapt/AndroidManifest.xml
+3rdpartylib/extcal/build/intermediates/bundles/release/R.txt
+3rdpartylib/extcal/build/intermediates/bundles/release/AndroidManifest.xml
+3rdpartylib/extcal/build/generated/source/r/release/com/tyczj/extendedcalendarview/R.java
+3rdpartylib/extcal/build/generated/source/buildConfig/release/com/tyczj/extendedcalendarview/BuildConfig.java

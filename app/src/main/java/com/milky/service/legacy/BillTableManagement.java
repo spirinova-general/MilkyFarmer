@@ -39,7 +39,6 @@ public class BillTableManagement {
         values.put(TableColumns.IsOutstanding, holder.getIsOutstanding());
         values.put(TableColumns.DateAdded, holder.getDateAdded());
         values.put(TableColumns.Dirty, 1);
-        values.put(TableColumns.RollDate, holder.getRollDate());
 //        values.put(TableColumns.DeletedOn, "1");
         long i = db.insert(TableNames.Bill, null, values);
     }
@@ -478,7 +477,6 @@ public class BillTableManagement {
                 holder.setIsOutstanding(cursor.getInt(cursor.getColumnIndex(TableColumns.IsOutstanding)));
 //                holder.setBalanceType(cursor.getInt(cursor.getColumnIndex(TableColumns.BALANCE_TYPE)));
                 holder.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
-                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
 //                BillingFragment.payment.add(holder);
             }
             while (cursor.moveToNext());

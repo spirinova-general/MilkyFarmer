@@ -108,7 +108,6 @@ public class CustomersBillingFragment extends Fragment {
             if (bills.size() > 0) {
                 _mListView.setAdapter(new BillingAdapter(bills, getActivity()));
             }
-            _dbHelper.close();
         }
     }
 

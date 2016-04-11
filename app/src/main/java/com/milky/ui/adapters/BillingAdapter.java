@@ -120,7 +120,6 @@ public class BillingAdapter extends BaseAdapter {
                         .putExtra("payment_made", data.getPaymentMade())
                         .putExtra("start_date_work_format", data.getStartDate())
                         .putExtra("end_date_work_format", data.getEndDate())
-                        .putExtra("roll_date", data.getRollDate())
                         .putExtra("is_outstanding", data.getIsOutstanding())
                         .putExtra("tax", data.getTax());
                 mContext.startActivity(intent);

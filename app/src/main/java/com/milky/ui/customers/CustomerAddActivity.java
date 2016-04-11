@@ -216,7 +216,6 @@ public class CustomerAddActivity extends AppCompatActivity {
                         bill.setIsCleared(0);
                         bill.setRate(setting.getDefaultRate());
                         bill.setDateModified(formattedDate);
-                        bill.setRollDate(globalSettings.getRollDate());
                         bill.setCustomerId(setting.getCustomerId());
                         bill.setStartDate(setting.getStartDate());
                         bill.setQuantity(setting.getGetDefaultQuantity());
