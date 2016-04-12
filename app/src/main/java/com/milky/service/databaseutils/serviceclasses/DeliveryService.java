@@ -15,6 +15,7 @@ import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.utils.AppUtil;
+import com.milky.utils.Constants;
 import com.milky.viewmodel.VDelivery;
 
 import java.util.ArrayList;
@@ -54,11 +55,10 @@ public class DeliveryService implements IDelivery {
 
 
     @Override
-    public void insertOrUpdate(Delivery delivery)
-    {
+    public void insertOrUpdate(Delivery delivery) {
         String deliveryDate = delivery.getDeliveryDate();
         String whereClause = TableColumns.StartDate + " ='" + deliveryDate + "'"
-                + " AND " + TableColumns.EndDate + " ='" + deliveryDate+"'"
+                + " AND " + TableColumns.EndDate + " ='" + deliveryDate + "'"
                 + " AND " + TableColumns.IsCustomDelivery + " ='1'";
 
         String selectQuery = "SELECT * FROM " + TableNames.CustomerSetting + " WHERE " + whereClause;
@@ -78,10 +78,9 @@ public class DeliveryService implements IDelivery {
 
             //Review date parsing later
             try {
-             date = Utils.FromDateString(deliveryDate);
-             setting = _customerService.getCustomerSetting(customer, date, false);
-            }
-            catch(Exception ex) {
+                date = Utils.FromDateString(deliveryDate);
+                setting = _customerService.getCustomerSetting(customer, date, false);
+            } catch (Exception ex) {
                 return;
             }
 
@@ -101,31 +100,47 @@ public class DeliveryService implements IDelivery {
 
     //Umesh doing it in memory for less database hits, remove maxday, startdate its not needed
     @Override
-    public List<Double> getMonthlyDeliveryOfAllCustomers( int month, int year) {
+    public List<Double> getMonthlyDeliveryOfAllCustomers(int month, int year) {
         try {
             List<Double> result = new ArrayList<>();
             Calendar start = Calendar.getInstance();
             //Umesh - Get first day and last days of the month...Review this - dont use deprecated APIs
             start.set(year, month, 1);
+            //set time zero, so that comparison between dates are not affected by hours
+            start.set(Calendar.HOUR_OF_DAY, 0);
+            start.set(Calendar.MINUTE, 0);
+            start.set(Calendar.SECOND, 0);
+            start.set(Calendar.MILLISECOND, 0);
+            start.set(Calendar.HOUR_OF_DAY,0);
             Date firstDayOfTheMonth = start.getTime();
             Calendar end = Calendar.getInstance();
             end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+            end.set(Calendar.HOUR_OF_DAY, 0);
+            end.set(Calendar.MINUTE, 0);
+            end.set(Calendar.SECOND, 0);
+            end.set(Calendar.MILLISECOND, 0);
             Date lastDayOfTheMonth = end.getTime();
-
             List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfTheMonth, lastDayOfTheMonth);
-            for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()){
+            for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
                 double totalQuantity = 0;
+                CustomersSetting fetchedSettings = null;
                 for (Customers customer : customers) {
                     CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false);
-                    if (setting != null)
-                        totalQuantity += setting.getGetDefaultQuantity();
+                    if (setting != null) {
+                        //If the date already fecthed and from same settings
+                        if (fetchedSettings != null && fetchedSettings.getCustomerId()==setting.getCustomerId() && fetchedSettings.getStartDate().equals(setting.getStartDate())) {
+                            totalQuantity += setting.getGetDefaultQuantity() - fetchedSettings.getGetDefaultQuantity();
+                        } else {
+                            totalQuantity += setting.getGetDefaultQuantity();
+                            fetchedSettings = setting;
+                        }
+                    }
+
                 }
                 result.add(totalQuantity);
             }
             return result;
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             return null;
         }
 
@@ -150,9 +165,7 @@ public class DeliveryService implements IDelivery {
             }
 
             return result;
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             //ALl these should be logged or re thrown when needed....
             return null;
         }
@@ -160,7 +173,7 @@ public class DeliveryService implements IDelivery {
 
     @Override
     public List<VDelivery> getDeliveryDetails(String day) {
-       return getDeliveryDetails(null, day);
+        return getDeliveryDetails(null, day);
     }
 
     //Umesh use stringbuilder for appending, rather than strings, also select only columns that are needed
@@ -173,7 +186,7 @@ public class DeliveryService implements IDelivery {
 
             List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(areaId, date, date);
             List<VDelivery> result = new ArrayList<>();
-            for(Customers customer: customers) {
+            for (Customers customer : customers) {
                 VDelivery holder = new VDelivery();
                 CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false);
                 holder.setCustomerId(customer.getCustomerId());
@@ -184,9 +197,7 @@ public class DeliveryService implements IDelivery {
                 result.add(holder);
             }
             return result;
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             return null;
         }
     }

@@ -1,3 +1,4 @@
+<!--suppress AndroidDomInspection -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tyczj.extendedcalendarview"
     android:versionCode="1"
@@ -16,6 +17,12 @@
         <provider
             android:name="CalendarProvider"
             android:authorities="calendarprovider" />
+        <receiver android:name="com.milky.service.serverapi.BroadcastCalendar" >
+            <intent-filter>
+                <action android:name="com.android.USER_ACTION" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

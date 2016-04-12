@@ -206,7 +206,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         new CustomersSettingService().insert(setting);
 
                         Bill bill = new Bill();
-                        bill.setDirty(0);
+                        bill.setDirty(1);
                         bill.setPaymentMade(0);
                         bill.setTotalAmount(0);
                         bill.setEndDate(setting.getEndDate());
@@ -220,7 +220,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         bill.setStartDate(setting.getStartDate());
                         bill.setQuantity(setting.getGetDefaultQuantity());
                         bill.setDateAdded(formattedDate);
-                        Calendar cal = Calendar.getInstance();
+//                        Calendar cal = Calendar.getInstance();
 //                        if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
 //                            bill.setIsOutstanding(0);
 //                            SharedPreferences preferences = AppUtil.getInstance().getPrefrences();

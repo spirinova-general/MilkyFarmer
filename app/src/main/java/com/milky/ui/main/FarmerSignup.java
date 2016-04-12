@@ -219,7 +219,6 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> listType) {
-
         if (type.equals(ServerApis.ACCOUNT_API)) {
             Account holder = new Account();
             try {
@@ -229,9 +228,9 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 holder.setLastName(result.getString("LastName"));
                 holder.setMobile(result.getString("Mobile"));
                 if (result.getBoolean("Validated"))
-                    holder.setValidated(0);
-                else
                     holder.setValidated(1);
+                else
+                    holder.setValidated(0);
                 holder.setDateAdded(result.getString("DateAdded"));
                 holder.setDateModified(result.getString("DateModified"));
 //                holder.setAccountStartDate(result.getString("StartDate"));
@@ -239,12 +238,11 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 holder.setUsedSms(result.getInt("UsedSms"));
                 holder.setTotalSms(result.getInt("TotalSms"));
                 holder.setServerAccountId(result.getInt("Id"));
+
                 edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
                 edit.putString(UserPrefrences.INSERT_BILL, "0");
                 edit.commit();
-
-//                com.milky.service.databaseutils.Account.insertAccountDetails(_dbhelper.getWritableDatabase(), holder);
-//                Insert Account details into table
+//              Insert Account details into table
                 accountService.insert(holder);
 
                 GlobalSettings settinsHolder = new GlobalSettings();
@@ -253,8 +251,10 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                         "-" + String.format("%02d", cal.getActualMaximum(Calendar.DAY_OF_MONTH)));
                 settinsHolder.setTax(0);
                 settinsHolder.setDefaultRate(0);
-//                Insert global settings data..
+
+//              Insert global settings data..
                new GlobalSettingsService().insert(settinsHolder);
+
                 startActivity(new Intent(FarmerSignup.this, MainActivity.class));
                 this.finish();
             } catch (JSONException e) {
@@ -266,8 +266,6 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 otpButton.setText("Resend OTP");
             else {
                 otp_layout.setError(null);
-
-//                ((LinearLayout) findViewById(R.id.textOtp)).setVisibility(View.VISIBLE);
                 AppUtil.getInstance().cancelTimer(FarmerSignup.this);
                 AppUtil.getInstance().startTimer();
             }

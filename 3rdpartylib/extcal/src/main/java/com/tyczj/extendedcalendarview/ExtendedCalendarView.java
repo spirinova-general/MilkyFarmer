@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -219,6 +220,11 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
         } else {
             cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
         }
+        Intent intnet = new Intent("com.android.USER_ACTION");
+        intnet.putExtra("month",cal.get(Calendar.MONTH));
+        intnet.putExtra("year",cal.get(Calendar.YEAR))     ;
+
+        context.sendBroadcast(intnet);
         rebuildCalendar();
     }
 
@@ -229,6 +235,11 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
         } else {
             cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) + 1);
         }
+        Intent intnet = new Intent("com.android.USER_ACTION");
+        intnet.putExtra("month",cal.get(Calendar.MONTH));
+        intnet.putExtra("year",cal.get(Calendar.YEAR))     ;
+
+        context.sendBroadcast(intnet);
         rebuildCalendar();
     }
 

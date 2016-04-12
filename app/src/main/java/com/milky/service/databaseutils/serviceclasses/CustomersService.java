@@ -72,6 +72,11 @@ public class CustomersService implements ICustomers {
         try {
             Customers customer = getCustomerDetail(setting.getCustomerId(), true);
             Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
             Date today = cal.getTime();
             CustomersSetting existingSetting = getCustomerSetting(customer, today, false);
             boolean toInsert = (existingSetting.getGetDefaultQuantity() != setting.getGetDefaultQuantity()) ||
@@ -191,7 +196,7 @@ public class CustomersService implements ICustomers {
             Date startDate = Utils.FromDateString(setting.getStartDate());
 
             if (setting.getIsCustomDelivery()) {
-                if (endDate == date &&startDate == date)
+                if (endDate.equals(date) && startDate.equals(date))
                     return setting;
             } else {
                 if ((startDate.before(date) || startDate.equals(date)) && endDate.after(date))
@@ -209,23 +214,17 @@ public class CustomersService implements ICustomers {
             throw new Exception("Customer setting is not populated");
         Calendar start = Calendar.getInstance();
         start.setTime(startDate);
-        Date firstDayOfTheMonth = start.getTime();
         Calendar end = Calendar.getInstance();
         end.setTime(endDate);
 
-        double totalQuantity = 0, totalAmount = 0,rate=0;
-        for (Date date = start.getTime(); start.before(end) || start.equals(end); start.add(Calendar.DATE, 1), date = start.getTime())
-        {
+        double totalQuantity = 0, totalAmount = 0, rate = 0;
+        for (Date date = start.getTime(); start.before(end) || start.equals(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
             CustomersSetting setting = getCustomerSetting(customer, date, false);
-            try {
+            if (setting != null) {
                 totalQuantity += setting.getGetDefaultQuantity();
                 rate = setting.getDefaultRate();
             }
-            catch (NullPointerException npe)
-            {
-                totalQuantity += 0;
-                rate = 0;
-            }
+
 
         }
         totalAmount += rate * totalQuantity;
@@ -297,7 +296,7 @@ public class CustomersService implements ICustomers {
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
                 customers.customerSettings.add(holder);
-                customersData= new ArrayList<>(customersMap.values());
+                customersData = new ArrayList<>(customersMap.values());
             }
             while (cursor.moveToNext());
         }

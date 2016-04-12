@@ -143,13 +143,18 @@ public class BillService implements IBill {
 
     private void InsertOrUpdateCurrentBills(HashMap<Integer, Bill> currentbillsMap) throws Exception {
         Calendar cal = Calendar.getInstance();
+
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.HOUR_OF_DAY,0);
         Date today = cal.getTime();
         //Set calendar to first date of month
         cal.set(Calendar.DAY_OF_MONTH, 1);
-
         Date firstDayOfMonth = cal.getTime();
 
-        List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth,today);
+        List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth, today);
 
         for (Customers customer : customers) {
             Bill bill;
@@ -158,22 +163,23 @@ public class BillService implements IBill {
             } else {
                 bill = new Bill();
             }
-
-            QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
+                QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
 //            bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
-            bill.setEndDate(Utils.ToDateString(today));
-            bill.setQuantity(qa.quantity);
-            bill.setTotalAmount(qa.amount);
-            bill.setBalance(customer.getBalance_amount());
-            bill.setIsCleared(0);
-            bill.setPaymentMade(0);
-               bill.setIsOutstanding(0);
+                bill.setEndDate(Utils.ToDateString(today));
+                bill.setQuantity(qa.quantity);
+                bill.setTotalAmount(qa.amount);
+                bill.setBalance(customer.getBalance_amount());
+                bill.setIsCleared(0);
+                bill.setPaymentMade(0);
+                bill.setIsOutstanding(0);
 
-            if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())) {
-                update(bill);
-            } else {
-                insert(bill);
+                if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())) {
+                    update(bill);
+                } else {
+                    insert(bill);
+
             }
+
         }
     }
 

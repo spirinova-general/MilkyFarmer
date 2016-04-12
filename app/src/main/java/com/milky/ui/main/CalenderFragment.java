@@ -2,6 +2,7 @@ package com.milky.ui.main;
 
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.milky.ui.customers.DeliveryActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.UserPrefrences;
+import com.milky.service.serverapi.BroadcastCalendar;
 import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
@@ -68,9 +70,12 @@ public class CalenderFragment extends Fragment {
             Constants.REFRESH_CALANDER = false;
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
+        getActivity().registerReceiver(receiver, intentFilter);
+
         if (Constants.REFRESH_CALANDER) {
             Calendar cal = Calendar.getInstance();
             DeliveryService service = new DeliveryService();
@@ -84,6 +89,17 @@ public class CalenderFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
     }
 
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(receiver);
+    }
+
+    BroadcastCalendar receiver;
+    IntentFilter intentFilter;
+
     private void initResources(View view) {
         viewLayout = view;
         _prefrences = AppUtil.getInstance().getPrefrences();
@@ -91,6 +107,8 @@ public class CalenderFragment extends Fragment {
         deliveryService = new com.milky.service.databaseutils.serviceclasses.DeliveryService();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
+        receiver = new BroadcastCalendar();
+        intentFilter = new IntentFilter("com.android.USER_ACTION");
         _mCalenderView.setForCustomersDelivery(false);
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override

@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
       * init resources
       * */
         initResources();
+
         Constants.REFRESH_CALANDER = true;
         Constants.REFRESH_CUSTOMERS = true;
         Constants.REFRESH_BILL = true;
@@ -93,11 +94,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
          * Setup click events on the Navigation View Items.
          */
         _headerView = mNavigationView.inflateHeaderView(R.layout.nav_headers);
-//        mNavigationView.addHeaderView(_headerView);
 
         TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
         Account dataHolder = accountService.getDetails();
         name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
+
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -107,14 +108,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                         Intent i = new Intent(MainActivity.this, GlobalSetting.class);
                         startActivity(i);
                         break;
-//                    case R.id.nav_sign_out:
-//                        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
-//                        SharedPreferences.Editor edit = preferences.edit();
-//                        edit.clear();
-//                        edit.apply();
-//                        finish();
-//
-//                        break;
                     case R.id.nav_about:
                         startActivity(new Intent(MainActivity.this, About.class));
                         break;
@@ -200,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                     if (CustomersFragment._mAdapter != null)
                         CustomersFragment._mAdapter.getFilter().filter(editSearch.getText().toString());
                     if (s.length() == 0) {
-                        Constants.selectedAreaId =-1;
+                        Constants.selectedAreaId = -1;
                     }
                 }
 

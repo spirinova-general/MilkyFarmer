@@ -43,9 +43,6 @@ public class Customers {
 
     public List<CustomersSetting> customerSettings;
 
-
-  
-
     public int getCustomerId() {
         return customerId;
     }

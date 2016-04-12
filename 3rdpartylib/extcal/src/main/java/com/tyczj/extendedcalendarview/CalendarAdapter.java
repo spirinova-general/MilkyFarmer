@@ -12,6 +12,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -44,6 +45,7 @@ public class CalendarAdapter extends BaseAdapter {
         this.context = context;
         cal.set(Calendar.DAY_OF_MONTH, 1);
         refreshDays();
+
     }
 
     @Override

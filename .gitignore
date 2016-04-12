@@ -65,3 +65,6 @@ app/proguard-rules.pro
 3rdpartylib/extcal/build/intermediates/bundles/release/AndroidManifest.xml
 3rdpartylib/extcal/build/generated/source/r/release/com/tyczj/extendedcalendarview/R.java
 3rdpartylib/extcal/build/generated/source/buildConfig/release/com/tyczj/extendedcalendarview/BuildConfig.java
+3rdpartylib/extcal/build/intermediates/bundles/debug/res/layout/day_of_week.xml
+3rdpartylib/extcal/build/intermediates/
+3rdpartylib/extcal/build/
