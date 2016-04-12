@@ -24,7 +24,7 @@ public class TableColumsDetail {
     //CUSTOMER
     public static final String CUSTOMER = "CREATE TABLE " + TableNames.CUSTOMER + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.FirstName + " TEXT,"
             + TableColumns.LastName + " TEXT," + TableColumns.Mobile + " TEXT," + TableColumns.Address1 + " TEXT," + TableColumns.Address2 + " TEXT," + TableColumns.Balance + " REAL,"
-            + TableColumns.DateAdded + " DATETIME," + TableColumns.AreaId + " INTEGER,"+ TableColumns.DeletedOn + " INTEGER," + TableColumns.DateModified + " DATETIME,"
+            + TableColumns.DateAdded + " DATETIME," + TableColumns.StartDate + " DATETIME," + TableColumns.AreaId + " INTEGER,"+ TableColumns.DeletedOn + " INTEGER," + TableColumns.DateModified + " DATETIME,"
             + TableColumns.IsDeleted + " INTEGER," + TableColumns.Dirty + " INTEGER" + " ,FOREIGN KEY (" + TableColumns.AreaId + ") REFERENCES " + TableNames.AREA + "(" + TableColumns.ID + ")" +
             ")";
 

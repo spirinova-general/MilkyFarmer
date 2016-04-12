@@ -39,12 +39,18 @@ public class Customers {
     private String deletedOn;
     private int customerId;
     private int dirty;
-
+    private String startDate;
 
     public List<CustomersSetting> customerSettings;
 
 
-  
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
 
     public int getCustomerId() {
         return customerId;
@@ -165,6 +171,7 @@ public class Customers {
         this.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
         this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
         this.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+        this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
     }
 
 }

@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.ui.customers.DeliveryActivity;
@@ -23,6 +24,7 @@ import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Neha on 11/17/2015.
@@ -92,33 +94,48 @@ public class CalenderFragment extends Fragment {
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
         _mCalenderView.setForCustomersDelivery(false);
+
+
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
-            @Override
-            public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
-                Constants.SELECTED_DAY = day;
-                Constants.DELIVERY_DATE = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
-                        String.format("%02d", day.getDay());
-                if ((new CustomersSettingService().isHasDataForDay(Constants.DELIVERY_DATE))
-                        && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
-                    Intent intent = new Intent(getActivity(), DeliveryActivity.class);
-                    startActivity(intent);
-                }
-            }
-        });
+                                                 @Override
+                                                 public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
+                                                     Constants.SELECTED_DAY = day;
+                                                     try {
+                                                         Calendar cal = Calendar.getInstance();
+                                                         Date today = cal.getTime();
+
+                                                         String dateStr = Utils.ToDateString(day.getDay(), day.getMonth() + 1, day.getYear());
+                                                         Date clickedDate = Utils.FromDateString(dateStr);
+
+                                                         if (Utils.BeforeOrEqualsDate(clickedDate, today)) {
+                                                             Intent intent = new Intent(getActivity(), DeliveryActivity.class);
+                                                             intent.putExtra("deliveryDate", dateStr);
+                                                             startActivity(intent);
+                                                         }
+                                                     } catch (Exception ex) {
+                                                         ex.printStackTrace();
+                                                     }
+                                                 }
+                                             }
+
+        );
          /*
         * Check if user is newly registered...
         * */
-        if (_prefrences.contains(UserPrefrences.NEW_USER))
-            _mCalenderView.setRegistrationDate(_prefrences.getInt(UserPrefrences.NEW_USER, 0));
-        else {
-            Calendar cl = Calendar.getInstance();
-            _editor.putInt(UserPrefrences.NEW_USER, cl.get(Calendar.DAY_OF_MONTH));
-            _editor.commit();
-            _mCalenderView.setRegistrationDate(cl.get(Calendar.DAY_OF_MONTH));
-            _mCalenderView.setRegistrationYear(cl.get(Calendar.YEAR));
-            _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
-        }
-        _dbHelper.close();
+            if(_prefrences.contains(UserPrefrences.NEW_USER))
+                    _mCalenderView.setRegistrationDate(_prefrences.getInt(UserPrefrences.NEW_USER,0));
+            else
 
+            {
+                Calendar cl = Calendar.getInstance();
+                _editor.putInt(UserPrefrences.NEW_USER, cl.get(Calendar.DAY_OF_MONTH));
+                _editor.commit();
+                _mCalenderView.setRegistrationDate(cl.get(Calendar.DAY_OF_MONTH));
+                _mCalenderView.setRegistrationYear(cl.get(Calendar.YEAR));
+                _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
+            }
+
+            _dbHelper.close();
+
+        }
     }
-}

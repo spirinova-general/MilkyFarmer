@@ -42,6 +42,7 @@ public class CustomersService implements ICustomers {
         values.put(TableColumns.IsDeleted, 0);
         values.put(TableColumns.DeletedOn, "null");
         values.put(TableColumns.Dirty, 0);
+        values.put(TableColumns.StartDate, customers.getStartDate());
         return getDb().insert(TableNames.CUSTOMER, null, values);
     }
 
@@ -58,6 +59,7 @@ public class CustomersService implements ICustomers {
         values.put(TableColumns.DateModified, customers.getDateAdded());
         values.put(TableColumns.IsDeleted, customers.getIsDeleted());
         values.put(TableColumns.DeletedOn, customers.getDeletedOn());
+        values.put(TableColumns.StartDate, customers.getStartDate());
         values.put(TableColumns.Dirty, 1);
         getDb().update(TableNames.CUSTOMER, values, TableColumns.ID + " ='" + customers.getCustomerId() + "'", null);
     }

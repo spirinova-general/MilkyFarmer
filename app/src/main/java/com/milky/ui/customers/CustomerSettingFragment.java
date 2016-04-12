@@ -214,8 +214,6 @@ public class CustomerSettingFragment extends Fragment {
 
         try {
             today = cal.getTime();
-            Date date = Constants.work_format.parse(settingData.getStartDate());
-            cal.setTime(date);
             settingData = customersService.getCustomerSetting(customer, today, false, true);
         } catch (Exception e) {
             e.printStackTrace();

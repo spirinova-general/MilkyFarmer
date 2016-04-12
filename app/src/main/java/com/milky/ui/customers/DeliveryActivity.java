@@ -1,6 +1,7 @@
 package com.milky.ui.customers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
@@ -61,6 +62,8 @@ public class DeliveryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent myIntent = getIntent();
+        selectedDate = myIntent.getStringExtra("deliveryDate");
         setContentView(R.layout.activity_customers_list);
         initResources();
     }
@@ -68,7 +71,7 @@ public class DeliveryActivity extends AppCompatActivity {
     private void initResources() {
         _mCustomers = (ListView) findViewById(R.id.customersList);
         selectedCustomersId = new ArrayList<>();
-        selectedDate =Constants.DELIVERY_DATE;
+        //selectedDate =Constants.DELIVERY_DATE;
         setActionBar();
         _mDeliveryList.clear();
         deliveryService = new DeliveryService();
