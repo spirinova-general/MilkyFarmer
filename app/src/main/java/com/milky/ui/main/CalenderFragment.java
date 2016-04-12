@@ -96,27 +96,28 @@ public class CalenderFragment extends Fragment {
         _mCalenderView.setForCustomersDelivery(false);
 
 
-        _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
-                                                 @Override
-                                                 public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
-                                                     Constants.SELECTED_DAY = day;
-                                                     try {
-                                                         Calendar cal = Calendar.getInstance();
-                                                         Date today = cal.getTime();
+        _mCalenderView.setOnDayClickListener(
+                new ExtendedCalendarView.OnDayClickListener() {
+                    @Override
+                    public void onDayClicked(AdapterView<?> adapterView, View view, int i, long l, Day day) {
+                        Constants.SELECTED_DAY = day;
+                        try {
+                            Calendar cal = Calendar.getInstance();
+                            Date today = cal.getTime();
 
-                                                         String dateStr = Utils.ToDateString(day.getDay(), day.getMonth() + 1, day.getYear());
-                                                         Date clickedDate = Utils.FromDateString(dateStr);
+                            String dateStr = Utils.ToDateString(day.getDay(), day.getMonth() + 1, day.getYear());
+                            Date clickedDate = Utils.FromDateString(dateStr);
 
-                                                         if (Utils.BeforeOrEqualsDate(clickedDate, today)) {
-                                                             Intent intent = new Intent(getActivity(), DeliveryActivity.class);
-                                                             intent.putExtra("deliveryDate", dateStr);
-                                                             startActivity(intent);
-                                                         }
-                                                     } catch (Exception ex) {
-                                                         ex.printStackTrace();
-                                                     }
-                                                 }
-                                             }
+                            if (Utils.BeforeOrEqualsDate(clickedDate, today)) {
+                                Intent intent = new Intent(getActivity(), DeliveryActivity.class);
+                                intent.putExtra("deliveryDate", dateStr);
+                                startActivity(intent);
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
 
         );
          /*

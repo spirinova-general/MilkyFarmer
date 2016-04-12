@@ -23,6 +23,7 @@ import com.milky.service.core.Account;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
@@ -209,19 +210,22 @@ public class CustomerSettingFragment extends Fragment {
 
         ICustomers customersService = new CustomersService();
         Customers customer = customersService.getCustomerDetail(custId, true);
-        Calendar cal = Calendar.getInstance();
-        Date today = null;
+
 
         try {
-            today = cal.getTime();
-            settingData = customersService.getCustomerSetting(customer, today, false, true);
+            Calendar cal = Calendar.getInstance();
+            //Date today = null;
+            //today = cal.getTime();
+            //settingData = customersService.getCustomerSetting(customer, today, false, true);
+            Date startDate = Utils.FromDateString(customer.getStartDate());
+            cal.setTime(startDate);
+            pick_date.setText(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[cal.get(Calendar.MONTH)] + "-"
+                    + String.valueOf(cal.get(Calendar.YEAR)));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        pick_date.setText(String.format("%02d",cal.get(Calendar.DAY_OF_MONTH))+"-"+Constants.MONTHS[cal.get(Calendar.MONTH)]+"-"
-        +String.valueOf(cal.get(Calendar.YEAR)));
         /*Set defaul rate
         * */
         if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
@@ -447,7 +451,7 @@ public class CustomerSettingFragment extends Fragment {
 
                     customerService.insertOrUpdateCustomerSetting(setting);
 
-                    Bill bill = new Bill();
+                    /*Bill bill = new Bill();
                     bill.setCustomerId(holder.getCustomerId());
                     bill.setStartDate(setting.getStartDate());
                     bill.setEndDate(setting.getEndDate());
@@ -463,7 +467,7 @@ public class CustomerSettingFragment extends Fragment {
                     bill.setIsOutstanding(0);
                     bill.setDateAdded(holder.getDateAdded());
                     bill.setDirty(1);
-                    new BillService().update(bill);
+                    new BillService().update(bill);*/
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_CUSTOMERS = true;

@@ -165,8 +165,8 @@ public class DeliveryActivity extends AppCompatActivity {
                 for (Delivery entry : _mDeliveryList) {
                     CustomersSetting holder = new CustomersSetting();
                     holder.setGetDefaultQuantity(entry.getQuantity());
-                    holder.setStartDate(entry.getDeliveryDate());
-                    holder.setEndDate(entry.getDeliveryDate());
+                    holder.setStartDate(selectedDate);
+                    holder.setEndDate(selectedDate);
                     holder.setCustomerId(entry.getCustomerId());
                     holder.setIsCustomDelivery(true);
                     ICustomers customerService = new CustomersService();

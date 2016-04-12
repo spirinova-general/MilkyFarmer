@@ -103,6 +103,7 @@ public class CustomersService implements ICustomers {
 
                 setting.setStartDate(setting.getStartDate());
                 setting.setEndDate(setting.getEndDate());
+                setting.setDefaultRate(existingSettingWithoutCustomDelivery.getDefaultRate());
                 setting.setIsCustomDelivery(true);
                 _customerSettingsService.insert(setting);
             }
@@ -243,24 +244,24 @@ public class CustomersService implements ICustomers {
         //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up
         if (customer.customerSettings == null)
             throw new Exception("Customer setting is not populated");
+
         Calendar start = Calendar.getInstance();
         start.setTime(startDate);
-        Date firstDayOfTheMonth = start.getTime();
-        Calendar end = Calendar.getInstance();
-        end.setTime(endDate);
 
         double totalQuantity = 0, totalAmount = 0;
-        Date date = start.getTime();
+        Date date = startDate;
         for ( ;Utils.BeforeOrEqualsDate(date, endDate); start.add(Calendar.DATE, 1), date = start.getTime())
         {
             CustomersSetting setting = getCustomerSetting(customer, date, false, false);
             if( setting != null) {
-                totalQuantity += setting.getGetDefaultQuantity();
+                double quantity = setting.getGetDefaultQuantity();
+                totalQuantity += quantity;
                 double rate = setting.getDefaultRate();
-                totalAmount += rate * totalQuantity;
+                totalAmount += rate * quantity;
             }
         }
 
+        totalAmount += customer.getBalance_amount();
         QuantityAmount qa = new QuantityAmount();
         qa.amount = totalAmount;
         qa.quantity = totalQuantity;
@@ -282,6 +283,7 @@ public class CustomersService implements ICustomers {
 
         if (cursor.moveToFirst()) {
             customers.PopulateFromCursor(cursor);
+            customers.setCustomerId(id);
             customers.customerSettings = new ArrayList<CustomersSetting>();
             do {
                 CustomersSetting holder = new CustomersSetting();
@@ -320,6 +322,7 @@ public class CustomersService implements ICustomers {
                 if (!customersMap.containsKey(customerId)) {
                     customers = new Customers();
                     customers.PopulateFromCursor(cursor);
+                    customers.setCustomerId(customerId);
                     customersMap.put(customerId, customers);
                     customers.customerSettings = new ArrayList<CustomersSetting>();
                 } else {
