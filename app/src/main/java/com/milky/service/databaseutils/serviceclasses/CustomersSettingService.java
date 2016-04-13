@@ -27,7 +27,9 @@ public class CustomersSettingService implements ICustomersSettings {
         values.put(TableColumns.StartDate, customers.getStartDate());
         values.put(TableColumns.EndDate, customers.getEndDate());
         values.put(TableColumns.IsCustomDelivery, customers.getIsCustomDelivery());
-        values.put(TableColumns.Dirty, 0);
+        values.put(TableColumns.Dirty, customers.getDirty());
+        values.put(TableColumns.IsDeleted,customers.getIsDeleted());
+        values.put(TableColumns.DateModified,customers.getDateModified());
         getDb().insert(TableNames.CustomerSetting, null, values);
     }
 
@@ -40,7 +42,9 @@ public class CustomersSettingService implements ICustomersSettings {
         values.put(TableColumns.StartDate, setting.getStartDate());
         values.put(TableColumns.EndDate, setting.getEndDate());
         values.put(TableColumns.IsCustomDelivery, setting.getIsCustomDelivery());
-        values.put(TableColumns.Dirty, 1);
+        values.put(TableColumns.Dirty, setting.getDirty());
+        values.put(TableColumns.IsDeleted, setting.getIsDeleted());
+        values.put(TableColumns.DateModified, setting.getDateModified());
         getDb().update(TableNames.CustomerSetting, values, TableColumns.CustomerId + " ='" + setting.getCustomerId() + "'"
                 + " AND " + TableColumns.StartDate + " <='" + setting.getStartDate() + "'" + " AND " +
                 TableColumns.EndDate + " >='" + setting.getEndDate() + "'", null);

@@ -128,6 +128,9 @@ public class CustomrDeliveryFragment extends Fragment {
                                 holder.setEndDate(selected_date);
                                 holder.setCustomerId(custId);
                                 holder.setIsCustomDelivery(true);
+                                holder.setDateModified(Constants.getCurrentDate());
+                                holder.setIsDeleted(0);
+                                holder.setDirty(1);
                                 ICustomers customerService = new CustomersService();
                                 customerService.insertOrUpdateCustomerSetting(holder);
 

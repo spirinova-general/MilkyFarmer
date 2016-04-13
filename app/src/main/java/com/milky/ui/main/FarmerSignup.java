@@ -238,7 +238,8 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                 holder.setUsedSms(result.getInt("UsedSms"));
                 holder.setTotalSms(result.getInt("TotalSms"));
                 holder.setServerAccountId(result.getInt("Id"));
-
+                holder.setDirty(1);
+                holder.setIsDeleted(0);
                 edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
                 edit.putString(UserPrefrences.INSERT_BILL, "0");
                 edit.commit();

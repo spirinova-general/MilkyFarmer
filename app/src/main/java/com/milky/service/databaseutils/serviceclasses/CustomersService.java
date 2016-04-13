@@ -39,9 +39,9 @@ public class CustomersService implements ICustomers {
         values.put(TableColumns.Mobile, customers.getMobile());
         values.put(TableColumns.DateAdded, customers.getDateAdded());
         values.put(TableColumns.DateModified, customers.getDateAdded());
-        values.put(TableColumns.IsDeleted, 0);
+        values.put(TableColumns.IsDeleted, customers.getIsDeleted());
         values.put(TableColumns.DeletedOn, "null");
-        values.put(TableColumns.Dirty, 0);
+        values.put(TableColumns.Dirty, customers.getDirty());
         values.put(TableColumns.StartDate, customers.getStartDate());
         return getDb().insert(TableNames.CUSTOMER, null, values);
     }
@@ -60,7 +60,7 @@ public class CustomersService implements ICustomers {
         values.put(TableColumns.IsDeleted, customers.getIsDeleted());
         values.put(TableColumns.DeletedOn, customers.getDeletedOn());
         values.put(TableColumns.StartDate, customers.getStartDate());
-        values.put(TableColumns.Dirty, 1);
+        values.put(TableColumns.Dirty, customers.getDirty());
         getDb().update(TableNames.CUSTOMER, values, TableColumns.ID + " ='" + customers.getCustomerId() + "'", null);
     }
 
@@ -232,7 +232,7 @@ public class CustomersService implements ICustomers {
             Date endDate = Utils.FromDateString(setting.getEndDate());
             Date startDate = Utils.FromDateString(setting.getStartDate());
 
-            if (setting.getIsCustomDelivery()) {
+//            if (setting.getIsCustomDelivery()) {
                 if (endDate.equals(date) && startDate.equals(date))
                     if (!ignoreCustomDelivery && setting.getIsCustomDelivery()) {
                         if (Utils.EqualsDate(date, endDate) && Utils.EqualsDate(startDate, date))
@@ -246,7 +246,7 @@ public class CustomersService implements ICustomers {
             //did not find any setting, might happen for deleted customer
             return toReturn;
         }
-    }
+    
 
     public QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception {
         //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up
@@ -256,12 +256,6 @@ public class CustomersService implements ICustomers {
         Calendar start = Calendar.getInstance();
         start.setTime(startDate);
 
-<<<<<<< HEAD
-        double totalQuantity = 0, totalAmount = 0, rate = 0;
-        for (Date date = start.getTime(); start.before(end) || start.equals(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
-            CustomersSetting setting = getCustomerSetting(customer, date, false);
-            if (setting != null) {
-=======
         double totalQuantity = 0, totalAmount = 0;
         Date date = startDate;
         for ( ;Utils.BeforeOrEqualsDate(date, endDate); start.add(Calendar.DATE, 1), date = start.getTime())
@@ -273,11 +267,6 @@ public class CustomersService implements ICustomers {
                 double rate = setting.getDefaultRate();
                 totalAmount += rate * quantity;
             }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
         }
 
         totalAmount += customer.getBalance_amount();
@@ -351,10 +340,7 @@ public class CustomersService implements ICustomers {
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
                 customers.customerSettings.add(holder);
-<<<<<<< HEAD
-                customersData = new ArrayList<>(customersMap.values());
-=======
->>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
+//                customersData = new ArrayList<>(customersMap.values());
             }
             while (cursor.moveToNext());
         }

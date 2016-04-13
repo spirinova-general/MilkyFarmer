@@ -36,8 +36,9 @@ public class DeliveryService implements IDelivery {
         values.put(TableColumns.DefaultQuantity, delivery.getQuantity());
         values.put(TableColumns.CustomerId, delivery.getCustomerId());
         values.put(TableColumns.DeliveryDate, delivery.getDeliveryDate());
-        values.put(TableColumns.Dirty, 0);
+        values.put(TableColumns.Dirty, delivery.getDirty());
         values.put(TableColumns.DateModified, delivery.getDateModified());
+        values.put(TableColumns.IsDeleted,delivery.getIsDeleted());
         getDb().insert(TableNames.DELIVERY, null, values);
     }
 
@@ -47,8 +48,9 @@ public class DeliveryService implements IDelivery {
         values.put(TableColumns.DefaultQuantity, delivery.getQuantity());
         values.put(TableColumns.CustomerId, delivery.getCustomerId());
         values.put(TableColumns.DeliveryDate, delivery.getDeliveryDate());
-        values.put(TableColumns.Dirty, 1);
+        values.put(TableColumns.Dirty, delivery.getDirty());
         values.put(TableColumns.DateModified, delivery.getDateModified());
+        values.put(TableColumns.IsDeleted,delivery.getIsDeleted());
         getDb().update(TableNames.DELIVERY, values, TableColumns.CustomerId + " ='" + delivery.getCustomerId() + "'" +
                 " AND " + TableColumns.DeliveryDate + " ='" + delivery.getDeliveryDate() + "'", null);
     }

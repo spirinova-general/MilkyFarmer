@@ -381,6 +381,9 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     holder.setMobile(mobile.getText().toString());
                     holder.setFirstName(firstname.getText().toString());
                     holder.setLastName(lastname.getText().toString());
+                    holder.setDirty(1);
+                    holder.setIsDeleted(0);
+                    holder.setDateModified(Constants.getCurrentDate());
 //                    Update details for Account and Global settings
                     accountSettings.update(holder);
                     globalService.update(globalSettings);
@@ -487,7 +490,9 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     holder.setArea(areaSelected.trim());
                     holder.setCity(citySelected.trim());
                     holder.setLocality(_locality.getText().toString().trim());
-
+                    holder.setIsDeleted(0);
+                    holder.setDirty(1);
+                    holder.setDateModified(Constants.getCurrentDate());
                     areaSelected = "";
                     citySelected = "";
                     long id = areaService.insert(holder);

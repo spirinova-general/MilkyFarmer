@@ -16,7 +16,29 @@ public class CustomersSetting  {
     private String startDate;
     private String endDate;
     private int dirty;
+    private int isDeleted;
+    private String dateModified;
     private boolean isCustomDelivery;
+
+    public int getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(int isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public String getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(String dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public boolean isCustomDelivery() {
+        return isCustomDelivery;
+    }
 
     public int getCustomerId() {
         return customerId;

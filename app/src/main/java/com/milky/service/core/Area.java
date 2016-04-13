@@ -12,6 +12,24 @@ public class Area {
     private String cityArea;
     private String locality;
     private int dirty;
+    private String DateModified;
+    private int IsDeleted;
+
+    public String getDateModified() {
+        return DateModified;
+    }
+
+    public void setDateModified(String dateModified) {
+        DateModified = dateModified;
+    }
+
+    public int getIsDeleted() {
+        return IsDeleted;
+    }
+
+    public void setIsDeleted(int isDeleted) {
+        IsDeleted = isDeleted;
+    }
 
     ///Umesh Since we will always have public getters and setters for these fields of core classes we can just keep them public
     public int getDirty() {

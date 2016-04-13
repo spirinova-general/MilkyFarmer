@@ -4,18 +4,27 @@ package com.milky.service.core;
  * Created by Neha on 12/26/2015.
  */
 public class Account {
-    public String FarmerCode;
-    public String FirstName;
-    public String LastName;
-    public int Validated;
-    public String DateAdded;
-    public String DateModified;
-    public int Dirty;
-    public int TotalSms;
-    public int UsedSms;
-    public String EndDate;
-    public int ServerAccountId;
-    public String Mobile;
+    private String FarmerCode;
+    private String FirstName;
+    private String LastName;
+    private int Validated;
+    private String DateAdded;
+    private int Dirty;
+    private int TotalSms;
+    private int UsedSms;
+    private String EndDate;
+    private int ServerAccountId;
+    private String Mobile;
+    private int isDeleted;
+    private String DateModified;
+
+    public int getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(int isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 
     public String getMobile() {
         return Mobile;

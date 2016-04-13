@@ -190,6 +190,9 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setMobile(_mPhone.getText().toString());
                         holder.setDateAdded(formattedDate);
                         holder.setStartDate(pickedDate);
+                        holder.setIsDeleted(0);
+                        holder.setDirty(1);
+                        holder.setDateModified(Constants.getCurrentDate());
                         //Insert new Customer..
                         long id = new CustomersService().insert(holder);
 
@@ -202,6 +205,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                                 String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
                         setting.setCustomerId((int) id);
                         setting.setDirty(1);
+                        setting.setDateModified(Constants.getCurrentDate());
+                        setting.setIsDeleted(0);
                         setting.setIsCustomDelivery(false);
                         //Insert customers setting detail...
                         new CustomersSettingService().insert(setting);
@@ -221,6 +226,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                         bill.setStartDate(setting.getStartDate());
                         bill.setQuantity(setting.getGetDefaultQuantity());
                         bill.setDateAdded(formattedDate);
+                        bill.setDirty(1);
+                        bill.setIsDeleted(0);
 //                        Calendar cal = Calendar.getInstance();
 //                        if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
 //                            bill.setIsOutstanding(0);

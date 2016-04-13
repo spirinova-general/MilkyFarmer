@@ -9,6 +9,15 @@ public class Delivery {
     private String deliveryDate;
     private double quantity;
     private String dateModified;
+    private int isDeleted;
+
+    public int getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(int isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 
     public int getDirty() {
         return dirty;

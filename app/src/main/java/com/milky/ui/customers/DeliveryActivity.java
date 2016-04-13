@@ -58,7 +58,8 @@ public class DeliveryActivity extends AppCompatActivity {
     public static List<Delivery> _mDeliveryList = new ArrayList<>();
     public static List<VDelivery> selectedCustomersId;
     private DeliveryService deliveryService;
-    private String selectedDate="";
+    private String selectedDate = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,6 +170,9 @@ public class DeliveryActivity extends AppCompatActivity {
                     holder.setEndDate(selectedDate);
                     holder.setCustomerId(entry.getCustomerId());
                     holder.setIsCustomDelivery(true);
+                    holder.setDateModified(Constants.getCurrentDate());
+                    holder.setIsDeleted(0);
+                    holder.setDirty(1);
                     ICustomers customerService = new CustomersService();
                     customerService.insertOrUpdateCustomerSetting(holder);
                 }
@@ -183,6 +187,7 @@ public class DeliveryActivity extends AppCompatActivity {
     View searchView;
     AreaCitySpinnerAdapter adp1;
     boolean expended = false;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -237,7 +242,7 @@ public class DeliveryActivity extends AppCompatActivity {
                     _mCustomers.setAdapter(_mAdaapter);
                     _mAdaapter.notifyDataSetChanged();
                     if (s.length() == 0) {
-                        Constants.selectedAreaId =-1;
+                        Constants.selectedAreaId = -1;
                     }
 
                 }
@@ -302,6 +307,9 @@ public class DeliveryActivity extends AppCompatActivity {
                             holder.setEndDate(selectedDate);
                             holder.setCustomerId(selectedCustomersId.get(i).getCustomerId());
                             holder.setIsCustomDelivery(true);
+                            holder.setDateModified(Constants.getCurrentDate());
+                            holder.setIsDeleted(0);
+                            holder.setDirty(1);
                             ICustomers customerService = new CustomersService();
                             customerService.insertOrUpdateCustomerSetting(holder);
                         }
@@ -322,7 +330,7 @@ public class DeliveryActivity extends AppCompatActivity {
                 dialog.hide();
             }
         });
-            dialog.show();
+        dialog.show();
 
 
     }

@@ -22,7 +22,6 @@ public class AccountService implements IAccountService {
     public void insert(Account account) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.FarmerCode, account.getFarmerCode());
-        values.put(TableColumns.DateModified, account.getDateModified());
         values.put(TableColumns.DateAdded, account.getDateAdded());
         values.put(TableColumns.FirstName, account.getFirstName());
         values.put(TableColumns.LastName, account.getLastName());
@@ -32,6 +31,10 @@ public class AccountService implements IAccountService {
         values.put(TableColumns.UsedSms, account.getUsedSms());
         values.put(TableColumns.ServerAccountId, account.getServerAccountId());
         values.put(TableColumns.Validated, account.getValidated());
+        values.put(TableColumns.IsDeleted,account.getIsDeleted());
+        values.put(TableColumns.Dirty,account.getDirty());
+        values.put(TableColumns.DateModified, account.getDateModified());
+
         getDb().insert(TableNames.ACCOUNT, null, values);
     }
 
@@ -41,6 +44,9 @@ public class AccountService implements IAccountService {
         values.put(TableColumns.EndDate, account.getEndDate());
         values.put(TableColumns.TotalSms, account.getTotalSms());
         values.put(TableColumns.ServerAccountId, account.getServerAccountId());
+        values.put(TableColumns.IsDeleted,account.getIsDeleted());
+        values.put(TableColumns.Dirty,account.getDirty());
+        values.put(TableColumns.DateModified,account.getDateModified());
         getDb().update(TableNames.ACCOUNT, values, TableColumns.ServerAccountId + " ='" + account.getServerAccountId() + "'", null);
     }
 

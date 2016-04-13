@@ -21,6 +21,9 @@ public class AreaService implements IArea  {
         values.put(TableColumns.City, area.getCity());
         values.put(TableColumns.Name, area.getArea());
         values.put(TableColumns.Locality, area.getLocality());
+        values.put(TableColumns.IsDeleted,area.getIsDeleted());
+        values.put(TableColumns.Dirty,area.getDirty());
+        values.put(TableColumns.DateModified,area.getDateModified());
         return getDb().insert(TableNames.AREA, null, values);
     }
 

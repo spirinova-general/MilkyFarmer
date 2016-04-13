@@ -428,10 +428,10 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setDateModified(currentDate);
                     holder.setCustomerId(getActivity().getIntent().getIntExtra("cust_id", 0));
                     holder.setIsDeleted(0);
+                    holder.setDirty(1);
                     holder.setDeletedOn("null");
                     //Update data into custmers table
                     new CustomersService().update(holder);
-
 
                     CustomersSetting setting = new CustomersSetting();
                     setting.setCustomerId(holder.getCustomerId());
@@ -446,6 +446,8 @@ public class CustomerSettingFragment extends Fragment {
                             String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
 
                     setting.setDirty(1);
+                    setting.setDateModified(currentDate);
+                    setting.setIsDeleted(0);
                     ICustomers customerService = new CustomersService();
 
 

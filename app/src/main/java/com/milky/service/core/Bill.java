@@ -7,21 +7,30 @@ import com.milky.service.databaseutils.TableColumns;
 import java.math.BigDecimal;
 
 public class Bill {
-    public double paymentMade;
-    public int dirty;
-    public double totalAmount;
-    public String endDate;
-    public double adjustment;
-    public double balance;
-    public double tax;
-    public int isCleared;
-    public String dateModified;
-    public int customerId;
-    public String startDate;
-    public double quantity;
-    public String dateAdded;
-    public int isOutstanding;
-    public double rate;
+    private double paymentMade;
+    private int dirty;
+    private double totalAmount;
+    private String endDate;
+    private double adjustment;
+    private double balance;
+    private double tax;
+    private int isCleared;
+    private String dateModified;
+    private int customerId;
+    private String startDate;
+    private double quantity;
+    private String dateAdded;
+    private int isOutstanding;
+    private double rate;
+    private int isDeleted;
+
+    public int getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(int isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 
     public double getRate() {
         return rate;
