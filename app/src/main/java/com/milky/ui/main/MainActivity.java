@@ -479,12 +479,16 @@ _dbHelper.close();
         int id = item.getItemId();
         switch (id) {
             case R.id.sens_sms:
+
                 if (!_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
                     Toast.makeText(MainActivity.this, "Please add customer !", Toast.LENGTH_SHORT).show();
                 } else if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
-                    if (BillingFragment.payment != null && BillingFragment.payment.size() > 0) {
-                        if (accountService.getLeftSMS() > BillingFragment.payment.size())
-                            new SendBillSMS().execute();
+                    IBill billService = new BillService();
+                    final List<Bill> bills = billService.getAllGlobalBills(true);
+
+                    if (bills.size() > 0) {
+                        if (accountService.getLeftSMS() > bills.size())
+                            new SendBillSMS(bills).execute();
                         else
                             Toast.makeText(MainActivity.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
                     }
@@ -507,6 +511,12 @@ _dbHelper.close();
         int progress = 0;
         int messageCount = 0;
         String msg = "";
+        List<Bill> bills;
+
+        public SendBillSMS(List<Bill> bills)
+        {
+            this.bills = bills;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -519,19 +529,13 @@ _dbHelper.close();
 
         @Override
         protected String doInBackground(Void... params) {
-            final Calendar startDate = Calendar.getInstance();
-            final Calendar endDate = Calendar.getInstance();
-            final List<Bill> finalList = BillingFragment.payment;
-
-
             new Thread(new Runnable() {
                 public void run() {
-                    IBill billService = new BillService();
-                    final List<Bill> bills = billService.getAllGlobalBills(true);
 
                     messageCount = 0;
                     for(int i = 0; i< bills.size(); i++) {
                         Bill bill = bills.get(i);
+                        IBill billService = new BillService();
                         billService.SmsBill(bill.getId());
                         messageCount = i + 1;
 
