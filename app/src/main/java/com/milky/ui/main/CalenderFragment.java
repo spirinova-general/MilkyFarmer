@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.Utils;
-import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.ui.customers.DeliveryActivity;
 import com.milky.utils.AppUtil;
@@ -38,6 +37,8 @@ public class CalenderFragment extends Fragment {
     private DatabaseHelper _dbHelper;
     private View viewLayout, view = null;
     private com.milky.service.databaseutils.serviceclasses.DeliveryService deliveryService;
+    private BroadcastCalendar receiver;
+    private IntentFilter intentFilter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,7 +78,6 @@ public class CalenderFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().registerReceiver(receiver, intentFilter);
-
         if (Constants.REFRESH_CALANDER) {
             Calendar cal = Calendar.getInstance();
             DeliveryService service = new DeliveryService();
@@ -92,15 +92,11 @@ public class CalenderFragment extends Fragment {
     }
 
 
-
     @Override
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(receiver);
     }
-
-    BroadcastCalendar receiver;
-    IntentFilter intentFilter;
 
     private void initResources(View view) {
         viewLayout = view;
@@ -141,20 +137,20 @@ public class CalenderFragment extends Fragment {
          /*
         * Check if user is newly registered...
         * */
-            if(_prefrences.contains(UserPrefrences.NEW_USER))
-                    _mCalenderView.setRegistrationDate(_prefrences.getInt(UserPrefrences.NEW_USER,0));
-            else
+        if (_prefrences.contains(UserPrefrences.NEW_USER))
+            _mCalenderView.setRegistrationDate(_prefrences.getInt(UserPrefrences.NEW_USER, 0));
+        else
 
-            {
-                Calendar cl = Calendar.getInstance();
-                _editor.putInt(UserPrefrences.NEW_USER, cl.get(Calendar.DAY_OF_MONTH));
-                _editor.commit();
-                _mCalenderView.setRegistrationDate(cl.get(Calendar.DAY_OF_MONTH));
-                _mCalenderView.setRegistrationYear(cl.get(Calendar.YEAR));
-                _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
-            }
-
-            _dbHelper.close();
-
+        {
+            Calendar cl = Calendar.getInstance();
+            _editor.putInt(UserPrefrences.NEW_USER, cl.get(Calendar.DAY_OF_MONTH));
+            _editor.commit();
+            _mCalenderView.setRegistrationDate(cl.get(Calendar.DAY_OF_MONTH));
+            _mCalenderView.setRegistrationYear(cl.get(Calendar.YEAR));
+            _mCalenderView.setRegistrationMonth(cl.get(Calendar.MONTH));
         }
+
+        _dbHelper.close();
+
     }
+}

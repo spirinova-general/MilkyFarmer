@@ -222,7 +222,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
         }
         Intent intnet = new Intent("com.android.USER_ACTION");
         intnet.putExtra("month",cal.get(Calendar.MONTH));
-        intnet.putExtra("year",cal.get(Calendar.YEAR))     ;
+        intnet.putExtra("year",cal.get(Calendar.YEAR));
 
         context.sendBroadcast(intnet);
         rebuildCalendar();
@@ -237,8 +237,7 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
         }
         Intent intnet = new Intent("com.android.USER_ACTION");
         intnet.putExtra("month",cal.get(Calendar.MONTH));
-        intnet.putExtra("year",cal.get(Calendar.YEAR))     ;
-
+        intnet.putExtra("year",cal.get(Calendar.YEAR));
         context.sendBroadcast(intnet);
         rebuildCalendar();
     }
@@ -246,7 +245,6 @@ public class ExtendedCalendarView extends RelativeLayout implements OnItemClickL
     private void rebuildCalendar() {
         if (month != null) {
             month.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " " + cal.get(Calendar.YEAR));
-//            calculateDeliveryTotal(cal.getActualMaximum(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
             refreshCalendar();
         }
     }

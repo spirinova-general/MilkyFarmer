@@ -210,7 +210,13 @@ public class CustomerSettingFragment extends Fragment {
 
         ICustomers customersService = new CustomersService();
         Customers customer = customersService.getCustomerDetail(custId, true);
-
+        for(CustomersSetting customersSetting : customer.customerSettings)
+        {
+            if(customersSetting.getCustomerId()==custId)
+            {
+                settingData = customersSetting;
+            }
+        }
 
         try {
             Calendar cal = Calendar.getInstance();
@@ -240,7 +246,6 @@ public class CustomerSettingFragment extends Fragment {
         _mFirstName.setText(getActivity().getIntent().getStringExtra("fname"));
         _mLastName.setText(getActivity().getIntent().getStringExtra("lname"));
         _mBalance.setText(String.valueOf(getActivity().getIntent().getDoubleExtra("balance", 0)));
-//        _mAddress2.setText(getActivity().getIntent().getStringExtra("address2"));
         _mAddress1.setText(getActivity().getIntent().getStringExtra("address1"));
         _mRate.setText(String.valueOf(settingData.getDefaultRate()));
         Area area = new AreaService().getAreaById(getActivity().getIntent().getIntExtra("areaId", 0));

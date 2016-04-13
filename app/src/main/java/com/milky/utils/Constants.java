@@ -9,6 +9,7 @@ import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.tyczj.extendedcalendarview.Day;
+import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import org.json.JSONObject;
 
@@ -40,6 +41,7 @@ public class Constants {
     public static JSONObject API_RESPONCE = null;
     public static Boolean TIME_OUT = false;
     static Calendar cal = Calendar.getInstance();
+
 
     public static String getCurrentDate() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");

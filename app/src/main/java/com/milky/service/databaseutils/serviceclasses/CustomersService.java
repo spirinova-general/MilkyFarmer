@@ -229,11 +229,12 @@ public class CustomersService implements ICustomers {
 
         CustomersSetting toReturn = null;
         for (CustomersSetting setting : customer.customerSettings) {
+
             Date endDate = Utils.FromDateString(setting.getEndDate());
             Date startDate = Utils.FromDateString(setting.getStartDate());
 
 //            if (setting.getIsCustomDelivery()) {
-                if (endDate.equals(date) && startDate.equals(date))
+//                if (endDate.equals(date) && startDate.equals(date))
                     if (!ignoreCustomDelivery && setting.getIsCustomDelivery()) {
                         if (Utils.EqualsDate(date, endDate) && Utils.EqualsDate(startDate, date))
                             return setting;
@@ -314,14 +315,14 @@ public class CustomersService implements ICustomers {
         String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
                 + " INNER JOIN " + TableNames.CustomerSetting + " ON "
                 + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.IsDeleted + " ='0'" + " OR (" + TableColumns.IsDeleted +  "='1' AND "
+                + " WHERE " + TableNames.CUSTOMER + "." + TableColumns.IsDeleted  + " ='0'" + " OR (" + TableNames.CUSTOMER + "." + TableColumns.IsDeleted +  "='1' AND "
                 + TableColumns.DeletedOn + " >='" + startDate + "')";
 
         if (areaId != null)
             selectQuery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
 
         Cursor cursor = getDb().rawQuery(selectQuery, null);
-        HashMap<Integer, Customers> customersMap = new HashMap<Integer, Customers>();
+        HashMap<Integer, Customers> customersMap = new HashMap<>();
 
         if (cursor.moveToFirst()) {
             do {
@@ -332,11 +333,10 @@ public class CustomersService implements ICustomers {
                     customers.PopulateFromCursor(cursor);
                     customers.setCustomerId(customerId);
                     customersMap.put(customerId, customers);
-                    customers.customerSettings = new ArrayList<CustomersSetting>();
+                    customers.customerSettings = new ArrayList<>();
                 } else {
                     customers = customersMap.get(customerId);
                 }
-
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
                 customers.customerSettings.add(holder);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
+import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import java.util.Calendar;
@@ -16,7 +17,6 @@ public class BroadcastCalendar extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         DeliveryService service = new DeliveryService();
-        ExtendedCalendarView _mCalenderView = new ExtendedCalendarView(context);
-        _mCalenderView.updateQuantityList(service.getMonthlyDeliveryOfAllCustomers(intent.getIntExtra("month", 0), intent.getIntExtra("year", 0)));
+        new ExtendedCalendarView(context).updateQuantityList(service.getMonthlyDeliveryOfAllCustomers(intent.getIntExtra("month", 0), intent.getIntExtra("year", 0)));
     }
 }

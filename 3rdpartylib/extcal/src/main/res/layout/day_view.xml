@@ -48,6 +48,6 @@
     </RelativeLayout>
     <TextView android:id="@+id/milk_quantity" android:layout_width="fill_parent"
         android:layout_height="@dimen/text_height_width"
-        android:layout_below="@+id/layout" android:gravity="center" android:text="10L"
+        android:layout_below="@+id/layout" android:gravity="center" android:text="0.0L"
         android:textColor="#008329" android:textSize="10sp" />
 </RelativeLayout>
