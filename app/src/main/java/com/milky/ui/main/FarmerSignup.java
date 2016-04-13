@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.core.GlobalSettings;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.IAccountService;
@@ -202,7 +203,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
                     if (!_mobile.getText().toString().equals("") && _mobile.getText().length() == 10) {
                         _mobileLayout.setError(null);
-                        Constants.SendSmsTouser(_mobile.getText().toString(), mesg,FarmerSignup.this);
+                        new Utils().SendSms(_mobile.getText().toString(), mesg,FarmerSignup.this);
                     } else
                         _mobileLayout.setError("Enter mobile number !");
                 } else

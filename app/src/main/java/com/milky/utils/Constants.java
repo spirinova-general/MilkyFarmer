@@ -60,12 +60,12 @@ public class Constants {
         }
         return result;
     }
-//Send SMS to Customer
-public static void SendSmsTouser(String mob, final String sms, final OnTaskCompleteListner activity) {
-    String append = "?mobile=" + mob + "&message=" + sms;
-    HttpAsycTask dataTask = new HttpAsycTask();
-    dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, activity, false, null);
-}
+////Send SMS to Customer
+//public static void SendSmsTouser(String mob, final String sms, final OnTaskCompleteListner activity) {
+//    String append = "?mobile=" + mob + "&message=" + sms;
+//    HttpAsycTask dataTask = new HttpAsycTask();
+//    dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, activity, false, null);
+//}
 
 //    public static double getQtyOfCustomer(String day, String custId) {
 //        double qty = 0;

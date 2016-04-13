@@ -246,7 +246,7 @@ public class CustomersService implements ICustomers {
             //did not find any setting, might happen for deleted customer
             return toReturn;
         }
-    
+
 
     public QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception {
         //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up

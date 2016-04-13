@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.milky.R;
 import com.milky.service.core.Customers;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
@@ -264,8 +265,8 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(customers.getMobile(), mesg);
-
+//                        SendSmsTouser(customers.getMobile(), mesg);
+                        new Utils().SendSms(customers.getMobile(), mesg,BillingEdit.this);
 
                         finalI = i + 1;
                         progressHandler.post(new Runnable() {
@@ -356,13 +357,13 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
     String url = "";
 
-    private void SendSmsTouser(String mob, final String sms) {
-
-        String append = "?mobile=" + mob + "&message=" + sms;
-        HttpAsycTask dataTask = new HttpAsycTask();
-        url = ServerApis.SMS_API_ROOT + append;
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
-    }
+//    private void SendSmsTouser(String mob, final String sms) {
+//
+//        String append = "?mobile=" + mob + "&message=" + sms;
+//        HttpAsycTask dataTask = new HttpAsycTask();
+//        url = ServerApis.SMS_API_ROOT + append;
+//        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
+//    }
 
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> listType) {

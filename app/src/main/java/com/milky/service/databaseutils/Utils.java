@@ -1,5 +1,9 @@
 package com.milky.service.databaseutils;
 
+import com.milky.service.serverapi.HttpAsycTask;
+import com.milky.service.serverapi.OnTaskCompleteListner;
+import com.milky.service.serverapi.ServerApis;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -92,5 +96,11 @@ public class Utils {
             return false;
         else
             return true;
+    }
+    //Send SMS to Customer
+    public void SendSms(String mob, final String sms, final OnTaskCompleteListner activity) {
+        String append = "?mobile=" + mob + "&message=" + sms;
+        HttpAsycTask dataTask = new HttpAsycTask();
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, activity, false, null);
     }
 }

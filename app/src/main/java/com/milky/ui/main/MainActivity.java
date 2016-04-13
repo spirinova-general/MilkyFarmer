@@ -38,6 +38,7 @@ import com.milky.R;
 import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
@@ -329,11 +330,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 expiryDialog();
             }
         }
+
         /**
          * Lets inflate the very first fragment
          * Here , we are inflating the TabFragment as the first Fragment
          */
-
         FragmentManager mFragmentManager = getSupportFragmentManager();
         FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.containerView, new MainTabFragment()).commit();
@@ -546,7 +547,7 @@ _dbHelper.close();
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        SendSmsTouser(customers.getMobile(), mesg);
+                        new Utils().SendSms(customers.getMobile(), mesg, MainActivity.this);
 
                         finalI = i + 1;
                         progressHandler.post(new Runnable() {
@@ -595,13 +596,13 @@ _dbHelper.close();
         }
     }
 
-    //Sens SMS to customers
-    private void SendSmsTouser(String mob, final String sms) {
-
-        String append = "?mobile=" + mob + "&message=" + sms;
-        HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
-    }
+//    //Sens SMS to customers
+//    private void SendSmsTouser(String mob, final String sms) {
+//
+//        String append = "?mobile=" + mob + "&message=" + sms;
+//        HttpAsycTask dataTask = new HttpAsycTask();
+//        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
+//    }
 
     private TextView messageSent;
     private ProgressBar androidProgressBar;
