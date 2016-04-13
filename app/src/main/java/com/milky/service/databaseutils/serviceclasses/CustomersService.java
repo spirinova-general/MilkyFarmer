@@ -67,6 +67,12 @@ public class CustomersService implements ICustomers {
 
     }
 
+    private boolean isQuantityOrRateDifferent(CustomersSetting setting1, CustomersSetting setting2){
+       boolean same =  (setting1.getGetDefaultQuantity() == setting2.getGetDefaultQuantity()) &&
+                    (setting1.getDefaultRate() == setting2.getDefaultRate());
+        return !same;
+    }
+
     @Override
     public void insertOrUpdateCustomerSetting(CustomersSetting setting) {
         try {
@@ -78,20 +84,47 @@ public class CustomersService implements ICustomers {
             cal.set(Calendar.MILLISECOND, 0);
             cal.set(Calendar.HOUR_OF_DAY, 0);
             Date today = cal.getTime();
-            CustomersSetting existingSetting = getCustomerSetting(customer, today, false);
-            boolean toInsert = (existingSetting.getGetDefaultQuantity() != setting.getGetDefaultQuantity()) ||
-                    (existingSetting.getDefaultRate() != setting.getDefaultRate());
+            CustomersSetting existingSetting = getCustomerSetting(customer, today, false, false);
+            CustomersSetting existingSettingWithoutCustomDelivery = getCustomerSetting(customer, today, false, true);
 
-            if (toInsert) {
-                existingSetting.setEndDate(Utils.ToDateString(today));
+            boolean isCustomDeliveryPresent = ((existingSetting != null) && existingSetting.getIsCustomDelivery());
+            boolean isSettingWithoutCustomDeliveryPresent = (existingSettingWithoutCustomDelivery != null);
+
+            if( setting.getIsCustomDelivery() && isCustomDeliveryPresent) {
+                boolean toUpdate = isQuantityOrRateDifferent(existingSetting, setting);
+                if( !toUpdate )
+                    return;
+
+                existingSetting.setGetDefaultQuantity(setting.getGetDefaultQuantity());
                 _customerSettingsService.update(existingSetting);
+            }
+            else if(setting.getIsCustomDelivery() && isSettingWithoutCustomDeliveryPresent){
+                boolean toInsert = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
+
+                if( !toInsert)
+                    return;
+
+                setting.setStartDate(setting.getStartDate());
+                setting.setEndDate(setting.getEndDate());
+                setting.setIsCustomDelivery(true);
+                _customerSettingsService.insert(setting);
+            }
+            else if( !setting.getIsCustomDelivery() ) {
+                boolean toInsert = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
+                if( !toInsert) {
+                    return;
+                }
+                //Delete existing custom setting
+                if(isCustomDeliveryPresent) {
+                    _customerSettingsService.delete(existingSetting);
+                }
+                existingSettingWithoutCustomDelivery.setEndDate(Utils.ToDateString(today));
+                _customerSettingsService.update(existingSettingWithoutCustomDelivery);
 
                 setting.setStartDate(Utils.ToDateString(today));
                 setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
-                setting.setIsCustomDelivery(false);
+                //setting.setIsCustomDelivery(false);
                 _customerSettingsService.insert(setting);
-            } else {
-                _customerSettingsService.update(setting);
             }
         } catch (Exception ex) {
             //TBD
@@ -183,7 +216,7 @@ public class CustomersService implements ICustomers {
 
     //This does not hit the database gets a complete customersetting for a particular date
     @Override
-    public CustomersSetting getCustomerSetting(Customers customer, Date date, boolean populateSettings) throws Exception {
+    public CustomersSetting getCustomerSetting(Customers customer, Date date, boolean populateSettings, boolean ignoreCustomDelivery) throws Exception {
         if (populateSettings)
             customer = getCustomerDetail(customer.getCustomerId(), true);
 
@@ -191,21 +224,27 @@ public class CustomersService implements ICustomers {
         if (!populateSettings && customer.customerSettings == null)
             throw new Exception("Customer setting is not populated");
 
+        CustomersSetting toReturn = null;
         for (CustomersSetting setting : customer.customerSettings) {
             Date endDate = Utils.FromDateString(setting.getEndDate());
             Date startDate = Utils.FromDateString(setting.getStartDate());
 
+<<<<<<< HEAD
             if (setting.getIsCustomDelivery()) {
                 if (endDate.equals(date) && startDate.equals(date))
+=======
+            if (!ignoreCustomDelivery && setting.getIsCustomDelivery()) {
+                if (Utils.EqualsDate(date, endDate) && Utils.EqualsDate(startDate, date))
+>>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
                     return setting;
             } else {
-                if ((startDate.before(date) || startDate.equals(date)) && endDate.after(date))
-                    return setting;
+                if ((Utils.BeforeOrEqualsDate(startDate, date)) && Utils.AfterDate(endDate,date))
+                    toReturn = setting;
             }
         }
 
         //did not find any setting, might happen for deleted customer
-        return null;
+        return toReturn;
     }
 
     public QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception {
@@ -217,17 +256,30 @@ public class CustomersService implements ICustomers {
         Calendar end = Calendar.getInstance();
         end.setTime(endDate);
 
+<<<<<<< HEAD
         double totalQuantity = 0, totalAmount = 0, rate = 0;
         for (Date date = start.getTime(); start.before(end) || start.equals(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
             CustomersSetting setting = getCustomerSetting(customer, date, false);
             if (setting != null) {
+=======
+        double totalQuantity = 0, totalAmount = 0;
+        Date date = start.getTime();
+        for ( ;Utils.BeforeOrEqualsDate(date, endDate); start.add(Calendar.DATE, 1), date = start.getTime())
+        {
+            CustomersSetting setting = getCustomerSetting(customer, date, false, false);
+            if( setting != null) {
+>>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
                 totalQuantity += setting.getGetDefaultQuantity();
-                rate = setting.getDefaultRate();
+                double rate = setting.getDefaultRate();
+                totalAmount += rate * totalQuantity;
             }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
         }
-        totalAmount += rate * totalQuantity;
+
         QuantityAmount qa = new QuantityAmount();
         qa.amount = totalAmount;
         qa.quantity = totalQuantity;
@@ -240,16 +292,16 @@ public class CustomersService implements ICustomers {
             return getCustomerDetail(id);
 
         String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
-                + " INNER JOIN " + TableNames.CustomerSetting + " ON "
+               + " INNER JOIN " + TableNames.CustomerSetting + " ON "
                 + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.CustomerId + " ='" + id + "'";
+                + " WHERE " + TableColumns.CustomerId + " ='" + id  + "'";
 
         Cursor cursor = getDb().rawQuery(selectQuery, null);
         Customers customers = new Customers();
 
         if (cursor.moveToFirst()) {
             customers.PopulateFromCursor(cursor);
-            customers.customerSettings = new ArrayList<>();
+            customers.customerSettings = new ArrayList<CustomersSetting>();
             do {
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
@@ -262,45 +314,48 @@ public class CustomersService implements ICustomers {
     }
 
 
+
     private List<Customers> searchCustomers(Integer areaId, Date startDateObj, Date endDateObj) {
 
         String startDate = Utils.ToDateString(startDateObj);
         String endDate = Utils.ToDateString(endDateObj);
-        List<Customers> customersData = new ArrayList<>();
+
         String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
                 + " INNER JOIN " + TableNames.CustomerSetting + " ON "
                 + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.IsDeleted + " ='0'" + " OR (" + TableColumns.IsDeleted + "='1' AND "
+                + " WHERE " + TableColumns.IsDeleted + " ='0'" + " OR (" + TableColumns.IsDeleted +  "='1' AND "
                 + TableColumns.DeletedOn + " >='" + startDate + "')";
 
         if (areaId != null)
             selectQuery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
 
         Cursor cursor = getDb().rawQuery(selectQuery, null);
-        HashMap<Integer, Customers> customersMap = new HashMap<>();
+        HashMap<Integer, Customers> customersMap = new HashMap<Integer, Customers>();
 
         if (cursor.moveToFirst()) {
             do {
-                Integer customerId = cursor.getInt(cursor.getColumnIndex(TableColumns.ID));
+                Integer customerId = cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId));
                 Customers customers = null;
                 if (!customersMap.containsKey(customerId)) {
                     customers = new Customers();
                     customers.PopulateFromCursor(cursor);
                     customersMap.put(customerId, customers);
+                    customers.customerSettings = new ArrayList<CustomersSetting>();
                 } else {
                     customers = customersMap.get(customerId);
                 }
 
-                customers.customerSettings = new ArrayList<>();
-
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
                 customers.customerSettings.add(holder);
+<<<<<<< HEAD
                 customersData = new ArrayList<>(customersMap.values());
+=======
+>>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
             }
             while (cursor.moveToNext());
         }
         cursor.close();
-        return customersData;
+        return  new ArrayList<Customers>(customersMap.values());
     }
 }

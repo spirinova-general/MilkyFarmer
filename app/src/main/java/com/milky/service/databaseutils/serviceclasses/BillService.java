@@ -164,7 +164,7 @@ public class BillService implements IBill {
                 bill = new Bill();
             }
                 QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
-//            bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
+            bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
                 bill.setEndDate(Utils.ToDateString(today));
                 bill.setQuantity(qa.quantity);
                 bill.setTotalAmount(qa.amount);
@@ -481,12 +481,12 @@ public class BillService implements IBill {
         values.put(TableColumns.RollDate, new GlobalSettingsService().getRollDate());
         long i = getDb().update(TableNames.Bill, values, TableColumns.StartDate + " <='" + Constants.getCurrentDate() + "' AND " +
                 TableColumns.IsOutstanding + " ='1'", null);
-    }*/
+    }
     public static void updateOutstandingBills(SQLiteDatabase db, String date) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.IsOutstanding, 1);
         values.put(TableColumns.EndDate, date);
         long i = db.update(TableNames.Bill, values, TableColumns.StartDate + " <='" + date + "'", null);
 
-    }
+    }*/
 }

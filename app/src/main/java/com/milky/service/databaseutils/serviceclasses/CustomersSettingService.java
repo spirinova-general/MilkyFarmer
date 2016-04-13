@@ -58,8 +58,8 @@ public class CustomersSettingService implements ICustomersSettings {
     }
 
     @Override
-    public void delete(CustomersSetting customers) {
-
+    public void delete(CustomersSetting setting) {
+        getDb().delete(TableNames.CustomerSetting, TableColumns.ID + " ='" + setting.getId() + "'", null);
     }
 
     public void updateEndDateForRoll(String enddate, int customerId) {

@@ -24,7 +24,7 @@ public interface ICustomers {
 
     void insertOrUpdateCustomerSetting(CustomersSetting setting);
     List<Customers> getCustomersWithinDeliveryRange(Integer areaId, Date startDateObj, Date endDateObj);
-    CustomersSetting getCustomerSetting(Customers customer, Date date, boolean populateSettings) throws Exception;
+    CustomersSetting getCustomerSetting(Customers customer, Date date, boolean populateSettings, boolean ignoreCustomDelivery) throws Exception;
     QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception;
     Customers getCustomerDetail(int id, boolean populateSettings);
 }

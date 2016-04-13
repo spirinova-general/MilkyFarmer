@@ -41,6 +41,51 @@ public class Utils {
         return FromDateString("2250-12-1");
     }
 
+
+    public static boolean BeforeDate(Date date1, Date date2)
+    {
+        date1 = GetDateWithoutTime(date1);
+        date2 = GetDateWithoutTime(date2);
+
+        return date1.before(date2);
+    }
+
+    public static boolean BeforeOrEqualsDate(Date date1, Date date2){
+        date1 = GetDateWithoutTime(date1);
+        date2 = GetDateWithoutTime(date2);
+
+        return date1.before(date2) || date1.equals(date2);
+
+    }
+
+    public static Date GetDateWithoutTime(Date d)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(d);
+
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return cal.getTime();
+    }
+
+    public static boolean AfterDate(Date date1, Date date2)
+    {
+        date1 = GetDateWithoutTime(date1);
+        date2 = GetDateWithoutTime(date2);
+
+        return date1.after(date2);
+    }
+
+    public static boolean EqualsDate(Date date1, Date date2){
+        date1 = GetDateWithoutTime(date1);
+        date2 = GetDateWithoutTime(date2);
+
+        return date1.equals(date2);
+    }
+
     public static boolean GetBoolean(int i)
     {
         if( i == 0)

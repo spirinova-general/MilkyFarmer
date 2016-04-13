@@ -6,7 +6,10 @@ import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 
-public class CustomersSetting extends CustomersSettingService {
+
+//Why was is derived from CustomerSettingServic!!!!
+public class CustomersSetting  {
+    private int id;
     private int customerId;
     private double defaultRate;
     private double getDefaultQuantity;
@@ -21,6 +24,14 @@ public class CustomersSetting extends CustomersSettingService {
 
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public double getDefaultRate() {
@@ -79,6 +90,7 @@ public class CustomersSetting extends CustomersSettingService {
         this.setGetDefaultQuantity(cursor.getDouble(cursor.getColumnIndex(TableColumns.DefaultQuantity)));
         this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
         this.setIsCustomDelivery(Utils.GetBoolean(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery))));
+        this.setId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
     }
 
 }

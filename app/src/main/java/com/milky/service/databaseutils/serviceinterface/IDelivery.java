@@ -10,7 +10,6 @@ public interface IDelivery {
 
      void update(Delivery delivery);
 
-     void insertOrUpdate(Delivery delivery) throws Exception;
 
      List<Double> getMonthlyDeliveryOfAllCustomers(int month, int year);
      List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year);

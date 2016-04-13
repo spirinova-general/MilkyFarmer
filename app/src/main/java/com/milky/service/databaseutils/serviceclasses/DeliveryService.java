@@ -54,7 +54,7 @@ public class DeliveryService implements IDelivery {
     }
 
 
-    @Override
+   /* @Override
     public void insertOrUpdate(Delivery delivery) {
         String deliveryDate = delivery.getDeliveryDate();
         String whereClause = TableColumns.StartDate + " ='" + deliveryDate + "'"
@@ -96,7 +96,7 @@ public class DeliveryService implements IDelivery {
             _customerSettingService.insert(newSetting);
         }
 
-    }
+    }*/
 
     //Umesh doing it in memory for less database hits, remove maxday, startdate its not needed
     @Override
@@ -125,7 +125,7 @@ public class DeliveryService implements IDelivery {
                 double totalQuantity = 0;
                 CustomersSetting fetchedSettings = null;
                 for (Customers customer : customers) {
-                    CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false);
+                    CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false, false);
                     if (setting != null) {
                         //If the date already fecthed and from same settings
                         if (fetchedSettings != null && fetchedSettings.getCustomerId()==setting.getCustomerId() && fetchedSettings.getStartDate().equals(setting.getStartDate())) {
@@ -160,8 +160,9 @@ public class DeliveryService implements IDelivery {
             Customers customer = _customerService.getCustomerDetail(customerId, true);
             for (int i = firstDayOfTheMonth; i <= lastDayOfTheMonth; i++) {
                 Date date = new Date(year, month, i);
-                CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false);
-                result.add(setting.getGetDefaultQuantity());
+                CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false, false);
+                double quantity =  setting == null? 0: setting.getGetDefaultQuantity();
+                result.add(quantity);
             }
 
             return result;
@@ -188,13 +189,15 @@ public class DeliveryService implements IDelivery {
             List<VDelivery> result = new ArrayList<>();
             for (Customers customer : customers) {
                 VDelivery holder = new VDelivery();
-                CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false);
-                holder.setCustomerId(customer.getCustomerId());
-                holder.setQuantity(setting.getGetDefaultQuantity());
-                holder.setAreaId(customer.getAreaId());
-                holder.setFirstname(customer.getFirstName());
-                holder.setLastname(customer.getLastName());
-                result.add(holder);
+                CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false, false);
+                if( setting != null) {
+                    holder.setCustomerId(customer.getCustomerId());
+                    holder.setQuantity(setting.getGetDefaultQuantity());
+                    holder.setAreaId(customer.getAreaId());
+                    holder.setFirstname(customer.getFirstName());
+                    holder.setLastname(customer.getLastName());
+                    result.add(holder);
+                }
             }
             return result;
         } catch (Exception ex) {
