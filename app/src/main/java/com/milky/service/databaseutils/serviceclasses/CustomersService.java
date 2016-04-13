@@ -232,22 +232,20 @@ public class CustomersService implements ICustomers {
             Date endDate = Utils.FromDateString(setting.getEndDate());
             Date startDate = Utils.FromDateString(setting.getStartDate());
 
-<<<<<<< HEAD
             if (setting.getIsCustomDelivery()) {
                 if (endDate.equals(date) && startDate.equals(date))
-=======
-            if (!ignoreCustomDelivery && setting.getIsCustomDelivery()) {
-                if (Utils.EqualsDate(date, endDate) && Utils.EqualsDate(startDate, date))
->>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
-                    return setting;
-            } else {
-                if ((Utils.BeforeOrEqualsDate(startDate, date)) && Utils.AfterDate(endDate,date))
-                    toReturn = setting;
+                    if (!ignoreCustomDelivery && setting.getIsCustomDelivery()) {
+                        if (Utils.EqualsDate(date, endDate) && Utils.EqualsDate(startDate, date))
+                            return setting;
+                    } else {
+                        if ((Utils.BeforeOrEqualsDate(startDate, date)) && Utils.AfterDate(endDate, date))
+                            toReturn = setting;
+                    }
             }
-        }
 
-        //did not find any setting, might happen for deleted customer
-        return toReturn;
+            //did not find any setting, might happen for deleted customer
+            return toReturn;
+        }
     }
 
     public QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception {
