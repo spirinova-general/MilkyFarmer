@@ -113,6 +113,8 @@ public class CustomersSetting  {
         this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
         this.setIsCustomDelivery(Utils.GetBoolean(cursor.getInt(cursor.getColumnIndex(TableColumns.IsCustomDelivery))));
         this.setId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
+        this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+        this.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
     }
 
 }

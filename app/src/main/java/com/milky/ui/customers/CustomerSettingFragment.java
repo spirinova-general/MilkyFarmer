@@ -71,7 +71,7 @@ public class CustomerSettingFragment extends Fragment {
     private TextView pick_date;
     private int custId = -1;
     private boolean updatedQty = false, updateRate = false;
-    private CustomersSetting settingData;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -210,19 +210,20 @@ public class CustomerSettingFragment extends Fragment {
 
         ICustomers customersService = new CustomersService();
         Customers customer = customersService.getCustomerDetail(custId, true);
+        /*CustomersSetting settingData = customersService.getCustomerSetting(customer, today, false, true);
         for(CustomersSetting customersSetting : customer.customerSettings)
         {
             if(customersSetting.getCustomerId()==custId)
             {
                 settingData = customersSetting;
             }
-        }
-
+        }*/
+        CustomersSetting settingData = null;
         try {
             Calendar cal = Calendar.getInstance();
-            //Date today = null;
-            //today = cal.getTime();
-            //settingData = customersService.getCustomerSetting(customer, today, false, true);
+            Date today = null;
+            today = cal.getTime();
+            settingData = customersService.getCustomerSetting(customer, today, false, true);
             Date startDate = Utils.FromDateString(customer.getStartDate());
             cal.setTime(startDate);
             pick_date.setText(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[cal.get(Calendar.MONTH)] + "-"

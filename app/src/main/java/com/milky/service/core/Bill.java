@@ -169,5 +169,6 @@ public class Bill {
         this.setIsOutstanding(cursor.getInt(cursor.getColumnIndex(TableColumns.IsOutstanding)));
         this.setRate(cursor.getInt(cursor.getColumnIndex(TableColumns.Rate)));
         this.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
+        this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
     }
 }
