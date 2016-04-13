@@ -13,8 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.core.Delivery;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
@@ -27,6 +29,7 @@ import com.milky.R;
 
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -74,18 +77,32 @@ public class CustomrDeliveryFragment extends Fragment {
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
             @Override
             public void onDayClicked(AdapterView<?> adapterView, View view, final int i, long l, final Day day) {
-                selected_date = day.getYear() + "-" + String.format("%02d", day.getMonth() + 1) + "-" +
-                        String.format("%02d", day.getDay());
+                //ICustomers customersService = new CustomersService();
+                //Customers customer  = customersService.getCustomerDetail(custId, true);
 
-                CustomersSetting settingData = new CustomersSettingService().getByCustId(custId, Constants.getCurrentDate());
-                Calendar deliveryDate = Calendar.getInstance();
+                //CustomersSetting settingData = customersService.getCustomerSetting(customer, today, false, true);
+                /*Calendar deliveryDate = Calendar.getInstance();
                 try {
                     deliveryDate.setTime(Constants.work_format.parse(settingData.getStartDate()));
                 } catch (ParseException e) {
                     e.printStackTrace();
+                }*/
+
+                Calendar cal = Calendar.getInstance();
+                Date today = cal.getTime();
+
+                boolean pastDateClicked = true;
+                try{
+                    selected_date = Utils.ToDateString(day.getDay(), day.getMonth() + 1, day.getYear());
+                    Date clickedDate = Utils.FromDateString(selected_date);
+                    pastDateClicked = Utils.BeforeOrEqualsDate(clickedDate, today);
                 }
-                if ((new CustomersSettingService().isHasDataForCustoner(selected_date, custId))
-                        && day.getDay() <= Calendar.getInstance().get(Calendar.DAY_OF_MONTH) && Calendar.getInstance().get(Calendar.MONTH) == day.getMonth() && Calendar.getInstance().get(Calendar.YEAR) == day.getYear()) {
+                catch(Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                if (pastDateClicked)
+                {
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
                     dialog = alertBuilder.create();
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

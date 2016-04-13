@@ -541,7 +541,7 @@ _dbHelper.close();
                                     + String.format("%02d", startDate.get(Calendar.DAY_OF_MONTH)) + " to " +
                                     Constants.MONTHS[endDate.get(Calendar.MONTH)] + " " + String.format("%02d", endDate.get(Calendar.DAY_OF_MONTH))
                                     + " is Rs. " + finalList.get(i).getTotalAmount()
-                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. Rate is " + new CustomersSettingService().getByCustId(finalList.get(i).getCustomerId(), Constants.getCurrentDate()).getDefaultRate() + "/litre.", "UTF-8");
+                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. ", "UTF-8");
 
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();

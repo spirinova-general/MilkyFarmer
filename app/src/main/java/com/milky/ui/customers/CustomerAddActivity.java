@@ -189,6 +189,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setAreaId(selectedAreaId);
                         holder.setMobile(_mPhone.getText().toString());
                         holder.setDateAdded(formattedDate);
+                        holder.setStartDate(pickedDate);
                         //Insert new Customer..
                         long id = new CustomersService().insert(holder);
 

@@ -53,51 +53,6 @@ public class DeliveryService implements IDelivery {
                 " AND " + TableColumns.DeliveryDate + " ='" + delivery.getDeliveryDate() + "'", null);
     }
 
-
-   /* @Override
-    public void insertOrUpdate(Delivery delivery) {
-        String deliveryDate = delivery.getDeliveryDate();
-        String whereClause = TableColumns.StartDate + " ='" + deliveryDate + "'"
-                + " AND " + TableColumns.EndDate + " ='" + deliveryDate + "'"
-                + " AND " + TableColumns.IsCustomDelivery + " ='1'";
-
-        String selectQuery = "SELECT * FROM " + TableNames.CustomerSetting + " WHERE " + whereClause;
-
-        Cursor cursor = getDb().rawQuery(selectQuery, null);
-        Boolean result = cursor.getCount() > 0;
-        cursor.close();
-
-        if (result) {
-            ContentValues values = new ContentValues();
-            values.put(TableColumns.DefaultQuantity, delivery.getQuantity());
-            getDb().update(TableNames.CustomerSetting, values, whereClause, null);
-        } else {
-            Customers customer = _customerService.getCustomerDetail(delivery.getCustomerId(), true);
-            Date date = null;
-            CustomersSetting setting = null;
-
-            //Review date parsing later
-            try {
-                date = Utils.FromDateString(deliveryDate);
-                setting = _customerService.getCustomerSetting(customer, date, false);
-            } catch (Exception ex) {
-                return;
-            }
-
-            CustomersSetting newSetting = new CustomersSetting();
-
-            newSetting.setCustomerId(setting.getCustomerId());
-            newSetting.setDefaultRate(setting.getDefaultRate());
-            newSetting.setGetDefaultQuantity(delivery.getQuantity());
-            newSetting.setStartDate(deliveryDate);
-            newSetting.setEndDate(deliveryDate);
-            newSetting.setIsCustomDelivery(true);
-            newSetting.setDirty(1);
-            _customerSettingService.insert(newSetting);
-        }
-
-    }*/
-
     //Umesh doing it in memory for less database hits, remove maxday, startdate its not needed
     @Override
     public List<Double> getMonthlyDeliveryOfAllCustomers(int month, int year) {
@@ -150,16 +105,17 @@ public class DeliveryService implements IDelivery {
     public List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year) {
         try {
             List<Double> result = new ArrayList<Double>();
-            Calendar cal = Calendar.getInstance();
-            //Umesh - Get first day and last days of the month...Review this - dont use deprecated APIs
-            cal.set(year, month, 1);
-            int firstDayOfTheMonth = cal.getTime().getDay();
-            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-            int lastDayOfTheMonth = cal.getTime().getDay();
+            Calendar start = Calendar.getInstance();
+            start.set(year, month, 1);
+            Date firstDayOfTheMonth = start.getTime();
+            Calendar end = Calendar.getInstance();
+            end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+            Date lastDayOfTheMonth = end.getTime();
 
             Customers customer = _customerService.getCustomerDetail(customerId, true);
-            for (int i = firstDayOfTheMonth; i <= lastDayOfTheMonth; i++) {
-                Date date = new Date(year, month, i);
+            Date date = firstDayOfTheMonth;
+
+            for (;Utils.BeforeOrEqualsDate(date, lastDayOfTheMonth); start.add(Calendar.DATE, 1), date = start.getTime()) {
                 CustomersSetting setting = _customerService.getCustomerSetting(customer, date, false, false);
                 double quantity =  setting == null? 0: setting.getGetDefaultQuantity();
                 result.add(quantity);
@@ -205,9 +161,59 @@ public class DeliveryService implements IDelivery {
         }
     }
 
+    private SQLiteDatabase getDb() {
+        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
+    }
+
+
+     /* @Override
+    public void insertOrUpdate(Delivery delivery)
+    {
+        String deliveryDate = delivery.getDeliveryDate();
+        String whereClause = TableColumns.StartDate + " ='" + deliveryDate + "'"
+                + " AND " + TableColumns.EndDate + " ='" + deliveryDate+"'"
+                + " AND " + TableColumns.IsCustomDelivery + " ='1'";
+
+        String selectQuery = "SELECT * FROM " + TableNames.CustomerSetting + " WHERE " + whereClause;
+
+        Cursor cursor = getDb().rawQuery(selectQuery, null);
+        Boolean result = cursor.getCount() > 0;
+        cursor.close();
+
+        if (result) {
+            ContentValues values = new ContentValues();
+            values.put(TableColumns.DefaultQuantity, delivery.getQuantity());
+            getDb().update(TableNames.CustomerSetting, values, whereClause, null);
+        } else {
+            Customers customer = _customerService.getCustomerDetail(delivery.getCustomerId(), true);
+            Date date = null;
+            CustomersSetting setting = null;
+
+            //Review date parsing later
+            try {
+             date = Utils.FromDateString(deliveryDate);
+             setting = _customerService.getCustomerSetting(customer, date, false);
+            }
+            catch(Exception ex) {
+                return;
+            }
+
+            CustomersSetting newSetting = new CustomersSetting();
+
+            newSetting.setCustomerId(setting.getCustomerId());
+            newSetting.setDefaultRate(setting.getDefaultRate());
+            newSetting.setGetDefaultQuantity(delivery.getQuantity());
+            newSetting.setStartDate(deliveryDate);
+            newSetting.setEndDate(deliveryDate);
+            newSetting.setIsCustomDelivery(true);
+            newSetting.setDirty(1);
+            _customerSettingService.insert(newSetting);
+        }
+
+    }*/
     //Umesh - the dates should have been converted to date in the UI itself, the core classes
     //should have Date rather than string.
-    private boolean isHasDataForDay(String day, int custId) {
+    /*private boolean isHasDataForDay(String day, int custId) {
         String selectQuery = "SELECT * FROM " + TableNames.DELIVERY + " WHERE " + TableColumns.DeliveryDate + " ='"
                 + day + "'" + " AND "
                 + TableColumns.CustomerId + " ='" + custId + "'";
@@ -217,11 +223,9 @@ public class DeliveryService implements IDelivery {
 
         cursor.close();
         return result;
-    }
+    }*/
 
-    private SQLiteDatabase getDb() {
-        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
-    }
+
 
  /*
   //Get quantity total for some dates, for bill

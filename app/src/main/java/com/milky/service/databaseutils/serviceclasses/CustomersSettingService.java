@@ -47,9 +47,16 @@ public class CustomersSettingService implements ICustomersSettings {
 
     }
 
+    @Override
+    public void delete(CustomersSetting setting) {
+        getDb().delete(TableNames.CustomerSetting, TableColumns.ID + " ='" + setting.getId() + "'", null);
+    }
 
+    private SQLiteDatabase getDb() {
+        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
+    }
 
-    public void updateEndDate(CustomersSetting holder, String enddate) {
+    /*public void updateEndDate(CustomersSetting holder, String enddate) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.EndDate, holder.getEndDate());
 
@@ -57,10 +64,7 @@ public class CustomersSettingService implements ICustomersSettings {
                 + " AND " + TableColumns.EndDate + " ='" + enddate + "'", null);
     }
 
-    @Override
-    public void delete(CustomersSetting setting) {
-        getDb().delete(TableNames.CustomerSetting, TableColumns.ID + " ='" + setting.getId() + "'", null);
-    }
+
 
     public void updateEndDateForRoll(String enddate, int customerId) {
         ContentValues values = new ContentValues();
@@ -150,26 +154,6 @@ public class CustomersSettingService implements ICustomersSettings {
     }
 
     @Override
-    public List<CustomersSetting> getCustomersByArea(int id, String day) {
-        String selectquery = "SELECT * FROM " + TableNames.CustomerSetting + " WHERE " + TableColumns.StartDate + " <='"
-                + day + "'" + " AND " + TableColumns.EndDate + " >'" + day + "' AND " + TableColumns.AreaId + " ='" + id + "'";
-        ArrayList<CustomersSetting> list = new ArrayList<>();
-
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                CustomersSetting holder = new CustomersSetting();
-                holder.PopulateFromCursor(cursor);
-                list.add(holder);
-            }
-            while (cursor.moveToNext());
-        }
-
-        return list;
-    }
-
-    @Override
     public String getEndDate(int id, String date) {
         String selectquery = "SELECT * FROM " + TableNames.CustomerSetting +
                 " WHERE " + TableColumns.CustomerId + " ='" + id + "' AND "
@@ -192,11 +176,33 @@ public class CustomersSettingService implements ICustomersSettings {
     }
 
 
-    private SQLiteDatabase getDb() {
-        return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
+
+    @Override
+    public List<CustomersSetting> getCustomersByArea(int id, String day) {
+        String selectquery = "SELECT * FROM " + TableNames.CustomerSetting + " WHERE " + TableColumns.StartDate + " <='"
+                + day + "'" + " AND " + TableColumns.EndDate + " >'" + day + "' AND " + TableColumns.AreaId + " ='" + id + "'";
+        ArrayList<CustomersSetting> list = new ArrayList<>();
+
+        Cursor cursor = getDb().rawQuery(selectquery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                CustomersSetting holder = new CustomersSetting();
+                holder.PopulateFromCursor(cursor);
+                list.add(holder);
+            }
+            while (cursor.moveToNext());
+        }
+
+        return list;
     }
 
-    public static double getQuantityById(SQLiteDatabase db, String day, int id) {
+
+
+
+
+
+    /*public static double getQuantityById(SQLiteDatabase db, String day, int id) {
         String selectquery = "SELECT * FROM " + TableNames.CustomerSetting + " INNER JOIN " + TableNames.CUSTOMER + " ON "
                 + TableNames.CustomerSetting + "." + TableColumns.CustomerId + " =" + TableNames.CUSTOMER + "." + TableColumns.ID
                 + " WHERE " + TableColumns.StartDate + " <='" + day + "'" + " AND " + TableColumns.EndDate + " >'" + day + "'"
@@ -262,7 +268,7 @@ public class CustomersSettingService implements ICustomersSettings {
         cursor.close();
 
         return qty;
-    }
+    }*/
 
 
 }

@@ -42,6 +42,7 @@ public class CustomersService implements ICustomers {
         values.put(TableColumns.IsDeleted, 0);
         values.put(TableColumns.DeletedOn, "null");
         values.put(TableColumns.Dirty, 0);
+        values.put(TableColumns.StartDate, customers.getStartDate());
         return getDb().insert(TableNames.CUSTOMER, null, values);
     }
 
@@ -58,6 +59,7 @@ public class CustomersService implements ICustomers {
         values.put(TableColumns.DateModified, customers.getDateAdded());
         values.put(TableColumns.IsDeleted, customers.getIsDeleted());
         values.put(TableColumns.DeletedOn, customers.getDeletedOn());
+        values.put(TableColumns.StartDate, customers.getStartDate());
         values.put(TableColumns.Dirty, 1);
         getDb().update(TableNames.CUSTOMER, values, TableColumns.ID + " ='" + customers.getCustomerId() + "'", null);
     }
@@ -106,6 +108,7 @@ public class CustomersService implements ICustomers {
 
                 setting.setStartDate(setting.getStartDate());
                 setting.setEndDate(setting.getEndDate());
+                setting.setDefaultRate(existingSettingWithoutCustomDelivery.getDefaultRate());
                 setting.setIsCustomDelivery(true);
                 _customerSettingsService.insert(setting);
             }
@@ -251,10 +254,9 @@ public class CustomersService implements ICustomers {
         //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up
         if (customer.customerSettings == null)
             throw new Exception("Customer setting is not populated");
+
         Calendar start = Calendar.getInstance();
         start.setTime(startDate);
-        Calendar end = Calendar.getInstance();
-        end.setTime(endDate);
 
 <<<<<<< HEAD
         double totalQuantity = 0, totalAmount = 0, rate = 0;
@@ -263,15 +265,15 @@ public class CustomersService implements ICustomers {
             if (setting != null) {
 =======
         double totalQuantity = 0, totalAmount = 0;
-        Date date = start.getTime();
+        Date date = startDate;
         for ( ;Utils.BeforeOrEqualsDate(date, endDate); start.add(Calendar.DATE, 1), date = start.getTime())
         {
             CustomersSetting setting = getCustomerSetting(customer, date, false, false);
             if( setting != null) {
->>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
-                totalQuantity += setting.getGetDefaultQuantity();
+                double quantity = setting.getGetDefaultQuantity();
+                totalQuantity += quantity;
                 double rate = setting.getDefaultRate();
-                totalAmount += rate * totalQuantity;
+                totalAmount += rate * quantity;
             }
 <<<<<<< HEAD
 
@@ -280,6 +282,7 @@ public class CustomersService implements ICustomers {
 >>>>>>> 7184480cf90290868e08648c8eb09a8f3952f8e6
         }
 
+        totalAmount += customer.getBalance_amount();
         QuantityAmount qa = new QuantityAmount();
         qa.amount = totalAmount;
         qa.quantity = totalQuantity;
@@ -301,6 +304,7 @@ public class CustomersService implements ICustomers {
 
         if (cursor.moveToFirst()) {
             customers.PopulateFromCursor(cursor);
+            customers.setCustomerId(id);
             customers.customerSettings = new ArrayList<CustomersSetting>();
             do {
                 CustomersSetting holder = new CustomersSetting();
@@ -339,6 +343,7 @@ public class CustomersService implements ICustomers {
                 if (!customersMap.containsKey(customerId)) {
                     customers = new Customers();
                     customers.PopulateFromCursor(cursor);
+                    customers.setCustomerId(customerId);
                     customersMap.put(customerId, customers);
                     customers.customerSettings = new ArrayList<CustomersSetting>();
                 } else {

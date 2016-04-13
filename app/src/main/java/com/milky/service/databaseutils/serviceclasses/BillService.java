@@ -162,16 +162,21 @@ public class BillService implements IBill {
                 bill = currentbillsMap.get(customer.getCustomerId());
             } else {
                 bill = new Bill();
+                bill.setCustomerId(customer.getCustomerId());
+                bill.setDateAdded(Utils.ToDateString(today));
+                bill.setDateModified(Utils.ToDateString(today));
             }
                 QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
             bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
-                bill.setEndDate(Utils.ToDateString(today));
-                bill.setQuantity(qa.quantity);
-                bill.setTotalAmount(qa.amount);
-                bill.setBalance(customer.getBalance_amount());
-                bill.setIsCleared(0);
-                bill.setPaymentMade(0);
-                bill.setIsOutstanding(0);
+            bill.setEndDate(Utils.ToDateString(today));
+            bill.setQuantity(qa.quantity);
+            bill.setTotalAmount(qa.amount);
+            bill.setBalance(customer.getBalance_amount());
+            bill.setIsCleared(0);
+            bill.setPaymentMade(0);
+            bill.setIsOutstanding(0);
+            CustomersSetting lastDaySetting = _customerService.getCustomerSetting(customer, today, false, true);
+            bill.setRate(lastDaySetting.getDefaultRate());
 
                 if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())) {
                     update(bill);
