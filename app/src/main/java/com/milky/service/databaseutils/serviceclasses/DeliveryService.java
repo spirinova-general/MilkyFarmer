@@ -70,15 +70,20 @@ public class DeliveryService implements IDelivery {
             start.set(Calendar.MILLISECOND, 0);
             start.set(Calendar.HOUR_OF_DAY,0);
             Date firstDayOfTheMonth = start.getTime();
+
             Calendar end = Calendar.getInstance();
+            //Set the month and date of calendar as selected from calendar
             end.set(Calendar.MONTH, month);
+            //Get last date of the month which is selected from calendar and set that date as end date
             end.set(year,month,end.getActualMaximum(Calendar.DAY_OF_MONTH));
             end.set(Calendar.HOUR_OF_DAY, 0);
             end.set(Calendar.MINUTE, 0);
             end.set(Calendar.SECOND, 0);
             end.set(Calendar.MILLISECOND, 0);
+
             Date lastDayOfTheMonth = end.getTime();
             List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfTheMonth, lastDayOfTheMonth);
+           // loop till the start date is before and equal to the end date
             for (Date date = start.getTime(); start.before(end) || start.equals(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
                 double totalQuantity = 0;
                 CustomersSetting fetchedSettings = null;
