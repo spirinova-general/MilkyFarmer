@@ -8,14 +8,19 @@ import com.milky.service.core.Bill;
 import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.*;
+import com.milky.service.databaseutils.serviceinterface.IAccountService;
 import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
 
+import com.milky.service.databaseutils.serviceinterface.ISmsService;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,65 +31,46 @@ public class BillService implements IBill {
 
     ICustomers _customerService = new CustomersService();
     IGlobalSetting _globalSettingService = new GlobalSettingsService();
+    ISmsService _smsService = new SmsService();
+    IAccountService _accountService = new AccountService();
 
     @Override
     public void insert(Bill holder) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.CustomerId, holder.getCustomerId());
-        values.put(TableColumns.StartDate, holder.getStartDate());
-        values.put(TableColumns.EndDate, holder.getEndDate());
-        values.put(TableColumns.TotalQuantity, holder.getQuantity());
-        values.put(TableColumns.Balance, holder.getBalance());
-        values.put(TableColumns.Adjustment, 0);
-        values.put(TableColumns.TAX, holder.getTax());
-        values.put(TableColumns.IsCleared, holder.getIsCleared());
-        values.put(TableColumns.PaymentMade, holder.getPaymentMade());
-        values.put(TableColumns.DateModified, holder.getDateModified());
-        values.put(TableColumns.TotalAmount, holder.getTotalAmount());
-        values.put(TableColumns.IsOutstanding, holder.getIsOutstanding());
-        values.put(TableColumns.DateAdded, holder.getDateAdded());
-        values.put(TableColumns.Dirty, 0);
-        values.put(TableColumns.Rate, holder.getRate());
+        ContentValues values = holder.ToContentValues();
         getDb().insert(TableNames.Bill, null, values);
     }
 
     @Override
     public void update(Bill bill) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.CustomerId, bill.getCustomerId());
-        values.put(TableColumns.StartDate, bill.getStartDate());
-        values.put(TableColumns.EndDate, bill.getEndDate());
-        values.put(TableColumns.TotalQuantity, bill.getQuantity());
-        values.put(TableColumns.Balance, bill.getBalance());
-        values.put(TableColumns.Adjustment, 0);
-        values.put(TableColumns.TAX, bill.getTax());
-        values.put(TableColumns.IsCleared, bill.getIsCleared());
-        values.put(TableColumns.PaymentMade, bill.getPaymentMade());
-        values.put(TableColumns.DateModified, bill.getDateModified());
-        values.put(TableColumns.TotalAmount, bill.getTotalAmount());
-        values.put(TableColumns.IsOutstanding, bill.getIsOutstanding());
-        values.put(TableColumns.DateAdded, bill.getDateAdded());
-        values.put(TableColumns.Dirty, 1);
-        values.put(TableColumns.Rate, bill.getRate());
+        ContentValues values = bill.ToContentValues();
         getDb().update(TableNames.Bill, values, TableColumns.CustomerId + " ='" + bill.getCustomerId() + "'", null);
     }
 
     @Override
-    public List<Bill> getAllGlobalBills() {
-        String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsCleared + " ='" + "0'";
+    public List<Bill> getAllGlobalBills(boolean reCalculate) {
+        try {
+            if (reCalculate)
+                RecalculateAllCurrentBills();
 
-        ArrayList<Bill> list = new ArrayList<>();
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                Bill holder = new Bill();
-                holder.PopulateFromCursor(cursor);
-                list.add(holder);
+            String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsCleared + " ='" + "0'";
+
+            ArrayList<Bill> list = new ArrayList<>();
+            Cursor cursor = getDb().rawQuery(selectquery, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    Bill holder = new Bill();
+                    holder.PopulateFromCursor(cursor);
+                    list.add(holder);
+                }
+                while (cursor.moveToNext());
             }
-            while (cursor.moveToNext());
+            cursor.close();
+            return list;
         }
-        cursor.close();
-        return list;
+        catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -110,20 +96,76 @@ public class BillService implements IBill {
     }
 
     @Override
-    public void RecalculateAllOutstandingBills() throws Exception {
-        Calendar cal = Calendar.getInstance();
-        Date today = cal.getTime();
-        Date rollDate = Utils.FromDateString(_globalSettingService.getRollDate());
+    public void RecalculateAllCurrentBills()  {
+        try {
+            Calendar cal = Calendar.getInstance();
+            Date today = cal.getTime();
+            Date rollDate = Utils.FromDateString(_globalSettingService.getRollDate());
 
-        HashMap<Integer, Bill> currentbillsMap = getAllCurrentBills();
+            HashMap<Integer, Bill> currentbillsMap = getAllCurrentBills();
 
-        //First update all bills with quantity, total, end date etc.
-        InsertOrUpdateCurrentBills(currentbillsMap);
+            //First update all bills with quantity, total, end date etc.
+            InsertOrUpdateCurrentBills(currentbillsMap);
 
-        //if we are after roll date...
-        if (!today.before(rollDate)) {
-            PerformBillRoll();
+            //if we are after roll date...
+            if (!today.before(rollDate)) {
+                PerformBillRoll();
+            }
         }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Bill getBill(int id) {
+        String selectQuery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.ID + " ='" + id + "' AND "
+                + TableColumns.IsDeleted  + " ='0'";
+
+        Bill bill = null;
+        Cursor cursor = getDb().rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                bill = new Bill();
+                bill.PopulateFromCursor(cursor);
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return bill;
+    }
+
+    @Override
+    public void SmsBill(int billId) {
+        //Umesh - too many DB hits for each sms fix later...
+        try {
+            Bill bill = getBill(billId);
+            Customers customer = _customerService.getCustomerDetail(bill.getCustomerId());
+
+            Date startDate = Utils.FromDateString(bill.getStartDate());
+            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yy");
+            String startDateStr = df.format(startDate);
+
+            Date endDate = Utils.FromDateString(bill.getEndDate());
+            df = new SimpleDateFormat("dd-MMM-yy");
+            String endDateStr = df.format(startDate);
+
+
+            String msg = URLEncoder.encode(
+                    "Dear " + customer.getFirstName() + ", " + "Your milk bill from " + bill.getStartDate() + " "
+                            + startDateStr + " to " + endDateStr + " is Rs. " + bill.getTotalAmount()
+                            + ". Total quantity " + bill.getQuantity() + " litres. ", "UTF-8");
+
+
+            _smsService.SendSms(customer.getMobile(), msg);
+            _accountService.updateSMSCount(1);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void PerformBillRoll() throws Exception {
@@ -143,18 +185,13 @@ public class BillService implements IBill {
 
     private void InsertOrUpdateCurrentBills(HashMap<Integer, Bill> currentbillsMap) throws Exception {
         Calendar cal = Calendar.getInstance();
-
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        cal.set(Calendar.HOUR_OF_DAY,0);
         Date today = cal.getTime();
         //Set calendar to first date of month
         cal.set(Calendar.DAY_OF_MONTH, 1);
+
         Date firstDayOfMonth = cal.getTime();
 
-        List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth, today);
+        List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth,today);
 
         for (Customers customer : customers) {
             Bill bill;
@@ -166,7 +203,8 @@ public class BillService implements IBill {
                 bill.setDateAdded(Utils.ToDateString(today));
                 bill.setDateModified(Utils.ToDateString(today));
             }
-                QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
+
+            QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
             bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
             bill.setEndDate(Utils.ToDateString(today));
             bill.setQuantity(qa.quantity);
@@ -177,14 +215,12 @@ public class BillService implements IBill {
             bill.setIsOutstanding(0);
             CustomersSetting lastDaySetting = _customerService.getCustomerSetting(customer, today, false, true);
             bill.setRate(lastDaySetting.getDefaultRate());
-
-                if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())) {
-                    update(bill);
-                } else {
-                    insert(bill);
-
+            bill.setIsDeleted(0);
+            if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())) {
+                update(bill);
+            } else {
+                insert(bill);
             }
-
         }
     }
 
@@ -207,13 +243,7 @@ public class BillService implements IBill {
         return map;
     }
 
-    public void updateQuantity(Bill bill) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.CustomerId, bill.getCustomerId());
-        values.put(TableColumns.TotalQuantity, bill.getQuantity());
-        values.put(TableColumns.Balance, bill.getBalance());
-        getDb().update(TableNames.Bill, values, TableColumns.CustomerId + " ='" + bill.getCustomerId() + "'", null);
-    }
+
 
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();

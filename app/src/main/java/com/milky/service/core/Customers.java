@@ -1,5 +1,6 @@
 package com.milky.service.core;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.milky.service.databaseutils.TableColumns;
@@ -172,6 +173,28 @@ public class Customers {
         this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
         this.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
         this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
+        this.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
+    }
+
+    public ContentValues ToContentValues()
+    {
+        ContentValues values = new ContentValues();
+
+        values.put(TableColumns.FirstName, this.getFirstName());
+        values.put(TableColumns.LastName, this.getLastName());
+        values.put(TableColumns.Balance, this.getBalance_amount());
+        values.put(TableColumns.Address1, this.getAddress1());
+        values.put(TableColumns.Address2, this.getAddress2());
+        values.put(TableColumns.AreaId, this.getAreaId());
+        values.put(TableColumns.Mobile, this.getMobile());
+        values.put(TableColumns.DateAdded, this.getDateAdded());
+        values.put(TableColumns.DateModified, this.getDateAdded());
+        values.put(TableColumns.IsDeleted, this.getIsDeleted());
+        values.put(TableColumns.DeletedOn, this.getDeletedOn());
+        values.put(TableColumns.Dirty, this.getDirty());
+        values.put(TableColumns.StartDate, this.getStartDate());
+
+        return values;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.milky.service.core;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.milky.service.databaseutils.TableColumns;
@@ -23,6 +24,14 @@ public class Bill {
     private int isOutstanding;
     private double rate;
     private int isDeleted;
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getIsDeleted() {
         return isDeleted;
@@ -155,6 +164,7 @@ public class Bill {
 
     public void PopulateFromCursor(Cursor cursor)
     {
+        this.setId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
         this.setCustomerId(cursor.getInt(cursor.getColumnIndex(TableColumns.CustomerId)));
         this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
         this.setEndDate(cursor.getString(cursor.getColumnIndex(TableColumns.EndDate)));
@@ -170,5 +180,27 @@ public class Bill {
         this.setRate(cursor.getInt(cursor.getColumnIndex(TableColumns.Rate)));
         this.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
         this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+    }
+
+    public ContentValues ToContentValues()
+    {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.CustomerId, this.getCustomerId());
+        values.put(TableColumns.StartDate, this.getStartDate());
+        values.put(TableColumns.EndDate, this.getEndDate());
+        values.put(TableColumns.TotalQuantity, this.getQuantity());
+        values.put(TableColumns.Balance, this.getBalance());
+        values.put(TableColumns.Adjustment, 0);
+        values.put(TableColumns.TAX, this.getTax());
+        values.put(TableColumns.IsCleared, this.getIsCleared());
+        values.put(TableColumns.PaymentMade, this.getPaymentMade());
+        values.put(TableColumns.DateModified, this.getDateModified());
+        values.put(TableColumns.TotalAmount, this.getTotalAmount());
+        values.put(TableColumns.IsOutstanding, this.getIsOutstanding());
+        values.put(TableColumns.DateAdded, this.getDateAdded());
+        values.put(TableColumns.Dirty, this.getDirty());
+        values.put(TableColumns.Rate, this.getRate());
+        values.put(TableColumns.IsDeleted, this.getIsDeleted());
+        return values;
     }
 }

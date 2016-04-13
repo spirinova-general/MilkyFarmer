@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.BillService;
-import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.ui.adapters.BillingAdapter;
 import com.milky.utils.AppUtil;
@@ -62,13 +61,11 @@ public class BillingFragment extends Fragment {
                 @Override
                 public void run() {
                     IBill billService = new BillService();
+
                     if(Constants.REFRESH_BILL)
-                        try {
-                            billService.RecalculateAllOutstandingBills();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    List<Bill> bills = billService.getAllGlobalBills();
+                        billService.RecalculateAllCurrentBills();
+
+                    List<Bill> bills = billService.getAllGlobalBills(false);
                         /*new BillService().getOutstandingBill();
                         new BillService().getTotalAllBill();*/
                     if (bills.size() > 0) {

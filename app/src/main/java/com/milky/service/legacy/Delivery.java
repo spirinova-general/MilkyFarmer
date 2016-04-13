@@ -1,4 +1,4 @@
-package com.milky.service.core;
+package com.milky.service.legacy;
 
 /**
  * Created by Neha on 11/30/2015.

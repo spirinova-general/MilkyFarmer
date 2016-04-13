@@ -41,9 +41,11 @@ import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
+import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -503,9 +505,8 @@ _dbHelper.close();
         AlertDialog dialog;
         Handler progressHandler = new Handler();
         int progress = 0;
-
+        int messageCount = 0;
         String msg = "";
-        int finalI = 0;
 
         @Override
         protected void onPreExecute() {
@@ -522,55 +523,36 @@ _dbHelper.close();
             final Calendar endDate = Calendar.getInstance();
             final List<Bill> finalList = BillingFragment.payment;
 
+
             new Thread(new Runnable() {
                 public void run() {
-                    for (int i = 0; i < finalList.size(); ++i) {
-                        String mesg = null;
-                        final Customers customers = new CustomersService().getCustomerDetail(finalList.get(i).getCustomerId());
+                    IBill billService = new BillService();
+                    final List<Bill> bills = billService.getAllGlobalBills(true);
 
-                        try {
+                    messageCount = 0;
+                    for(int i = 0; i< bills.size(); i++) {
+                        Bill bill = bills.get(i);
+                        billService.SmsBill(bill.getId());
+                        messageCount = i + 1;
 
-                            try {
-                                Date date = Constants.work_format.parse(finalList.get(i).getStartDate());
-                                Date end = Constants.work_format.parse(finalList.get(i).getEndDate());
-                                startDate.setTime(date);
-                                endDate.setTime(end);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            mesg = URLEncoder.encode("Dear " + customers.getFirstName() + ", " + "Your milk bill from " + Constants.MONTHS[startDate.get(Calendar.MONTH)] + " "
-                                    + String.format("%02d", startDate.get(Calendar.DAY_OF_MONTH)) + " to " +
-                                    Constants.MONTHS[endDate.get(Calendar.MONTH)] + " " + String.format("%02d", endDate.get(Calendar.DAY_OF_MONTH))
-                                    + " is Rs. " + finalList.get(i).getTotalAmount()
-                                    + ". Total quantity " + finalList.get(i).getQuantity() + " litres. ", "UTF-8");
-
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                        new Utils().SendSms(customers.getMobile(), mesg, MainActivity.this);
-
-                        finalI = i + 1;
                         progressHandler.post(new Runnable() {
                             public void run() {
-                                progress += (100 / finalList.size());
+                                progress += (100 / bills.size());
                                 androidProgressBar.setProgress(progress);
                                 //Status update in textview
-
-                                if (finalI != finalList.size())
-                                    msg = "Sending message: " + finalI + "/" + finalList.size();
-                                else
-                                    msg = "Sent message: " + finalI + "/" + finalList.size();
+                                msg = "Sending message: " + messageCount + "/" + bills.size();
                                 publishProgress(msg);
-
                             }
                         });
                         try {
                             Thread.sleep(500);
-                        } catch (InterruptedException e) {
+                        }
+                        catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-
+                    msg = "Sent messages: " + messageCount + "/" + bills.size();
+                    publishProgress(msg, "done");
                 }
             }).start();
 
@@ -581,8 +563,8 @@ _dbHelper.close();
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             messageSent.setText(values[0]);
-            if (BillingFragment.payment.size() == finalI) {
-                accountService.updateSMSCount(BillingFragment.payment.size());
+            if( values.length > 1 && values[1] == "done")
+            {
                 ok.setVisibility(View.VISIBLE);
             }
         }

@@ -10,23 +10,12 @@ public interface IBill {
 
     void update(Bill bill);
 
-    //Umesh - this needs to be removed
-    //List<Bill> getTotalAllBill();
+    void SmsBill(int billId);
 
-    /*List<Bill> getOutstandingBill();
-
-    List<Bill> getOutstandingBillsById(int id);
-
-    List<Bill> getTotalBillById(int id);*/
-
-    //void updateBillById(Bill bill);
-
-    //void updateOutstandingBills(Bill bill);
-
-    //Umesh - the ones to be used now
-    void RecalculateAllOutstandingBills() throws Exception;
+    void RecalculateAllCurrentBills();
     //To be called from global bill tab
-    List<Bill> getAllGlobalBills();
+    List<Bill> getAllGlobalBills(boolean reCalculate);
     //To be called from customer bill tab
     List<Bill> getBillsOfCustomer(int customerId);
+    Bill getBill(int id);
 }

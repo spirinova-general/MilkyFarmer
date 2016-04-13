@@ -25,48 +25,21 @@ public class CustomersService implements ICustomers {
 
     private ICustomersSettings _customerSettingsService = new CustomersSettingService();
 
-    //Umesh - can write opposite of PopulateFromCursor to put values
 
     @Override
     public long insert(Customers customers) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.FirstName, customers.getFirstName());
-        values.put(TableColumns.LastName, customers.getLastName());
-        values.put(TableColumns.Balance, customers.getBalance_amount());
-        values.put(TableColumns.Address1, customers.getAddress1());
-        values.put(TableColumns.Address2, customers.getAddress2());
-        values.put(TableColumns.AreaId, customers.getAreaId());
-        values.put(TableColumns.Mobile, customers.getMobile());
-        values.put(TableColumns.DateAdded, customers.getDateAdded());
-        values.put(TableColumns.DateModified, customers.getDateAdded());
-        values.put(TableColumns.IsDeleted, customers.getIsDeleted());
-        values.put(TableColumns.DeletedOn, "null");
-        values.put(TableColumns.Dirty, customers.getDirty());
-        values.put(TableColumns.StartDate, customers.getStartDate());
+        ContentValues values = customers.ToContentValues();
         return getDb().insert(TableNames.CUSTOMER, null, values);
     }
 
     @Override
     public void update(Customers customers) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.FirstName, customers.getFirstName());
-        values.put(TableColumns.LastName, customers.getLastName());
-        values.put(TableColumns.Balance, customers.getBalance_amount());
-        values.put(TableColumns.Address1, customers.getAddress1());
-        values.put(TableColumns.AreaId, customers.getAreaId());
-        values.put(TableColumns.Mobile, customers.getMobile());
-        values.put(TableColumns.DateAdded, customers.getDateAdded());
-        values.put(TableColumns.DateModified, customers.getDateAdded());
-        values.put(TableColumns.IsDeleted, customers.getIsDeleted());
-        values.put(TableColumns.DeletedOn, customers.getDeletedOn());
-        values.put(TableColumns.StartDate, customers.getStartDate());
-        values.put(TableColumns.Dirty, customers.getDirty());
+        ContentValues values = customers.ToContentValues();
         getDb().update(TableNames.CUSTOMER, values, TableColumns.ID + " ='" + customers.getCustomerId() + "'", null);
     }
 
     @Override
     public void delete(Customers customers) {
-
     }
 
     private boolean isQuantityOrRateDifferent(CustomersSetting setting1, CustomersSetting setting2){
@@ -80,11 +53,6 @@ public class CustomersService implements ICustomers {
         try {
             Customers customer = getCustomerDetail(setting.getCustomerId(), true);
             Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            cal.set(Calendar.HOUR_OF_DAY, 0);
             Date today = cal.getTime();
             CustomersSetting existingSetting = getCustomerSetting(customer, today, false, false);
             CustomersSetting existingSettingWithoutCustomDelivery = getCustomerSetting(customer, today, false, true);
@@ -229,25 +197,21 @@ public class CustomersService implements ICustomers {
 
         CustomersSetting toReturn = null;
         for (CustomersSetting setting : customer.customerSettings) {
-
             Date endDate = Utils.FromDateString(setting.getEndDate());
             Date startDate = Utils.FromDateString(setting.getStartDate());
 
-//            if (setting.getIsCustomDelivery()) {
-//                if (endDate.equals(date) && startDate.equals(date))
-                    if (!ignoreCustomDelivery && setting.getIsCustomDelivery()) {
-                        if (Utils.EqualsDate(date, endDate) && Utils.EqualsDate(startDate, date))
-                            return setting;
-                    } else {
-                        if ((Utils.BeforeOrEqualsDate(startDate, date)) && Utils.AfterDate(endDate, date))
-                            toReturn = setting;
-                    }
+            if (!ignoreCustomDelivery && setting.getIsCustomDelivery()) {
+                if (Utils.EqualsDate(date, endDate) && Utils.EqualsDate(startDate, date))
+                    return setting;
+            } else {
+                if ((Utils.BeforeOrEqualsDate(startDate, date)) && Utils.AfterDate(endDate,date))
+                    toReturn = setting;
             }
-
-            //did not find any setting, might happen for deleted customer
-            return toReturn;
         }
 
+        //did not find any setting, might happen for deleted customer
+        return toReturn;
+    }
 
     public QuantityAmount getTotalQuantityAndAmount(Customers customer, Date startDate, Date endDate) throws Exception {
         //throwing just for safety - later call getCustomerrSetting with populatesetting to fill up
@@ -340,7 +304,6 @@ public class CustomersService implements ICustomers {
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
                 customers.customerSettings.add(holder);
-//                customersData = new ArrayList<>(customersMap.values());
             }
             while (cursor.moveToNext());
         }

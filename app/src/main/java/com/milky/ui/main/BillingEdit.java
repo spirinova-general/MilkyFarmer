@@ -26,6 +26,7 @@ import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -40,6 +41,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class BillingEdit extends AppCompatActivity implements OnTaskCompleteListner {
     private Intent intent;
@@ -216,7 +218,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         AlertDialog dialog;
         Handler progressHandler = new Handler();
         int progress = 0;
-
+        int billId;
         String msg = "";
         int finalI = 0;
 
@@ -255,41 +257,26 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         @Override
         protected String doInBackground(Void... params) {
             final Customers customers = new CustomersService().getCustomerDetail( getIntent().getIntExtra("custId", 0));
+
+
+
             new Thread(new Runnable() {
                 public void run() {
-                    for (int i = 0; i < 1; ++i) {
-                        String mesg = null;
-                        try {
-                            mesg = URLEncoder.encode("Dear " + customers.getFirstName() + ", " + "Your milk bill from" + start_date.getText().toString() + " to " + end_date.getText().toString() + " is Rs. " + String.valueOf(intent.getDoubleExtra("total",0))
-                                    + ". Total quantity " + milk_quantity.getText().toString() + " litres. Rate is " + rate.getText().toString() + "/litre.", "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
+                    IBill billService = new BillService();
+                    Bill bill = billService.getBill(billId);
+                    billService.SmsBill(bill.getId());
+
+                    /*progressHandler.post(new Runnable() {
+                        public void run() {
+                            progress += (100);
+                            androidProgressBar.setProgress(progress);
+                            //Status update in textview
+                            msg = "Sending message... ";
+                            publishProgress(msg);
                         }
-//                        SendSmsTouser(customers.getMobile(), mesg);
-                        new Utils().SendSms(customers.getMobile(), mesg,BillingEdit.this);
-
-                        finalI = i + 1;
-                        progressHandler.post(new Runnable() {
-                            public void run() {
-                                progress += 100;
-                                androidProgressBar.setProgress(progress);
-                                //Status update in textview
-
-                                if (finalI != 1)
-                                    msg = "Sending message: " + finalI + "/" + 1;
-                                else
-                                    msg = "Sent message: " + finalI + "/" + 1;
-                                publishProgress(msg);
-
-                            }
-                        });
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
+                    });*/
+                    msg = "Sent message ";
+                    publishProgress(msg, "done");
                 }
             }).start();
 
@@ -300,9 +287,6 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             messageSent.setText(values[0]);
-
-
-            accountService.updateSMSCount(1);
             ok.setVisibility(View.VISIBLE);
 
         }

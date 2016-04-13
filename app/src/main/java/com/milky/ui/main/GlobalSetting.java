@@ -47,6 +47,7 @@ import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
+import com.milky.service.databaseutils.serviceinterface.IAccountService;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.ui.adapters.PlaceAdapter;
 import com.milky.utils.AppUtil;
@@ -376,7 +377,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                     globalSettings.setTax(Double.parseDouble(tax.getText().toString().trim()));
                     globalSettings.setDefaultRate(Double.parseDouble(rate.getText().toString().trim()));
                     globalSettings.setRollDate(rollDate);
-                    Account holder = new Account();
+                    IAccountService accountService = new AccountService();
+                    Account holder = accountService.getDetails();
                     holder.setDateModified(date);
                     holder.setMobile(mobile.getText().toString());
                     holder.setFirstName(firstname.getText().toString());

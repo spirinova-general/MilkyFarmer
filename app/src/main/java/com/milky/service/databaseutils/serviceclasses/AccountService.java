@@ -20,33 +20,13 @@ import java.util.Calendar;
 public class AccountService implements IAccountService {
     @Override
     public void insert(Account account) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.FarmerCode, account.getFarmerCode());
-        values.put(TableColumns.DateAdded, account.getDateAdded());
-        values.put(TableColumns.FirstName, account.getFirstName());
-        values.put(TableColumns.LastName, account.getLastName());
-        values.put(TableColumns.Mobile, account.getMobile());
-        values.put(TableColumns.EndDate, account.getEndDate());
-        values.put(TableColumns.TotalSms, account.getTotalSms());
-        values.put(TableColumns.UsedSms, account.getUsedSms());
-        values.put(TableColumns.ServerAccountId, account.getServerAccountId());
-        values.put(TableColumns.Validated, account.getValidated());
-        values.put(TableColumns.IsDeleted,account.getIsDeleted());
-        values.put(TableColumns.Dirty,account.getDirty());
-        values.put(TableColumns.DateModified, account.getDateModified());
-
+        ContentValues values = account.ToContentValues();
         getDb().insert(TableNames.ACCOUNT, null, values);
     }
 
     @Override
     public void update(Account account) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.EndDate, account.getEndDate());
-        values.put(TableColumns.TotalSms, account.getTotalSms());
-        values.put(TableColumns.ServerAccountId, account.getServerAccountId());
-        values.put(TableColumns.IsDeleted,account.getIsDeleted());
-        values.put(TableColumns.Dirty,account.getDirty());
-        values.put(TableColumns.DateModified,account.getDateModified());
+        ContentValues values = account.ToContentValues();
         getDb().update(TableNames.ACCOUNT, values, TableColumns.ServerAccountId + " ='" + account.getServerAccountId() + "'", null);
     }
 
@@ -62,12 +42,7 @@ public class AccountService implements IAccountService {
         com.milky.service.core.Account holder = new com.milky.service.core.Account();
         if (cursor.moveToFirst()) {
             do {
-
-                holder.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
-                holder.setFirstName(cursor.getString(cursor.getColumnIndex(TableColumns.FirstName)));
-                holder.setLastName(cursor.getString(cursor.getColumnIndex(TableColumns.LastName)));
-                holder.setFarmerCode(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
-                holder.setFarmerCode(cursor.getString(cursor.getColumnIndex(TableColumns.FarmerCode)));
+                holder.PopulateFromCursor(cursor);
             }
             while (cursor.moveToNext());
 

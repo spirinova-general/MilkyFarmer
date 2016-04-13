@@ -13,12 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
-import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
-import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.utils.Constants;
@@ -27,7 +24,6 @@ import com.tyczj.extendedcalendarview.ExtendedCalendarView;
 
 import com.milky.R;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;

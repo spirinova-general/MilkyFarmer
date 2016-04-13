@@ -1,5 +1,6 @@
 package com.milky.service.core;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.milky.service.databaseutils.TableColumns;
@@ -115,6 +116,23 @@ public class CustomersSetting  {
         this.setId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
         this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
         this.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+    }
+
+
+    public ContentValues ToContentValues()
+    {
+        ContentValues values = new ContentValues();
+        values.put(TableColumns.CustomerId, this.getCustomerId());
+        values.put(TableColumns.DefaultRate, this.getDefaultRate());
+        values.put(TableColumns.DefaultQuantity, this.getGetDefaultQuantity());
+        values.put(TableColumns.StartDate, this.getStartDate());
+        values.put(TableColumns.EndDate, this.getEndDate());
+        values.put(TableColumns.IsCustomDelivery, this.getIsCustomDelivery());
+        values.put(TableColumns.Dirty, this.getDirty());
+        values.put(TableColumns.IsDeleted,this.getIsDeleted());
+        values.put(TableColumns.DateModified,this.getDateModified());
+
+        return values;
     }
 
 }

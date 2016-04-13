@@ -14,7 +14,7 @@ import android.widget.Filter;
 import android.widget.TextView;
 
 import com.milky.R;
-import com.milky.service.core.Delivery;
+import com.milky.service.legacy.Delivery;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.ui.customers.DeliveryActivity;
 import com.milky.utils.Constants;

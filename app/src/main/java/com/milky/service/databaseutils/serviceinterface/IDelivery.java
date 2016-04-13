@@ -1,6 +1,6 @@
 package com.milky.service.databaseutils.serviceinterface;
 
-import com.milky.service.core.Delivery;
+import com.milky.service.legacy.Delivery;
 import com.milky.viewmodel.VDelivery;
 
 import java.util.List;

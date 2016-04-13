@@ -2,49 +2,24 @@ package com.milky.service.databaseutils.serviceclasses;
 
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.milky.service.core.CustomersSetting;
-import com.milky.service.core.Delivery;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
-import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.utils.AppUtil;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 public class CustomersSettingService implements ICustomersSettings {
     @Override
     public void insert(CustomersSetting customers) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.CustomerId, customers.getCustomerId());
-        values.put(TableColumns.DefaultRate, customers.getDefaultRate());
-        values.put(TableColumns.DefaultQuantity, customers.getGetDefaultQuantity());
-        values.put(TableColumns.StartDate, customers.getStartDate());
-        values.put(TableColumns.EndDate, customers.getEndDate());
-        values.put(TableColumns.IsCustomDelivery, customers.getIsCustomDelivery());
-        values.put(TableColumns.Dirty, customers.getDirty());
-        values.put(TableColumns.IsDeleted,customers.getIsDeleted());
-        values.put(TableColumns.DateModified,customers.getDateModified());
+        ContentValues values = customers.ToContentValues();
         getDb().insert(TableNames.CustomerSetting, null, values);
     }
 
     @Override
     public void update(CustomersSetting setting) {
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.CustomerId, setting.getCustomerId());
-        values.put(TableColumns.DefaultRate, setting.getDefaultRate());
-        values.put(TableColumns.DefaultQuantity, setting.getGetDefaultQuantity());
-        values.put(TableColumns.StartDate, setting.getStartDate());
-        values.put(TableColumns.EndDate, setting.getEndDate());
-        values.put(TableColumns.IsCustomDelivery, setting.getIsCustomDelivery());
-        values.put(TableColumns.Dirty, setting.getDirty());
-        values.put(TableColumns.IsDeleted, setting.getIsDeleted());
-        values.put(TableColumns.DateModified, setting.getDateModified());
+        ContentValues values = setting.ToContentValues();
         getDb().update(TableNames.CustomerSetting, values, TableColumns.CustomerId + " ='" + setting.getCustomerId() + "'"
                 + " AND " + TableColumns.StartDate + " <='" + setting.getStartDate() + "'" + " AND " +
                 TableColumns.EndDate + " >='" + setting.getEndDate() + "'", null);

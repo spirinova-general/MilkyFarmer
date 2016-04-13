@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.core.CustomersSetting;
-import com.milky.service.core.Delivery;
+import com.milky.service.legacy.Delivery;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
