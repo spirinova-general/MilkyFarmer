@@ -180,6 +180,7 @@ public class Bill {
         this.setRate(cursor.getInt(cursor.getColumnIndex(TableColumns.Rate)));
         this.setTotalAmount(cursor.getDouble(cursor.getColumnIndex(TableColumns.TotalAmount)));
         this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+        this.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
     }
 
     public ContentValues ToContentValues()

@@ -22,6 +22,9 @@ public class GlobalSettingsService implements IGlobalSetting {
         values.put(TableColumns.DefaultRate, globalSettings.getDefaultRate());
         values.put(TableColumns.TAX, globalSettings.getTax());
         values.put(TableColumns.RollDate, globalSettings.getRollDate());
+        values.put(TableColumns.IsDeleted,globalSettings.getIsDeleted());
+        values.put(TableColumns.Dirty,globalSettings.getDirty());
+        values.put(TableColumns.DateModified,globalSettings.getDateModified());
         getDb().insert(TableNames.GlobalSetting, null, values);
     }
 
@@ -31,6 +34,9 @@ public class GlobalSettingsService implements IGlobalSetting {
         values.put(TableColumns.RollDate, globalSettings.getRollDate());
         values.put(TableColumns.TAX, globalSettings.getTax());
         values.put(TableColumns.DefaultRate, globalSettings.getDefaultRate());
+        values.put(TableColumns.IsDeleted,globalSettings.getIsDeleted());
+        values.put(TableColumns.Dirty,globalSettings.getDirty());
+        values.put(TableColumns.DateModified,globalSettings.getDateModified());
         getDb().update(TableNames.GlobalSetting, values, null, null);
     }
 
@@ -44,6 +50,8 @@ public class GlobalSettingsService implements IGlobalSetting {
                 holder.setDefaultRate(cursor.getInt(cursor.getColumnIndex(TableColumns.DefaultRate)));
                 holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
                 holder.setTax(cursor.getInt(cursor.getColumnIndex(TableColumns.TAX)));
+                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+                holder.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
             }
             while (cursor.moveToNext());
         }

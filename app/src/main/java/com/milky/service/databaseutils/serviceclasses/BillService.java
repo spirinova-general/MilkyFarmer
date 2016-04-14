@@ -16,11 +16,8 @@ import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
 import com.milky.service.databaseutils.serviceinterface.ISmsService;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.utils.AppUtil;
-import com.milky.utils.Constants;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -253,6 +250,7 @@ public class BillService implements IBill {
     //Umesh - clean up the old code when they are not in use. Comment them and put them at the bottom of the file - don't delete
     //Umesh commented these since they are now not used and also because they were accessing UI fragments.
     // Never access UI back in service layer
+
     /* public List<Bill>getTotalAllBill() {
         String selectquery = "SELECT * FROM " + TableNames.Bill + " INNER JOIN " + TableNames.CUSTOMER
                 + " ON " + TableNames.Bill + "." + TableColumns.CustomerId + "=" + TableNames.CUSTOMER + "." + TableColumns.ID + " WHERE " + TableColumns.IsCleared + " ='" + "0'"

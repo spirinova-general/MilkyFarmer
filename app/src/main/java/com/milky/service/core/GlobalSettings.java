@@ -8,6 +8,33 @@ public class GlobalSettings {
     private double DefaultRate;
     private double Tax;
     private String RollDate;
+    private int isDeleted;
+    private int dirty;
+    private String dateModified;
+
+    public int getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(int isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public int getDirty() {
+        return dirty;
+    }
+
+    public void setDirty(int dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(String dateModified) {
+        this.dateModified = dateModified;
+    }
 
     public String getRollDate() {
         return RollDate;

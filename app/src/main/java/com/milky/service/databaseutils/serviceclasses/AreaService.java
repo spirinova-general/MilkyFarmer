@@ -13,17 +13,17 @@ import com.milky.utils.AppUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AreaService implements IArea  {
+public class AreaService implements IArea {
     @Override
     public long insert(Area area) {
         ContentValues values = new ContentValues();
-        values.put(TableColumns.Dirty,0);
+        values.put(TableColumns.Dirty, 0);
         values.put(TableColumns.City, area.getCity());
         values.put(TableColumns.Name, area.getArea());
         values.put(TableColumns.Locality, area.getLocality());
-        values.put(TableColumns.IsDeleted,area.getIsDeleted());
-        values.put(TableColumns.Dirty,area.getDirty());
-        values.put(TableColumns.DateModified,area.getDateModified());
+        values.put(TableColumns.IsDeleted, area.getIsDeleted());
+        values.put(TableColumns.Dirty, area.getDirty());
+        values.put(TableColumns.DateModified, area.getDateModified());
         return getDb().insert(TableNames.AREA, null, values);
     }
 
@@ -66,10 +66,13 @@ public class AreaService implements IArea  {
         if (cursor.moveToFirst()) {
             do {
                 holder = new Area();
-                    holder.setCity(cursor.getString(cursor.getColumnIndex(TableColumns.City)));
-                    holder.setArea(cursor.getString(cursor.getColumnIndex(TableColumns.Name)));
-                    holder.setLocality(cursor.getString(cursor.getColumnIndex(TableColumns.Locality)));
-                    holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
+                holder.setCity(cursor.getString(cursor.getColumnIndex(TableColumns.City)));
+                holder.setArea(cursor.getString(cursor.getColumnIndex(TableColumns.Name)));
+                holder.setLocality(cursor.getString(cursor.getColumnIndex(TableColumns.Locality)));
+                holder.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.ID)));
+                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+                holder.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
 
             }
             while (cursor.moveToNext());
@@ -94,6 +97,9 @@ public class AreaService implements IArea  {
                 holder.setArea(cursor.getString(cursor.getColumnIndex(TableColumns.Name)));
                 holder.setCity(cursor.getString(cursor.getColumnIndex(TableColumns.City)));
                 holder.setLocality(cursor.getString(cursor.getColumnIndex(TableColumns.Locality)));
+                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
+                holder.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+                holder.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
                 holder.setCityArea(holder.getFullAddress(holder));
                 areaList.add(holder);
             }
