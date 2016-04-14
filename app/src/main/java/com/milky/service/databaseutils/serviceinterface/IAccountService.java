@@ -1,6 +1,7 @@
 package com.milky.service.databaseutils.serviceinterface;
 
 import com.milky.service.core.Account;
+import com.milky.service.serverapi.OnTaskCompleteListner;
 
 import org.json.JSONObject;
 
@@ -14,4 +15,5 @@ public interface IAccountService {
      boolean isAccountExpired();
      JSONObject getJsonData();
      void updateSMSCount(int count);
+     void SendOtp(String mobile, String Otp, OnTaskCompleteListner listner);
 }

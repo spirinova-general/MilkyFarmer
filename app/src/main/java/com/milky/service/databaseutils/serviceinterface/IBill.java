@@ -2,6 +2,7 @@ package com.milky.service.databaseutils.serviceinterface;
 
 
 import com.milky.service.core.Bill;
+import com.milky.service.serverapi.OnTaskCompleteListner;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface IBill {
 
     void update(Bill bill);
 
-    void SmsBill(int billId);
+    void SmsBill(int billId,OnTaskCompleteListner listner);
 
     void RecalculateAllCurrentBills();
     //To be called from global bill tab

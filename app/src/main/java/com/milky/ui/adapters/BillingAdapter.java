@@ -105,6 +105,7 @@ public class BillingAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, BillingEdit.class);
+                intent.putExtra("bill_id", data.getId());
                 intent.putExtra("start_date", showDatePattern.get(Calendar.DAY_OF_MONTH) + "-" +
                         Constants.MONTHS[showDatePattern.get(Calendar.MONTH)] + "-" + showDatePattern.get(Calendar.YEAR))
                         .putExtra("end_date", shownEndDate.get(Calendar.DAY_OF_MONTH) + "-" +

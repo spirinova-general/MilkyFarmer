@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -19,11 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.core.Account;
 import com.milky.service.core.GlobalSettings;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
-import com.milky.service.databaseutils.serviceinterface.IAccountService;
+import com.milky.service.databaseutils.serviceinterface.ISmsService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
@@ -31,7 +31,6 @@ import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.utils.UserPrefrences;
-import com.milky.service.core.Account;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +45,6 @@ import java.util.HashMap;
 public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteListner {
     private TextInputLayout _nameLayout, _lastnameLayout, _mobileLayout, _passwordLayout, otp_layout;
     private EditText _firstName, _lastName, _mobile, _password, otp;
-    private SharedPreferences preferences;
     private SharedPreferences.Editor edit;
     private Button otpButton;
     private AccountService accountService;
@@ -167,7 +165,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
     private void initResources() {
         AppUtil.getInstance().startTimer();
-        preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
+        SharedPreferences preferences = AppUtil.getInstance().getSharedPreferences(UserPrefrences.PREFRENCES, MODE_PRIVATE);
         _firstName = (EditText) findViewById(R.id.first_name);
         _lastName = (EditText) findViewById(R.id.last_name);
         _mobile = (EditText) findViewById(R.id.mobile);
@@ -194,16 +192,12 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //                otpButton.setEnabled(false);
                 if (AppUtil.getInstance().isNetworkAvailable(FarmerSignup.this)) {
                     String mesg = null;
-                    try {
-                        Constants.OTP = Constants.generateOTP();
-                        mesg = URLEncoder.encode("OTP to sign in KrushiVikas is: " + Constants.OTP, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    Constants.OTP = Constants.generateOTP();
+
 
                     if (!_mobile.getText().toString().equals("") && _mobile.getText().length() == 10) {
                         _mobileLayout.setError(null);
-                        new Utils().SendSms(_mobile.getText().toString(), mesg,FarmerSignup.this);
+                        accountService.SendOtp(_mobile.getText().toString(), mesg,FarmerSignup.this);
                     } else
                         _mobileLayout.setError("Enter mobile number !");
                 } else
@@ -216,7 +210,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
     }
 
 
-    ProgressDialog progressBar;
+    private ProgressDialog progressBar;
 
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> listType) {

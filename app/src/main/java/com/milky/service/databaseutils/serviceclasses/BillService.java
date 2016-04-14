@@ -14,6 +14,7 @@ import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
 
 import com.milky.service.databaseutils.serviceinterface.ISmsService;
+import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 
@@ -138,7 +139,7 @@ public class BillService implements IBill {
     }
 
     @Override
-    public void SmsBill(int billId) {
+    public void SmsBill(int billId, OnTaskCompleteListner listner) {
         //Umesh - too many DB hits for each sms fix later...
         try {
             Bill bill = getBill(billId);
@@ -159,7 +160,7 @@ public class BillService implements IBill {
                             + ". Total quantity " + bill.getQuantity() + " litres. ", "UTF-8");
 
 
-            _smsService.SendSms(customer.getMobile(), msg);
+            _smsService.SendSms(customer.getMobile(), msg,listner);
             _accountService.updateSMSCount(1);
         }
         catch (Exception e) {

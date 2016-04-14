@@ -536,7 +536,7 @@ _dbHelper.close();
                     for(int i = 0; i< bills.size(); i++) {
                         Bill bill = bills.get(i);
                         IBill billService = new BillService();
-                        billService.SmsBill(bill.getId());
+                        billService.SmsBill(bill.getId(),MainActivity.this);
                         messageCount = i + 1;
 
                         progressHandler.post(new Runnable() {

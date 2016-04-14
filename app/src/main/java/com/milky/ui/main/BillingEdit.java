@@ -218,7 +218,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         AlertDialog dialog;
         Handler progressHandler = new Handler();
         int progress = 0;
-        int billId;
+        int billId = intent.getIntExtra("bill_id",0);
         String msg = "";
         int finalI = 0;
 
@@ -264,9 +264,9 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                 public void run() {
                     IBill billService = new BillService();
                     Bill bill = billService.getBill(billId);
-                    billService.SmsBill(bill.getId());
+                    billService.SmsBill(bill.getId(),BillingEdit.this);
 
-                    /*progressHandler.post(new Runnable() {
+                    progressHandler.post(new Runnable() {
                         public void run() {
                             progress += (100);
                             androidProgressBar.setProgress(progress);
@@ -274,7 +274,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             msg = "Sending message... ";
                             publishProgress(msg);
                         }
-                    });*/
+                    });
                     msg = "Sent message ";
                     publishProgress(msg, "done");
                 }
@@ -338,16 +338,6 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
         return super.onOptionsItemSelected(item);
     }
-
-    String url = "";
-
-//    private void SendSmsTouser(String mob, final String sms) {
-//
-//        String append = "?mobile=" + mob + "&message=" + sms;
-//        HttpAsycTask dataTask = new HttpAsycTask();
-//        url = ServerApis.SMS_API_ROOT + append;
-//        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, this, false, null);
-//    }
 
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> listType) {

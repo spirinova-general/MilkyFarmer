@@ -117,6 +117,7 @@ public class HttpAsycTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void s) {
+        if(_listner!=null)
         _listner.onTaskCompleted(_type, requestedList);
 
     }

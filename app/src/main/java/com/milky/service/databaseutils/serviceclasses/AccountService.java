@@ -5,19 +5,30 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.milky.service.core.Bill;
+import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.IAccountService;
 import com.milky.service.core.Account;
+import com.milky.service.databaseutils.serviceinterface.ISmsService;
+import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class AccountService implements IAccountService {
+    ISmsService _smsService = new SmsService();
+
     @Override
     public void insert(Account account) {
         ContentValues values = account.ToContentValues();
@@ -50,6 +61,7 @@ public class AccountService implements IAccountService {
         cursor.close();
         return holder;
     }
+
     @Override
     public int getLeftSMS() {
         String selectquery = "SELECT * FROM " + TableNames.ACCOUNT;
@@ -141,6 +153,17 @@ public class AccountService implements IAccountService {
         ContentValues values = new ContentValues();
         values.put(TableColumns.UsedSms, String.valueOf(getUsedSMS() + count));
         getDb().update(TableNames.ACCOUNT, values, null, null);
+    }
+
+    @Override
+    public void SendOtp(String mobile, String Otp, OnTaskCompleteListner listner) {
+
+        try {
+            String mesg = URLEncoder.encode("OTP to sign in KrushiVikas is: " + Otp, "UTF-8");
+            _smsService.SendSms(mobile, mesg, listner);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private SQLiteDatabase getDb() {

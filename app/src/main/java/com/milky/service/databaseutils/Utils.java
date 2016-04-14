@@ -42,9 +42,8 @@ public class Utils {
     {
         Calendar c = Calendar.getInstance();
         //This must change, have just kept this arbitrary date as it was there earlier
-        return FromDateString("2250-12-1");
+        return new Date(Long.MAX_VALUE);
     }
-
 
     public static boolean BeforeDate(Date date1, Date date2)
     {
@@ -96,11 +95,5 @@ public class Utils {
             return false;
         else
             return true;
-    }
-    //Send SMS to Customer
-    public void SendSms(String mob, final String sms, final OnTaskCompleteListner activity) {
-        String append = "?mobile=" + mob + "&message=" + sms;
-        HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, activity, false, null);
     }
 }

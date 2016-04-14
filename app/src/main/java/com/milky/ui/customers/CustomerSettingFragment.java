@@ -447,9 +447,11 @@ public class CustomerSettingFragment extends Fragment {
                     setting.setDefaultRate(Double.parseDouble(_mRate.getText().toString()));
                     //setting.setStartDate(new CustomersSettingService().getByCustId(custId, currentDate).getStartDate());
 
-                    Calendar c = Calendar.getInstance();
-                    setting.setEndDate(2250 + "-" + String.format("%02d", c.get(Calendar.MONTH) + 13) + "-" +
-                            String.format("%02d", Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+                    try {
+                        setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
 
                     setting.setDirty(1);
                     setting.setDateModified(currentDate);
@@ -476,6 +478,7 @@ public class CustomerSettingFragment extends Fragment {
                     bill.setDateAdded(holder.getDateAdded());
                     bill.setDirty(1);
                     new BillService().update(bill);*/
+
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_CUSTOMERS = true;

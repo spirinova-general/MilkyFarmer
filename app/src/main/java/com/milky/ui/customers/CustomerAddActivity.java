@@ -27,6 +27,7 @@ import com.milky.R;
 import com.milky.service.core.GlobalSettings;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
@@ -45,6 +46,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CustomerAddActivity extends AppCompatActivity {
@@ -200,9 +202,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         setting.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
                         setting.setDefaultRate(Double.parseDouble(_rate.getText().toString()));
                         setting.setStartDate(pickedDate);
-                        setting.setEndDate("2250" + "-" +
-                                String.format("%02d", deliveryDateTime.get(Calendar.MONTH) + 13) + "-" +
-                                String.format("%02d", deliveryDateTime.getActualMaximum(Calendar.DAY_OF_MONTH) + 5));
+                        setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
                         setting.setCustomerId((int) id);
                         setting.setDirty(1);
                         setting.setDateModified(Constants.getCurrentDate());
@@ -246,6 +246,8 @@ public class CustomerAddActivity extends AppCompatActivity {
                         CustomerAddActivity.this.finish();
                     }
                 } catch (NullPointerException npe) {
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 } finally {
                     _dbHelper.close();
                 }
@@ -263,11 +265,10 @@ public class CustomerAddActivity extends AppCompatActivity {
 
 
         final Calendar c = Calendar.getInstance();
-
+//
         myear = c.get(Calendar.YEAR);
         mmonth = c.get(Calendar.MONTH);
         mday = c.get(Calendar.DAY_OF_MONTH);
-
         // set current date into textview
 
 //        _pickdate.setText(new StringBuilder()

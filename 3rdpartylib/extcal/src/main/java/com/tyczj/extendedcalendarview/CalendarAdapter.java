@@ -112,32 +112,29 @@ public class CalendarAdapter extends BaseAdapter {
             TextView dayTV = (TextView) v.findViewById(R.id.textView1);
             TextView quantitiTV = (TextView) v.findViewById(R.id.milk_quantity);
             FrameLayout today = (FrameLayout) v.findViewById(R.id.today_frame);
-            Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+            Calendar cal = Calendar.getInstance();
             Day d = dayList.get(position);
             String date = d.getYear() + "-" + String.format("%02d", d.getMonth() + 1) + "-" + String.format("%02d", d.getDay());
-//            if (db.isTableNotEmpty("customers"))
-//                quantityOfDay = getQuantity(date);
+
             //today
             if (d.getYear() == cal.get(Calendar.YEAR) && d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() == cal.get(Calendar.DAY_OF_MONTH)) {
                 today.setVisibility(View.VISIBLE);
-
-            } else if (d.getYear() <= cal.get(Calendar.YEAR) && d.getMonth() <= cal.get(Calendar.MONTH) && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)
-                    ) {
+            }
+            //Past dates
+            else if (d.getYear() <= cal.get(Calendar.YEAR) && ((d.getMonth() < cal.get(Calendar.MONTH) || ((d.getMonth() == cal.get(Calendar.MONTH)
+                    && d.getDay() < cal.get(Calendar.DAY_OF_MONTH)))))) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     today.setBackground(context.getResources().getDrawable(R.drawable.past_days));
                 }
                 today.setVisibility(View.VISIBLE);
-            } else if (d.getYear() >= cal.get(Calendar.YEAR) && d.getMonth() >= cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH)
-                    ) {
+            }
+
+            //Future dates
+            else if (d.getYear() >= cal.get(Calendar.YEAR) && ( (d.getMonth() == cal.get(Calendar.MONTH) && d.getDay() > cal.get(Calendar.DAY_OF_MONTH))
+                    || (d.getMonth() > cal.get(Calendar.MONTH)))) {
                 today.setVisibility(View.GONE);
             }
-//            else {
-//                if (getQuantity(d) == 0)
-//                    quantitiTV.setText("0L");
-//                else
-//                    quantitiTV.setText(String.valueOf(getQuantity(d)) + "L");
-//                today.setVisibility(View.GONE);
-//            }
+
             if (date.equals("0-01-00")) {
             } else {
                 if (!isFirtsIndex) {
@@ -149,9 +146,7 @@ public class CalendarAdapter extends BaseAdapter {
 
                 } catch (IndexOutOfBoundsException iob) {
 
-                }
-                catch (NullPointerException npe)
-                {
+                } catch (NullPointerException npe) {
 
                 }
             }
@@ -326,6 +321,7 @@ public class CalendarAdapter extends BaseAdapter {
     }
 
     private static int custId = -1;
+
     public static void setcustId(int id) {
         custId = id;
     }
