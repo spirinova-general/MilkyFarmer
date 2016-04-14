@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
     ActionBarDrawerToggle mDrawerToggle;
 
-    List<Area> _areaList = new ArrayList<>(), _areacityList = new ArrayList<>();
+    List<Area> _areacityList = new ArrayList<>();
 
     public static String selectedArea = "";
     Menu menu = null;
@@ -203,9 +203,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 public boolean onQueryTextSubmit(String query) {
                     if (TextUtils.isEmpty(editSearch.getText().toString())) {
 
-                        if (getFragmentRefreshListener() != null) {
+                        /*if (getFragmentRefreshListener() != null) {
                             getFragmentRefreshListener().onRefresh();
-                        }
+                        }*/
 
                     } else {
                         if (CustomersFragment._mAdapter != null)
@@ -236,17 +236,17 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
         TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
         Account dataHolder = accountService.getDetails();
         name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
-        if (getFragmentRefreshListener() != null) {
+        /*if (getFragmentRefreshListener() != null) {
             getFragmentRefreshListener().onRefresh();
-        }
-        _areaList.clear();
+        }*/
+        //_areaList.clear();
         _areacityList.clear();
         AreaService areaService = new AreaService();
         _areacityList = areaService.getStoredAddresses();
 
-        for (int i = 0; i < _areacityList.size(); ++i) {
+        /*for (int i = 0; i < _areacityList.size(); ++i) {
             _areaList.add(areaService.getAreaById(_areacityList.get(i).getAreaId()));
-        }
+        }*/
         _dbHelper.close();
 
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
@@ -459,10 +459,10 @@ _dbHelper.close();
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (expended)
+        /*if (expended)
             if (getFragmentRefreshListener() != null) {
                 getFragmentRefreshListener().onRefresh();
-            }
+            }*/
     }
 
     //Expiry dialog
