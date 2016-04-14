@@ -64,8 +64,7 @@ public class BillService implements IBill {
             }
             cursor.close();
             return list;
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -94,7 +93,7 @@ public class BillService implements IBill {
     }
 
     @Override
-    public void RecalculateAllCurrentBills()  {
+    public void RecalculateAllCurrentBills() {
         try {
             Calendar cal = Calendar.getInstance();
             Date today = cal.getTime();
@@ -109,8 +108,7 @@ public class BillService implements IBill {
             if (!today.before(rollDate)) {
                 PerformBillRoll();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -118,7 +116,7 @@ public class BillService implements IBill {
     @Override
     public Bill getBill(int id) {
         String selectQuery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.ID + " ='" + id + "' AND "
-                + TableColumns.IsDeleted  + " ='0'";
+                + TableColumns.IsDeleted + " ='0'";
 
         Bill bill = null;
         Cursor cursor = getDb().rawQuery(selectQuery, null);
@@ -157,10 +155,9 @@ public class BillService implements IBill {
                             + ". Total quantity " + bill.getQuantity() + " litres. ", "UTF-8");
 
 
-            _smsService.SendSms(customer.getMobile(), msg,listner);
+            _smsService.SendSms(customer.getMobile(), msg, listner);
             _accountService.updateSMSCount(1);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -189,7 +186,7 @@ public class BillService implements IBill {
 
         Date firstDayOfMonth = cal.getTime();
 
-        List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth,today);
+        List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth, today);
 
         for (Customers customer : customers) {
             Bill bill;
@@ -200,10 +197,13 @@ public class BillService implements IBill {
                 bill.setCustomerId(customer.getCustomerId());
                 bill.setDateAdded(Utils.ToDateString(today));
                 bill.setDateModified(Utils.ToDateString(today));
+                bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
             }
 
             QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
-            bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
+            //Each time it updated Start delivery date as first date of month..
+//            bill.setStartDate(Utils.ToDateString(firstDayOfMonth))
+// ;
             bill.setEndDate(Utils.ToDateString(today));
             bill.setQuantity(qa.quantity);
             bill.setTotalAmount(qa.amount);
@@ -240,7 +240,6 @@ public class BillService implements IBill {
         cursor.close();
         return map;
     }
-
 
 
     private SQLiteDatabase getDb() {

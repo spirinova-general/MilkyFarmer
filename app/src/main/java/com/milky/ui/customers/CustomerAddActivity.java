@@ -334,7 +334,6 @@ public class CustomerAddActivity extends AppCompatActivity {
             myear = selectedYear;
             mmonth = selectedMonth;
             mday = selectedDay;
-            Calendar c = Calendar.getInstance();
             pickedDate = myear + "-" + String.format("%02d", mmonth + 1) + "-" + String.format("%02d", mday);
 
             // set selected date into textview
