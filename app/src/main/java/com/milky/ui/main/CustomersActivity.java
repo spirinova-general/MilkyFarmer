@@ -124,7 +124,7 @@ public class CustomersActivity extends AppCompatActivity {
                         data.setDeletedOn(Constants.getCurrentDate());
                         new CustomersService().update(data);
                         POSITION=0;
-                        Constants.REFRESH_BILL=true;
+//                        Constants.REFRESH_BILL=true;
                         Constants.REFRESH_CALANDER=true;
                         Constants.REFRESH_CUSTOMERS=true;
                         finish();

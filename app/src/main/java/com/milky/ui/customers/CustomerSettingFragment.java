@@ -482,7 +482,7 @@ public class CustomerSettingFragment extends Fragment {
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_CUSTOMERS = true;
-                    Constants.REFRESH_BILL = true;
+//                    Constants.REFRESH_BILL = true;
                     getActivity().finish();
 
                 } else {

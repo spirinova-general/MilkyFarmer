@@ -56,13 +56,7 @@ import com.milky.utils.Constants;
 import com.milky.service.core.Account;
 import com.milky.service.core.Area;
 import com.milky.service.core.Bill;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -86,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
         Constants.REFRESH_CALANDER = true;
         Constants.REFRESH_CUSTOMERS = true;
-        Constants.REFRESH_BILL = true;
+//        Constants.REFRESH_BILL = true;
 
         /*
         * Set up ACTIONBAR
@@ -285,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.sens_sms).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
+                menu.findItem(R.id.refresh_bills).setVisible(false);
 
 
                 break;
@@ -293,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.sens_sms).setVisible(false);
                 menu.findItem(R.id.save).setVisible(false);
+                menu.findItem(R.id.refresh_bills).setVisible(false);
 
                 break;
             case 2:
@@ -300,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
                 menu.findItem(R.id.bulk_edit).setVisible(false);
                 menu.findItem(R.id.sens_sms).setVisible(true);
                 menu.findItem(R.id.save).setVisible(false);
+                menu.findItem(R.id.refresh_bills).setVisible(true);
 
                 break;
         }
@@ -443,8 +440,6 @@ _dbHelper.close();
         return fragmentRefreshListener;
     }
 
-    private FragmentRefreshListener fragmentRefreshListener;
-
     public interface FragmentRefreshListener {
         void onRefresh();
     }
@@ -497,6 +492,12 @@ _dbHelper.close();
                     Toast.makeText(MainActivity.this, "No network available. ", Toast.LENGTH_SHORT).show();
 
                 break;
+            case R.id.refresh_bills:
+                if(getFragmentRefreshListener()!=null){
+                    Constants.REFRESH_BILL = true;
+                    getFragmentRefreshListener().onRefresh();
+                }
+                break;
 
 
         }
@@ -504,6 +505,12 @@ _dbHelper.close();
 
     }
 
+
+    public void setFragmentRefreshListener(FragmentRefreshListener fragmentRefreshListener) {
+        this.fragmentRefreshListener = fragmentRefreshListener;
+    }
+
+    private FragmentRefreshListener fragmentRefreshListener;
 
     private class SendBillSMS extends AsyncTask<Void, String, String> {
         AlertDialog dialog;

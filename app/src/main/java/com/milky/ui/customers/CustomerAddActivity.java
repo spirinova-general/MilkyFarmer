@@ -241,7 +241,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         new BillService().insert(bill);
 
                         Constants.REFRESH_CUSTOMERS = true;
-                        Constants.REFRESH_BILL = true;
+//                        Constants.REFRESH_BILL = true;
                         Constants.REFRESH_CALANDER = true;
                         CustomerAddActivity.this.finish();
                     }

@@ -134,7 +134,7 @@ public class CustomrDeliveryFragment extends Fragment {
                                 totalData.set(day.getDay() - 1, Double.parseDouble(quantity.getText().toString()));
                                 _mCalenderView.refreshAdapter();
                                 Constants.REFRESH_CALANDER = true;
-                                Constants.REFRESH_BILL=true;
+//                                Constants.REFRESH_BILL=true;
                                 dialog.dismiss();
                             }
 

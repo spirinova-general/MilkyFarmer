@@ -70,7 +70,11 @@
         appcompat:showAsAction="never"
         android:orderInCategory="1"
         android:title="Send Bills" />
-
+    <item
+        android:id="@+id/refresh_bills"
+        appcompat:showAsAction="never"
+        android:orderInCategory="1"
+        android:title="Refresh Bills" />
 
 
 </menu>

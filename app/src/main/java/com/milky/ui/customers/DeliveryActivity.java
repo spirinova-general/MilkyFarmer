@@ -177,7 +177,7 @@ public class DeliveryActivity extends AppCompatActivity {
                     customerService.insertOrUpdateCustomerSetting(holder);
                 }
             Constants.REFRESH_CALANDER = true;
-            Constants.REFRESH_BILL = true;
+//            Constants.REFRESH_BILL = true;
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -316,7 +316,7 @@ public class DeliveryActivity extends AppCompatActivity {
                     }
                     dialog.hide();
                     Constants.REFRESH_CALANDER = true;
-                    Constants.REFRESH_BILL = true;
+//                    Constants.REFRESH_BILL = true;
                     finish();
                 }
 
