@@ -50,7 +50,6 @@ public class BillingFragment extends Fragment {
                     Constants.REFRESH_BILL=false;
                 } else {
                     Toast.makeText(getActivity(), "No customer is added yet..", Toast.LENGTH_SHORT).show();
-
                 }
             }
         });

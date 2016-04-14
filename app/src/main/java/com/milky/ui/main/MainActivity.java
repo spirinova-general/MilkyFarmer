@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
         Constants.REFRESH_CALANDER = true;
         Constants.REFRESH_CUSTOMERS = true;
-//        Constants.REFRESH_BILL = true;
+        Constants.REFRESH_BILL = true;
 
         /*
         * Set up ACTIONBAR

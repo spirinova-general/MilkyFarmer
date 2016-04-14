@@ -202,8 +202,8 @@ public class BillService implements IBill {
 
             QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
             //Each time it updated Start delivery date as first date of month..
-//            bill.setStartDate(Utils.ToDateString(firstDayOfMonth))
-// ;
+//            bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
+
             bill.setEndDate(Utils.ToDateString(today));
             bill.setQuantity(qa.quantity);
             bill.setTotalAmount(qa.amount);
@@ -522,4 +522,5 @@ public class BillService implements IBill {
         long i = db.update(TableNames.Bill, values, TableColumns.StartDate + " <='" + date + "'", null);
 
     }*/
+
 }
