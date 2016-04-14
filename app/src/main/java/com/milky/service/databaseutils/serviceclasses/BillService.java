@@ -146,11 +146,11 @@ public class BillService implements IBill {
 
             Date endDate = Utils.FromDateString(bill.getEndDate());
             df = new SimpleDateFormat("dd-MMM-yy");
-            String endDateStr = df.format(startDate);
+            String endDateStr = df.format(endDate);
 
 
             String msg = URLEncoder.encode(
-                    "Dear " + customer.getFirstName() + ", " + "Your milk bill from " + bill.getStartDate() + " "
+                    "Dear " + customer.getFirstName() + ", " + "Your milk bill from "
                             + startDateStr + " to " + endDateStr + " is Rs. " + bill.getTotalAmount()
                             + ". Total quantity " + bill.getQuantity() + " litres. ", "UTF-8");
 

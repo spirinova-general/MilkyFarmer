@@ -37,7 +37,8 @@ public class BillingFragment extends Fragment {
             @Override
             public void onRefresh() {
                 if (_dbHelper.isTableNotEmpty(TableNames.Bill)   ) {
-                    if( Constants.REFRESH_BILL) {
+                    if( Constants.REFRESH_BILL)
+                    {
                         billService.RecalculateAllCurrentBills();
                         List<Bill> bills = billService.getAllGlobalBills(false);
                         if (bills.size() > 0) {
@@ -45,7 +46,7 @@ public class BillingFragment extends Fragment {
                             _mListView.setAdapter(adapter);
                         }
 
-                        Toast.makeText(getActivity(), "Bill is Refreshed..", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Bills Refreshed...", Toast.LENGTH_SHORT).show();
                     }
                     Constants.REFRESH_BILL=false;
                 } else {

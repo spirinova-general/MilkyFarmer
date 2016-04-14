@@ -8,7 +8,6 @@ import java.util.List;
 public interface IArea {
     long insert(Area area);
 
-    List<Area> getAllArea();
 
     boolean deleteAreaById(int areaId);
 

@@ -69,7 +69,8 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
         holder.userFirstName.setText(customer.getFirstName());
         holder.userLastName.setText(customer.getLastName());
         holder.userFlatNo.setText(customer.getAddress1() + ", ");
-        Area area = new AreaService().getAreaById(customer.getAreaId());
+        //Area area = new AreaService().getAreaById(customer.getAreaId());
+        Area area = customer.area;
         if (!area.getLocality().equals(""))
             holder.userAreaName.setText(area.getLocality() + ", " + area.getArea());
         else
@@ -163,7 +164,7 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
             if (Constants.selectedAreaId != -1) {
                 clear();
                 Area holder = areaService.getAreaById(Constants.selectedAreaId);
-                filterList = new CustomersService().getCustomersLisytByArea(Constants.selectedAreaId);
+                filterList = new CustomersService().getCustomersListByArea(Constants.selectedAreaId);
                 for (Customers Area : filterList) {
                     add(Area);
                     notifyDataSetChanged();

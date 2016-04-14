@@ -192,7 +192,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 //                otpButton.setEnabled(false);
                 if (AppUtil.getInstance().isNetworkAvailable(FarmerSignup.this)) {
                     String mesg = null;
-                    Constants.OTP = Constants.generateOTP();
+                    mesg = Constants.OTP = Constants.generateOTP();
 
 
                     if (!_mobile.getText().toString().equals("") && _mobile.getText().length() == 10) {

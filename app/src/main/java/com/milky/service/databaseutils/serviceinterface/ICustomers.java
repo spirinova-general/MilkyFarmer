@@ -14,7 +14,7 @@ public interface ICustomers {
 
     void delete(Customers customers);
 
-    List<Customers> getCustomersLisytByArea(int areaId);
+    List<Customers> getCustomersListByArea(int areaId);
 
     List<Customers> getAllCustomers();
 

@@ -28,11 +28,6 @@ public class AreaService implements IArea {
     }
 
     @Override
-    public List<Area> getAllArea() {
-        return null;
-    }
-
-    @Override
     public boolean deleteAreaById(int areaId) {
         return getDb().delete(TableNames.AREA, TableColumns.ID + " ='" + areaId + "'", null) > 0;
 

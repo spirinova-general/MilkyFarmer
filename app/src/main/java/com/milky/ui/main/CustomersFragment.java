@@ -39,8 +39,9 @@ public class CustomersFragment extends Fragment {
         super.onResume();
         if (Constants.REFRESH_CUSTOMERS) {
             if (_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
+
+                _mCustomersList = customersSettingService.getCustomersListByArea(Constants.selectedAreaId);
                 if (Constants.selectedAreaId==-1) {
-                    _mCustomersList = customersSettingService.getAllCustomers();
                     if (_mCustomersList.size() == 1)
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer");
                     else
@@ -48,7 +49,6 @@ public class CustomersFragment extends Fragment {
                     _mAdapter = new MainCustomersListAdapter(getActivity(), 0, R.id.address, _mCustomersList);
                     recList.setAdapter(_mAdapter);
                 } else {
-                    _mCustomersList = customersSettingService.getCustomersLisytByArea(Constants.selectedAreaId);
                     if (_mCustomersList.size() == 1)
                         mTotalCustomers.setText(String.valueOf(_mCustomersList.size()) + " " + "Customer in " + MainActivity.selectedArea);
                     else

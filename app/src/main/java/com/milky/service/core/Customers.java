@@ -42,7 +42,9 @@ public class Customers {
     private int dirty;
     private String startDate;
 
+    //We should guard these when they are not populated by throwing exceptions but for now...
     public List<CustomersSetting> customerSettings;
+    public Area area;
 
 
     public String getStartDate() {

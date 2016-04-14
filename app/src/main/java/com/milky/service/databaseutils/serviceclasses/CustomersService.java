@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.milky.service.core.Area;
 import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.TableColumns;
@@ -103,9 +104,15 @@ public class CustomersService implements ICustomers {
     }
 
     @Override
-    public List<Customers> getCustomersLisytByArea(int areaId) {
-        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER + " WHERE " + TableColumns.IsDeleted + " ='" + "1'"
-                + " AND " + TableColumns.AreaId + " ='" + areaId + "'";
+    public List<Customers> getCustomersListByArea(int areaId) {
+        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER
+                + " INNER JOIN " + TableNames.AREA + " ON "
+                + TableColumns.AreaId + " =" + TableNames.AREA + "." + TableColumns.ID;
+
+        if( areaId != -1) {
+            selectquery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
+        }
+
         ArrayList<Customers> list = new ArrayList<>();
 
         Cursor cursor = getDb().rawQuery(selectquery, null);
@@ -114,6 +121,15 @@ public class CustomersService implements ICustomers {
             do {
                 Customers holder = new Customers();
                 holder.PopulateFromCursor(cursor);
+
+                Area area = new Area();
+                area.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));
+                area.setArea(cursor.getString(cursor.getColumnIndex(TableColumns.Name)));
+                area.setCity(cursor.getString(cursor.getColumnIndex(TableColumns.City)));
+                area.setLocality(cursor.getString(cursor.getColumnIndex(TableColumns.Locality)));
+                holder.area = area;
+
+                list.add(holder);
             }
             while (cursor.moveToNext());
         }

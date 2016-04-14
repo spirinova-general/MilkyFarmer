@@ -14,6 +14,6 @@ public class SmsService implements ISmsService {
     {
         String append = "?mobile=" + mobile + "&message=" + message;
         HttpAsycTask dataTask = new HttpAsycTask();
-//        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, listner, false, null);
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, listner, false, null);
     }
 }
