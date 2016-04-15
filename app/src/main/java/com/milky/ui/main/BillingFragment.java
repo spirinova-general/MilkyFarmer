@@ -32,7 +32,6 @@ public class BillingFragment extends Fragment {
     private DatabaseHelper _dbHelper;
     int custId = 0;
     IBill billService = new BillService();
-//    private ProgressDialog progressDialog,progressDialog1;
 
     @Override
     public void onResume() {
@@ -43,11 +42,8 @@ public class BillingFragment extends Fragment {
             public void onRefresh() {
                 if (_dbHelper.isTableNotEmpty(TableNames.Bill)) {
                     if (Constants.REFRESH_BILL) {
-//                        progressDialog = ProgressDialog.show(getActivity(), "", "Refreshing...", false, true);
-                        SearchThread searchThread = new SearchThread();
-                        searchThread.start();
+                        new UpdataBills().execute();
                     }
-                    Constants.REFRESH_BILL = false;
                 } else {
                     Toast.makeText(getActivity(), "No customer is added yet..", Toast.LENGTH_SHORT).show();
                 }
@@ -75,7 +71,7 @@ public class BillingFragment extends Fragment {
     }
 
     private BillingAdapter adapter;
-
+    List<Bill> bills;
     private class UpdataBills extends AsyncTask<Void, Void, Void> {
         ProgressDialog progressDialog;
 
@@ -88,16 +84,22 @@ public class BillingFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            progressDialog = ProgressDialog.show(getActivity(), "", "Refreshing...", false, true);
-            SearchThread searchThread = new SearchThread();
-            searchThread.start();
-
+            billService.RecalculateAllCurrentBills();
+            bills = billService.getAllGlobalBills(false);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            if (bills.size() > 0) {
+                adapter = new BillingAdapter(bills, getActivity());
+                _mListView.setAdapter(adapter);
+            }
+            progressDialog.dismiss();
+            Constants.REFRESH_BILL=false;
+
+            Toast.makeText(getActivity(), "Bills Refreshed...", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -123,38 +125,11 @@ public class BillingFragment extends Fragment {
         if (isVisibleToUser) {
             if (Constants.REFRESH_BILL) {
 //                progressDialog = ProgressDialog.show(getActivity(), "", "Refreshing...", false, true);
-                SearchThread searchThread = new SearchThread();
-                searchThread.start();
-                Constants.REFRESH_BILL = false;
+                new UpdataBills().execute();
             }
 
         }
     }
 
-    private class SearchThread extends Thread {
 
-
-        public SearchThread() {
-        }
-
-        @Override
-        public void run() {
-            handler.sendEmptyMessage(0);
-        }
-
-        private Handler handler = new Handler() {
-
-            @Override
-            public void handleMessage(Message msg) {
-                billService.RecalculateAllCurrentBills();
-                List<Bill> bills = billService.getAllGlobalBills(false);
-                if (bills.size() > 0) {
-                    adapter = new BillingAdapter(bills, getActivity());
-                    _mListView.setAdapter(adapter);
-                }
-                Toast.makeText(getActivity(), "Bills Refreshed...", Toast.LENGTH_SHORT).show();
-
-            }
-        };
-    }
 }
