@@ -105,7 +105,7 @@ public class CalenderFragment extends Fragment {
         deliveryService = new com.milky.service.databaseutils.serviceclasses.DeliveryService();
         _dbHelper = AppUtil.getInstance().getDatabaseHandler();
         _mCalenderView = (ExtendedCalendarView) viewLayout.findViewById(R.id.calendar);
-        receiver = new BroadcastCalendar();
+        receiver = new BroadcastCalendar(getActivity());
         intentFilter = new IntentFilter("com.android.USER_ACTION");
         _mCalenderView.setForCustomersDelivery(false);
 

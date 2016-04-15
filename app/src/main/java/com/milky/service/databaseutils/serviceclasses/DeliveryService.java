@@ -56,10 +56,12 @@ public class DeliveryService implements IDelivery {
         try {
             List<Double> result = new ArrayList<>();
             Calendar start = Calendar.getInstance();
-            start.set(year, month, 1);
+            start.set(year,month,1,0,0,0);
             Date firstDayOfTheMonth = start.getTime();
             Calendar end = Calendar.getInstance();
-            end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+            //Set month as selected month and then get the last day , previously it was getting current month everytime
+            end.set(year,month,1,0,0,0);
+            end.set(Calendar.DAY_OF_MONTH,end.getActualMaximum(Calendar.DAY_OF_MONTH));
             Date lastDayOfTheMonth = end.getTime();
             Date date = firstDayOfTheMonth;
 
@@ -85,11 +87,12 @@ public class DeliveryService implements IDelivery {
     @Override
     public List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year) {
         try {
-            List<Double> result = new ArrayList<Double>();
+            List<Double> result = new ArrayList<>();
             Calendar start = Calendar.getInstance();
-            start.set(year, month, 1);
+            start.set(year, month, 1,0,0,0);
             Date firstDayOfTheMonth = start.getTime();
             Calendar end = Calendar.getInstance();
+            end.set(year,month,1,0,0,0);
             end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
             Date lastDayOfTheMonth = end.getTime();
 

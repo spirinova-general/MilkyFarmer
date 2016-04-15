@@ -221,8 +221,7 @@ public class CustomerSettingFragment extends Fragment {
         CustomersSetting settingData = null;
         try {
             Calendar cal = Calendar.getInstance();
-            Date today = null;
-            today = cal.getTime();
+            Date today =  Utils.GetDateWithoutTime(cal.getTime());
             settingData = customersService.getCustomerSetting(customer, today, false, true);
             Date startDate = Utils.FromDateString(customer.getStartDate());
             cal.setTime(startDate);

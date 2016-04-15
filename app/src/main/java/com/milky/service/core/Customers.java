@@ -46,7 +46,6 @@ public class Customers {
     public List<CustomersSetting> customerSettings;
     public Area area;
 
-
     public String getStartDate() {
         return startDate;
     }

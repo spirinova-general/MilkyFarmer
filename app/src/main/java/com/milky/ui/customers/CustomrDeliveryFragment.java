@@ -1,6 +1,7 @@
 package com.milky.ui.customers;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.serverapi.BroadcastCalendar;
 import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.Day;
 import com.tyczj.extendedcalendarview.ExtendedCalendarView;
@@ -37,7 +39,14 @@ public class CustomrDeliveryFragment extends Fragment {
     private int dataCount = 0;
     private int custId = 0;
     private String selected_date;
+    private BroadcastCalendar receiver;
+    private IntentFilter intentFilter;
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().registerReceiver(receiver, intentFilter);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,9 +74,17 @@ public class CustomrDeliveryFragment extends Fragment {
 
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(receiver);
+    }
+
     private AlertDialog dialog;
 
     private void initResources() {
+        receiver = new BroadcastCalendar(getActivity(),custId);
+        intentFilter = new IntentFilter("com.android.USER_ACTION");
         Calendar cal = Calendar.getInstance();
         totalData = new DeliveryService().getMonthlyDeliveryOfCustomer(custId, cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
         _mCalenderView.setOnDayClickListener(new ExtendedCalendarView.OnDayClickListener() {
@@ -88,17 +105,15 @@ public class CustomrDeliveryFragment extends Fragment {
                 Date today = cal.getTime();
 
                 boolean pastDateClicked = true;
-                try{
+                try {
                     selected_date = Utils.ToDateString(day.getDay(), day.getMonth() + 1, day.getYear());
                     Date clickedDate = Utils.FromDateString(selected_date);
                     pastDateClicked = Utils.BeforeOrEqualsDate(clickedDate, today);
-                }
-                catch(Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
 
-                if (pastDateClicked)
-                {
+                if (pastDateClicked) {
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
                     dialog = alertBuilder.create();
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

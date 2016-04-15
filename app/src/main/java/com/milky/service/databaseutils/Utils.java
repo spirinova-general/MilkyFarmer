@@ -57,7 +57,7 @@ public class Utils {
         date1 = GetDateWithoutTime(date1);
         date2 = GetDateWithoutTime(date2);
 
-        return date1.before(date2) || date1.equals(date2);
+        return (date1.before(date2) || date1.equals(date2));
 
     }
 

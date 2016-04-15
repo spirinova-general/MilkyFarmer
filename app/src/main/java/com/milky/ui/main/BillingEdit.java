@@ -13,26 +13,35 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.milky.R;
 import com.milky.service.core.Customers;
+import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
+import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.IBill;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
+import com.milky.ui.adapters.BillDetailDeliveryAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Bill;
+
+import org.w3c.dom.Text;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -45,12 +54,18 @@ import java.util.List;
 
 public class BillingEdit extends AppCompatActivity implements OnTaskCompleteListner {
     private Intent intent;
-    private EditText milk_quantity;
-    private EditText rate;
-    private TextView start_date;
+    private TextView milk_quantity;
+    //    private EditText rate;
+    private TextView start_date, payment_text;
     private TextView end_date;
     protected TextInputLayout _amount_layout;
     private AccountService accountService;
+    private ListView deliveryList;
+    private List<CustomersSetting> allDeliveryData;
+    private Bill allBillData = null;
+    int billId, custId;
+    ICustomers customers = new CustomersService();
+    private BillDetailDeliveryAdapter adpter;
 
     @Override
     protected void onResume() {
@@ -59,18 +74,25 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
     }
 
     private void getview() {
-        milk_quantity = (EditText) findViewById(R.id.milk_quantity);
-        rate = (EditText) findViewById(R.id.rate);
-        EditText balance_amount = (EditText) findViewById(R.id.balance_amount);
-        EditText tax = (EditText) findViewById(R.id.tax);
+        milk_quantity = (TextView) findViewById(R.id.milk_quantity);
+        TextView balance_amount = (TextView) findViewById(R.id.balance_amount);
+        TextView tax = (TextView) findViewById(R.id.tax);
         start_date = (TextView) findViewById(R.id.start_date);
+        billId = intent.getIntExtra("bill_id", 0);
+        //All bill related data
+        allBillData = new BillService().getBill(billId);
+
         end_date = (TextView) findViewById(R.id.end_date);
         start_date.setText(intent.getStringExtra("start_date"));
         end_date.setText(intent.getStringExtra("end_date"));
         _amount_layout = (TextInputLayout) findViewById(R.id.amount_layout);
-        LinearLayout _payment = (LinearLayout) findViewById(R.id.payment);
-        EditText payment_made = (EditText) findViewById(R.id.payment_amount);
-        payment_made.setText(String.valueOf(intent.getDoubleExtra("payment_made", 0)));
+        TextView payment_made = (TextView) findViewById(R.id.payment_amount);
+        deliveryList = (ListView) findViewById(R.id.deliveryList);
+        allDeliveryData = customers.getCustomerDetail(allBillData.getCustomerId(),true).customerSettings;
+        adpter =new BillDetailDeliveryAdapter(allDeliveryData,this);
+        deliveryList.setAdapter(adpter);
+        setListViewHeightBasedOnChildren(deliveryList);
+        payment_made.setText("(Rupees) " + String.valueOf(intent.getDoubleExtra("payment_made", 0)));
 
         Calendar cal = Calendar.getInstance();
         accountService = new AccountService();
@@ -89,13 +111,13 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                     Toast.makeText(BillingEdit.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
             }
         });
-        rate.setText(String.valueOf(intent.getDoubleExtra("totalPrice", 0)));
         start_date.setEnabled(false);
         end_date.setEnabled(false);
-        milk_quantity.setText(String.valueOf(intent.getDoubleExtra("quantity", 0)));
+        milk_quantity.setText(String.valueOf(intent.getDoubleExtra("quantity", 0)) + " (Litres)");
         milk_quantity.setFocusable(false);
         milk_quantity.setFocusableInTouchMode(false);
         Button clear_bill = (Button) findViewById(R.id.clear_bill);
+        payment_text = (TextView) findViewById(R.id.payment_text);
         TextView clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
         Calendar calendar = Calendar.getInstance();
         try {
@@ -117,14 +139,31 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                     + " " + Constants.MONTHS[calendar.get(Calendar.MONTH)]);
             clear_bill.setEnabled(false);
         }
-        /*If bill is already cleared*/
-        if (intent.getIntExtra("clear", 0) == 1) {
+
+        /*If bill is outstanding but not cleared yet*/
+        if(allBillData.getIsOutstanding()==1 && allBillData.getCustomerId()==0)
+        {
+            clear_bill.setEnabled(true);
+            clera_bill_text.setVisibility(View.VISIBLE);
+            send_bill.setEnabled(true);
+            payment_made.setVisibility(View.GONE);
+            payment_text.setVisibility(View.GONE);
+        }
+        /* If bill is already cleared*/
+        else if (intent.getIntExtra("clear", 0) == 1) {
             clear_bill.setVisibility(View.GONE);
             clera_bill_text.setVisibility(View.GONE);
             send_bill.setVisibility(View.GONE);
-            _payment.setVisibility(View.VISIBLE);
-        } else
-            _payment.setVisibility(View.GONE);
+            payment_made.setVisibility(View.VISIBLE);
+            payment_text.setVisibility(View.VISIBLE);
+//            clera_bill_text.setText("You have made payment of Rupees "+payment_made.getText().toString());
+        } else {
+            payment_made.setVisibility(View.GONE);
+            payment_text.setVisibility(View.GONE);
+            clera_bill_text.setVisibility(View.GONE);
+            clear_bill.setEnabled(false);
+        }
+
 
         clear_bill.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,41 +223,56 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                         dialog.dismiss();
                     }
                 });
-                if(dialog != null)
+                if (dialog != null)
                     dialog.show();
 
             }
         });
 
-        balance_amount.setText(String.valueOf(intent.getDoubleExtra("balance", 0)));
+        balance_amount.setText("(Rupees) " + String.valueOf(intent.getDoubleExtra("balance", 0)));
         balance_amount.setFocusable(false);
         balance_amount.setFocusableInTouchMode(false);
 //        if (balanceType == 1)
 //            balance_amount.setHint("Balance due (Rs)");
 
         TextView total_amount = (TextView) findViewById(R.id.total_amount);
-        total_amount.setText(String.valueOf(intent.getDoubleExtra("total", 0)));
+        total_amount.setText("(Rupees) " + String.valueOf(intent.getDoubleExtra("total", 0)));
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
-        tax.setText(String.valueOf(new GlobalSettingsService().getData().getTax()));
+        tax.setText(String.valueOf(new GlobalSettingsService().getData().getTax()) + " %");
         AppUtil.getInstance().getDatabaseHandler().close();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.billing_fragment);
+        setContentView(R.layout.bill_detail_screen);
         intent = this.getIntent();
         setActionBar();
         getview();
 
     }
+    public void setListViewHeightBasedOnChildren(ListView listView) {
+        if (adpter == null) {
+            // pre-condition
+            return;
+        }
 
+        int totalHeight = 0;
+        for (int i = 0; i < adpter.getCount(); i++) {
+            View listItem = adpter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (adpter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
     private class SendBillSMS extends AsyncTask<Void, String, String> {
         AlertDialog dialog;
         Handler progressHandler = new Handler();
         int progress = 0;
-        int billId = intent.getIntExtra("bill_id",0);
         String msg = "";
         int finalI = 0;
 
@@ -256,15 +310,14 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
 
         @Override
         protected String doInBackground(Void... params) {
-            final Customers customers = new CustomersService().getCustomerDetail( getIntent().getIntExtra("custId", 0));
-
+            final Customers customers = new CustomersService().getCustomerDetail(getIntent().getIntExtra("custId", 0));
 
 
             new Thread(new Runnable() {
                 public void run() {
                     IBill billService = new BillService();
                     Bill bill = billService.getBill(billId);
-                    billService.SmsBill(bill.getId(),BillingEdit.this);
+                    billService.SmsBill(bill.getId(), BillingEdit.this);
 
                     progressHandler.post(new Runnable() {
                         public void run() {

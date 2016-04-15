@@ -30,43 +30,15 @@ public class SignUp extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
         initResources();
 
-        if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
 
-                Intent i = new Intent(SignUp.this, MainActivity.class);
-                startActivity(i);
-                finish();
-
-        }
 
         _signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (AppUtil.getInstance().getPrefrences().getBoolean(UserPrefrences.VALID_USER, false)) {
-//                    Intent i = new Intent(SignUp.this, MainActivity.class);
-//                    startActivity(i);
-//                } else
-//                    Toast.makeText(SignUp.this, "Please login with facebook !", Toast.LENGTH_SHORT).show();
-                if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
-                        Intent i = new Intent(SignUp.this, MainActivity.class);
-                        startActivity(i);
-                        finish();
 
-                } else {
                     Intent i = new Intent(SignUp.this, FarmerSignup.class);
                     startActivity(i);
                     finish();
-                }
-//                if(_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
-//                {
-//                    Intent i = new Intent(SignUp.this, MainActivity.class);
-//                    startActivity(i);
-//                }
-//                else
-//                {
-//                    Intent i = new Intent(SignUp.this, FarmerSignup.class);
-//                    startActivity(i);
-//                }
-//                _dbHelper.close();
 
             }
         });

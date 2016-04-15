@@ -34,6 +34,7 @@
     <string name="enter_valid_rate">Enter valid rate</string>
     <string name="enter_valid_balance">Enter valid balance</string>
     <string name="enter_valid_tax">Enter valid tax</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
 
 
 </resources>

@@ -29,6 +29,7 @@ import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.service.serverapi.ServerApis;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
+import com.milky.utils.NotificationBroadcastReceiver;
 import com.milky.utils.TextValidationMessage;
 import com.milky.utils.UserPrefrences;
 
@@ -197,14 +198,15 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
                     if (!_mobile.getText().toString().equals("") && _mobile.getText().length() == 10) {
                         _mobileLayout.setError(null);
-                        accountService.SendOtp(_mobile.getText().toString(), mesg,FarmerSignup.this);
+                        accountService.SendOtp(_mobile.getText().toString(), mesg, FarmerSignup.this);
+                        AppUtil.getInstance().showNotification(FarmerSignup.this, FarmerSignup.this.getResources().getString(R.string.app_name), "Your OTP for " + FarmerSignup.this.getResources().getString(R.string.app_name) + " is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
+
                     } else
                         _mobileLayout.setError("Enter mobile number !");
                 } else
                     Toast.makeText(FarmerSignup.this, "Network is not available. ", Toast.LENGTH_SHORT).show();
 
 
-//                AppUtil.getInstance().showNotification(FarmerSignup.this, FarmerSignup.this.getResources().getString(R.string.app_name), "Your OTP for "+FarmerSignup.this.getResources().getString(R.string.app_name)+" is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
             }
         });
     }
