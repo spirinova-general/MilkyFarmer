@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.milky.R;
+import com.milky.service.core.Bill;
+import com.milky.service.core.CustomerSettingComparator;
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.Utils;
 import com.milky.utils.Constants;
@@ -17,16 +19,21 @@ import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class BillDetailDeliveryAdapter extends BaseAdapter {
     private List<CustomersSetting> customerSettingsData;
+    private Bill _bill;
     private Context mContext;
 
-    public BillDetailDeliveryAdapter(final List<CustomersSetting> dataList, final Context con) {
+    public BillDetailDeliveryAdapter(final Bill bill, final List<CustomersSetting> dataList, final Context con) {
         this.mContext = con;
+        Collections.sort(dataList, new CustomerSettingComparator());
         this.customerSettingsData = dataList;
+        this._bill = bill;
     }
 
     @Override
@@ -60,18 +67,33 @@ public class BillDetailDeliveryAdapter extends BaseAdapter {
         Calendar startCal = Calendar.getInstance();
         Calendar endCal = Calendar.getInstance();
 
-        try {
-            Date sDate = Utils.FromDateString(data.getStartDate());
-            Date eDAte = Utils.FromDateString(data.getEndDate());
-            startCal.setTime(sDate);
-            endCal.setTime(eDAte);
+        Date sDate = Utils.FromDateString(data.getStartDate());
+        Date eDAte = Utils.FromDateString(data.getEndDate());
+        Date billEndDate = Utils.FromDateString(_bill.getEndDate());
+        Date billStartDate = Utils.FromDateString(_bill.getStartDate());
 
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if( Utils.BeforeOrEqualsDate(billEndDate, eDAte))
+        {
+            eDAte = billEndDate;
         }
+        if(Utils.BeforeOrEqualsDate(sDate, billStartDate))
+        {
+            sDate = billStartDate;
+        }
+
+        startCal.setTime(sDate);
+        endCal.setTime(eDAte);
+
         String startDate = String.format("%02d", startCal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[startCal.get(Calendar.MONTH)];
         String endDate = String.format("%02d", endCal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[endCal.get(Calendar.MONTH)];
-        holder.deliveryFrom.setText(startDate + " to " + endDate);
+        if( data.getIsCustomDelivery())
+        {
+            holder.deliveryFrom.setText("        " + startDate + "    ");
+        }
+        else
+        {
+            holder.deliveryFrom.setText(startDate + " to " + endDate);
+        }
         holder.dayRate.setText(String.valueOf(data.getDefaultRate()));
         holder.dayQuantity.setText(String.valueOf(data.getGetDefaultQuantity()));
         return convertView;

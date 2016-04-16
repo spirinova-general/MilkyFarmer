@@ -19,4 +19,5 @@ public interface IBill {
     //To be called from customer bill tab
     List<Bill> getBillsOfCustomer(int customerId);
     Bill getBill(int id);
+    void clearBill(Bill bill, double paymentMade);
 }

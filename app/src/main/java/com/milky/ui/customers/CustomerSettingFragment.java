@@ -234,8 +234,8 @@ public class CustomerSettingFragment extends Fragment {
 
         /*Set defaul rate
         * */
-        if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
-            _mRate.setText(String.valueOf(new GlobalSettingsService().getData().getDefaultRate()));
+        /*if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
+            _mRate.setText(String.valueOf(new GlobalSettingsService().getData().getDefaultRate()));*/
 
         /*
         * If to edit customer details
@@ -446,11 +446,8 @@ public class CustomerSettingFragment extends Fragment {
                     setting.setDefaultRate(Double.parseDouble(_mRate.getText().toString()));
                     //setting.setStartDate(new CustomersSettingService().getByCustId(custId, currentDate).getStartDate());
 
-                    try {
-                        setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
+
 
                     setting.setDirty(1);
                     setting.setDateModified(currentDate);

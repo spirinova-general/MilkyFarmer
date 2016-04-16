@@ -8,12 +8,10 @@ import org.json.JSONObject;
 public interface IAccountService {
      void insert(Account account);
      void update(Account account);
-     void delete(Account account);
      Account getDetails();
-     int getLeftSMS();
-     int getUsedSMS();
+     int getRemainingSMS();
      boolean isAccountExpired();
      JSONObject getJsonData();
-     void updateSMSCount(int count);
-     void SendOtp(String mobile, String Otp, OnTaskCompleteListner listner);
+     void incrementUsedSMSCount(int count);
+
 }

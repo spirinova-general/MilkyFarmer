@@ -40,7 +40,7 @@ public class TableColumsDetail {
     //Customers Setting
     public static final String CUSTOMER_SETTINGS = "CREATE TABLE " + TableNames.CustomerSetting + "(" + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             TableColumns.DefaultRate + " REAL," + TableColumns.DefaultQuantity + " TEXT,"
-            + TableColumns.Balance + " REAL," + TableColumns.StartDate + " DATETIME," + TableColumns.EndDate + " DATETIME,"
+            + TableColumns.StartDate + " DATETIME," + TableColumns.EndDate + " DATETIME,"
             + TableColumns.IsCustomDelivery + " INTEGER," + TableColumns.CustomerId + " INTEGER,"+TableColumns.IsDeleted+" INTEGER,"
             +TableColumns.Dirty+" INTEGER,"+TableColumns.DateModified+" DATETIME,"
             + " FOREIGN KEY (" + TableColumns.CustomerId + ")" + " REFERENCES " + TableNames.CUSTOMER + "(" + TableColumns.ID + ")" + ")";

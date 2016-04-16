@@ -35,15 +35,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
-import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
-import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
-import com.milky.service.databaseutils.serviceclasses.CustomersService;
-import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.service.serverapi.HttpAsycTask;
@@ -482,10 +478,10 @@ _dbHelper.close();
                     final List<Bill> bills = billService.getAllGlobalBills(true);
 
                     if (bills.size() > 0) {
-                        if (accountService.getLeftSMS() > bills.size())
+                        if (accountService.getRemainingSMS() >= bills.size())
                             new SendBillSMS(bills).execute();
                         else
-                            Toast.makeText(MainActivity.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, "Your SMS quota is not sufficient. Please contact administrator !", Toast.LENGTH_LONG).show();
                     }
 
                 } else

@@ -210,7 +210,7 @@ public class CustomersService implements ICustomers {
     //as it represents one row of the table
     @Override
     public List<Customers> getCustomersWithinDeliveryRange(Integer areaId, Date startDateObj, Date endDateObj) {
-        return searchCustomers(areaId, startDateObj, endDateObj);
+        return searchCustomers(areaId, startDateObj, endDateObj, null);
     }
 
     //This does not hit the database gets a complete customersetting for a particular date
@@ -274,42 +274,31 @@ public class CustomersService implements ICustomers {
         if (!populateSettings)
             return getCustomerDetail(id);
 
-        String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
-               + " INNER JOIN " + TableNames.CustomerSetting + " ON "
-                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableColumns.CustomerId + " ='" + id  + "'";
-
-        Cursor cursor = getDb().rawQuery(selectQuery, null);
-        Customers customers = new Customers();
-
-        if (cursor.moveToFirst()) {
-            customers.PopulateFromCursor(cursor);
-            customers.setCustomerId(id);
-            customers.customerSettings = new ArrayList<CustomersSetting>();
-            do {
-                CustomersSetting holder = new CustomersSetting();
-                holder.PopulateFromCursor(cursor);
-                customers.customerSettings.add(holder);
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-        return customers;
+        Customers customer = searchCustomers(null, null, null, id).get(0);
+        return customer;
     }
 
 
 
-    private List<Customers> searchCustomers(Integer areaId, Date startDateObj, Date endDateObj) {
-
-        String startDate = Utils.ToDateString(startDateObj, true);
+    private List<Customers> searchCustomers(Integer areaId, Date startDateObj, Date endDateObj, Integer customerIdInt) {
         //String endDate = Utils.ToDateString(endDateObj);
 
-        String selectQuery = "SELECT *, " + TableNames.CUSTOMER + "." + TableColumns.IsDeleted + " as IsCustomerDeleted "
+        String selectQuery = "SELECT *, " + TableNames.CUSTOMER + "." + TableColumns.IsDeleted + " as IsCustomerDeleted, "
+                + TableNames.CustomerSetting + "." +  TableColumns.IsDeleted + " as IsCustomerSettingDeleted, "
+                + TableNames.CUSTOMER + "." + TableColumns.StartDate + " as CustomerStartDate, "
+                + TableNames.CustomerSetting + "." +  TableColumns.StartDate + " as CustomerSettingStartDate "
                 + " FROM " + TableNames.CUSTOMER
                 + " INNER JOIN " + TableNames.CustomerSetting + " ON "
-                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE IsCustomerDeleted ='0' OR ( IsCustomerDeleted ='1' AND "
-                + TableColumns.DeletedOn + " >='" + startDate + "')";
+                + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId;
+
+        if( customerIdInt == null ) {
+            String startDate = Utils.ToDateString(startDateObj, true);
+
+            selectQuery += " WHERE IsCustomerDeleted ='0' OR ( IsCustomerDeleted ='1' AND "
+                    + TableColumns.DeletedOn + " >='" + startDate + "')";
+        }
+        else
+            selectQuery +=  " WHERE " + TableColumns.CustomerId + " ='" + customerIdInt  + "'";
 
         if (areaId != null)
             selectQuery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
@@ -326,6 +315,7 @@ public class CustomersService implements ICustomers {
                     customers.PopulateFromCursor(cursor);
                     customers.setCustomerId(customerId);
                     customers.setIsDeleted(cursor.getInt(cursor.getColumnIndex("IsCustomerDeleted")));
+                    customers.setStartDate(cursor.getString(cursor.getColumnIndex("CustomerStartDate")));
                     customersMap.put(customerId, customers);
                     customers.customerSettings = new ArrayList<>();
                 } else {
@@ -333,6 +323,8 @@ public class CustomersService implements ICustomers {
                 }
                 CustomersSetting holder = new CustomersSetting();
                 holder.PopulateFromCursor(cursor);
+                holder.setStartDate(cursor.getString(cursor.getColumnIndex("CustomerSettingStartDate")));
+                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex("IsCustomerSettingDeleted")));
                 customers.customerSettings.add(holder);
             }
             while (cursor.moveToNext());

@@ -18,6 +18,18 @@ public class GlobalSettingsService implements IGlobalSetting {
 
     @Override
     public void insert(GlobalSettings globalSettings) {
+        Calendar c = Calendar.getInstance();
+        Date dateModified = c.getTime();
+        globalSettings.setDateModified(Utils.ToDateString(dateModified));
+
+        try {
+            Date rollDate = Utils.FromDateString(globalSettings.getRollDate());
+            globalSettings.setRollDate(Utils.ToDateString(rollDate, true));
+        }
+        catch(Exception ex)
+        {
+            //
+        }
         ContentValues values = new ContentValues();
         values.put(TableColumns.DefaultRate, globalSettings.getDefaultRate());
         values.put(TableColumns.TAX, globalSettings.getTax());
@@ -30,6 +42,19 @@ public class GlobalSettingsService implements IGlobalSetting {
 
     @Override
     public void update(GlobalSettings globalSettings) {
+        Calendar c = Calendar.getInstance();
+        Date dateModified = c.getTime();
+        globalSettings.setDateModified(Utils.ToDateString(dateModified));
+
+        try {
+            Date rollDate = Utils.FromDateString(globalSettings.getRollDate());
+            globalSettings.setRollDate(Utils.ToDateString(rollDate, true));
+        }
+        catch(Exception ex)
+        {
+            //
+        }
+
         ContentValues values = new ContentValues();
         values.put(TableColumns.RollDate, globalSettings.getRollDate());
         values.put(TableColumns.TAX, globalSettings.getTax());
@@ -62,38 +87,26 @@ public class GlobalSettingsService implements IGlobalSetting {
 
     @Override
     public String getRollDate() {
-        String selectquery = "SELECT * FROM " + TableNames.GlobalSetting;
-        String rate = null;
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                rate = cursor.getString(cursor.getColumnIndex(TableColumns.RollDate));
-
-            }
-            while (cursor.moveToNext());
-
-        }
-        cursor.close();
-
-        return rate;
+        return getData().getRollDate();
     }
 
     @Override
-    public void setNextRollDate() {
+    public void calculateAndSetNextRollDate() {
         try {
             //Calculate  next roll date and update it in global settings
             //Next roll date - the last day of the month for (date + 1 day)
-            Date rollDate = Utils.FromDateString(getRollDate());
-
             Date newRollDate = null;
             Calendar c = Calendar.getInstance();
             c.add(Calendar.DATE, 1);
             newRollDate = c.getTime();
 
-
             c.setTime(newRollDate);
             c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
             newRollDate = c.getTime();
+
+            GlobalSettings settings = getData();
+            settings.setRollDate(Utils.ToDateString(newRollDate, true));
+            update(settings);
         }
         catch(Exception ex)
         {
@@ -105,9 +118,10 @@ public class GlobalSettingsService implements IGlobalSetting {
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();
     }
-    public void updateRollDate(String date) {
+
+    /*public void updateRollDate(String date) {
         ContentValues values = new ContentValues();
         values.put(TableColumns.RollDate,date);
         getDb().update(TableNames.GlobalSetting, values,null, null);
-    }
+    }*/
 }

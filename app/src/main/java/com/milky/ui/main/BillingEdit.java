@@ -29,24 +29,18 @@ import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
-import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
-import com.milky.service.serverapi.HttpAsycTask;
+import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
 import com.milky.service.serverapi.OnTaskCompleteListner;
-import com.milky.service.serverapi.ServerApis;
 import com.milky.ui.adapters.BillDetailDeliveryAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Bill;
 
-import org.w3c.dom.Text;
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,35 +77,45 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         allBillData = new BillService().getBill(billId);
 
         end_date = (TextView) findViewById(R.id.end_date);
-        start_date.setText(intent.getStringExtra("start_date"));
-        end_date.setText(intent.getStringExtra("end_date"));
+
+        Date endDate = Utils.FromDateString(allBillData.getEndDate());
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yy");
+        String endDateStr = df.format(endDate);
+        Date startDate =  Utils.FromDateString(allBillData.getStartDate());
+        String startDateStr = df.format(startDate);
+
+        start_date.setText(startDateStr);
+        end_date.setText(endDateStr);
         _amount_layout = (TextInputLayout) findViewById(R.id.amount_layout);
-        TextView payment_made = (TextView) findViewById(R.id.payment_amount);
+        final TextView payment_made = (TextView) findViewById(R.id.payment_amount);
         deliveryList = (ListView) findViewById(R.id.deliveryList);
         allDeliveryData = customers.getCustomerDetail(allBillData.getCustomerId(),true).customerSettings;
-        adpter =new BillDetailDeliveryAdapter(allDeliveryData,this);
+        adpter = new BillDetailDeliveryAdapter(allBillData, allDeliveryData,this);
         deliveryList.setAdapter(adpter);
+        //Umesh - this needs to change
         setListViewHeightBasedOnChildren(deliveryList);
-        payment_made.setText("Rs " + String.valueOf(intent.getDoubleExtra("payment_made", 0)));
 
-        Calendar cal = Calendar.getInstance();
+        payment_made.setText("Rs " + allBillData.getPaymentMade());
+        //Calendar cal = Calendar.getInstance();
         accountService = new AccountService();
         Button send_bill = (Button) findViewById(R.id.send_bill);
-        try {
+
+        /*try {
             cal.setTime(Constants._display_format.parse(intent.getStringExtra("end_date")));
         } catch (ParseException e) {
             e.printStackTrace();
-        }
+        }*/
+        //Umesh
         send_bill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (accountService.getLeftSMS() >= 1)
+                if (accountService.getRemainingSMS() >= 1)
                     new SendBillSMS().execute();
                 else
                     Toast.makeText(BillingEdit.this, "Your SMS quota has expired. Please contact administrator !", Toast.LENGTH_LONG).show();
             }
         });
-        start_date.setEnabled(false);
+        start_date.setEnabled(true);
         end_date.setEnabled(false);
         milk_quantity.setText(String.valueOf(intent.getDoubleExtra("quantity", 0)) + " Litres");
         milk_quantity.setFocusable(false);
@@ -119,29 +123,33 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         Button clear_bill = (Button) findViewById(R.id.clear_bill);
         payment_text = (TextView) findViewById(R.id.payment_text);
         TextView clera_bill_text = (TextView) findViewById(R.id.clera_bill_text);
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         try {
             Date date = Constants.work_format.parse(new GlobalSettingsService().getRollDate());
             calendar.setTime(date);
         } catch (ParseException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        if (cal.get(Calendar.DAY_OF_MONTH) >= calendar.get(Calendar.DAY_OF_MONTH) && cal.get(Calendar.MONTH) >= calendar.get(Calendar.MONTH)
-                && cal.get(Calendar.YEAR) >= calendar.get(Calendar.YEAR) && intent.getIntExtra("clear", 0) == 1) {
-            clear_bill.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_button_click));
-            clera_bill_text.setVisibility(View.GONE);
-            clear_bill.setEnabled(true);
-            clear_bill.setTextColor(getResources().getColor(R.color.white));
-        } else {
+        //Current bill
+        if(allBillData.getIsOutstanding() == 0)
+        {
+            IGlobalSetting settingService = new GlobalSettingsService();
+            String rollDate = settingService.getRollDate();
+            Date rd = Utils.FromDateString(rollDate);
+            df = new SimpleDateFormat("dd-MMM-yy");
+            String formattedRollDate = df.format(rd);
+
             clear_bill.setBackgroundColor(getResources().getColor(R.color.gray));
-            clera_bill_text.setText("You can clear this bill once the final bill is generated on " + calendar.get(Calendar.DAY_OF_MONTH)
-                    + " " + Constants.MONTHS[calendar.get(Calendar.MONTH)]);
+            clera_bill_text.setText("You can clear this bill once the final bill is generated on " + formattedRollDate);
             clear_bill.setEnabled(false);
+
+            payment_made.setVisibility(View.GONE);
+            payment_text.setVisibility(View.GONE);
         }
 
         /*If bill is outstanding but not cleared yet*/
-        if(allBillData.getIsOutstanding()==1 && allBillData.getCustomerId()==0)
+        if(allBillData.getIsOutstanding()==1 && allBillData.getIsCleared()==0)
         {
             clear_bill.setEnabled(true);
             clera_bill_text.setVisibility(View.VISIBLE);
@@ -150,18 +158,13 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             payment_text.setVisibility(View.GONE);
         }
         /* If bill is already cleared*/
-        else if (intent.getIntExtra("clear", 0) == 1) {
+        else if (allBillData.getIsCleared() == 1) {
             clear_bill.setVisibility(View.GONE);
             clera_bill_text.setVisibility(View.GONE);
             send_bill.setVisibility(View.GONE);
             payment_made.setVisibility(View.VISIBLE);
             payment_text.setVisibility(View.VISIBLE);
 //            clera_bill_text.setText("You have made payment of Rupees "+payment_made.getText().toString());
-        } else {
-            payment_made.setVisibility(View.GONE);
-            payment_text.setVisibility(View.GONE);
-            clera_bill_text.setVisibility(View.GONE);
-            clear_bill.setEnabled(false);
         }
 
 
@@ -183,34 +186,11 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                     public void onClick(View v) {
 
                         if (payment.getText().toString().equals("")) {
-                            quantity_layout.setError("Enter quantity!");
+                            quantity_layout.setError("Enter Amount!");
                         } else {
-                            Bill holder = new Bill();
-
                             double payment_made = Double.parseDouble(payment.getText().toString());
-                            double bill_amount = intent.getDoubleExtra("total", 0);
-
-                            double bill = payment_made - bill_amount;
-                            if (bill_amount >= payment_made) {
-                                holder.setBalance(bill_amount - payment_made);
-                            } else {
-                                holder.setBalance(bill);
-                            }
-                            holder.setPaymentMade(payment_made);
-                            holder.setIsCleared(1);
-
-                            holder.setStartDate(intent.getStringExtra("start_date_work_format"));
-                            holder.setEndDate(intent.getStringExtra("end_date_work_format"));
-                            holder.setTotalAmount(bill_amount);
-                            holder.setRate(intent.getDoubleExtra("totalPrice", 0));
-                            holder.setQuantity(intent.getDoubleExtra("quantity", 0));
-                            holder.setAdjustment(0);
-                            holder.setIsOutstanding(intent.getIntExtra("is_outstanding", 0));
-                            holder.setCustomerId(intent.getIntExtra("custId", 0));
-                            holder.setTax(intent.getDoubleExtra("tax", 0));
-                            holder.setDateModified(Constants.getCurrentDate());
-
-                            new BillService().update(holder);
+                            IBill billService = new BillService();
+                            billService.clearBill(allBillData, payment_made);
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER = true;
                             BillingEdit.this.finish();

@@ -10,6 +10,6 @@ public interface IGlobalSetting {
     GlobalSettings getData();
 
     String getRollDate();
-    void setNextRollDate();
+    void calculateAndSetNextRollDate();
 
 }

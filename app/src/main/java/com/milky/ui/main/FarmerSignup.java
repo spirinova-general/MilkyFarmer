@@ -20,9 +20,9 @@ import android.widget.Toast;
 import com.milky.R;
 import com.milky.service.core.Account;
 import com.milky.service.core.GlobalSettings;
-import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceclasses.SmsService;
 import com.milky.service.databaseutils.serviceinterface.ISmsService;
 import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
@@ -37,8 +37,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -198,7 +196,8 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
                     if (!_mobile.getText().toString().equals("") && _mobile.getText().length() == 10) {
                         _mobileLayout.setError(null);
-                        accountService.SendOtp(_mobile.getText().toString(), mesg, FarmerSignup.this);
+                        ISmsService smsService = new SmsService();
+                        smsService.SendOtp(_mobile.getText().toString(), mesg, FarmerSignup.this);
                         AppUtil.getInstance().showNotification(FarmerSignup.this, FarmerSignup.this.getResources().getString(R.string.app_name), "Your OTP for " + FarmerSignup.this.getResources().getString(R.string.app_name) + " is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
 
                     } else

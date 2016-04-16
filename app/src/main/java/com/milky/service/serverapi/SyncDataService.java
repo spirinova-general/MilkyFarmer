@@ -9,20 +9,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.milky.service.core.Bill;
-import com.milky.service.core.Customers;
-import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
-import com.milky.service.databaseutils.serviceclasses.BillService;
-import com.milky.service.databaseutils.serviceclasses.CustomersService;
-import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
-import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Account;
-import com.milky.utils.UserPrefrences;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -30,11 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,8 +51,12 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
             SharedPreferences.Editor edit = preferences.edit();
 
             public void run() {
+                if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
+                    SyncNow();
+                handler.postDelayed(runnable, 50000);
+
                 // Get roll date from db.
-                Calendar calendar = Calendar.getInstance();
+                /*Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat work_format = new SimpleDateFormat("yyyy-MM-dd");
                 work_format.format(calendar.getTime());
 
@@ -74,7 +67,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
-                }
+                }*/
                 /*Calendar c = Calendar.getInstance();
                 if (c.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH) && c.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)) {
                     //Bill is to be outstanding
@@ -144,9 +137,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
                     edit.apply();
                 }*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
-                    SyncNow();
-                handler.postDelayed(runnable, 50000);
+
             }
         };
 

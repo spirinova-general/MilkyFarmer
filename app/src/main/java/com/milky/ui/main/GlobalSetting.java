@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -42,12 +41,12 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.milky.R;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.serviceclasses.AreaService;
-import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceinterface.IAccountService;
+import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
 import com.milky.service.serverapi.OnTaskCompleteListner;
 import com.milky.ui.adapters.PlaceAdapter;
 import com.milky.utils.AppUtil;
@@ -148,15 +147,14 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
     }
 
 
-    @Override
+   @Override
     protected Dialog onCreateDialog(int id) {
-
         switch (id) {
             case DATE_DIALOG_ID:
                 // set date picker as current date
                 DatePickerDialog _date = new DatePickerDialog(this, datePickerListener, _mYear, _mmonth,
                         _mday) {
-                    @Override
+                   /* @Override
                     public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         if (year < _mYear)
                             view.updateDate(_mYear, _mmonth, _mday);
@@ -164,11 +162,11 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
                         if (monthOfYear < _mmonth && year == _mYear)
                             view.updateDate(_mYear, _mmonth, _mday);
 
-                        if (dayOfMonth < _mday && year == _mYear && monthOfYear == _mmonth)
+                        if (dayOfMonth <= _mday && year == _mYear && monthOfYear == _mmonth)
                             view.updateDate(_mYear, _mmonth, _mday);
 
 
-                    }
+                    }*/
                 };
                 return _date;
         }
@@ -185,6 +183,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             _mmonth = selectedMonth;
             _mday = selectedDay;
 
+            //IGlobalSetting _globalSettingService = new GlobalSettingsService();
+            //_globalSettingService.se
             _billGenerationDateView.setText(new StringBuilder()
                     .append(Constants.MONTHS[_mmonth]).append("-")
                     .append(String.format("%02d", _mday)).append("-")
@@ -272,7 +272,7 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
             _billGenerationDateView.setText(Constants.MONTHS[cal.get(Calendar.MONTH)] + "-"
                     + String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + String.valueOf(cal.get(Calendar.YEAR)));
 
-            msgCount.setText(String.valueOf(accountSettings.getLeftSMS()));
+            msgCount.setText(String.valueOf(accountSettings.getRemainingSMS()));
         }
         populateAreaView();
         mob = mobile.getText().

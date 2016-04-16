@@ -52,7 +52,7 @@ public class BillService implements IBill {
     @Override
     public void update(Bill bill) {
         ContentValues values = bill.ToContentValues();
-        getDb().update(TableNames.Bill, values, TableColumns.CustomerId + " ='" + bill.getCustomerId() + "'", null);
+        getDb().update(TableNames.Bill, values, TableColumns.ID + " ='" + bill.getId() + "'", null);
     }
 
     @Override
@@ -166,12 +166,24 @@ public class BillService implements IBill {
                             + ". Total quantity " + bill.getQuantity() + " litres. ", "UTF-8");
 
 
-            _smsService.SendSms(customer.getMobile(), msg, listner);
-            _accountService.updateSMSCount(1);
+            _smsService.SendSms(customer.getMobile(), msg, listner, true);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void clearBill(Bill bill, double paymentMade)
+    {
+        bill.setPaymentMade(paymentMade);
+        bill.setIsCleared(1);
+        double balance = bill.getTotalAmount() - paymentMade;
+        Customers customer = _customerService.getCustomerDetail(bill.getCustomerId());
+        customer.setBalance_amount(balance);
+        update(bill);
+        _customerService.update(customer);
     }
 
     private void PerformBillRoll() throws Exception {
@@ -185,7 +197,7 @@ public class BillService implements IBill {
         InsertOrUpdateCurrentBills(null);
 
 
-        _globalSettingService.setNextRollDate();
+        _globalSettingService.calculateAndSetNextRollDate();
 
     }
 

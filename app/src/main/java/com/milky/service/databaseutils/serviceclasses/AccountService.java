@@ -27,7 +27,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class AccountService implements IAccountService {
-    ISmsService _smsService = new SmsService();
 
     @Override
     public void insert(Account account) {
@@ -39,11 +38,6 @@ public class AccountService implements IAccountService {
     public void update(Account account) {
         ContentValues values = account.ToContentValues();
         getDb().update(TableNames.ACCOUNT, values, TableColumns.ServerAccountId + " ='" + account.getServerAccountId() + "'", null);
-    }
-
-    @Override
-    public void delete(Account account) {
-
     }
 
     @Override
@@ -63,40 +57,9 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public int getLeftSMS() {
-        String selectquery = "SELECT * FROM " + TableNames.ACCOUNT;
-        int sms = 0;
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.TotalSms)))
-                        - getUsedSMS();
-
-            }
-            while (cursor.moveToNext());
-
-        }
-        cursor.close();
-
-        return sms;
-    }
-
-    @Override
-    public int getUsedSMS() {
-        String selectquery = "SELECT * FROM " + TableNames.ACCOUNT;
-        int sms = 0;
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                sms = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TableColumns.UsedSms)));
-
-            }
-            while (cursor.moveToNext());
-
-        }
-        cursor.close();
-
-        return sms;
+    public int getRemainingSMS() {
+        Account account = getDetails();
+        return account.getTotalSms() - account.getUsedSms();
     }
 
     @Override
@@ -149,22 +112,13 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public void updateSMSCount(int count) {
+    public void incrementUsedSMSCount(int count) {
+        Account account = getDetails();
         ContentValues values = new ContentValues();
-        values.put(TableColumns.UsedSms, String.valueOf(getUsedSMS() + count));
+        values.put(TableColumns.UsedSms, String.valueOf(account.getUsedSms() + count));
         getDb().update(TableNames.ACCOUNT, values, null, null);
     }
 
-    @Override
-    public void SendOtp(String mobile, String Otp, OnTaskCompleteListner listner) {
-
-        try {
-            String mesg = URLEncoder.encode("OTP to sign in KrushiVikas is: " + Otp, "UTF-8");
-            _smsService.SendSms(mobile, mesg, listner);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
 
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();

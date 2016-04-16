@@ -6,5 +6,6 @@ import com.milky.service.serverapi.OnTaskCompleteListner;
  * Created by admin on 4/13/2016.
  */
 public interface ISmsService {
-    void SendSms(String mobile, String message,OnTaskCompleteListner listner);
+    void SendSms(String mobile, String message,OnTaskCompleteListner listner, boolean incrementUsedSmsCount);
+    void SendOtp(String mobile, String Otp, OnTaskCompleteListner listner);
 }

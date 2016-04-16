@@ -27,7 +27,6 @@
             android:id='@+id/milk_quantity'
             android:layout_width='fill_parent'
             android:layout_height='wrap_content'
-            android:hint='Edit quantity(Liters)'
             android:inputType="numberDecimal"
             android:singleLine='true'>
 

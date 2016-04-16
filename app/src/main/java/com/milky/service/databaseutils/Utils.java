@@ -47,13 +47,20 @@ public class Utils {
 
     //Umesh - Correct the format and use similar method for above function too. These functionos can be later part of Utils
     //They should be used everywhere you convert dates to and from strings...
-    public static Date FromDateString(String date) throws ParseException
+    public static Date FromDateString(String date)
     {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        return format.parse(date);
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            return format.parse(date);
+        }
+        catch(ParseException ex) {
+            //Will fix and do something later
+            ex.printStackTrace();
+            return null;
+        }
     }
 
-    public static Date GetMaxDate() throws ParseException
+    public static Date GetMaxDate()
     {
         Calendar c = Calendar.getInstance();
         //This must change, have just kept this arbitrary date as it was there earlier

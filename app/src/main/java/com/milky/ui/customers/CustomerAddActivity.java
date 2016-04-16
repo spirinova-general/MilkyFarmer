@@ -246,9 +246,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         CustomerAddActivity.this.finish();
                     }
                 } catch (NullPointerException npe) {
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                } finally {
+                }  finally {
                     _dbHelper.close();
                 }
             }
