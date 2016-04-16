@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.core.Customers;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.ui.customers.CustomerTabFragment;
 import com.milky.utils.Constants;
 
@@ -110,7 +111,9 @@ public class CustomersActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Customers data = new Customers();
+                        /*Customers data = new Customers();
+                        ICustomers customerService = new CustomersService();
+                        customerService.getCustomerDetail()
                         data.setFirstName(_mIntent.getStringExtra("fname"));
                         data.setLastName(_mIntent.getStringExtra("lname"));
                         data.setBalance_amount(_mIntent.getDoubleExtra("balance", 0));
@@ -122,7 +125,11 @@ public class CustomersActivity extends AppCompatActivity {
                         data.setIsDeleted(1);
                         data.setCustomerId(_mIntent.getIntExtra("cust_id",0));
                         data.setDeletedOn(Constants.getCurrentDate());
-                        new CustomersService().update(data);
+                        new CustomersService().update(data);*/
+                        int id = _mIntent.getIntExtra("cust_id",0);
+                        ICustomers customerService = new CustomersService();
+                        customerService.delete(id);
+
                         POSITION=0;
 //                        Constants.REFRESH_BILL=true;
                         Constants.REFRESH_CALANDER=true;

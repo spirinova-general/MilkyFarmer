@@ -12,8 +12,6 @@ public interface ICustomers {
 
     void update(Customers customers);
 
-    void delete(Customers customers);
-
     List<Customers> getCustomersListByArea(int areaId);
 
     List<Customers> getAllCustomers();
@@ -21,6 +19,7 @@ public interface ICustomers {
     Customers getCustomerDetail(int id);
 
     boolean isAreaAssociated(int areaId);
+    void delete(int customerId);
 
     void insertOrUpdateCustomerSetting(CustomersSetting setting);
     List<Customers> getCustomersWithinDeliveryRange(Integer areaId, Date startDateObj, Date endDateObj);

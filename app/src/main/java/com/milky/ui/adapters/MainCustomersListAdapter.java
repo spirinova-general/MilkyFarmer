@@ -72,9 +72,9 @@ public class MainCustomersListAdapter extends ArrayAdapter<Customers> {
         //Area area = new AreaService().getAreaById(customer.getAreaId());
         Area area = customer.area;
         if (!area.getLocality().equals(""))
-            holder.userAreaName.setText(area.getLocality() + ", " + area.getArea());
+            holder.userAreaName.setText(area.getLocality() + ", " + area.getArea() + ", ");
         else
-            holder.userAreaName.setText(area.getArea());
+            holder.userAreaName.setText(area.getArea() + ", ");
         holder.userStreet.setText(customer.getAddress2() + ", ");
         holder.userCity.setText(area.getCity());
         String a = Character.toString(customer.getFirstName().charAt(0));

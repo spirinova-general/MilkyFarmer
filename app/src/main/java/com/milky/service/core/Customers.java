@@ -174,6 +174,7 @@ public class Customers {
         this.setMobile(cursor.getString(cursor.getColumnIndex(TableColumns.Mobile)));
         this.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
         this.setDateModified(cursor.getString(cursor.getColumnIndex(TableColumns.DateModified)));
+        this.setDeletedOn(cursor.getString(cursor.getColumnIndex(TableColumns.DeletedOn)));
         this.setStartDate(cursor.getString(cursor.getColumnIndex(TableColumns.StartDate)));
         this.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
     }

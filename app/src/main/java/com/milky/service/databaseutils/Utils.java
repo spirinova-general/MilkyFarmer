@@ -30,6 +30,21 @@ public class Utils {
         return df.format(date);
     }
 
+    public static String ToDateString(Date date, boolean zeroMinutesAndSeconds)
+    {
+        if( zeroMinutesAndSeconds) {
+            Calendar cal = Calendar.getInstance();
+            cal.clear();
+            cal.setTime(date);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            date = cal.getTime();
+        }
+        return ToDateString(date);
+    }
+
     //Umesh - Correct the format and use similar method for above function too. These functionos can be later part of Utils
     //They should be used everywhere you convert dates to and from strings...
     public static Date FromDateString(String date) throws ParseException

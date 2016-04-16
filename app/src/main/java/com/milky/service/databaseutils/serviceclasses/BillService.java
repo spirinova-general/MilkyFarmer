@@ -32,10 +32,21 @@ public class BillService implements IBill {
     ISmsService _smsService = new SmsService();
     IAccountService _accountService = new AccountService();
 
+    //We did not take care of exceptions well from start so just let it be...throw back only when absolutely needed
     @Override
     public void insert(Bill holder) {
-        ContentValues values = holder.ToContentValues();
-        getDb().insert(TableNames.Bill, null, values);
+        try {
+            Date billStartDate = Utils.FromDateString(holder.getStartDate());
+            Date nextRollDate = Utils.FromDateString(_globalSettingService.getRollDate());
+
+            //if customer start date is after bill roll date, this bill is not to be inserted
+            if( Utils.BeforeOrEqualsDate(billStartDate, nextRollDate)) {
+                ContentValues values = holder.ToContentValues();
+                getDb().insert(TableNames.Bill, null, values);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -197,14 +208,30 @@ public class BillService implements IBill {
                 bill.setCustomerId(customer.getCustomerId());
                 bill.setDateAdded(Utils.ToDateString(today));
                 bill.setDateModified(Utils.ToDateString(today));
-                bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
+
             }
 
             QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
-            //Each time it updated Start delivery date as first date of month..
-//            bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
 
-            bill.setEndDate(Utils.ToDateString(today));
+            //Set start date, taking care of the condition where start date is after first day of month...
+            Date startDate = Utils.FromDateString(customer.getStartDate());
+            if( Utils.BeforeDate(firstDayOfMonth, startDate))
+                bill.setStartDate(customer.getStartDate());
+            else
+                bill.setStartDate(Utils.ToDateString(firstDayOfMonth));
+
+            //Set end date, taking care of the condition where customer has been deleted in betweeen...
+            String endDate = Utils.ToDateString(today);
+            if( customer.getIsDeleted() == 1 )
+            {
+                if( customer.getDeletedOn() != null) {
+                    Date deletedDate = Utils.FromDateString(customer.getDeletedOn());
+                    if (Utils.BeforeDate(deletedDate, today))
+                        endDate = customer.getDeletedOn();
+                }
+            }
+
+            bill.setEndDate(endDate);
             bill.setQuantity(qa.quantity);
             bill.setTotalAmount(qa.amount);
             bill.setBalance(customer.getBalance_amount());

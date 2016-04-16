@@ -40,7 +40,16 @@ public class CustomersService implements ICustomers {
     }
 
     @Override
-    public void delete(Customers customers) {
+    public void delete(int customerId) {
+        Customers customer = getCustomerDetail(customerId);
+
+        customer.setIsDeleted(1);
+        Calendar cal = Calendar.getInstance();
+        String today = Utils.ToDateString(cal.getTime());
+        customer.setDateModified(today);
+        customer.setDeletedOn(today);
+
+        update(customer);
     }
 
     private boolean isQuantityOrRateDifferent(CustomersSetting setting1, CustomersSetting setting2){
@@ -108,7 +117,8 @@ public class CustomersService implements ICustomers {
     public List<Customers> getCustomersListByArea(int areaId) {
         String selectquery = "SELECT " + TableNames.CUSTOMER +"." + TableColumns.ID + " as CustomerId, * FROM "
                 + TableNames.CUSTOMER + " INNER JOIN " + TableNames.AREA + " ON "
-                + TableColumns.AreaId + " =" + TableNames.AREA + "." + TableColumns.ID;
+                + TableColumns.AreaId + " =" + TableNames.AREA + "." + TableColumns.ID + " AND "
+                + TableNames.CUSTOMER + "." + TableColumns.IsDeleted + " ='" + "0'";
 
         if( areaId != -1) {
             selectquery += " AND " + TableColumns.AreaId + " ='" + areaId + "'";
@@ -291,13 +301,14 @@ public class CustomersService implements ICustomers {
 
     private List<Customers> searchCustomers(Integer areaId, Date startDateObj, Date endDateObj) {
 
-        String startDate = Utils.ToDateString(startDateObj);
-        String endDate = Utils.ToDateString(endDateObj);
+        String startDate = Utils.ToDateString(startDateObj, true);
+        //String endDate = Utils.ToDateString(endDateObj);
 
-        String selectQuery = "SELECT * FROM " + TableNames.CUSTOMER
+        String selectQuery = "SELECT *, " + TableNames.CUSTOMER + "." + TableColumns.IsDeleted + " as IsCustomerDeleted "
+                + " FROM " + TableNames.CUSTOMER
                 + " INNER JOIN " + TableNames.CustomerSetting + " ON "
                 + TableNames.CUSTOMER + "." + TableColumns.ID + " =" + TableNames.CustomerSetting + "." + TableColumns.CustomerId
-                + " WHERE " + TableNames.CUSTOMER + "." + TableColumns.IsDeleted  + " ='0'" + " OR (" + TableNames.CUSTOMER + "." + TableColumns.IsDeleted +  "='1' AND "
+                + " WHERE IsCustomerDeleted ='0' OR ( IsCustomerDeleted ='1' AND "
                 + TableColumns.DeletedOn + " >='" + startDate + "')";
 
         if (areaId != null)
@@ -314,6 +325,7 @@ public class CustomersService implements ICustomers {
                     customers = new Customers();
                     customers.PopulateFromCursor(cursor);
                     customers.setCustomerId(customerId);
+                    customers.setIsDeleted(cursor.getInt(cursor.getColumnIndex("IsCustomerDeleted")));
                     customersMap.put(customerId, customers);
                     customers.customerSettings = new ArrayList<>();
                 } else {
