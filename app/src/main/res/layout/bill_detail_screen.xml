@@ -148,7 +148,7 @@
                                     android:enabled="false"
                                     android:inputType="numberDecimal"
                                     android:padding="5dp"
-                                    android:text="2 (Litres)"
+                                    android:text="2 Litres"
                                     android:textColor="@color/textfield_enable"
 
                                     />
