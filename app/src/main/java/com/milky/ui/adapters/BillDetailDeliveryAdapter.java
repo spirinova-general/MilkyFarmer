@@ -72,8 +72,8 @@ public class BillDetailDeliveryAdapter extends BaseAdapter {
         String startDate = String.format("%02d", startCal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[startCal.get(Calendar.MONTH)];
         String endDate = String.format("%02d", endCal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[endCal.get(Calendar.MONTH)];
         holder.deliveryFrom.setText(startDate + " to " + endDate);
-        holder.dayRate.setText("Rupees " + String.valueOf(data.getDefaultRate()));
-        holder.dayQuantity.setText(String.valueOf(data.getGetDefaultQuantity()) + " Litres");
+        holder.dayRate.setText(String.valueOf(data.getDefaultRate()));
+        holder.dayQuantity.setText(String.valueOf(data.getGetDefaultQuantity()));
         return convertView;
     }
 

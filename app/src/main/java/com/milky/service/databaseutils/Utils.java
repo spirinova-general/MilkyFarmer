@@ -42,7 +42,8 @@ public class Utils {
     {
         Calendar c = Calendar.getInstance();
         //This must change, have just kept this arbitrary date as it was there earlier
-        return new Date(Long.MAX_VALUE);
+        //return new Date(Long.MAX_VALUE);
+        return FromDateString("2999-12-30");
     }
 
     public static boolean BeforeDate(Date date1, Date date2)

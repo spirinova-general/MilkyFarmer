@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.milky.service.databaseutils.TableColumns;
+import com.milky.service.databaseutils.TableNames;
 
 import java.util.List;
 

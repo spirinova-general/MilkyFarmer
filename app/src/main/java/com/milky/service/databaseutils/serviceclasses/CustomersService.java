@@ -55,8 +55,9 @@ public class CustomersService implements ICustomers {
             Customers customer = getCustomerDetail(setting.getCustomerId(), true);
             Calendar cal = Calendar.getInstance();
             Date today = cal.getTime();
-            CustomersSetting existingSetting = getCustomerSetting(customer, today, false, false);
-            CustomersSetting existingSettingWithoutCustomDelivery = getCustomerSetting(customer, today, false, true);
+            Date date = Utils.FromDateString(setting.getStartDate());
+            CustomersSetting existingSetting = getCustomerSetting(customer, date, false, false);
+            CustomersSetting existingSettingWithoutCustomDelivery = getCustomerSetting(customer, date, false, true);
 
             boolean isCustomDeliveryPresent = ((existingSetting != null) && existingSetting.getIsCustomDelivery());
             boolean isSettingWithoutCustomDeliveryPresent = (existingSettingWithoutCustomDelivery != null);
@@ -75,8 +76,8 @@ public class CustomersService implements ICustomers {
                 if( !toInsert)
                     return;
 
-                setting.setStartDate(setting.getStartDate());
-                setting.setEndDate(setting.getEndDate());
+                //setting.setStartDate(setting.getStartDate());
+                //setting.setEndDate(setting.getEndDate());
                 setting.setDefaultRate(existingSettingWithoutCustomDelivery.getDefaultRate());
                 setting.setIsCustomDelivery(true);
                 _customerSettingsService.insert(setting);
@@ -105,8 +106,8 @@ public class CustomersService implements ICustomers {
 
     @Override
     public List<Customers> getCustomersListByArea(int areaId) {
-        String selectquery = "SELECT * FROM " + TableNames.CUSTOMER
-                + " INNER JOIN " + TableNames.AREA + " ON "
+        String selectquery = "SELECT " + TableNames.CUSTOMER +"." + TableColumns.ID + " as CustomerId, * FROM "
+                + TableNames.CUSTOMER + " INNER JOIN " + TableNames.AREA + " ON "
                 + TableColumns.AreaId + " =" + TableNames.AREA + "." + TableColumns.ID;
 
         if( areaId != -1) {
@@ -121,6 +122,7 @@ public class CustomersService implements ICustomers {
             do {
                 Customers holder = new Customers();
                 holder.PopulateFromCursor(cursor);
+                holder.setCustomerId(cursor.getInt(cursor.getColumnIndex("CustomerId")));
 
                 Area area = new Area();
                 area.setAreaId(cursor.getInt(cursor.getColumnIndex(TableColumns.AreaId)));

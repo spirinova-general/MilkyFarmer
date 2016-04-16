@@ -92,7 +92,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         adpter =new BillDetailDeliveryAdapter(allDeliveryData,this);
         deliveryList.setAdapter(adpter);
         setListViewHeightBasedOnChildren(deliveryList);
-        payment_made.setText("(Rupees) " + String.valueOf(intent.getDoubleExtra("payment_made", 0)));
+        payment_made.setText("Rs " + String.valueOf(intent.getDoubleExtra("payment_made", 0)));
 
         Calendar cal = Calendar.getInstance();
         accountService = new AccountService();
@@ -113,7 +113,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         });
         start_date.setEnabled(false);
         end_date.setEnabled(false);
-        milk_quantity.setText(String.valueOf(intent.getDoubleExtra("quantity", 0)) + " (Litres)");
+        milk_quantity.setText(String.valueOf(intent.getDoubleExtra("quantity", 0)) + " Litres");
         milk_quantity.setFocusable(false);
         milk_quantity.setFocusableInTouchMode(false);
         Button clear_bill = (Button) findViewById(R.id.clear_bill);
@@ -229,14 +229,14 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
             }
         });
 
-        balance_amount.setText("(Rupees) " + String.valueOf(intent.getDoubleExtra("balance", 0)));
+        balance_amount.setText("Rs " + String.valueOf(intent.getDoubleExtra("balance", 0)));
         balance_amount.setFocusable(false);
         balance_amount.setFocusableInTouchMode(false);
 //        if (balanceType == 1)
 //            balance_amount.setHint("Balance due (Rs)");
 
         TextView total_amount = (TextView) findViewById(R.id.total_amount);
-        total_amount.setText("(Rupees) " + String.valueOf(intent.getDoubleExtra("total", 0)));
+        total_amount.setText("Rs " + String.valueOf(intent.getDoubleExtra("total", 0)));
         tax.setFocusable(false);
         tax.setFocusableInTouchMode(false);
         tax.setText(String.valueOf(new GlobalSettingsService().getData().getTax()) + " %");

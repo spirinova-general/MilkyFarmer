@@ -20,9 +20,7 @@ public class CustomersSettingService implements ICustomersSettings {
     @Override
     public void update(CustomersSetting setting) {
         ContentValues values = setting.ToContentValues();
-        getDb().update(TableNames.CustomerSetting, values, TableColumns.CustomerId + " ='" + setting.getCustomerId() + "'"
-                + " AND " + TableColumns.StartDate + " <='" + setting.getStartDate() + "'" + " AND " +
-                TableColumns.EndDate + " >='" + setting.getEndDate() + "'", null);
+        getDb().update(TableNames.CustomerSetting, values, TableColumns.ID + " ='" + setting.getId() + "'", null);
 
     }
 
