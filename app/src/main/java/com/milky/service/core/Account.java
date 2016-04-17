@@ -5,6 +5,11 @@ import android.database.Cursor;
 
 import com.milky.service.databaseutils.TableColumns;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+
 /**
  * Created by Neha on 12/26/2015.
  */
@@ -159,9 +164,36 @@ public class Account {
         values.put(TableColumns.UsedSms, this.getUsedSms());
         values.put(TableColumns.ServerAccountId, this.getServerAccountId());
         values.put(TableColumns.Validated, this.getValidated());
-        values.put(TableColumns.IsDeleted,this.getIsDeleted());
-        values.put(TableColumns.Dirty,this.getDirty());
+        values.put(TableColumns.IsDeleted, this.getIsDeleted());
+        values.put(TableColumns.Dirty, this.getDirty());
         values.put(TableColumns.DateModified, this.getDateModified());
         return values;
+    }
+
+    //Umesh - this needs to change, when its to be done for other classes
+    //change it to use exiting serializers
+    public JSONObject ToJSON()
+    {
+        return null;
+    }
+
+    public void PopulateFromJSON(JSONObject jsonObject) throws JSONException
+    {
+        this.setFarmerCode(jsonObject.getString("FarmerCode"));
+        this.setFirstName(jsonObject.getString("FirstName"));
+        this.setLastName(jsonObject.getString("LastName"));
+        this.setMobile(jsonObject.getString("Mobile"));
+        int validated = jsonObject.getBoolean("Validated") == true? 1: 0;
+        this.setValidated(validated);
+        this.setDateAdded(jsonObject.getString("DateAdded"));
+        this.setDateModified(jsonObject.getString("DateModified"));
+        this.setEndDate(jsonObject.getString("EndDate"));
+        this.setUsedSms(jsonObject.getInt("UsedSms"));
+        this.setTotalSms(jsonObject.getInt("TotalSms"));
+
+        //Id from server is ServerAccountID field in local db
+        this.setServerAccountId(jsonObject.getInt("Id"));
+        this.setDirty(1);
+        this.setIsDeleted(0);
     }
 }

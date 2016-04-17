@@ -13,7 +13,9 @@ import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.IAccountService;
 import com.milky.service.core.Account;
 import com.milky.service.databaseutils.serviceinterface.ISmsService;
+import com.milky.service.serverapi.HttpAsycTask;
 import com.milky.service.serverapi.OnTaskCompleteListner;
+import com.milky.service.serverapi.ServerApis;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 
@@ -119,6 +121,15 @@ public class AccountService implements IAccountService {
         getDb().update(TableNames.ACCOUNT, values, null, null);
     }
 
+    @Override
+    public void syncAccount(){
+        Account account = getDetails();
+        HttpAsycTask dataTask = new HttpAsycTask();
+        String append = ServerApis.API_ACCOUNT_GET + "?accountId=" + account.getServerAccountId();
+        dataTask.runRequest(ServerApis.API_ACCOUNT_GET, null, null, false, null);
+
+        //To do later
+    }
 
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();

@@ -28,9 +28,11 @@ import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
+import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
@@ -82,8 +84,9 @@ public class CustomerSettingFragment extends Fragment {
 
         /** initialize all resources
          * */
-
         initResources(view);
+
+        //throw new IllegalStateException("something");
        /*  * Set text field listeners*/
         _mAddress1.addTextChangedListener(new TextValidationMessage(_mAddress1, flat_number_layout, getActivity(), false, false, false, false, false));
         _mFirstName.addTextChangedListener(new TextValidationMessage(_mAddress1, name_layout, getActivity(), false, false, false, false, false));
@@ -176,7 +179,9 @@ public class CustomerSettingFragment extends Fragment {
     }
 
 
-    private void initResources(View view) {
+    private void initResources(View view)  {
+        //try
+
         _mFirstName = (EditText) view.findViewById(R.id.first_name);
         _mLastName = (EditText) view.findViewById(R.id.last_name);
         _mRate = (EditText) view.findViewById(R.id.rate);
@@ -210,36 +215,28 @@ public class CustomerSettingFragment extends Fragment {
 
         ICustomers customersService = new CustomersService();
         Customers customer = customersService.getCustomerDetail(custId, true);
-        /*CustomersSetting settingData = customersService.getCustomerSetting(customer, today, false, true);
-        for(CustomersSetting customersSetting : customer.customerSettings)
-        {
-            if(customersSetting.getCustomerId()==custId)
-            {
-                settingData = customersSetting;
-            }
-        }*/
         CustomersSetting settingData = null;
-        try {
-            Calendar cal = Calendar.getInstance();
-            Date today =  Utils.GetDateWithoutTime(cal.getTime());
-            settingData = customersService.getCustomerSetting(customer, today, false, true);
-            Date startDate = Utils.FromDateString(customer.getStartDate());
-            cal.setTime(startDate);
-            pick_date.setText(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[cal.get(Calendar.MONTH)] + "-"
-                    + String.valueOf(cal.get(Calendar.YEAR)));
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        Calendar cal = Calendar.getInstance();
+        Date today = Utils.GetDateWithoutTime(cal.getTime());
+        Date startDate = Utils.FromDateString(customer.getStartDate());
+        Date settingDate = null;
+        if (Utils.BeforeOrEqualsDate(today, startDate)) {
+            settingDate = startDate;
+        } else {
+            settingDate = today;
         }
-
-        /*Set defaul rate
-        * */
-        /*if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
-            _mRate.setText(String.valueOf(new GlobalSettingsService().getData().getDefaultRate()));*/
-
-        /*
-        * If to edit customer details
-        * */
+        try {
+            settingData = customersService.getCustomerSetting(customer, settingDate, false, true);
+        }
+        catch (Exception ex)
+        {
+            //All exception handling has to be taken care of later,
+        }
+        startDate = Utils.FromDateString(customer.getStartDate());
+        cal.setTime(startDate);
+        pick_date.setText(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + "-" + Constants.MONTHS[cal.get(Calendar.MONTH)] + "-"
+                + String.valueOf(cal.get(Calendar.YEAR)));
 
         _mMobile.setText(getActivity().getIntent().getStringExtra("mobile"));
         _mQuantuty.setText(String.valueOf(settingData.getGetDefaultQuantity()));
@@ -263,7 +260,7 @@ public class CustomerSettingFragment extends Fragment {
 
         _mBalance.setSelection(String.valueOf(getActivity().getIntent().getDoubleExtra("balance", 0)).length());
         _mAddress1.setSelection(getActivity().getIntent().getStringExtra("address1").length());
-//        _mAddress2.setSelection(getActivity().getIntent().getStringExtra("address2").length());
+        //_mAddress2.setSelection(getActivity().getIntent().getStringExtra("address2").length());
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
         _mQuantuty.setSelection(String.valueOf(settingData.getGetDefaultQuantity()).length());
 
@@ -271,7 +268,7 @@ public class CustomerSettingFragment extends Fragment {
         AreaCityAdapter adapter1 = new AreaCityAdapter(getActivity(), 0, R.id.address, _areacityList);
         _autocomplete_city_area.setAdapter(adapter1);
         _autocomplete_city_area.setSelection(_autocomplete_city_area.getText().length());
-        // final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, autoCompleteData);
+            // final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, autoCompleteData);
 
      /*   _autocomplete_city_area.addTextChangedListener(new TextWatcher() {
 
@@ -421,7 +418,8 @@ public class CustomerSettingFragment extends Fragment {
                         && !_mMobile.getText().toString().equals("") &&
                         !_mQuantuty.getText().toString().equals("")
                         ) {
-                    Customers holder = new Customers();
+                    ICustomers service = new CustomersService();
+                    Customers holder = service.getCustomerDetail(getActivity().getIntent().getIntExtra("cust_id", 0));
                     holder.setFirstName(_mFirstName.getText().toString());
                     holder.setLastName(_mLastName.getText().toString());
                     holder.setBalance_amount(Double.parseDouble(_mBalance.getText().toString()));
@@ -431,12 +429,11 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setDateAdded(getActivity().getIntent().getStringExtra("added_date"));
                     String currentDate = Constants.getCurrentDate();
                     holder.setDateModified(currentDate);
-                    holder.setCustomerId(getActivity().getIntent().getIntExtra("cust_id", 0));
                     holder.setIsDeleted(0);
                     holder.setDirty(1);
                     holder.setDeletedOn("null");
                     //Update data into custmers table
-                    new CustomersService().update(holder);
+                    service.update(holder);
 
                     CustomersSetting setting = new CustomersSetting();
                     setting.setCustomerId(holder.getCustomerId());
@@ -452,10 +449,9 @@ public class CustomerSettingFragment extends Fragment {
                     setting.setDirty(1);
                     setting.setDateModified(currentDate);
                     setting.setIsDeleted(0);
-                    ICustomers customerService = new CustomersService();
 
-
-                    customerService.insertOrUpdateCustomerSetting(setting);
+                    IDelivery deliverService = new DeliveryService();
+                    deliverService.insertOrUpdateCustomerSetting(setting);
 
                     /*Bill bill = new Bill();
                     bill.setCustomerId(holder.getCustomerId());
@@ -478,7 +474,7 @@ public class CustomerSettingFragment extends Fragment {
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_CUSTOMERS = true;
-//                    Constants.REFRESH_BILL = true;
+                    Constants.REFRESH_BILL = true;
                     getActivity().finish();
 
                 } else {

@@ -1,5 +1,6 @@
 package com.milky.service.databaseutils.serviceinterface;
 
+import com.milky.service.core.CustomersSetting;
 import com.milky.service.legacy.Delivery;
 import com.milky.viewmodel.VDelivery;
 
@@ -15,4 +16,5 @@ public interface IDelivery {
      List<Double> getMonthlyDeliveryOfCustomer(int customerId, int month, int year);
      List<VDelivery> getDeliveryDetails(String date);
      List<VDelivery> getDeliveryDetails(Integer areaId, String day);
+     void insertOrUpdateCustomerSetting(CustomersSetting setting);
 }

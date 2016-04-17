@@ -23,5 +23,6 @@ public class ServerApis {
 
 
     //Sign up ,to get sign upe detail
-    public static String ACCOUNT_API="http://milky.yaylo.com/api/SyncObject/AddAccount";
+    public static String API_ACCOUNT_ADD="http://milky.yaylo.com/api/SyncObject/AddAccount";
+    public static String API_ACCOUNT_GET="http://milky.yaylo.com/api/SyncObject/GetAccount";
 }

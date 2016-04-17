@@ -16,7 +16,8 @@ public class TableColumsDetail {
     //Global Settings
     public static final String GLOBAL_ETTINGS = "CREATE TABLE " + TableNames.GlobalSetting + "("
             + TableColumns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + TableColumns.DefaultRate + " REAL,"
-            + TableColumns.TAX + " REAL," + TableColumns.RollDate + " DATETIME,"+TableColumns.IsDeleted+" INTEGER,"
+            + TableColumns.TAX + " REAL," + TableColumns.RollDate + " DATETIME,"+ TableColumns.LastBillSyncedTime + " DATETIME,"
+            + TableColumns.IsDeleted+" INTEGER,"
             +TableColumns.Dirty+" INTEGER,"+TableColumns.DateModified+" DATETIME" + ")";
 
     //AREA

@@ -13,5 +13,6 @@ public interface IAccountService {
      boolean isAccountExpired();
      JSONObject getJsonData();
      void incrementUsedSMSCount(int count);
+     void syncAccount();
 
 }

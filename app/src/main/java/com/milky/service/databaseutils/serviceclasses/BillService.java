@@ -61,7 +61,12 @@ public class BillService implements IBill {
             if (reCalculate)
                 RecalculateAllCurrentBills();
 
-            String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsCleared + " ='" + "0'";
+            Calendar cal = Calendar.getInstance();
+            Date today = cal.getTime();
+            String todayStr = Utils.ToDateString(today, true);
+
+            String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsCleared + " ='" + "0'"
+                    + " AND " + TableColumns.StartDate + " <='" + todayStr + "'";
 
             ArrayList<Bill> list = new ArrayList<>();
             Cursor cursor = getDb().rawQuery(selectquery, null);
@@ -110,10 +115,10 @@ public class BillService implements IBill {
             Date today = cal.getTime();
             Date rollDate = Utils.FromDateString(_globalSettingService.getRollDate());
 
-            HashMap<Integer, Bill> currentbillsMap = getAllCurrentBills();
+            HashMap<Integer, Bill> currentbillsMap = getAllCurrentBills(-1);
 
             //First update all bills with quantity, total, end date etc.
-            InsertOrUpdateCurrentBills(currentbillsMap);
+            InsertOrUpdateCurrentBills(currentbillsMap, -1);
 
             //if we are after roll date...
             if (!today.before(rollDate)) {
@@ -186,6 +191,18 @@ public class BillService implements IBill {
         _customerService.update(customer);
     }
 
+    @Override
+    public void updateCustomerCurrentBill(int customerId)
+    {
+        try {
+            InsertOrUpdateCurrentBills(getAllCurrentBills(customerId), customerId);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void PerformBillRoll() throws Exception {
         //Mark all current bills outstanding
         String selectquery = "UPDATE " + TableNames.Bill + " SET " + TableColumns.IsOutstanding + " ='" + "1'"
@@ -194,14 +211,14 @@ public class BillService implements IBill {
         //Umesh check if it updates values
         getDb().execSQL(selectquery);
 
-        InsertOrUpdateCurrentBills(null);
+        InsertOrUpdateCurrentBills(null, -1);
 
 
         _globalSettingService.calculateAndSetNextRollDate();
 
     }
 
-    private void InsertOrUpdateCurrentBills(HashMap<Integer, Bill> currentbillsMap) throws Exception {
+    private void InsertOrUpdateCurrentBills(HashMap<Integer, Bill> currentbillsMap, int customerId) throws Exception {
         Calendar cal = Calendar.getInstance();
         Date today = cal.getTime();
         //Set calendar to first date of month
@@ -209,10 +226,26 @@ public class BillService implements IBill {
 
         Date firstDayOfMonth = cal.getTime();
 
-        List<Customers> customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth, today);
+        List<Customers> customers = null;
+
+        if( customerId == -1)
+        {
+            customers = _customerService.getCustomersWithinDeliveryRange(null, firstDayOfMonth, today);
+        }
+        else
+        {
+            customers =  new ArrayList<Customers>();
+            customers.add(_customerService.getCustomerDetail(customerId, true));
+        }
 
         for (Customers customer : customers) {
             Bill bill;
+            Date startDate = Utils.FromDateString(customer.getStartDate());
+            //If bill's start date is after today, leave it
+            if( !Utils.BeforeOrEqualsDate(startDate, today)) {
+                continue;
+            }
+
             if (currentbillsMap != null && currentbillsMap.containsKey(customer.getCustomerId())) {
                 bill = currentbillsMap.get(customer.getCustomerId());
             } else {
@@ -226,7 +259,7 @@ public class BillService implements IBill {
             QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, firstDayOfMonth, today);
 
             //Set start date, taking care of the condition where start date is after first day of month...
-            Date startDate = Utils.FromDateString(customer.getStartDate());
+            startDate = Utils.FromDateString(customer.getStartDate());
             if( Utils.BeforeDate(firstDayOfMonth, startDate))
                 bill.setStartDate(customer.getStartDate());
             else
@@ -262,9 +295,19 @@ public class BillService implements IBill {
     }
 
     //Gets current month's bills - that are not yet marked outstanding, get bills in a map with customer id for easier access
-    private HashMap<Integer, Bill> getAllCurrentBills() {
+    private HashMap<Integer, Bill> getAllCurrentBills(int customerId) {
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        String todayStr = Utils.ToDateString(today, true);
+
         String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsOutstanding + " ='" + "0'"
-                + " AND " + TableColumns.IsCleared + " ='" + "0'";
+                + " AND " + TableColumns.IsCleared + " ='" + "0'"
+                + " AND " + TableColumns.StartDate + " <='" + todayStr + "'";
+
+        if( customerId != -1)
+        {
+            selectquery += " AND " + TableColumns.CustomerId + " ='" + customerId  + "'";
+        }
 
         HashMap<Integer, Bill> map = new HashMap<Integer, Bill>();
         Cursor cursor = getDb().rawQuery(selectquery, null);

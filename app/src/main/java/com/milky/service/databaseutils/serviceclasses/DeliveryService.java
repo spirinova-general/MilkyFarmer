@@ -24,6 +24,8 @@ public class DeliveryService implements IDelivery {
 
     ICustomers _customerService = new CustomersService();
     ICustomersSettings _customerSettingService = new CustomersSettingService();
+    private ICustomersSettings _customerSettingsService = new CustomersSettingService();
+    private BillService _billService = new BillService();
 
     @Override
     public void insert(Delivery delivery) {
@@ -147,6 +149,94 @@ public class DeliveryService implements IDelivery {
         {
             return null;
         }
+    }
+
+    public void insertOrUpdateCustomerSetting(CustomersSetting setting) {
+        try {
+            Customers customer = _customerService.getCustomerDetail(setting.getCustomerId(), true);
+            Calendar cal = Calendar.getInstance();
+            Date today = cal.getTime();
+            Date settingStartDate = Utils.FromDateString(setting.getStartDate());
+            CustomersSetting existingSetting = _customerService.getCustomerSetting(customer, settingStartDate, false, false);
+            CustomersSetting existingSettingWithoutCustomDelivery = _customerService.getCustomerSetting(customer, settingStartDate, false, true);
+
+            boolean isCustomDeliveryPresent = ((existingSetting != null) && existingSetting.getIsCustomDelivery());
+            boolean isSettingWithoutCustomDeliveryPresent = (existingSettingWithoutCustomDelivery != null);
+
+            Date customerStartDate = Utils.FromDateString(customer.getStartDate());
+
+            //When the customer's delivery has not yet started and he updated settings, just update the existing entry
+            if( Utils.BeforeOrEqualsDate(today,customerStartDate))
+            {
+                if( setting.isCustomDelivery())
+                    return;
+                else
+                {
+                    existingSettingWithoutCustomDelivery = _customerService.getCustomerSetting(customer, customerStartDate, false, true);
+                    boolean toUpdate = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
+                    if( toUpdate ) {
+                        existingSettingWithoutCustomDelivery.setDefaultRate(setting.getDefaultRate());
+                        existingSettingWithoutCustomDelivery.setGetDefaultQuantity(setting.getGetDefaultQuantity());
+                        _customerSettingsService.update(existingSettingWithoutCustomDelivery);
+                        _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                    }
+                }
+                return;
+            }
+
+            if( setting.getIsCustomDelivery() && isCustomDeliveryPresent) {
+                boolean toUpdate = isQuantityOrRateDifferent(existingSetting, setting);
+                if( !toUpdate )
+                    return;
+
+                existingSetting.setGetDefaultQuantity(setting.getGetDefaultQuantity());
+                _customerSettingsService.update(existingSetting);
+                _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                return;
+            }
+
+            else if(setting.getIsCustomDelivery() && isSettingWithoutCustomDeliveryPresent){
+                boolean toInsert = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
+
+                if( !toInsert)
+                    return;
+
+                //setting.setStartDate(setting.getStartDate());
+                //setting.setEndDate(setting.getEndDate());
+                setting.setDefaultRate(existingSettingWithoutCustomDelivery.getDefaultRate());
+                setting.setIsCustomDelivery(true);
+                _customerSettingsService.insert(setting);
+                _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                return;
+            }
+            else if( !setting.getIsCustomDelivery() ) {
+                boolean toInsert = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
+                if( !toInsert) {
+                    return;
+                }
+                //Delete existing custom setting
+                if(isCustomDeliveryPresent) {
+                    _customerSettingsService.delete(existingSetting);
+                }
+                existingSettingWithoutCustomDelivery.setEndDate(Utils.ToDateString(today));
+                _customerSettingsService.update(existingSettingWithoutCustomDelivery);
+
+                setting.setStartDate(Utils.ToDateString(today));
+                setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
+                //setting.setIsCustomDelivery(false);
+                _customerSettingsService.insert(setting);
+                _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                return;
+            }
+        } catch (Exception ex) {
+            //TBD
+        }
+    }
+
+    private boolean isQuantityOrRateDifferent(CustomersSetting setting1, CustomersSetting setting2){
+        boolean same =  (setting1.getGetDefaultQuantity() == setting2.getGetDefaultQuantity()) &&
+                (setting1.getDefaultRate() == setting2.getDefaultRate());
+        return !same;
     }
 
     private SQLiteDatabase getDb() {

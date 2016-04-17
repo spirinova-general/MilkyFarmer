@@ -9,6 +9,7 @@ import com.milky.service.databaseutils.TableColumns;
 import com.milky.service.databaseutils.TableNames;
 import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceinterface.IGlobalSetting;
+import com.milky.ui.main.GlobalSetting;
 import com.milky.utils.AppUtil;
 
 import java.util.Calendar;
@@ -22,21 +23,10 @@ public class GlobalSettingsService implements IGlobalSetting {
         Date dateModified = c.getTime();
         globalSettings.setDateModified(Utils.ToDateString(dateModified));
 
-        try {
-            Date rollDate = Utils.FromDateString(globalSettings.getRollDate());
-            globalSettings.setRollDate(Utils.ToDateString(rollDate, true));
-        }
-        catch(Exception ex)
-        {
-            //
-        }
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.DefaultRate, globalSettings.getDefaultRate());
-        values.put(TableColumns.TAX, globalSettings.getTax());
-        values.put(TableColumns.RollDate, globalSettings.getRollDate());
-        values.put(TableColumns.IsDeleted,globalSettings.getIsDeleted());
-        values.put(TableColumns.Dirty,globalSettings.getDirty());
-        values.put(TableColumns.DateModified,globalSettings.getDateModified());
+        Date rollDate = Utils.FromDateString(globalSettings.getRollDate());
+        globalSettings.setRollDate(Utils.ToDateString(rollDate, true));
+        ContentValues values = globalSettings.ToContentValues();
+
         getDb().insert(TableNames.GlobalSetting, null, values);
     }
 
@@ -46,22 +36,22 @@ public class GlobalSettingsService implements IGlobalSetting {
         Date dateModified = c.getTime();
         globalSettings.setDateModified(Utils.ToDateString(dateModified));
 
-        try {
-            Date rollDate = Utils.FromDateString(globalSettings.getRollDate());
-            globalSettings.setRollDate(Utils.ToDateString(rollDate, true));
-        }
-        catch(Exception ex)
-        {
-            //
-        }
+        Date rollDate = Utils.FromDateString(globalSettings.getRollDate());
+        globalSettings.setRollDate(Utils.ToDateString(rollDate, true));
 
-        ContentValues values = new ContentValues();
-        values.put(TableColumns.RollDate, globalSettings.getRollDate());
-        values.put(TableColumns.TAX, globalSettings.getTax());
-        values.put(TableColumns.DefaultRate, globalSettings.getDefaultRate());
-        values.put(TableColumns.IsDeleted,globalSettings.getIsDeleted());
-        values.put(TableColumns.Dirty,globalSettings.getDirty());
-        values.put(TableColumns.DateModified,globalSettings.getDateModified());
+        ContentValues values = globalSettings.ToContentValues();
+        getDb().update(TableNames.GlobalSetting, values, null, null);
+    }
+
+    @Override
+    public void updateLastBillSyncedTime(){
+        GlobalSettings setting = getData();
+
+        Calendar c = Calendar.getInstance();
+        Date now = c.getTime();
+        setting.setLastBillSyncedTime(Utils.ToDateString(now));
+
+        ContentValues values = setting.ToContentValues();
         getDb().update(TableNames.GlobalSetting, values, null, null);
     }
 
@@ -72,11 +62,7 @@ public class GlobalSettingsService implements IGlobalSetting {
         GlobalSettings holder = new GlobalSettings();
         if (cursor.moveToFirst()) {
             do {
-                holder.setDefaultRate(cursor.getInt(cursor.getColumnIndex(TableColumns.DefaultRate)));
-                holder.setRollDate(cursor.getString(cursor.getColumnIndex(TableColumns.RollDate)));
-                holder.setTax(cursor.getInt(cursor.getColumnIndex(TableColumns.TAX)));
-                holder.setIsDeleted(cursor.getInt(cursor.getColumnIndex(TableColumns.IsDeleted)));
-                holder.setDirty(cursor.getInt(cursor.getColumnIndex(TableColumns.Dirty)));
+               holder.PopulateFromCursor(cursor);
             }
             while (cursor.moveToNext());
         }

@@ -391,7 +391,7 @@ _dbHelper.close();
             Constants.TIME_OUT = false;
 
         }
-        if (type.equals(ServerApis.ACCOUNT_API)) {
+        /*if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
 //                try {
 //                    JSONObject result = Constants.API_RESPONCE;
@@ -428,7 +428,7 @@ _dbHelper.close();
             } else if (requestType.get("Bill_List").equals("0")) {
 //                BillTableManagement.updateSyncedData(_dbHelper.getWritableDatabase());
             }
-        }
+        }*/
         _dbHelper.close();
     }
 
@@ -667,7 +667,7 @@ _dbHelper.close();
 //            asyncTask.runRequest(ServerApis.ACCOUNT_API, sendDataToServer(), FarmerSignup.this, true, requestedList);
 //            new ServerCommunication().SendHttpPost(ServerApis.ACCOUNT_API, jsonObject);
             HttpAsycTask dataTask = new HttpAsycTask();
-            dataTask.runRequest(ServerApis.ACCOUNT_API, accountService.getJsonData(), MainActivity.this, true, null);
+            dataTask.runRequest(ServerApis.API_ACCOUNT_ADD, accountService.getJsonData(), MainActivity.this, true, null);
             return null;
         }
 

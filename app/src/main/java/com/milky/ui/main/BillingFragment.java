@@ -42,7 +42,7 @@ public class BillingFragment extends Fragment {
             public void onRefresh() {
                 if (_dbHelper.isTableNotEmpty(TableNames.Bill)) {
                     if (Constants.REFRESH_BILL) {
-                        new UpdataBills().execute();
+                        new UpdataBills(true).execute();
                     }
                 } else {
                     Toast.makeText(getActivity(), "No customer is added yet..", Toast.LENGTH_SHORT).show();
@@ -74,6 +74,11 @@ public class BillingFragment extends Fragment {
     List<Bill> bills;
     private class UpdataBills extends AsyncTask<Void, Void, Void> {
         ProgressDialog progressDialog;
+        private boolean _reCalculateBills = false;
+        public UpdataBills(boolean reCalculate)
+        {
+            _reCalculateBills = reCalculate;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -84,8 +89,8 @@ public class BillingFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            billService.RecalculateAllCurrentBills();
-            bills = billService.getAllGlobalBills(false);
+            //billService.RecalculateAllCurrentBills();
+            bills = billService.getAllGlobalBills(_reCalculateBills);
             return null;
         }
 
@@ -99,7 +104,10 @@ public class BillingFragment extends Fragment {
             progressDialog.dismiss();
             Constants.REFRESH_BILL=false;
 
-            Toast.makeText(getActivity(), "Bills Refreshed...", Toast.LENGTH_SHORT).show();
+            if( _reCalculateBills)
+                Toast.makeText(getActivity(), "All Bills Refreshed...", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getActivity(), "Bills Refreshed...", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -125,7 +133,7 @@ public class BillingFragment extends Fragment {
         if (isVisibleToUser) {
             if (Constants.REFRESH_BILL) {
 //                progressDialog = ProgressDialog.show(getActivity(), "", "Refreshing...", false, true);
-                new UpdataBills().execute();
+                new UpdataBills(false).execute();
             }
 
         }

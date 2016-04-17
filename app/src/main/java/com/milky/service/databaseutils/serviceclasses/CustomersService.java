@@ -52,66 +52,6 @@ public class CustomersService implements ICustomers {
         update(customer);
     }
 
-    private boolean isQuantityOrRateDifferent(CustomersSetting setting1, CustomersSetting setting2){
-       boolean same =  (setting1.getGetDefaultQuantity() == setting2.getGetDefaultQuantity()) &&
-                    (setting1.getDefaultRate() == setting2.getDefaultRate());
-        return !same;
-    }
-
-    @Override
-    public void insertOrUpdateCustomerSetting(CustomersSetting setting) {
-        try {
-            Customers customer = getCustomerDetail(setting.getCustomerId(), true);
-            Calendar cal = Calendar.getInstance();
-            Date today = cal.getTime();
-            Date date = Utils.FromDateString(setting.getStartDate());
-            CustomersSetting existingSetting = getCustomerSetting(customer, date, false, false);
-            CustomersSetting existingSettingWithoutCustomDelivery = getCustomerSetting(customer, date, false, true);
-
-            boolean isCustomDeliveryPresent = ((existingSetting != null) && existingSetting.getIsCustomDelivery());
-            boolean isSettingWithoutCustomDeliveryPresent = (existingSettingWithoutCustomDelivery != null);
-
-            if( setting.getIsCustomDelivery() && isCustomDeliveryPresent) {
-                boolean toUpdate = isQuantityOrRateDifferent(existingSetting, setting);
-                if( !toUpdate )
-                    return;
-
-                existingSetting.setGetDefaultQuantity(setting.getGetDefaultQuantity());
-                _customerSettingsService.update(existingSetting);
-            }
-            else if(setting.getIsCustomDelivery() && isSettingWithoutCustomDeliveryPresent){
-                boolean toInsert = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
-
-                if( !toInsert)
-                    return;
-
-                //setting.setStartDate(setting.getStartDate());
-                //setting.setEndDate(setting.getEndDate());
-                setting.setDefaultRate(existingSettingWithoutCustomDelivery.getDefaultRate());
-                setting.setIsCustomDelivery(true);
-                _customerSettingsService.insert(setting);
-            }
-            else if( !setting.getIsCustomDelivery() ) {
-                boolean toInsert = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
-                if( !toInsert) {
-                    return;
-                }
-                //Delete existing custom setting
-                if(isCustomDeliveryPresent) {
-                    _customerSettingsService.delete(existingSetting);
-                }
-                existingSettingWithoutCustomDelivery.setEndDate(Utils.ToDateString(today));
-                _customerSettingsService.update(existingSettingWithoutCustomDelivery);
-
-                setting.setStartDate(Utils.ToDateString(today));
-                setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
-                //setting.setIsCustomDelivery(false);
-                _customerSettingsService.insert(setting);
-            }
-        } catch (Exception ex) {
-            //TBD
-        }
-    }
 
     @Override
     public List<Customers> getCustomersListByArea(int areaId) {

@@ -23,6 +23,7 @@ public class TableColumns {
     public static final String IsCleared = "IsCleared";
     public static final String FirstName = "FirstName";
     public static final String LastName = "LastName";
+    public static final String LastBillSyncedTime = "LastBillSyncedTime";
 
     public static final String Mobile = "Mobile";
     public static final String PaymentMade = "PaymentMade";

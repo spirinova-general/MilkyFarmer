@@ -33,6 +33,7 @@ import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
+import com.milky.service.databaseutils.serviceinterface.IBill;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
@@ -196,22 +197,24 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setDirty(1);
                         holder.setDateModified(Constants.getCurrentDate());
                         //Insert new Customer..
-                        long id = new CustomersService().insert(holder);
+                        int id = (int)(new CustomersService().insert(holder));
 
                         CustomersSetting setting = new CustomersSetting();
                         setting.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
                         setting.setDefaultRate(Double.parseDouble(_rate.getText().toString()));
                         setting.setStartDate(pickedDate);
                         setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
-                        setting.setCustomerId((int) id);
+                        setting.setCustomerId(id);
                         setting.setDirty(1);
                         setting.setDateModified(Constants.getCurrentDate());
                         setting.setIsDeleted(0);
                         setting.setIsCustomDelivery(false);
                         //Insert customers setting detail...
                         new CustomersSettingService().insert(setting);
+                        IBill billService = new BillService();
+                        billService.updateCustomerCurrentBill(id);
 
-                        Bill bill = new Bill();
+                        /*Bill bill = new Bill();
                         bill.setDirty(1);
                         bill.setPaymentMade(0);
                         bill.setTotalAmount(0);
@@ -227,7 +230,7 @@ public class CustomerAddActivity extends AppCompatActivity {
                         bill.setQuantity(setting.getGetDefaultQuantity());
                         bill.setDateAdded(formattedDate);
                         bill.setDirty(1);
-                        bill.setIsDeleted(0);
+                        bill.setIsDeleted(0);*/
 //                        Calendar cal = Calendar.getInstance();
 //                        if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
 //                            bill.setIsOutstanding(0);
@@ -236,12 +239,12 @@ public class CustomerAddActivity extends AppCompatActivity {
 //                            edit.putString(UserPrefrences.INSERT_BILL, "0");
 //                            edit.apply();
 //                        } else
-                        bill.setIsOutstanding(0);
+                        //bill.setIsOutstanding(0);
                         //Insert new Bills...
-                        new BillService().insert(bill);
+                        //new BillService().insert(bill);
 
                         Constants.REFRESH_CUSTOMERS = true;
-//                        Constants.REFRESH_BILL = true;
+                        Constants.REFRESH_BILL = true;
                         Constants.REFRESH_CALANDER = true;
                         CustomerAddActivity.this.finish();
                     }

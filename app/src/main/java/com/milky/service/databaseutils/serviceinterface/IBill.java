@@ -20,4 +20,5 @@ public interface IBill {
     List<Bill> getBillsOfCustomer(int customerId);
     Bill getBill(int id);
     void clearBill(Bill bill, double paymentMade);
+    void updateCustomerCurrentBill(int customerId);
 }

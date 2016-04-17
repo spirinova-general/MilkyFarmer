@@ -11,5 +11,6 @@ public interface IGlobalSetting {
 
     String getRollDate();
     void calculateAndSetNextRollDate();
+    void updateLastBillSyncedTime();
 
 }

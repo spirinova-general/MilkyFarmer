@@ -22,7 +22,7 @@ public class SmsService implements ISmsService {
         HttpAsycTask dataTask = new HttpAsycTask();
         if( incrementUsedSmsCount )
             _accountService.incrementUsedSMSCount(1);
-        //dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, listner, false, null);
+        dataTask.runRequest(ServerApis.SMS_API_ROOT + append, null, listner, false, null);
     }
 
     @Override

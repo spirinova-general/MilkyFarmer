@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.core.CustomersSetting;
+import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.service.legacy.Delivery;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
@@ -173,11 +174,11 @@ public class DeliveryActivity extends AppCompatActivity {
                     holder.setDateModified(Constants.getCurrentDate());
                     holder.setIsDeleted(0);
                     holder.setDirty(1);
-                    ICustomers customerService = new CustomersService();
-                    customerService.insertOrUpdateCustomerSetting(holder);
+                    IDelivery deliverService = new DeliveryService();
+                    deliverService.insertOrUpdateCustomerSetting(holder);
                 }
             Constants.REFRESH_CALANDER = true;
-//            Constants.REFRESH_BILL = true;
+            Constants.REFRESH_BILL = true;
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -310,13 +311,13 @@ public class DeliveryActivity extends AppCompatActivity {
                             holder.setDateModified(Constants.getCurrentDate());
                             holder.setIsDeleted(0);
                             holder.setDirty(1);
-                            ICustomers customerService = new CustomersService();
-                            customerService.insertOrUpdateCustomerSetting(holder);
+                            IDelivery deliverService = new DeliveryService();
+                            deliverService.insertOrUpdateCustomerSetting(holder);
                         }
                     }
                     dialog.hide();
                     Constants.REFRESH_CALANDER = true;
-//                    Constants.REFRESH_BILL = true;
+                    Constants.REFRESH_BILL = true;
                     finish();
                 }
 

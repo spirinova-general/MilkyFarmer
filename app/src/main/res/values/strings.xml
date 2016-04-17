@@ -35,6 +35,9 @@
     <string name="enter_valid_balance">Enter valid balance</string>
     <string name="enter_valid_tax">Enter valid tax</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="title_activity_exception_handler">ExceptionHandlerActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 
 
 </resources>

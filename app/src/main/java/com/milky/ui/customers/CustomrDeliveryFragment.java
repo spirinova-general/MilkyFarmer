@@ -19,6 +19,7 @@ import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.service.serverapi.BroadcastCalendar;
 import com.milky.utils.Constants;
 import com.tyczj.extendedcalendarview.Day;
@@ -142,14 +143,14 @@ public class CustomrDeliveryFragment extends Fragment {
                                 holder.setDateModified(Constants.getCurrentDate());
                                 holder.setIsDeleted(0);
                                 holder.setDirty(1);
-                                ICustomers customerService = new CustomersService();
-                                customerService.insertOrUpdateCustomerSetting(holder);
+                                IDelivery deliverService = new DeliveryService();
+                                deliverService.insertOrUpdateCustomerSetting(holder);
 
 
                                 totalData.set(day.getDay() - 1, Double.parseDouble(quantity.getText().toString()));
                                 _mCalenderView.refreshAdapter();
                                 Constants.REFRESH_CALANDER = true;
-//                                Constants.REFRESH_BILL=true;
+                                Constants.REFRESH_BILL=true;
                                 dialog.dismiss();
                             }
 

@@ -9,9 +9,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.milky.service.core.GlobalSettings;
 import com.milky.service.databaseutils.DatabaseHelper;
 import com.milky.service.databaseutils.TableNames;
+import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
+import com.milky.service.databaseutils.serviceclasses.BillService;
+import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Account;
@@ -24,6 +28,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,8 +52,8 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
         accountService = new AccountService();
 //        _exDb = new ExtcalDatabaseHelper(this);
         runnable = new Runnable() {
-            SharedPreferences preferences = getApplicationContext().getSharedPreferences("com.milky_prefrences", MODE_PRIVATE);
-            SharedPreferences.Editor edit = preferences.edit();
+            //SharedPreferences preferences = getApplicationContext().getSharedPreferences("com.milky_prefrences", MODE_PRIVATE);
+            //SharedPreferences.Editor edit = preferences.edit();
 
             public void run() {
                 if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT))
@@ -157,7 +162,36 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
     public void SyncNow() {
         HttpAsycTask dataTask = new HttpAsycTask();
-        dataTask.runRequest(ServerApis.ACCOUNT_API, accountService.getJsonData(), this, true, null);
+        dataTask.runRequest(ServerApis.API_ACCOUNT_ADD, accountService.getJsonData(), this, true, null);
+        ReCalculateBills();
+    }
+
+    private void ReCalculateBills()
+    {
+        GlobalSettingsService gsService = new GlobalSettingsService();
+        BillService billService = new BillService();
+        GlobalSettings setting = gsService.getData();
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        String lastBillSyncedTimeStr = setting.getLastBillSyncedTime();
+
+        boolean toRecalculate = false;
+        //Recalculate only once in a day
+        if( lastBillSyncedTimeStr == null )
+        {
+            toRecalculate = true;
+        }
+        else
+        {
+            Date lastBillSyncedTime = Utils.FromDateString(lastBillSyncedTimeStr);
+            if( Utils.BeforeDate(lastBillSyncedTime, today))
+                toRecalculate = true;
+        }
+
+        if( toRecalculate) {
+            billService.RecalculateAllCurrentBills();
+            gsService.updateLastBillSyncedTime();
+        }
     }
 
     public static HashMap<String, String> requestedList = new HashMap<>();
@@ -298,7 +332,9 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> requestType) {
 
-        if (type.equals(ServerApis.ACCOUNT_API)) {
+    }
+
+        /*if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
                 Account holder = new Account();
 //                try {
@@ -368,6 +404,6 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 //                    BillTableManagement.insertNewBills(db.getWritableDatabase(), holder);
 //            }
         }
-    }
+    }*/
 
 }

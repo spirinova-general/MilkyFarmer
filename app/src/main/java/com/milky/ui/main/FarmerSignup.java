@@ -146,8 +146,9 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            //Only place where we needed to Ad Account - all other places should be Get
                             HttpAsycTask dataTask = new HttpAsycTask();
-                            dataTask.runRequest(ServerApis.ACCOUNT_API, jsonObject, FarmerSignup.this, true, null);
+                            dataTask.runRequest(ServerApis.API_ACCOUNT_ADD, jsonObject, FarmerSignup.this, true, null);
                         } else otp_layout.setError("Invalid OTP");
                     }
                 } else
@@ -198,7 +199,7 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
                         _mobileLayout.setError(null);
                         ISmsService smsService = new SmsService();
                         smsService.SendOtp(_mobile.getText().toString(), mesg, FarmerSignup.this);
-                        AppUtil.getInstance().showNotification(FarmerSignup.this, FarmerSignup.this.getResources().getString(R.string.app_name), "Your OTP for " + FarmerSignup.this.getResources().getString(R.string.app_name) + " is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
+                        //AppUtil.getInstance().showNotification(FarmerSignup.this, FarmerSignup.this.getResources().getString(R.string.app_name), "Your OTP for " + FarmerSignup.this.getResources().getString(R.string.app_name) + " is ", new Intent(FarmerSignup.this, NotificationBroadcastReceiver.class));
 
                     } else
                         _mobileLayout.setError("Enter mobile number !");
@@ -215,27 +216,12 @@ public class FarmerSignup extends AppCompatActivity implements OnTaskCompleteLis
 
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> listType) {
-        if (type.equals(ServerApis.ACCOUNT_API)) {
-            Account holder = new Account();
+        if (type.equals(ServerApis.API_ACCOUNT_ADD)) {
             try {
+                Account holder = new Account();
                 JSONObject result = Constants.API_RESPONCE;
-                holder.setFarmerCode(result.getString("FarmerCode"));
-                holder.setFirstName(result.getString("FirstName"));
-                holder.setLastName(result.getString("LastName"));
-                holder.setMobile(result.getString("Mobile"));
-                if (result.getBoolean("Validated"))
-                    holder.setValidated(1);
-                else
-                    holder.setValidated(0);
-                holder.setDateAdded(result.getString("DateAdded"));
-                holder.setDateModified(result.getString("DateModified"));
-//                holder.setAccountStartDate(result.getString("StartDate"));
-                holder.setEndDate(result.getString("EndDate"));
-                holder.setUsedSms(result.getInt("UsedSms"));
-                holder.setTotalSms(result.getInt("TotalSms"));
-                holder.setServerAccountId(result.getInt("Id"));
-                holder.setDirty(1);
-                holder.setIsDeleted(0);
+                holder.PopulateFromJSON(result);
+
                 edit.putString(UserPrefrences.MOBILE_NUMBER, _mobile.getText().toString());
                 edit.putString(UserPrefrences.INSERT_BILL, "0");
                 edit.commit();
