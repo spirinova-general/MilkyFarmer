@@ -234,8 +234,8 @@ public class CustomersService implements ICustomers {
         if( customerIdInt == null ) {
             String startDate = Utils.ToDateString(startDateObj, true);
 
-            selectQuery += " WHERE IsCustomerDeleted ='0' OR ( IsCustomerDeleted ='1' AND "
-                    + TableColumns.DeletedOn + " >='" + startDate + "')";
+            selectQuery += " WHERE (IsCustomerDeleted ='0' OR ( IsCustomerDeleted ='1' AND "
+                    + TableColumns.DeletedOn + " >='" + startDate + "'))";
         }
         else
             selectQuery +=  " WHERE " + TableColumns.CustomerId + " ='" + customerIdInt  + "'";

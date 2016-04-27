@@ -30,12 +30,14 @@ import java.util.List;
 public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
     private Context mContext;
     private List<VDelivery> filteredList, tempItems, suggestions;
-    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final List<VDelivery> _mCustomersList) {
+    private String selectedDate;
+    public GlobalDeliveryAdapter(final Context con, int resource, int textViewResourceId, final List<VDelivery> _mCustomersList, String selectedDate) {
         super(con, resource, textViewResourceId, _mCustomersList);
         this.mContext = con;
         this.filteredList = _mCustomersList;
         tempItems = new ArrayList<>(filteredList); // this makes the difference.
         suggestions = new ArrayList<>();
+        this.selectedDate = selectedDate;
 
     }
 
@@ -233,7 +235,8 @@ public class GlobalDeliveryAdapter extends ArrayAdapter<VDelivery> {
                 if (Constants.selectedAreaId!=-1) {
                     clear();
 
-                    filterList = new DeliveryService().getDeliveryDetails(Constants.selectedAreaId, Constants.DELIVERY_DATE);
+                    //I did not pass on these variables through public static constants
+                    filterList = new DeliveryService().getDeliveryDetails(Constants.selectedAreaId, selectedDate);
                     DeliveryActivity.selectedCustomersId = new ArrayList<>();
                     for (VDelivery Area : filterList) {
                         add(Area);
