@@ -72,62 +72,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+
       /*
       * init resources
       * */
         initResources();
 
-        Constants.REFRESH_CALANDER = true;
-        Constants.REFRESH_CUSTOMERS = true;
-        Constants.REFRESH_BILL = true;
-
-        /*
-        * Set up ACTIONBAR
-        * */
-        supportActionBar();
-
-        /**
-         * Setup click events on the Navigation View Items.
-         */
-        _headerView = mNavigationView.inflateHeaderView(R.layout.nav_headers);
-
-        TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
-        Account dataHolder = accountService.getDetails();
-        name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
-
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.nav_settings:
-                        Intent i = new Intent(MainActivity.this, GlobalSetting.class);
-                        startActivity(i);
-                        break;
-                    case R.id.nav_about:
-                        startActivity(new Intent(MainActivity.this, About.class));
-                        break;
-                }
-                mDrawerLayout.closeDrawers();
-
-                return true;
-            }
-
-        });
-
-        /**
-         * Setup Drawer Toggle of the Toolbar
-         */
-
-        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
-                R.string.app_name);
-
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        mDrawerToggle.syncState();
-        //To get the current data
 
     }
 
@@ -251,6 +201,16 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 
         adp1 = new AreaCitySpinnerAdapter(MainActivity.this, R.id.spinnerText
                 , _areacityList);
+
+        AccountService accountService = new AccountService();
+        if(expirationDialog != null)
+            expirationDialog.dismiss();
+
+        if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
+            if (accountService.isAccountExpired()) {
+                expiryDialog();
+            }
+        }
     }
 
 
@@ -309,6 +269,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
     private void initResources() {/**
      *Setup the DrawerLayout and NavigationView
      */
+        setContentView(R.layout.main);
+
         progressBar = new ProgressDialog(MainActivity.this);
         progressBar.setCancelable(true);
         progressBar.setMessage("Checking in ...");
@@ -324,6 +286,9 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
 //        MenuItem sync = (MenuItem) mNavigationView.findViewById(R.id.nav_sync);
 //        sync.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_image));
         accountService = new AccountService();
+        if(expirationDialog != null)
+            expirationDialog.dismiss();
+
         if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
             if (accountService.isAccountExpired()) {
                 expiryDialog();
@@ -345,6 +310,57 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleteLis
             Toast.makeText(MainActivity.this, getResources().getString(R.string.set_global_rate), Toast.LENGTH_SHORT).show();
             _dbHelper.close();
         }
+
+
+        Constants.REFRESH_CALANDER = true;
+        Constants.REFRESH_CUSTOMERS = true;
+        Constants.REFRESH_BILL = true;
+
+        /*
+        * Set up ACTIONBAR
+        * */
+        supportActionBar();
+
+        /**
+         * Setup click events on the Navigation View Items.
+         */
+        _headerView = mNavigationView.inflateHeaderView(R.layout.nav_headers);
+
+        TextView name = (TextView) _headerView.findViewById(R.id.farmer_name);
+        Account dataHolder = accountService.getDetails();
+        name.setText(String.format("%s %s", dataHolder.getFirstName(), dataHolder.getLastName()));
+
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.nav_settings:
+                        Intent i = new Intent(MainActivity.this, GlobalSetting.class);
+                        startActivity(i);
+                        break;
+                    case R.id.nav_about:
+                        startActivity(new Intent(MainActivity.this, About.class));
+                        break;
+                }
+                mDrawerLayout.closeDrawers();
+
+                return true;
+            }
+
+        });
+
+        /**
+         * Setup Drawer Toggle of the Toolbar
+         */
+
+        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
+                R.string.app_name);
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        mDrawerToggle.syncState();
 /*
 String Area[] = new String[]{"Hadaspar", "Worli", "Baner", "Phase5", "Sector 71"};
 int AreaID[] = new int[]{1, 2, 3, 4, 5};
@@ -404,6 +420,9 @@ _dbHelper.close();
                     JSONObject result = Constants.API_RESPONCE;
                     account.setEndDate(result.getString("EndDate"));
                     accountService.update(account);
+                    if (!accountService.isAccountExpired()) {
+                        initResources();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
