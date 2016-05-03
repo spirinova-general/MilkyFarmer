@@ -331,34 +331,21 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
 
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> requestType) {
-
-    }
-
-        /*if (type.equals(ServerApis.ACCOUNT_API)) {
+        if (type.equals(ServerApis.API_ACCOUNT_ADD)) {
             if (Constants.API_RESPONCE != null) {
-                Account holder = new Account();
-//                try {
-//                    JSONObject result = Constants.API_RESPONCE;
-//                    holder.setExpiryDate(result.getString("EndDate"));
-//                    holder.setUsedSms(String.valueOf(result.getInt("UsedSms")));
-//                    holder.setTotalSms(String.valueOf(result.getInt("TotalSms")));
-//                    holder.setId(String.valueOf(result.getInt("Id")));
-//                    if (_dbHelper.isTableNotEmpty(TableNames.ACCOUNT)) {
-//                        holder.setRate(Account.getDefaultRate(_dbHelper.getReadableDatabase()));
-//                        holder.setTax(Account.getDefautTax(_dbHelper.getReadableDatabase()));
-//                    } else {
-//                        holder.setRate("0");
-//                        holder.setTax("0");
-//                    }
-//                    Account.updateAllAccountDetails(_dbHelper.getWritableDatabase(), holder);
-
-
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                AccountService accountService = new AccountService();
+                Account account = accountService.getDetails();
+                try {
+                    JSONObject result = Constants.API_RESPONCE;
+                    account.setEndDate(result.getString("EndDate"));
+                    accountService.update(account);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-
-        } else if (type.equals(ServerApis.SYNC)) {
+        }
+    }
+    /*    } else if (type.equals(ServerApis.SYNC)) {
             if (requestType.get("Customer_List").equals("0")) {
 //                CustomersTableMagagement.updateSyncedData(_dbHelper.getWritableDatabase());
             } else if (requestType.get("Bill_List").equals("0")) {

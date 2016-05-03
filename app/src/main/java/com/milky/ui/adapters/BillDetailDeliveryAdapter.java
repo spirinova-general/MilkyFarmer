@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.milky.R;
 import com.milky.service.core.Bill;
 import com.milky.service.core.CustomerSettingComparator;
+import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.Utils;
 import com.milky.utils.Constants;
@@ -18,6 +19,7 @@ import com.milky.utils.Constants;
 import org.w3c.dom.Text;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,8 +33,25 @@ public class BillDetailDeliveryAdapter extends BaseAdapter {
 
     public BillDetailDeliveryAdapter(final Bill bill, final List<CustomersSetting> dataList, final Context con) {
         this.mContext = con;
-        Collections.sort(dataList, new CustomerSettingComparator());
-        this.customerSettingsData = dataList;
+        this.customerSettingsData = new ArrayList<CustomersSetting>();
+        for(CustomersSetting customersSetting:dataList ) {
+            Date customerSettingStartDate = Utils.FromDateString(customersSetting.getStartDate());
+            Date customerSettingEndDate = Utils.FromDateString(customersSetting.getEndDate());
+            Date billStartDate = Utils.FromDateString(bill.getStartDate());
+            Date billEndDate = Utils.FromDateString(bill.getEndDate());
+
+            if( Utils.BeforeDate(customerSettingEndDate, billStartDate) ||
+                    Utils.AfterDate(customerSettingStartDate, billEndDate)) {
+                continue;
+            }
+            else
+            {
+                this.customerSettingsData.add(customersSetting);
+            }
+
+        }
+
+        Collections.sort(this.customerSettingsData, new CustomerSettingComparator());
         this._bill = bill;
     }
 

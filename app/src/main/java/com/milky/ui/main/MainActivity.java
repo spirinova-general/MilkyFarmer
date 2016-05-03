@@ -52,6 +52,10 @@ import com.milky.utils.Constants;
 import com.milky.service.core.Account;
 import com.milky.service.core.Area;
 import com.milky.service.core.Bill;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -381,15 +385,29 @@ _dbHelper.close();
     @Override
     public void onTaskCompleted(String type, HashMap<String, String> requestType) {
 
-        if (Constants.TIME_OUT) {
-            if (progressBar != null)
-                progressBar.hide();
-            else if (androidProgressBar != null) {
-                androidProgressBar.setMax(100);
-                androidProgressBar.setVisibility(View.GONE);
-            }
-            Constants.TIME_OUT = false;
+        if (progressBar != null)
+            progressBar.hide();
+        else if (androidProgressBar != null) {
+            androidProgressBar.setMax(100);
+            androidProgressBar.setVisibility(View.GONE);
+        }
 
+
+        if (Constants.TIME_OUT) {
+            Constants.TIME_OUT = false;
+        }
+        else if (type.equals(ServerApis.API_ACCOUNT_ADD)) {
+            if (Constants.API_RESPONCE != null) {
+                AccountService accountService = new AccountService();
+                Account account = accountService.getDetails();
+                try {
+                    JSONObject result = Constants.API_RESPONCE;
+                    account.setEndDate(result.getString("EndDate"));
+                    accountService.update(account);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         /*if (type.equals(ServerApis.ACCOUNT_API)) {
             if (Constants.API_RESPONCE != null) {
@@ -667,6 +685,7 @@ _dbHelper.close();
 //            asyncTask.runRequest(ServerApis.ACCOUNT_API, sendDataToServer(), FarmerSignup.this, true, requestedList);
 //            new ServerCommunication().SendHttpPost(ServerApis.ACCOUNT_API, jsonObject);
             HttpAsycTask dataTask = new HttpAsycTask();
+
             dataTask.runRequest(ServerApis.API_ACCOUNT_ADD, accountService.getJsonData(), MainActivity.this, true, null);
             return null;
         }

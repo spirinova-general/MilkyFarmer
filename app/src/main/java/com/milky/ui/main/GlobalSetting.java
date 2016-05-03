@@ -257,7 +257,8 @@ public class GlobalSetting extends AppCompatActivity implements AdapterView.OnIt
 //                if(format.length==1 || format[1].length()==11)
 //                cal.setTime(Constants.api_format_other.parse(expDate));
 //                else
-                cal.setTime(Constants.work_format.parse(globalSettings.getRollDate()));
+                AccountService accountService = new AccountService();
+                cal.setTime(Constants.work_format.parse(accountService.getDetails().getEndDate()));
                 expirationDate.setText(Constants.MONTHS[cal.get(Calendar.MONTH)] + "-" + cal.get(Calendar.DAY_OF_MONTH) + "-" + cal.get(Calendar.YEAR));
             } catch (ParseException e) {
                 e.printStackTrace();
