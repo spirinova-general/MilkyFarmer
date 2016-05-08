@@ -121,7 +121,7 @@ public class BillService implements IBill {
             InsertOrUpdateCurrentBills(currentbillsMap, -1);
 
             //if we are after roll date...
-            if (!today.before(rollDate)) {
+            if (today.after(rollDate)) {
                 PerformBillRoll();
             }
         } catch (Exception e) {

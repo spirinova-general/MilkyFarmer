@@ -1,7 +1,10 @@
 package com.milky.ui.customers;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TextInputLayout;
@@ -22,6 +25,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.core.GlobalSettings;
@@ -32,8 +36,11 @@ import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.IBill;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
@@ -184,6 +191,9 @@ public class CustomerAddActivity extends AppCompatActivity {
                         }
                         autocomplete_layout.setError(null);
 
+
+
+
                         Customers holder = new Customers();
                         holder.setFirstName(_firstName.getText().toString());
                         holder.setLastName(_lastName.getText().toString());
@@ -196,57 +206,26 @@ public class CustomerAddActivity extends AppCompatActivity {
                         holder.setIsDeleted(0);
                         holder.setDirty(1);
                         holder.setDateModified(Constants.getCurrentDate());
-                        //Insert new Customer..
-                        int id = (int)(new CustomersService().insert(holder));
+
 
                         CustomersSetting setting = new CustomersSetting();
                         setting.setGetDefaultQuantity(Double.parseDouble(_mQuantuty.getText().toString()));
                         setting.setDefaultRate(Double.parseDouble(_rate.getText().toString()));
                         setting.setStartDate(pickedDate);
                         setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
-                        setting.setCustomerId(id);
+
                         setting.setDirty(1);
                         setting.setDateModified(Constants.getCurrentDate());
                         setting.setIsDeleted(0);
                         setting.setIsCustomDelivery(false);
-                        //Insert customers setting detail...
-                        new CustomersSettingService().insert(setting);
-                        IBill billService = new BillService();
-                        billService.updateCustomerCurrentBill(id);
 
-                        /*Bill bill = new Bill();
-                        bill.setDirty(1);
-                        bill.setPaymentMade(0);
-                        bill.setTotalAmount(0);
-                        bill.setEndDate(setting.getEndDate());
-                        bill.setAdjustment(0);
-                        bill.setBalance(0);
-                        bill.setTax(globalSettings.getTax());
-                        bill.setIsCleared(0);
-                        bill.setRate(setting.getDefaultRate());
-                        bill.setDateModified(formattedDate);
-                        bill.setCustomerId(setting.getCustomerId());
-                        bill.setStartDate(setting.getStartDate());
-                        bill.setQuantity(setting.getGetDefaultQuantity());
-                        bill.setDateAdded(formattedDate);
-                        bill.setDirty(1);
-                        bill.setIsDeleted(0);*/
-//                        Calendar cal = Calendar.getInstance();
-//                        if ((cal.get(Calendar.DAY_OF_MONTH)) == cal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-//                            bill.setIsOutstanding(0);
-//                            SharedPreferences preferences = AppUtil.getInstance().getPrefrences();
-//                            SharedPreferences.Editor edit = preferences.edit();
-//                            edit.putString(UserPrefrences.INSERT_BILL, "0");
-//                            edit.apply();
-//                        } else
-                        //bill.setIsOutstanding(0);
-                        //Insert new Bills...
-                        //new BillService().insert(bill);
 
-                        Constants.REFRESH_CUSTOMERS = true;
-                        Constants.REFRESH_BILL = true;
-                        Constants.REFRESH_CALANDER = true;
-                        CustomerAddActivity.this.finish();
+
+
+                        SaveCustomer saveCustomerTask = new SaveCustomer(CustomerAddActivity.this, holder, setting);
+                        saveCustomerTask.execute();
+
+
                     }
                 } catch (NullPointerException npe) {
                 }  finally {
@@ -481,6 +460,45 @@ public class CustomerAddActivity extends AppCompatActivity {
 
     }
 
+
+    private class SaveCustomer extends AsyncTask<Void, Void, Void> {
+        ProgressDialog progressDialog;
+        Customers customer;
+        CustomersSetting customersSetting;
+        Activity activity;
+        public SaveCustomer(Activity activity, Customers customer, CustomersSetting setting){
+            this.customer = customer;
+            this.customersSetting = setting;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activity, "", "Saving Customer...", false, true);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            //Insert new Customer..
+            int id = (int)(new CustomersService().insert(customer));
+            customersSetting.setCustomerId(id);
+            //Insert customers setting detail...
+            new CustomersSettingService().insert(customersSetting);
+            IBill billService = new BillService();
+            billService.updateCustomerCurrentBill(id);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Constants.REFRESH_CUSTOMERS = true;
+            Constants.REFRESH_BILL = true;
+            Constants.REFRESH_CALANDER = true;
+            CustomerAddActivity.this.finish();
+        }
+    }
 
 }
 

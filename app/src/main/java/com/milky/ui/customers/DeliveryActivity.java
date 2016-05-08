@@ -1,7 +1,10 @@
 package com.milky.ui.customers;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
@@ -27,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.milky.R;
+import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.service.legacy.Delivery;
@@ -163,23 +167,12 @@ public class DeliveryActivity extends AppCompatActivity {
 
 
         if (id == R.id.save) {
-            if (_mDeliveryList.size() > 0)
-                for (Delivery entry : _mDeliveryList) {
-                    CustomersSetting holder = new CustomersSetting();
-                    holder.setGetDefaultQuantity(entry.getQuantity());
-                    holder.setStartDate(selectedDate);
-                    holder.setEndDate(selectedDate);
-                    holder.setCustomerId(entry.getCustomerId());
-                    holder.setIsCustomDelivery(true);
-                    holder.setDateModified(Constants.getCurrentDate());
-                    holder.setIsDeleted(0);
-                    holder.setDirty(1);
-                    IDelivery deliverService = new DeliveryService();
-                    deliverService.insertOrUpdateCustomerSetting(holder);
-                }
-            Constants.REFRESH_CALANDER = true;
-            Constants.REFRESH_BILL = true;
-            finish();
+            if (_mDeliveryList.size() > 0) {
+                SaveDelivery saveDeliveryTask = new SaveDelivery(this, _mDeliveryList);
+                saveDeliveryTask.execute();
+            }
+
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -300,25 +293,14 @@ public class DeliveryActivity extends AppCompatActivity {
                 if (quantity.getText().toString().equals(".")) {
                     quantity_layout.setError(getResources().getString(R.string.enter_valid_quantity));
                 } else {
-                    if (selectedCustomersId.size() > 0) {
-                        for (int i = 0; i < selectedCustomersId.size(); ++i) {
-                            CustomersSetting holder = new CustomersSetting();
-                            holder.setGetDefaultQuantity(Double.parseDouble(quantity.getText().toString()));
-                            holder.setStartDate(selectedDate);
-                            holder.setEndDate(selectedDate);
-                            holder.setCustomerId(selectedCustomersId.get(i).getCustomerId());
-                            holder.setIsCustomDelivery(true);
-                            holder.setDateModified(Constants.getCurrentDate());
-                            holder.setIsDeleted(0);
-                            holder.setDirty(1);
-                            IDelivery deliverService = new DeliveryService();
-                            deliverService.insertOrUpdateCustomerSetting(holder);
-                        }
-                    }
                     dialog.hide();
-                    Constants.REFRESH_CALANDER = true;
-                    Constants.REFRESH_BILL = true;
-                    finish();
+                    if (selectedCustomersId.size() > 0) {
+                        String q = quantity.getText().toString();
+                        BulkEditTask task = new BulkEditTask(DeliveryActivity.this, selectedCustomersId, q);
+                        task.execute();
+                    }
+
+
                 }
 
             }
@@ -342,6 +324,97 @@ public class DeliveryActivity extends AppCompatActivity {
         if (dialog != null) {
             dialog.dismiss();
             dialog = null;
+        }
+    }
+
+
+    private class SaveDelivery extends AsyncTask<Void, Void, Void> {
+        ProgressDialog progressDialog;
+        List<Delivery> deliveries;
+      Activity activity;
+
+        public SaveDelivery( Activity activity, List<Delivery> deliveries) {
+            this.deliveries = deliveries;
+            this.activity = activity;
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activity, "", "Saving Deliveries...", false, true);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (Delivery entry : deliveries) {
+                CustomersSetting holder = new CustomersSetting();
+                holder.setGetDefaultQuantity(entry.getQuantity());
+                holder.setStartDate(selectedDate);
+                holder.setEndDate(selectedDate);
+                holder.setCustomerId(entry.getCustomerId());
+                holder.setIsCustomDelivery(true);
+                holder.setDateModified(Constants.getCurrentDate());
+                holder.setIsDeleted(0);
+                holder.setDirty(1);
+                IDelivery deliverService = new DeliveryService();
+                deliverService.insertOrUpdateCustomerSetting(holder);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Constants.REFRESH_CALANDER = true;
+            Constants.REFRESH_BILL = true;
+            finish();
+        }
+    }
+
+
+    private class BulkEditTask extends AsyncTask<Void, Void, Void> {
+        ProgressDialog progressDialog;
+        List<VDelivery> vdeliveries;
+        Activity activity;
+        String quantity;
+        public BulkEditTask( Activity activity, List<VDelivery>  vdeliveries, String quantity) {
+            this.vdeliveries = vdeliveries;
+            this.activity = activity;
+            this.quantity = quantity;
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activity, "", "Bulk Editing...", false, true);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (int i = 0; i < vdeliveries.size(); ++i) {
+                CustomersSetting holder = new CustomersSetting();
+                holder.setGetDefaultQuantity(Double.parseDouble(quantity));
+                holder.setStartDate(selectedDate);
+                holder.setEndDate(selectedDate);
+                holder.setCustomerId(vdeliveries.get(i).getCustomerId());
+                holder.setIsCustomDelivery(true);
+                holder.setDateModified(Constants.getCurrentDate());
+                holder.setIsDeleted(0);
+                holder.setDirty(1);
+                IDelivery deliverService = new DeliveryService();
+                deliverService.insertOrUpdateCustomerSetting(holder);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Constants.REFRESH_CALANDER = true;
+            Constants.REFRESH_BILL = true;
+            finish();
         }
     }
 }

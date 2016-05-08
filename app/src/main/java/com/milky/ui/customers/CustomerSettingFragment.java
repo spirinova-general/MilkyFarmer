@@ -1,6 +1,9 @@
 package com.milky.ui.customers;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -34,6 +37,7 @@ import com.milky.service.databaseutils.serviceinterface.ICustomers;
 import com.milky.service.databaseutils.serviceinterface.ICustomersSettings;
 import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.ui.adapters.AreaCityAdapter;
+import com.milky.ui.adapters.BillingAdapter;
 import com.milky.ui.main.CustomersActivity;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
@@ -433,7 +437,7 @@ public class CustomerSettingFragment extends Fragment {
                     holder.setDirty(1);
                     holder.setDeletedOn("null");
                     //Update data into custmers table
-                    service.update(holder);
+                    //service.update(holder);
 
                     CustomersSetting setting = new CustomersSetting();
                     setting.setCustomerId(holder.getCustomerId());
@@ -450,32 +454,18 @@ public class CustomerSettingFragment extends Fragment {
                     setting.setDateModified(currentDate);
                     setting.setIsDeleted(0);
 
-                    IDelivery deliverService = new DeliveryService();
-                    deliverService.insertOrUpdateCustomerSetting(setting);
 
-                    /*Bill bill = new Bill();
-                    bill.setCustomerId(holder.getCustomerId());
-                    bill.setStartDate(setting.getStartDate());
-                    bill.setEndDate(setting.getEndDate());
-                    bill.setBalance(holder.getBalance_amount());
-                    bill.setCustomerId(setting.getCustomerId());
-                    bill.setQuantity(setting.getGetDefaultQuantity());
-                    bill.setAdjustment(0);
-                    bill.setTax(0);
-                    bill.setIsCleared(0);
-                    bill.setPaymentMade(0);
-                    bill.setDateModified(Constants.getCurrentDate());
-                    bill.setTotalAmount(0);
-                    bill.setIsOutstanding(0);
-                    bill.setDateAdded(holder.getDateAdded());
-                    bill.setDirty(1);
-                    new BillService().update(bill);*/
+                    SaveCustomer task = new SaveCustomer(getActivity(), holder, setting);
+                    task.execute();
+                    /*deliverService.insertOrUpdateCustomerSetting(setting);
+
+
 
                     Toast.makeText(getActivity(), "Customer edited successfully !", Toast.LENGTH_SHORT).show();
                     Constants.REFRESH_CALANDER = true;
                     Constants.REFRESH_CUSTOMERS = true;
                     Constants.REFRESH_BILL = true;
-                    getActivity().finish();
+                    getActivity().finish();*/
 
                 } else {
                     Toast.makeText(getActivity(), getResources().getString(R.string.fill_require_fields), Toast.LENGTH_SHORT).show();
@@ -502,4 +492,47 @@ public class CustomerSettingFragment extends Fragment {
     }
 
 
+
+    private class SaveCustomer extends AsyncTask<Void, Void, Void> {
+        ProgressDialog progressDialog;
+        Customers customer;
+        CustomersSetting customersSetting;
+        Activity activity;
+        public SaveCustomer(Activity activity, Customers customer, CustomersSetting setting){
+        this.customer = customer;
+        this.customersSetting = setting;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(activity, "", "Saving Customer...", false, true);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            //billService.RecalculateAllCurrentBills();
+            //bills = billService.getAllGlobalBills(_reCalculateBills);
+            ICustomers customersService = new CustomersService();
+            customersService.update(customer);
+            IDelivery deliverService = new DeliveryService();
+            deliverService.insertOrUpdateCustomerSetting(customersSetting);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            progressDialog.dismiss();
+
+            Toast.makeText(activity, "Customer edited successfully !", Toast.LENGTH_SHORT).show();
+            Constants.REFRESH_CALANDER = true;
+            Constants.REFRESH_CUSTOMERS = true;
+            Constants.REFRESH_BILL = true;
+          activity.finish();
+        }
+    }
 }

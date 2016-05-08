@@ -165,21 +165,21 @@ public class DeliveryService implements IDelivery {
 
             Date customerStartDate = Utils.FromDateString(customer.getStartDate());
 
-            //When the customer's delivery has not yet started and he updated settings, just update the existing entry
-            if( Utils.BeforeOrEqualsDate(today,customerStartDate))
-            {
-                if( setting.isCustomDelivery())
+
+            if( setting.isCustomDelivery() && Utils.BeforeDate(today, customerStartDate)) {
                     return;
-                else
-                {
-                    existingSettingWithoutCustomDelivery = _customerService.getCustomerSetting(customer, customerStartDate, false, true);
-                    boolean toUpdate = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
-                    if( toUpdate ) {
-                        existingSettingWithoutCustomDelivery.setDefaultRate(setting.getDefaultRate());
-                        existingSettingWithoutCustomDelivery.setGetDefaultQuantity(setting.getGetDefaultQuantity());
-                        _customerSettingsService.update(existingSettingWithoutCustomDelivery);
-                        _billService.updateCustomerCurrentBill(customer.getCustomerId());
-                    }
+            }
+
+            //When the customer's delivery has not yet started and he updated settings, just update the existing entry
+            if(  !setting.isCustomDelivery() && Utils.BeforeOrEqualsDate(today,customerStartDate))
+            {
+                existingSettingWithoutCustomDelivery = _customerService.getCustomerSetting(customer, customerStartDate, false, true);
+                boolean toUpdate = isQuantityOrRateDifferent(existingSettingWithoutCustomDelivery, setting);
+                if( toUpdate ) {
+                    existingSettingWithoutCustomDelivery.setDefaultRate(setting.getDefaultRate());
+                    existingSettingWithoutCustomDelivery.setGetDefaultQuantity(setting.getGetDefaultQuantity());
+                    _customerSettingsService.update(existingSettingWithoutCustomDelivery);
+                    _billService.updateCustomerCurrentBill(customer.getCustomerId());
                 }
                 return;
             }

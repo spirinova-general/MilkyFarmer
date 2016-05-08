@@ -333,12 +333,18 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
     public void onTaskCompleted(String type, HashMap<String, String> requestType) {
         if (type.equals(ServerApis.API_ACCOUNT_ADD)) {
             if (Constants.API_RESPONCE != null) {
-                AccountService accountService = new AccountService();
-                Account account = accountService.getDetails();
+
                 try {
+                    AccountService accountService = new AccountService();
+                    Account account = accountService.getDetails();
+
                     JSONObject result = Constants.API_RESPONCE;
-                    account.setEndDate(result.getString("EndDate"));
-                    accountService.update(account);
+                    String endDate = result.getString("EndDate");
+
+                    if( account.getEndDate() != endDate) {
+                        account.setEndDate(endDate);
+                        accountService.update(account);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

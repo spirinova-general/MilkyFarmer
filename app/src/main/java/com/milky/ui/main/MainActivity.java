@@ -2,6 +2,7 @@ package com.milky.ui.main;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -414,14 +415,23 @@ _dbHelper.close();
         }
         else if (type.equals(ServerApis.API_ACCOUNT_ADD)) {
             if (Constants.API_RESPONCE != null) {
-                AccountService accountService = new AccountService();
-                Account account = accountService.getDetails();
+
+
                 try {
                     JSONObject result = Constants.API_RESPONCE;
-                    account.setEndDate(result.getString("EndDate"));
+                    String endDate = result.getString("EndDate");
+
+                    AccountService accountService = new AccountService();
+                    Account account = accountService.getDetails();
+
+                    if( account.getEndDate() != endDate)
+                    {
+
+                    account.setEndDate(endDate);
                     accountService.update(account);
                     if (!accountService.isAccountExpired()) {
                         initResources();
+                    }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -511,15 +521,37 @@ _dbHelper.close();
                 if (!_dbHelper.isTableNotEmpty(TableNames.CUSTOMER)) {
                     Toast.makeText(MainActivity.this, "Please add customer !", Toast.LENGTH_SHORT).show();
                 } else if (AppUtil.getInstance().isNetworkAvailable(MainActivity.this)) {
-                    IBill billService = new BillService();
-                    final List<Bill> bills = billService.getAllGlobalBills(true);
 
-                    if (bills.size() > 0) {
-                        if (accountService.getRemainingSMS() >= bills.size())
-                            new SendBillSMS(bills).execute();
-                        else
-                            Toast.makeText(MainActivity.this, "Your SMS quota is not sufficient. Please contact administrator !", Toast.LENGTH_LONG).show();
-                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Send Bills");
+                    builder.setMessage("This will send bills as SMS to users. Do you want to continue ?");
+
+
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            IBill billService = new BillService();
+                            final List<Bill> bills = billService.getAllGlobalBills(true);
+
+                            if (bills.size() > 0) {
+                                if (accountService.getRemainingSMS() >= bills.size())
+                                    new SendBillSMS(bills).execute();
+                                else
+                                    Toast.makeText(MainActivity.this, "Your SMS quota is not sufficient. Please contact administrator !", Toast.LENGTH_LONG).show();
+                            }
+
+
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    builder.show();
 
                 } else
                     Toast.makeText(MainActivity.this, "No network available. ", Toast.LENGTH_SHORT).show();
