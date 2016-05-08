@@ -179,7 +179,7 @@ public class DeliveryService implements IDelivery {
                     existingSettingWithoutCustomDelivery.setDefaultRate(setting.getDefaultRate());
                     existingSettingWithoutCustomDelivery.setGetDefaultQuantity(setting.getGetDefaultQuantity());
                     _customerSettingsService.update(existingSettingWithoutCustomDelivery);
-                    _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                    _billService.updateCustomerBills(customer.getCustomerId());
                 }
                 return;
             }
@@ -191,7 +191,7 @@ public class DeliveryService implements IDelivery {
 
                 existingSetting.setGetDefaultQuantity(setting.getGetDefaultQuantity());
                 _customerSettingsService.update(existingSetting);
-                _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                _billService.updateCustomerBills(customer.getCustomerId());
                 return;
             }
 
@@ -206,7 +206,7 @@ public class DeliveryService implements IDelivery {
                 setting.setDefaultRate(existingSettingWithoutCustomDelivery.getDefaultRate());
                 setting.setIsCustomDelivery(true);
                 _customerSettingsService.insert(setting);
-                _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                _billService.updateCustomerBills(customer.getCustomerId());
                 return;
             }
             else if( !setting.getIsCustomDelivery() ) {
@@ -225,7 +225,7 @@ public class DeliveryService implements IDelivery {
                 setting.setEndDate(Utils.ToDateString(Utils.GetMaxDate()));
                 //setting.setIsCustomDelivery(false);
                 _customerSettingsService.insert(setting);
-                _billService.updateCustomerCurrentBill(customer.getCustomerId());
+                _billService.updateCustomerBills(customer.getCustomerId());
                 return;
             }
         } catch (Exception ex) {

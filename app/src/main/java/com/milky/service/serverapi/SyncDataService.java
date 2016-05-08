@@ -4,7 +4,6 @@ package com.milky.service.serverapi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -16,7 +15,6 @@ import com.milky.service.databaseutils.Utils;
 import com.milky.service.databaseutils.serviceclasses.AccountService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
-import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.service.core.Account;
 
@@ -189,7 +187,7 @@ public class SyncDataService extends Service implements OnTaskCompleteListner {
         }
 
         if( toRecalculate) {
-            billService.RecalculateAllCurrentBills();
+            billService.RecalculateAllCurrentAndOutstandingBills();
             gsService.updateLastBillSyncedTime();
         }
     }
