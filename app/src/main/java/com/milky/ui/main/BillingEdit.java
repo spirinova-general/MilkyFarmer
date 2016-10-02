@@ -193,6 +193,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
                             billService.clearBill(allBillData, payment_made);
                             dialog.dismiss();
                             Constants.REFRESH_CALANDER = true;
+                            Constants.REFRESH_BILL = true;
                             BillingEdit.this.finish();
                         }
                     }
