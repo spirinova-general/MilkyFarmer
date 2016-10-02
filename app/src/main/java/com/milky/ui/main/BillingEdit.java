@@ -168,7 +168,7 @@ public class BillingEdit extends AppCompatActivity implements OnTaskCompleteList
         }
 
 
-        clear_bill.setOnClickListener(new View.OnClickListener() {
+         clear_bill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(BillingEdit.this);
