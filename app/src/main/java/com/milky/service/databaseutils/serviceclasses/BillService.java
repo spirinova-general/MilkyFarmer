@@ -120,7 +120,7 @@ public class BillService implements IBill {
             //First update all bills with quantity, total, end date etc.
             InsertOrUpdateCurrentBills(currentbillsMap, -1);
 
-            InsertOrUpdateOutstandingBills(-1);
+            //InsertOrUpdateOutstandingBills(-1);
 
             //if we are after roll date...
             if (today.after(rollDate)) {
@@ -198,7 +198,7 @@ public class BillService implements IBill {
     {
         try {
             InsertOrUpdateCurrentBills(getAllCurrentBills(customerId), customerId);
-            InsertOrUpdateOutstandingBills(customerId);
+            //InsertOrUpdateOutstandingBills(customerId);
         }
         catch (Exception e) {
             e.printStackTrace();
