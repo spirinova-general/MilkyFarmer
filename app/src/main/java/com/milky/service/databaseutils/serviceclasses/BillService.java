@@ -59,7 +59,7 @@ public class BillService implements IBill {
     public List<Bill> getAllGlobalBills(boolean reCalculate) {
         try {
             if (reCalculate)
-                RecalculateAllCurrentAndOutstandingBills();
+                RecalculateAllCurrentBills();
 
             Calendar cal = Calendar.getInstance();
             Date today = cal.getTime();
@@ -109,7 +109,7 @@ public class BillService implements IBill {
     }
 
     @Override
-    public void RecalculateAllCurrentAndOutstandingBills() {
+    public void RecalculateAllCurrentBills() {
         try {
             Calendar cal = Calendar.getInstance();
             Date today = cal.getTime();
@@ -119,8 +119,6 @@ public class BillService implements IBill {
 
             //First update all bills with quantity, total, end date etc.
             InsertOrUpdateCurrentBills(currentbillsMap, -1);
-
-            //InsertOrUpdateOutstandingBills(-1);
 
             //if we are after roll date...
             if (today.after(rollDate)) {
@@ -194,11 +192,10 @@ public class BillService implements IBill {
     }
 
     @Override
-    public void updateCustomerBills(int customerId)
+    public void updateCustomerCurrentBill(int customerId)
     {
         try {
             InsertOrUpdateCurrentBills(getAllCurrentBills(customerId), customerId);
-            //InsertOrUpdateOutstandingBills(customerId);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -326,49 +323,6 @@ public class BillService implements IBill {
         return map;
     }
 
-    private List<Bill> getAllOutstandingBills(int customerId ) {
-        String selectquery = "SELECT * FROM " + TableNames.Bill + " WHERE " + TableColumns.IsOutstanding + " ='" + "1'"
-                + " AND " + TableColumns.IsCleared + " ='" + "0'";
-
-
-        if( customerId != -1)
-        {
-            selectquery += " AND " + TableColumns.CustomerId + " ='" + customerId  + "'";
-        }
-
-        List<Bill> bills = new ArrayList<Bill>();
-        Cursor cursor = getDb().rawQuery(selectquery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                Bill holder = new Bill();
-                holder.PopulateFromCursor(cursor);
-                bills.add(holder);
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-        return bills;
-    }
-
-
-    private void InsertOrUpdateOutstandingBills( int customerId) throws Exception {
-        List<Bill> outstandingbills = getAllOutstandingBills(customerId);
-        if (outstandingbills == null || outstandingbills.size() == 0)
-            return;
-
-        for( Bill bill: outstandingbills)
-        {
-            Customers customer = _customerService.getCustomerDetail(bill.getCustomerId(), true);
-            if (customerId != -1 && customerId != bill.getCustomerId())
-                continue;
-            Date startDate = Utils.FromDateString(bill.getStartDate());
-            Date endDate = Utils.FromDateString(bill.getEndDate());
-            QuantityAmount qa = _customerService.getTotalQuantityAndAmount(customer, startDate, endDate);
-            bill.setQuantity(qa.quantity);
-            bill.setTotalAmount(qa.amount);
-            update(bill);
-        }
-    }
 
     private SQLiteDatabase getDb() {
         return AppUtil.getInstance().getDatabaseHandler().getWritableDatabase();

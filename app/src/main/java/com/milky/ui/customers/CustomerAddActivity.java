@@ -25,6 +25,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.milky.R;
 import com.milky.service.core.GlobalSettings;
@@ -35,13 +36,17 @@ import com.milky.service.databaseutils.serviceclasses.AreaService;
 import com.milky.service.databaseutils.serviceclasses.BillService;
 import com.milky.service.databaseutils.serviceclasses.CustomersService;
 import com.milky.service.databaseutils.serviceclasses.CustomersSettingService;
+import com.milky.service.databaseutils.serviceclasses.DeliveryService;
 import com.milky.service.databaseutils.serviceclasses.GlobalSettingsService;
 import com.milky.service.databaseutils.serviceinterface.IBill;
+import com.milky.service.databaseutils.serviceinterface.ICustomers;
+import com.milky.service.databaseutils.serviceinterface.IDelivery;
 import com.milky.ui.adapters.AreaCityAdapter;
 import com.milky.utils.AppUtil;
 import com.milky.utils.Constants;
 import com.milky.utils.TextValidationMessage;
 import com.milky.service.core.Area;
+import com.milky.service.core.Bill;
 import com.milky.service.core.Customers;
 import com.milky.service.core.CustomersSetting;
 
@@ -49,6 +54,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CustomerAddActivity extends AppCompatActivity {
@@ -481,7 +487,7 @@ public class CustomerAddActivity extends AppCompatActivity {
             //Insert customers setting detail...
             new CustomersSettingService().insert(customersSetting);
             IBill billService = new BillService();
-            billService.updateCustomerBills(id);
+            billService.updateCustomerCurrentBill(id);
             return null;
         }
 

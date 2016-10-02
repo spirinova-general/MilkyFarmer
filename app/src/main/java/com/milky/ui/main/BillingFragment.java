@@ -89,7 +89,7 @@ public class BillingFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            //billService.RecalculateAllCurrentAndOutstandingBills();
+            //billService.RecalculateAllCurrentBills();
             bills = billService.getAllGlobalBills(_reCalculateBills);
             return null;
         }

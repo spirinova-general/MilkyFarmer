@@ -13,12 +13,12 @@ public interface IBill {
 
     void SmsBill(int billId,OnTaskCompleteListner listner);
 
-    void RecalculateAllCurrentAndOutstandingBills();
+    void RecalculateAllCurrentBills();
     //To be called from global bill tab
     List<Bill> getAllGlobalBills(boolean reCalculate);
     //To be called from customer bill tab
     List<Bill> getBillsOfCustomer(int customerId);
     Bill getBill(int id);
     void clearBill(Bill bill, double paymentMade);
-    void updateCustomerBills(int customerId);
+    void updateCustomerCurrentBill(int customerId);
 }

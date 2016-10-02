@@ -513,7 +513,7 @@ public class CustomerSettingFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            //billService.RecalculateAllCurrentAndOutstandingBills();
+            //billService.RecalculateAllCurrentBills();
             //bills = billService.getAllGlobalBills(_reCalculateBills);
             ICustomers customersService = new CustomersService();
             customersService.update(customer);
